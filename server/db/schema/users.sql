@@ -1,4 +1,3 @@
--- ask about public.users
 DROP TABLE IF EXISTS public.users CASCADE;
 CREATE TYPE roles AS ENUM('master', 'ccm', 'ccs', 'viewer');
 CREATE TYPE statusType AS ENUM('approved', 'pending', 'rejected');
