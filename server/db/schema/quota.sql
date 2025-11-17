@@ -12,6 +12,10 @@ CREATE TABLE IF NOT EXISTS quota (
     hours INTEGER NOT NULL, 
     appointment_type appointment_type NOT NULL,
     notes VARCHAR(256),
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> 5b73a6aceb5a75fd37a4a5f147944305407c19bd
     CREATE TYPE appointment_type enum('inperson', 'telehealth'),
 );
