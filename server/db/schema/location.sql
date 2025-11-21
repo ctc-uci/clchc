@@ -1,5 +1,6 @@
 DROP TABLE IF EXISTS location CASCADE;
-CREATE TABLE location (
+
+CREATE TABLE IF NOT EXISTS location (
     id SERIAL PRIMARY KEY,
-    tag_value TEXT NOT NULL UNIQUE
+    tag_value TEXT NOT NULL
 );
