@@ -1,0 +1,7 @@
+DROP TABLE IF EXISTS providers CASCADE;
+
+CREATE TABLE IF NOT EXISTS providers (
+    id SERIAL PRIMARY KEY,
+    data JSONB NOT NULL,
+    note TEXT NOT NULL
+);
