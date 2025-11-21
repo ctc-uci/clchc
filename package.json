@@ -13,7 +13,7 @@
     "lint": "eslint",
     "format": "npx prettier --write .",
     "test": "node test-runner.js",
-    "test:server": "yarn workspace server test",
+    "test:server": "yarn workspace server test --reporter=verbose",
     "test:client": "yarn workspace client test"
   },
   "lint-staged": {
