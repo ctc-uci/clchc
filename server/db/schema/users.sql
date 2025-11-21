@@ -4,11 +4,11 @@ CREATE TYPE statusType AS ENUM('approved', 'pending', 'rejected');
 
 CREATE TABLE users (
   id SERIAL PRIMARY KEY,
-  firebase_uid VARCHAR(128) NOT NULL,
+  firebase_uid TEXT NOT NULL UNIQUE,
   role roles NOT NULL,
-  first_name VARCHAR(16) NOT NULL,
-  last_name VARCHAR(16) NOT NULL,
-  email VARCHAR(32) NOT NULL,
+  first_name TEXT NOT NULL,
+  last_name TEXT NOT NULL,
+  email TEXT NOT NULL UNIQUE,
   status statusType  NOT NULL,
-  appt_calc_factor FLOAT,
+  appt_calc_factor FLOAT
 );
