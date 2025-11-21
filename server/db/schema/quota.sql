@@ -1,6 +1,7 @@
-CREATE TYPE appointment_type enum('inperson', 'telehealth'),
-
 DROP TABLE IF EXISTS quota;
+
+CREATE TYPE appointment_type enum('inperson', 'telehealth');
+
 CREATE TABLE IF NOT EXISTS quota (
     id SERIAL PRIMARY KEY,
     provider_id INTEGER NOT NULL,
