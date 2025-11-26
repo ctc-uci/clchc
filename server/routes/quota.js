@@ -31,6 +31,17 @@ quotaRouter.post("/quota", async (req, res) => {
     }
 });
 
+
+// get all quotas
+quotaRouter.get("/quota", async (req, res) => {
+    try {
+      const quotas = await db.query(`SELECT * FROM quota ORDER BY id ASC`);
+      res.status(200).json(keysToCamel(quotas));
+    } catch (err) {
+      res.status(400).send(err.message);
+    }
+  });
+  
 // get all quotas by id
 quotaRouter.get("/quota/:id", async (req, res) => {
   try {
@@ -43,15 +54,6 @@ quotaRouter.get("/quota/:id", async (req, res) => {
   }
 });
 
-// get all quotas
-quotaRouter.get("/quota", async (req, res) => {
-    try {
-      const quotas = await db.query(`SELECT * FROM quota ORDER BY id ASC`);
-      res.status(200).json(keysToCamel(quotas));
-    } catch (err) {
-      res.status(400).send(err.message);
-    }
-  });
 
 // update quota by id
 quotaRouter.put("/quota/:id", async (req, res) => {
