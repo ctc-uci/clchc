@@ -24,6 +24,7 @@ quotaRouter.post("/quota", async (req, res) => {
             RETURNING *`, 
             [provider_id, location_id, quota, progress, hours, appointment_type, notes]
         );
+        res.status(200).json(keysToCamel(result));
 
     } catch (err) {
         res.status(400).send(err.message);
@@ -31,7 +32,7 @@ quotaRouter.post("/quota", async (req, res) => {
 });
 
 // get all quotas by id
-quotaRouter.get("/quota/id:", async (req, res) => {
+quotaRouter.get("/quota/:id", async (req, res) => {
   try {
     const { id } = req.params
     const quotas = await db.query(`SELECT * FROM quota WHERE id = $1`, [id]);
