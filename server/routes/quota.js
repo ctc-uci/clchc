@@ -71,7 +71,7 @@ quotaRouter.put("/quota/:id", async (req, res) => {
         const result = await db.query(
             `UPDATE quota
             SET
-            provider_int = COALESCE($1, provider_int),
+            provider_id = COALESCE($1, provider_id),
             location_id = COALESCE($2, location_id),
             quota = COALESCE($3, quota),
             progress = COALESCE($4, progress),
@@ -80,7 +80,7 @@ quotaRouter.put("/quota/:id", async (req, res) => {
             notes = COALESCE($7, notes)
             WHERE id = $8
             RETURNING *`, 
-            [provider_int, location_id, quota, progress, hours, appointment_type, notes, id]
+            [provider_id, location_id, quota, progress, hours, appointment_type, notes, id]
         )
 
         res.status(200).json(keysToCamel(result));
