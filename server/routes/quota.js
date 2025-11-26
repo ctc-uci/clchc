@@ -60,7 +60,7 @@ quotaRouter.put("/quota/:id", async (req, res) => {
     try {
         const { id } = req.params
         const {
-            provider_int, 
+            provider_id, 
             location_id,
             quota,
             progress,
@@ -78,7 +78,8 @@ quotaRouter.put("/quota/:id", async (req, res) => {
             hours = COALESCE($5, hours),
             appointment_type = COALESCE($6, appointment_type),
             notes = COALESCE($7, notes)
-            WHERE id = $8`, 
+            WHERE id = $8
+            RETURNING *`, 
             [provider_int, location_id, quota, progress, hours, appointment_type, notes, id]
         )
 
