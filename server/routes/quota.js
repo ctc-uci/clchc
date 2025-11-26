@@ -42,7 +42,7 @@ quotaRouter.get("/quota", async (req, res) => {
     }
   });
   
-// get all quotas by id
+// get quotas by id
 quotaRouter.get("/quota/:id", async (req, res) => {
   try {
     const { id } = req.params
