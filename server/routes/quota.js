@@ -90,10 +90,10 @@ quotaRouter.put("/quota/:id", async (req, res) => {
 });
 
 // delete quota by id
-quotaRouter.delete("/quota/id:", async (req, res) => {
+quotaRouter.delete("/quota/:id", async (req, res) => {
     try {
         const { id } = req.params
-        const result = await db.query("DELETE FROM quota WHERE id = $1", [id]);
+        const result = await db.query("DELETE FROM quota WHERE id = $1 RETURNING *", [id]);
 
         res.status(200).json(keysToCamel(result));
     }
