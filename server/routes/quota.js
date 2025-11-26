@@ -9,23 +9,21 @@ export const quotaRouter = Router();
 quotaRouter.post("/quota", async (req, res) => {
     try {
         const {
-            id,
-            provider_int, 
+            provider_id, 
             location_id,
             quota,
             progress,
             hours,
             appointment_type,
             notes
-        } = req.body
+        } = req.body;
 
-        const result = await pool.query(
-            `INSERT INTO quota (id, provider_int, location_id, quota, progress, hours, appointment_type, notes)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-            RETURNING *`, [id, provider_int, location_id, quota, progress, hours, appointment_type, notes]
-        )
-
-        res.status(200).json(keysToCamel(result))
+        const result = await db.query(
+            `INSERT INTO quota (provider_id, location_id, quota, progress, hours, appointment_type, notes)
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            RETURNING *`, 
+            [provider_id, location_id, quota, progress, hours, appointment_type, notes]
+        );
 
     } catch (err) {
         res.status(400).send(err.message);
