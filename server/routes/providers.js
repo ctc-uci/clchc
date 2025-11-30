@@ -7,7 +7,7 @@ providersRouter.post("/", async (req, res) => {
   try {
     const { data, note } = req.body;
 
-    const result = await db.query(
+    const result = await db.one(
       `
       INSERT INTO providers (data, note)
       VALUES ($1, $2)
@@ -15,7 +15,7 @@ providersRouter.post("/", async (req, res) => {
       [data, note]
     );
 
-    res.status(201).json(result[0]);
+    res.status(201).json(result);
   } catch (err) {
     console.error(err);
     res.status(500).send(err.message);
@@ -24,7 +24,7 @@ providersRouter.post("/", async (req, res) => {
 
 providersRouter.get("/", async (req, res) => {
   try {
-    const result = await db.query(`SELECT * FROM providers`);
+    const result = await db.any(`SELECT * FROM providers`);
     res.status(200).json(result);
   } catch (err) {
     console.error(err);
@@ -34,18 +34,16 @@ providersRouter.get("/", async (req, res) => {
 
 providersRouter.get("/:id", async (req, res) => {
   try {
-    const result = await db.query(
+    const result = await db.oneOrNone(
       `
       SELECT * FROM providers 
       WHERE id =  $1`,
       [req.params.id]
     );
 
-    if (result.length === 0) {
-      return res.status(404).send("No provider found");
-    }
+    if (!result) return res.status(404).send("Provider not found");
 
-    res.status(200).json(result[0]);
+    res.status(200).json(result);
   } catch (err) {
     console.error(err);
     res.status(500).send(err.message);
@@ -56,7 +54,7 @@ providersRouter.put("/:id", async (req, res) => {
   try {
     const { data, note } = req.body;
 
-    const result = await db.query(
+    const result = await db.oneOrNone(
       `
       UPDATE providers
       SET data = $1, note = $2
@@ -65,11 +63,9 @@ providersRouter.put("/:id", async (req, res) => {
       [data, note, req.params.id]
     );
 
-    if (result.length === 0) {
-      return res.status(404).send("No provider found");
-    }
+    if (!result) return res.status(404).send("Provider not found");
 
-    res.status(200).json(result[0]);
+    res.status(200).json(result);
   } catch (err) {
     console.error(err);
     res.status(500).send(err.message);
@@ -78,7 +74,7 @@ providersRouter.put("/:id", async (req, res) => {
 
 providersRouter.delete("/:id", async (req, res) => {
   try {
-    const result = await db.query(
+    const result = await db.oneOrNone(
       `
       DELETE FROM providers
       WHERE id = $1
@@ -86,11 +82,9 @@ providersRouter.delete("/:id", async (req, res) => {
       [req.params.id]
     );
 
-    if (result.length === 0) {
-      return res.status(404).send("No provider found");
-    }
+    if (!result) return res.status(404).send("Provider not found");
 
-    res.status(200).json(result[0]);
+    res.status(200).json(result);
   } catch (err) {
     console.error(err);
     res.status(500).send(err.message);
