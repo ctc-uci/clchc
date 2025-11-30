@@ -24,9 +24,8 @@ providersRouter.post("/", async (req, res) => {
 
 providersRouter.get("/", async (req, res) => {
   try {
-    const result = await db.query(`
-          SELECT * FROM providers`);
-    res.status(200).json(result.rows);
+    const result = await db.query(`SELECT * FROM providers`);
+    res.status(200).json(result);
   } catch (err) {
     console.error(err);
     res.status(500).send(err.message);
@@ -41,7 +40,7 @@ providersRouter.get("/:id", async (req, res) => {
           WHERE id =  $1`,
       [req.params.id]
     );
-    res.status(200).json(result.rows[0]);
+    res.status(200).json(result[0]);
   } catch (err) {
     console.error(err);
     res.status(500).send(err.message);
@@ -64,7 +63,7 @@ providersRouter.put("/:id", async (req, res) => {
       return res.status(404).send("No provider found");
     }
 
-    res.status(200).json(result.rows[0]);
+    res.status(200).json(result[0]);
   } catch (err) {
     console.error(err);
     res.status(500).send(err.message);
@@ -80,7 +79,7 @@ providersRouter.delete("/:id", async (req, res) => {
         RETURNING *`,
       [req.params.id]
     );
-    res.status(200).json(result.rows[0]);
+    res.status(200).json(result[0]);
   } catch (err) {
     console.error(err);
     res.status(500).send(err.message);
