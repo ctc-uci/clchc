@@ -1,5 +1,5 @@
 import express from 'express';
-import { db } from '../db/db-pgp.js';
+import { db } from '@/db/db-pgp';
 
 const router = express.Router();
 
@@ -66,4 +66,4 @@ router.delete('/:id', async(req,res)=>{
     }
 });
 
-export default router;
+export const usersJsRouter = router;
