@@ -2,16 +2,16 @@ import { db } from "@/db/db-pgp";
 import express from "express";
 
 const providersRouter = express.Router();
-providersRouter.use(express.json());
 
 providersRouter.post("/", async (req, res) => {
   try {
     const { data, note } = req.body;
 
     const result = await db.query(
-      `INSERT INTO providers (data, note)
-            VALUES ($1, $2)
-            RETURNING *`,
+      `
+      INSERT INTO providers (data, note)
+      VALUES ($1, $2)
+      RETURNING *`,
       [data, note]
     );
 
@@ -36,8 +36,8 @@ providersRouter.get("/:id", async (req, res) => {
   try {
     const result = await db.query(
       `
-          SELECT * FROM providers 
-          WHERE id =  $1`,
+      SELECT * FROM providers 
+      WHERE id =  $1`,
       [req.params.id]
     );
 
@@ -57,7 +57,8 @@ providersRouter.put("/:id", async (req, res) => {
     const { data, note } = req.body;
 
     const result = await db.query(
-      `UPDATE providers
+      `
+      UPDATE providers
       SET data = $1, note = $2
       WHERE id = $3
       RETURNING *`,
@@ -79,9 +80,9 @@ providersRouter.delete("/:id", async (req, res) => {
   try {
     const result = await db.query(
       `
-        DELETE FROM providers
-        WHERE id = $1
-        RETURNING *`,
+      DELETE FROM providers
+      WHERE id = $1
+      RETURNING *`,
       [req.params.id]
     );
 
