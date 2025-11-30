@@ -40,6 +40,11 @@ providersRouter.get("/:id", async (req, res) => {
           WHERE id =  $1`,
       [req.params.id]
     );
+
+    if (result.length === 0) {
+      return res.status(404).send("No provider found");
+    }
+
     res.status(200).json(result[0]);
   } catch (err) {
     console.error(err);
@@ -59,7 +64,7 @@ providersRouter.put("/:id", async (req, res) => {
       [data, note, req.params.id]
     );
 
-    if (result.rows.length === 0) {
+    if (result.length === 0) {
       return res.status(404).send("No provider found");
     }
 
@@ -79,6 +84,11 @@ providersRouter.delete("/:id", async (req, res) => {
         RETURNING *`,
       [req.params.id]
     );
+
+    if (result.length === 0) {
+      return res.status(404).send("No provider found");
+    }
+
     res.status(200).json(result[0]);
   } catch (err) {
     console.error(err);
