@@ -4,10 +4,10 @@ import { db } from "@/db/db-pgp"; // TODO: replace this db with
 import { verifyRole } from "@/middleware";
 import { Router } from "express";
 
-export const usersRouter = Router();
+export const directoryCategoriesRouter = Router();
 
 // Get all directory categories
-usersRouter.get("/:id", async (req, res) => {
+directoryCategoriesRouter.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const categories = await db.query(`SELECT * FROM directory_categories WHERE id = $1`, [id]);
@@ -19,7 +19,7 @@ usersRouter.get("/:id", async (req, res) => {
 });
 
 // Adds a new category
-usersRouter.post("/create", async (req, res) => {
+directoryCategoriesRouter.post("/create", async (req, res) => {
   try {
     const { id, name, input_type, is_required, date_created, column_order } = req.body;
     const categories = await db.query(
@@ -35,7 +35,7 @@ usersRouter.post("/create", async (req, res) => {
 
 
 // Delete a category
-usersRouter.delete("/:id", async (req, res) => {
+directoryCategoriesRouter.delete("/:id", async (req, res) => {
   try {
     const { id } = req.params;
     await admin.auth().deleteUser(id);
@@ -50,7 +50,7 @@ usersRouter.delete("/:id", async (req, res) => {
 });
 
 // Updates only the fields present in the request body
-usersRouter.patch("/:id", async (req, res) => {
+directoryCategoriesRouter.patch("/:id", async (req, res) => {
     try {
         const { id } = req.params;
         const { name, column_order } = req.body;
