@@ -38,7 +38,6 @@ directoryCategoriesRouter.post("/create", async (req, res) => {
 directoryCategoriesRouter.delete("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    await admin.auth().deleteUser(id);
     const categories = await db.query("DELETE FROM directory_categories WHERE id = $1", [
       id,
     ]);
