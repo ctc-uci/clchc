@@ -53,10 +53,20 @@ directoryCategoriesRouter.delete("/:id", async (req, res) => {
 directoryCategoriesRouter.patch("/:id", async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, column_order } = req.body;
-        const categories = await db.query("UPDATE directory_categories SET name = $1 WHERE column_order = $2 RETURNING *",[
-            name, column_order
-        ]);
+        const fields = req.body;
+        if (Object.keys(req.body).length === 0) {
+            return res.status(200).send({ message: "No fields to update" });
+        }
+        const updates = [];
+        const values = [];
+        values.push(id);
+        let index = 2;
+        for (const key in fields) {
+          updates.push(`${key} = $${index}`);
+          values.push(fields[key]);
+          index++;
+        }
+        const categories = await db.query(`UPDATE directory_categories SET ${updates.join(", ")} WHERE id = $1 RETURNING *`, values);
         
         res.status(200).json(keysToCamel(categories));
     } catch (err) {

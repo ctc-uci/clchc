@@ -7,7 +7,7 @@
   "author": "CTC <ctc@uci.edu>",
   "license": "MIT",
   "scripts": {
-    "dev": "tsx concurrently.ts",
+    "dev": "yarn tsx concurrently.ts",
     "start": "yarn tsx concurrently.ts",
     "prepare": "husky install",
     "lint": "eslint",
