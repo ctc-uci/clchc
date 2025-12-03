@@ -2,6 +2,7 @@ import { verifyToken } from "@/middleware";
 import { providersRouter } from "@/routes/providers";
 import { sampleRouter } from "@/routes/sample"; // TODO: delete sample router
 import { usersRouter } from "@/routes/users";
+import { providersRouter } from "@/routes/providers";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
