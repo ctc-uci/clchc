@@ -1,19 +1,20 @@
 import express from 'express';
 import { db } from '@/db/db-pgp';
+import { keysToCamel } from '@/common/utils';
 
 const router = express.Router();
 
 // Create a new user
 router.post('/',async(req,res) =>{
     try {
-        const { email, firebase_uid } = req.body;
+        const { email, firebaseUid } = req.body;
         
-        const user = await db.query(
+        const result = await db.query(
         'INSERT INTO users (email, firebase_uid) VALUES ($1, $2) RETURNING *',
-        [email, firebase_uid]
+        [email, firebaseUid]
         );
         
-        res.status(201).json(user);
+        res.status(201).json(keysToCamel(result));
   } catch (err) {
         res.status(500).send(err.message);
   }
@@ -21,8 +22,8 @@ router.post('/',async(req,res) =>{
 // Get all users
 router.get('/', async(req,res)=>{
     try{
-        const user = await db.query('SELECT * from users');
-        res.status(200).json(user);
+        const result = await db.query('SELECT * from users');
+        res.status(200).json(keysToCamel(result));
     } catch(err){
         res.status(500).send(err.message);
     }
@@ -32,8 +33,8 @@ router.get('/:id', async(req,res)=>{
     try{
         const {id} = req.params
 
-        const user = await db.query('SELECT * from users WHERE id=$1',[id]);
-        res.status(200).json(user);
+        const result = await db.query('SELECT * from users WHERE id=$1',[id]);
+        res.status(200).json(keysToCamel(result));
     } catch(err){
         res.status(500).send(err.message);
     }
@@ -42,14 +43,14 @@ router.get('/:id', async(req,res)=>{
 router.put('/:id', async(req,res)=>{
     try{
         const {id} = req.params;
-        const { email, firebase_uid } = req.body;
+        const { email, firebaseUid } = req.body;
         
-        const user = await db.query(
+        const result = await db.query(
         'UPDATE users SET email=$1, firebase_uid=$2 WHERE id=$3 RETURNING *',
-        [email, firebase_uid, id]
+        [email, firebaseUid, id]
         );
         
-        res.status(200).json(user);
+        res.status(200).json(keysToCamel(result));
     } catch(err){
         res.status(500).send(err.message); 
     }
@@ -59,8 +60,8 @@ router.delete('/:id', async(req,res)=>{
     try{
         const {id} = req.params;
 
-        const user = await db.query('DELETE FROM users WHERE id=$1 RETURNING *',[id]);
-        res.status(200).json(user);
+        const result = await db.query('DELETE FROM users WHERE id=$1 RETURNING *',[id]);
+        res.status(200).json(keysToCamel(result));
     } catch(err){
         res.status(500).send(err.message);
     }
