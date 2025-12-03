@@ -105,7 +105,7 @@ quotaRouter.delete("/:id", async (req, res) => {
             return res.status(404).json({ error: `Quota with id ${id} not found.`}); 
         }
         else {
-            res.status(200).json(keysToCamel(quotas));
+            res.status(200).json(keysToCamel(result));
         }
         res.status(200).json(keysToCamel(result));
     }
