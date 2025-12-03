@@ -42,6 +42,5 @@
   "packageManager": "yarn@1.22.22",
   "engines": {
     "node": ">=18"
-  },
-  "dependencies": {}
+  }
 }
