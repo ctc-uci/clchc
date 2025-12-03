@@ -21,6 +21,10 @@ tagsRouter.get("/:id", async (req, res) => {
     const { id } = req.params;
     const tags = await db.query("SELECT * FROM tags where id = $1", [id]);
 
+    if (tags.length === 0) {
+      return res.status(404).send("Tag not found");
+    }
+
     res.status(200).json(keysToCamel(tags));
   } catch (err) {
     res.status(500).send(err.message);
@@ -44,10 +48,13 @@ tagsRouter.delete("/:id", async (req, res) => {
 // Create Tag
 tagsRouter.post("/", async (req, res) => {
   try {
-    const { id, category_id, tag_value } = req.body;
+    const { id, categoryId, tagValue } = req.body;
+    if ( !categoryId || !tagValue) {
+      return res.status(400).send("Missing one or more required fields: categoryId, tagValue");
+    }
     const tag = await db.query(
-      "INSERT INTO tags (id, category_id, tag_value) VALUES ($1, $2, $3) RETURNING *",
-      [id, category_id, tag_value]
+      "INSERT INTO tags (category_id, tag_value) VALUES ($1, $2) RETURNING *",
+      [categoryId, tagValue]
     );
 
     res.status(200).json(keysToCamel(tag));
@@ -60,10 +67,13 @@ tagsRouter.post("/", async (req, res) => {
 tagsRouter.put("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const { category_id, tag_value } = req.body;
+    const { categoryId, tagValue } = req.body;
+    if (!categoryId || !tagValue) {
+      return res.status(400).send("Missing one or more required fields: categoryId, tagValue");
+    }
     const tag = await db.query(
-      "UPDATE tags SET category_id = $2, tag_value = $3 WHERE id = $1 RETURNING *",
-      [id, category_id, tag_value]
+      "UPDATE tags SET category_id = $1, tag_value = $2 WHERE id = $3 RETURNING *",
+      [categoryId, tagValue, id]
     );
     res.status(200).json(keysToCamel(tag));
   } catch (err) {
