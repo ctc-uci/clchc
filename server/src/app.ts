@@ -33,7 +33,7 @@ if (process.env.NODE_ENV === "production") {
 
 app.use("/", sampleRouter); // TODO: delete sample endpoint
 app.use("/users", usersRouter);
-app.use("/", quotaRouter);
+app.use("/quota", quotaRouter);
 
 // Listening is moved to server.ts to enable importing app in tests
 export default app;

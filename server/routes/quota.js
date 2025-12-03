@@ -6,23 +6,23 @@ import { Router } from "express";
 export const quotaRouter = Router();
 
 // create quota
-quotaRouter.post("/quota", async (req, res) => {
+quotaRouter.post("/", async (req, res) => {
     try {
         const {
-            provider_id, 
-            location_id,
+            providerId, 
+            locationId,
             quota,
             progress,
             hours,
-            appointment_type,
+            appointmentType,
             notes
         } = req.body;
 
         const result = await db.query(
-            `INSERT INTO quota (provider_id, location_id, quota, progress, hours, appointment_type, notes)
+            `INSERT INTO quota (providerId, locationId, quota, progress, hours, appointmentType, notes)
             VALUES ($1, $2, $3, $4, $5, $6, $7)
             RETURNING *`, 
-            [provider_id, location_id, quota, progress, hours, appointment_type, notes]
+            [providerId, locationId, quota, progress, hours, appointmentType, notes]
         );
         res.status(200).json(keysToCamel(result));
 
@@ -33,7 +33,7 @@ quotaRouter.post("/quota", async (req, res) => {
 
 
 // get all quotas
-quotaRouter.get("/quota", async (req, res) => {
+quotaRouter.get("/", async (req, res) => {
     try {
       const quotas = await db.query(`SELECT * FROM quota ORDER BY id ASC`);
       res.status(200).json(keysToCamel(quotas));
@@ -43,12 +43,18 @@ quotaRouter.get("/quota", async (req, res) => {
   });
   
 // get quotas by id
-quotaRouter.get("/quota/:id", async (req, res) => {
+quotaRouter.get("/:id", async (req, res) => {
   try {
     const { id } = req.params
     const quotas = await db.query(`SELECT * FROM quota WHERE id = $1`, [id]);
 
-    res.status(200).json(keysToCamel(quotas));
+    if (quotas.length === 0) {
+       return res.status(404).json({ error: `Quota with id ${id} not found.`}); 
+    }
+    else {
+        res.status(200).json(keysToCamel(quotas));
+    }
+    
   } catch (err) {
     res.status(400).send(err.message);
   }
@@ -56,7 +62,7 @@ quotaRouter.get("/quota/:id", async (req, res) => {
 
 
 // update quota by id
-quotaRouter.put("/quota/:id", async (req, res) => {
+quotaRouter.put("/:id", async (req, res) => {
     try {
         const { id } = req.params
         const {
@@ -90,11 +96,17 @@ quotaRouter.put("/quota/:id", async (req, res) => {
 });
 
 // delete quota by id
-quotaRouter.delete("/quota/:id", async (req, res) => {
+quotaRouter.delete("/:id", async (req, res) => {
     try {
         const { id } = req.params
         const result = await db.query("DELETE FROM quota WHERE id = $1 RETURNING *", [id]);
 
+        if (result.length === 0) {
+            return res.status(404).json({ error: `Quota with id ${id} not found.`}); 
+        }
+        else {
+            res.status(200).json(keysToCamel(quotas));
+        }
         res.status(200).json(keysToCamel(result));
     }
     catch (err) {
