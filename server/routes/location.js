@@ -2,10 +2,10 @@ import { keysToCamel } from "@/common/utils";
 import express from "express";
 import { db } from "@/db/db-pgp";
 
-const router = express.Router();
+export const locationRouter = express.Router();
 
 //Create (POST /location) - adds a new location to the Location table
-router.post("/", async (req, res) => {
+locationRouter.post("/", async (req, res) => {
     try {
         const { tagValue } = req.body;
 
@@ -26,7 +26,7 @@ router.post("/", async (req, res) => {
 });
 
 //Read (GET /location, GET /location/:id) - gets all locations and gets location by ID
-router.get("/", async (req, res) => {
+locationRouter.get("/", async (req, res) => {
   try {
     const allLocations = await db.query("SELECT * FROM location");
 
@@ -38,7 +38,7 @@ router.get("/", async (req, res) => {
 });
 
 //Read (GET /location/:id) - gets location by ID (Added error handling for not found)
-router.get("/:id", async (req, res) => {
+locationRouter.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const location = await db.query(
@@ -58,7 +58,7 @@ router.get("/:id", async (req, res) => {
 });
 
 //Update (PUT/PATCH /location/:id) - updates the values of a location
-router.put("/:id", async (req, res) => {
+locationRouter.put("/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const { tagValue } = req.body;
@@ -80,7 +80,7 @@ router.put("/:id", async (req, res) => {
 });
 
 //Delete (DELETE /location/:id) - deletes a location from the Location Table
-router.delete("/:id", async (req, res) => {
+locationRouter.delete("/:id", async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -89,7 +89,8 @@ router.delete("/:id", async (req, res) => {
       [Number(id)]
     );
 
-    if (deletedCount === 0) {
+    //This doesn't work as intended, need to check length of returned array
+    if (deletedCount.length === 0) {
       return res.status(404).json({ error: "Location not found." });
     }
 
@@ -99,6 +100,3 @@ router.delete("/:id", async (req, res) => {
     res.status(500).json({ error: "Internal server error." });
   }
 });
-
-// Export the router
-export default router;
