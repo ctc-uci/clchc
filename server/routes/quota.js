@@ -66,12 +66,12 @@ quotaRouter.put("/:id", async (req, res) => {
     try {
         const { id } = req.params
         const {
-            provider_id, 
-            location_id,
+            providerId, 
+            locationId,
             quota,
             progress,
             hours,
-            appointment_type,
+            appointmentType,
             notes
         } = req.body;
         const result = await db.query(
