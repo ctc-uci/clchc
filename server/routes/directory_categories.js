@@ -7,26 +7,39 @@ import { Router } from "express";
 export const directoryCategoriesRouter = Router();
 
 // Get all directory categories
-directoryCategoriesRouter.get("/:id", async (req, res) => {
+directoryCategoriesRouter.get("/", async (req, res) => {
   try {
-    const { id } = req.params;
-    const categories = await db.query(`SELECT * FROM directory_categories WHERE id = $1`, [id]);
-
+    const { id } = req.params; 
+    const categories = await db.query(`SELECT * FROM directory_categories`, []);
     res.status(200).json(keysToCamel(categories));
   } catch (err) {
     res.status(400).send(err.message);
   }
 });
 
-// Adds a new category
-directoryCategoriesRouter.post("/create", async (req, res) => {
+// Get directory categories by id
+directoryCategoriesRouter.get("/:id", async (req, res) => {
   try {
-    const { id, name, input_type, is_required, date_created, column_order } = req.body;
-    const categories = await db.query(
-      "INSERT INTO directory_categories (id, name, input_type, is_required, date_created, column_order) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
-      [id, name, input_type, is_required, date_created, column_order]
-    );
+    const { id } = req.params;
+    const categories = await db.query(`SELECT * FROM directory_categories WHERE id = $1`, [id]);
+    if (categories.rows.length === 0) {
+      res.status(404).json({ error: "Not found" });
+    } else {
+      res.status(200).json(keysToCamel(categories));
+    }
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+});
 
+// Adds a new category
+directoryCategoriesRouter.post("/", async (req, res) => {
+  try {
+    const { name, inputType, isRequired, dateCreated, columnOrder } = req.body;
+    const categories = await db.query(
+      "INSERT INTO directory_categories (name, input_type, is_required, date_created, column_order) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+      [name, inputType, isRequired, dateCreated, columnOrder]
+    );
     res.status(200).json(keysToCamel(categories));
   } catch (err) {
     res.status(500).send(err.message);
@@ -41,8 +54,11 @@ directoryCategoriesRouter.delete("/:id", async (req, res) => {
     const categories = await db.query("DELETE FROM directory_categories WHERE id = $1", [
       id,
     ]);
-
-    res.status(200).json(keysToCamel(categories));
+    if (categories.rows.length === 0) {
+      res.status(404).json({ error: "Not found" });
+    } else {
+      res.status(200).json(keysToCamel(categories));
+    }
   } catch (err) {
     res.status(400).send(err.message);
   }
@@ -66,8 +82,11 @@ directoryCategoriesRouter.patch("/:id", async (req, res) => {
           index++;
         }
         const categories = await db.query(`UPDATE directory_categories SET ${updates.join(", ")} WHERE id = $1 RETURNING *`, values);
-        
-        res.status(200).json(keysToCamel(categories));
+        if (categories.rows.length === 0) {
+          res.status(404).json({ error: "Not found" });
+        } else {
+          res.status(200).json(keysToCamel(categories));
+        }
     } catch (err) {
         res.status(400).send(err.message);
     }
