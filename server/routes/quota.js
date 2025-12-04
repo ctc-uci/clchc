@@ -66,27 +66,27 @@ quotaRouter.put("/:id", async (req, res) => {
     try {
         const { id } = req.params
         const {
-            provider_id, 
-            location_id,
+            providerId, 
+            locationId,
             quota,
             progress,
             hours,
-            appointment_type,
+            appointmentType,
             notes
         } = req.body;
         const result = await db.query(
             `UPDATE quota
             SET
-            provider_id = COALESCE($1, provider_id),
-            location_id = COALESCE($2, location_id),
+            providerId = COALESCE($1, providerId),
+            locationId = COALESCE($2, locationId),
             quota = COALESCE($3, quota),
             progress = COALESCE($4, progress),
             hours = COALESCE($5, hours),
-            appointment_type = COALESCE($6, appointment_type),
+            appointmentType = COALESCE($6, appointmentType),
             notes = COALESCE($7, notes)
             WHERE id = $8
             RETURNING *`, 
-            [provider_id, location_id, quota, progress, hours, appointment_type, notes, id]
+            [providerId, locationId, quota, progress, hours, appointmentType, notes, id]
         )
 
         if (result.length === 0) {
