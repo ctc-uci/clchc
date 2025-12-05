@@ -50,9 +50,9 @@ versionLogRouter.put("/:id", async (req, res) => {
     const { userId, quotaId, action } = req.body;
     const updated = await db.query(
       `UPDATE version_log
-       SET user_id = $1,
-           quota_id = $2,
-           action = $3
+       SET user_id = COALESCE($1, user_id),
+           quota_id = COALESCE($2, quota_id),
+           action = COALESCE($3, action)
        WHERE id = $4
        RETURNING *`,
       [userId, quotaId, action, id]
