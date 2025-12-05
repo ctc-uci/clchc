@@ -39,6 +39,10 @@ tagsRouter.delete("/:id", async (req, res) => {
       id,
     ]);
 
+    if (tags.length === 0) {
+      return res.status(404).send("Tag not found");
+    }
+
     res.status(200).json(keysToCamel(tag));
   } catch (err) {
     res.status(400).send(err.message);
@@ -48,9 +52,11 @@ tagsRouter.delete("/:id", async (req, res) => {
 // Create Tag
 tagsRouter.post("/", async (req, res) => {
   try {
-    const { id, categoryId, tagValue } = req.body;
-    if ( !categoryId || !tagValue) {
-      return res.status(400).send("Missing one or more required fields: categoryId, tagValue");
+    const { categoryId, tagValue } = req.body;
+    if (!categoryId || !tagValue) {
+      return res
+        .status(400)
+        .send("Missing one or more required fields: categoryId, tagValue");
     }
     const tag = await db.query(
       "INSERT INTO tags (category_id, tag_value) VALUES ($1, $2) RETURNING *",
@@ -69,12 +75,18 @@ tagsRouter.put("/:id", async (req, res) => {
     const { id } = req.params;
     const { categoryId, tagValue } = req.body;
     if (!categoryId || !tagValue) {
-      return res.status(400).send("Missing one or more required fields: categoryId, tagValue");
+      return res
+        .status(400)
+        .send("Missing one or more required fields: categoryId, tagValue");
     }
     const tag = await db.query(
       "UPDATE tags SET category_id = $1, tag_value = $2 WHERE id = $3 RETURNING *",
       [categoryId, tagValue, id]
     );
+
+    if (tags.length === 0) {
+      return res.status(404).send("Tag not found");
+    }
     res.status(200).json(keysToCamel(tag));
   } catch (err) {
     res.status(400).send(err.message);
