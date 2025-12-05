@@ -1,6 +1,7 @@
 import { verifyToken } from "@/middleware";
 import { sampleRouter } from "@/routes/sample"; // TODO: delete sample router
 import { usersRouter } from "@/routes/users";
+import { tagsRouter } from "@/routes/tags";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -32,6 +33,7 @@ if (process.env.NODE_ENV === "production") {
 
 app.use("/", sampleRouter); // TODO: delete sample endpoint
 app.use("/users", usersRouter);
+app.use("/tags", tagsRouter);
 
 // Listening is moved to server.ts to enable importing app in tests
 export default app;
