@@ -6,16 +6,16 @@ import { keysToCamel } from "@/common/utils";
 export const versionLogRouter = Router();
 
 
-versionLogRouter.post("/create", async (req, res) => {
+versionLogRouter.post("/", async (req, res) => {
   try {
-    const { user_id, quota_id, action } = req.body;
+    const { userId, quotaId, action } = req.body;
     const result = await db.query(
       `INSERT INTO version_log (user_id, quota_id, action)
        VALUES ($1, $2, $3) RETURNING *`,
-      [user_id, quota_id, action]
+      [userId, quotaId, action]
     );
 
-    res.status(201).json(result);
+    res.status(201).json(keysToCamel(result));
   } catch (err) {
     res.status(500).send(err.message);
   }
@@ -44,10 +44,10 @@ versionLogRouter.get("/:id", async (req, res) => {
   }
 });
 
-versionLogRouter.put("/update/:id", async (req, res) => {
+versionLogRouter.put("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const { user_id, quota_id, action } = req.body;
+    const { userId, quotaId, action } = req.body;
     const updated = await db.query(
       `UPDATE version_log
        SET user_id = $1,
@@ -55,10 +55,10 @@ versionLogRouter.put("/update/:id", async (req, res) => {
            action = $3
        WHERE id = $4
        RETURNING *`,
-      [user_id, quota_id, action, id]
+      [userId, quotaId, action, id]
     );
 
-    res.status(200).json(updated);
+    res.status(200).json(keysToCamel(updated));
   } catch (err) {
     res.status(400).send(err.message);
   }
@@ -73,7 +73,7 @@ versionLogRouter.delete("/:id", async (req, res) => {
       [id]
     );
 
-    res.status(200).json(deleted);
+    res.status(200).json(keysToCamel(deleted));
   } catch (err) {
     res.status(400).send(err.message);
   }
