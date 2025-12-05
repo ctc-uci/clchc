@@ -9,6 +9,11 @@ export const versionLogRouter = Router();
 versionLogRouter.post("/", async (req, res) => {
   try {
     const { userId, quotaId, action } = req.body;
+
+    if(!userId || !quotaId || !action){
+      return res.status(404).json({error: "Parameters not sufficient; userId, quotaId, and action are required."});
+    }
+
     const result = await db.query(
       `INSERT INTO version_log (user_id, quota_id, action)
        VALUES ($1, $2, $3) RETURNING *`,
@@ -38,6 +43,10 @@ versionLogRouter.get("/:id", async (req, res) => {
       id,
     ]);
 
+    if(versionLog.length === 0){
+      return res.status(404).json({ error: `id: ${id} was not found.` })
+    }
+
     res.status(200).json(keysToCamel(versionLog));
   } catch (err) {
     res.status(400).send(err.message);
@@ -58,6 +67,10 @@ versionLogRouter.put("/:id", async (req, res) => {
       [userId, quotaId, action, id]
     );
 
+    if(versionLog.length === 0){
+      return res.status(404).json({ error: `id: ${id} was not found.` })
+    }
+
     res.status(200).json(keysToCamel(updated));
   } catch (err) {
     res.status(400).send(err.message);
@@ -72,6 +85,10 @@ versionLogRouter.delete("/:id", async (req, res) => {
       `DELETE FROM version_log WHERE id = $1 RETURNING *`,
       [id]
     );
+
+    if(versionLog.length === 0){
+      return res.status(404).json({ error: `id: ${id} was not found.` })
+    }
 
     res.status(200).json(keysToCamel(deleted));
   } catch (err) {
