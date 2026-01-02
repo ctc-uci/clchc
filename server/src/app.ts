@@ -2,6 +2,7 @@ import { verifyToken } from "@/middleware";
 import { quotaRouter } from "@/routes/quota";
 import { providersRouter } from "@/routes/providers";
 import { sampleRouter } from "@/routes/sample"; // TODO: delete sample router
+import { versionLogRouter } from "@/routes/versionLog";
 import { usersRouter } from "@/routes/users";
 import { tagsRouter } from "@/routes/tags";
 import { directoryCategoriesRouter } from "@/routes/directory_categories";
@@ -37,6 +38,7 @@ if (process.env.NODE_ENV === "production") {
 
 app.use("/", sampleRouter); // TODO: delete sample endpoint
 app.use("/users", usersRouter);
+app.use("/versionLog", versionLogRouter);
 app.use("/tags", tagsRouter);
 app.use("/quota", quotaRouter);
 app.use("/directoryCategories", directoryCategoriesRouter);
