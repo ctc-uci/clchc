@@ -39,7 +39,7 @@ tagsRouter.delete("/:id", async (req, res) => {
       id,
     ]);
 
-    if (tags.length === 0) {
+    if (tag.length === 0) {
       return res.status(404).send("Tag not found");
     }
 
@@ -74,17 +74,17 @@ tagsRouter.put("/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const { categoryId, tagValue } = req.body;
-    if (!categoryId || !tagValue) {
-      return res
-        .status(400)
-        .send("Missing one or more required fields: categoryId, tagValue");
-    }
+    
     const tag = await db.query(
-      "UPDATE tags SET category_id = $1, tag_value = $2 WHERE id = $3 RETURNING *",
+      `UPDATE tags 
+      SET 
+      category_id = COALESCE($1, category_id),
+      tag_value = COALESCE($2, tag_value)
+      WHERE id = $3 RETURNING *`,
       [categoryId, tagValue, id]
     );
 
-    if (tags.length === 0) {
+    if (tag.length === 0) {
       return res.status(404).send("Tag not found");
     }
     res.status(200).json(keysToCamel(tag));
