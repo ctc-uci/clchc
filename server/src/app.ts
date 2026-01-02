@@ -3,6 +3,7 @@ import { quotaRouter } from "@/routes/quota";
 import { providersRouter } from "@/routes/providers";
 import { sampleRouter } from "@/routes/sample"; // TODO: delete sample router
 import { usersRouter } from "@/routes/users";
+import { tagsRouter } from "@/routes/tags";
 import { directoryCategoriesRouter } from "@/routes/directory_categories";
 import  { locationRouter }  from "@/routes/location";
 import cookieParser from "cookie-parser";
@@ -36,6 +37,7 @@ if (process.env.NODE_ENV === "production") {
 
 app.use("/", sampleRouter); // TODO: delete sample endpoint
 app.use("/users", usersRouter);
+app.use("/tags", tagsRouter);
 app.use("/quota", quotaRouter);
 app.use("/directoryCategories", directoryCategoriesRouter);
 app.use("/location", locationRouter);
