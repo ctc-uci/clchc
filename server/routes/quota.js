@@ -19,7 +19,7 @@ quotaRouter.post("/", async (req, res) => {
         } = req.body;
 
         const result = await db.query(
-            `INSERT INTO quota (providerId, locationId, quota, progress, hours, appointmentType, notes)
+            `INSERT INTO quota (provider_id, location_id, quota, progress, hours, appointment_type, notes)
             VALUES ($1, $2, $3, $4, $5, $6, $7)
             RETURNING *`, 
             [providerId, locationId, quota, progress, hours, appointmentType, notes]
@@ -36,6 +36,7 @@ quotaRouter.post("/", async (req, res) => {
 quotaRouter.get("/", async (req, res) => {
     try {
       const quotas = await db.query(`SELECT * FROM quota ORDER BY id ASC`);
+
       res.status(200).json(keysToCamel(quotas));
     } catch (err) {
       res.status(400).send(err.message);
@@ -77,12 +78,12 @@ quotaRouter.put("/:id", async (req, res) => {
         const result = await db.query(
             `UPDATE quota
             SET
-            providerId = COALESCE($1, providerId),
-            locationId = COALESCE($2, locationId),
+            provider_id = COALESCE($1, provider_id),
+            location_id = COALESCE($2, location_id),
             quota = COALESCE($3, quota),
             progress = COALESCE($4, progress),
             hours = COALESCE($5, hours),
-            appointmentType = COALESCE($6, appointmentType),
+            appointment_type = COALESCE($6, appointment_type),
             notes = COALESCE($7, notes)
             WHERE id = $8
             RETURNING *`, 
