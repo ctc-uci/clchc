@@ -67,7 +67,7 @@ versionLogRouter.put("/:id", async (req, res) => {
       [userId, quotaId, action, id]
     );
 
-    if(versionLog.length === 0){
+    if(updated.length === 0){
       return res.status(404).json({ error: `id: ${id} was not found.` })
     }
 
@@ -86,7 +86,7 @@ versionLogRouter.delete("/:id", async (req, res) => {
       [id]
     );
 
-    if(versionLog.length === 0){
+    if(deleted.length === 0){
       return res.status(404).json({ error: `id: ${id} was not found.` })
     }
 
