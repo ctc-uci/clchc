@@ -5,13 +5,11 @@ import {
   IconButton,
   Stack,
   Table,
-  //   TableCaption,
   TableContainer,
   Tbody,
   Td,
   Th,
   Thead,
-  //   Tfoot,
   Tr,
 } from "@chakra-ui/react";
 
