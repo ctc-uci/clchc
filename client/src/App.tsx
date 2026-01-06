@@ -2,6 +2,7 @@ import { Admin } from "@/components/admin/Admin";
 import { CatchAll } from "@/components/CatchAll";
 import { Dashboard } from "@/components/dashboard/Dashboard";
 import { Login } from "@/components/login/Login";
+import { Playground } from "@/components/Playground";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { Signup } from "@/components/signup/Signup";
 import { AuthProvider } from "@/contexts/AuthContext";
@@ -30,6 +31,10 @@ const App = () => {
                 <Route
                   path="/signup"
                   element={<Signup />}
+                />
+                <Route
+                  path="/playground"
+                  element={<Playground />}
                 />
                 <Route
                   path="/dashboard"
