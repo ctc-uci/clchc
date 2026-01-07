@@ -42,5 +42,8 @@
   "packageManager": "yarn@1.22.22",
   "engines": {
     "node": ">=18"
+  },
+  "dependencies": {
+    "@chakra-ui/icons": "^2.2.4"
   }
 }

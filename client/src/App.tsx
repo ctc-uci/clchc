@@ -5,6 +5,8 @@ import { Login } from "@/components/login/Login";
 import { Playground } from "@/components/Playground";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { Signup } from "@/components/signup/Signup";
+import { QuotaTracking } from "@/components/QuotaTrackingPage";
+import { UserDirectory } from "@/components/UserDirectoryPage";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { BackendProvider } from "@/contexts/BackendContext";
 import { RoleProvider } from "@/contexts/RoleContext";
@@ -24,6 +26,14 @@ const App = () => {
           <RoleProvider>
             <Router>
               <Routes>
+                <Route
+                  path="/user_directory"
+                  element={<UserDirectory/>}
+                />
+                <Route
+                  path="/quota_tracking"
+                  element={<QuotaTracking/>}
+                />
                 <Route
                   path="/login"
                   element={<Login />}
