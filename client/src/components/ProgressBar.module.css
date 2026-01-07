@@ -1,0 +1,12 @@
+.progress-bar {
+    display: flex;
+    gap: 0.5em;
+    align-items: center;
+}
+
+.button {
+    width: 17px;
+    height: 22px;
+    border: 1px black solid;
+    border-radius: 5px;
+}
