@@ -29,7 +29,7 @@ export const UserDirectory = () => {
                         <PopoverContent width="auto">
                             <PopoverArrow />
                             <PopoverBody>
-                                <Input type="date" onChange={(e) => setSelectedDate(e.target.value)} />
+                                <Input type="date"/>
                             </PopoverBody>
                         </PopoverContent>
                     </Popover>
