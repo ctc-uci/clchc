@@ -1,6 +1,8 @@
 import React from "react";
 
-import { Button, Flex, Progress } from "@chakra-ui/react";
+import { Button, Flex, Progress, Icon, } from "@chakra-ui/react";
+
+import {ArrowUp, ArrowDown} from "lucide-react";
 
 export default function ProgressBar(props) {
   const { width = "172px", currentProgress, setCurrentProgress } = props;
@@ -17,16 +19,18 @@ export default function ProgressBar(props) {
     >
       <Button
         onClick={handleDecrease}
-        width="17px"
+        width="20px"
         minW={0}
         px={0}
-        height="22px"
+        height="24px"
         border="1px black solid"
         background="white"
         border-radius="5px"
         fontSize="100%"
       >
-        {"\u2193"}
+        <Icon>
+            <ArrowUp />
+        </Icon>
       </Button>
       <Progress
         value={currentProgress}
@@ -39,17 +43,19 @@ export default function ProgressBar(props) {
       />
       <Button
         onClick={handleIncrease}
-        width="17px"
+        width="20px"
         minW={0}
         px={0}
-        height="22px"
+        height="24px"
         border="1px black solid"
         background="black"
         textColor="white"
         _hover={{ background: "gray" }}
         fontSize="100%"
       >
-        {"\u2191"}
+        <Icon>
+            <ArrowDown />
+        </Icon>
       </Button>
     </Flex>
   );
