@@ -13,6 +13,7 @@ export const Navbar = () => {
     px: 2,
     py: 1,
     borderRadius: "md",
+    fontSize: { base: "8px", sm: "14px" },
     _hover: { textDecoration: "underline", textUnderlineOffset: "3px" },
   };
 
@@ -37,7 +38,7 @@ export const Navbar = () => {
       align="center"
       justify="space-evenly"
       px={4}>
-        <Flex gap="4" width="100%" justify="space-evenly">
+        <Flex gap="3" width="100%" justify="space-evenly">
 
             <Link as={NavLink} to="/quota-tracking" style={activeStyle} {...baseLinkProps}>
             Quota Tracking
