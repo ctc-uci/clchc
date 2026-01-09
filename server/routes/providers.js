@@ -27,7 +27,13 @@ providersRouter.post("/", async (req, res) => {
 
 providersRouter.get("/", async (req, res) => {
   try {
-    const result = await db.any(`SELECT * FROM providers`);
+    const { expand } = req.query;
+    let query = `SELECT * FROM providers`;
+
+    if (expand === "user") {
+      query = `SELECT p.*, u.* FROM providers p JOIN users u ON p.id = u.id`;
+    }
+    const result = await db.any(query);
     res.status(200).json(keysToCamel(result));
   } catch (err) {
     console.error(err);
