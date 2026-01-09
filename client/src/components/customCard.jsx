@@ -1,16 +1,36 @@
-import { Card, CardHeader, CardBody, CardFooter } from '@chakra-ui/react'
-export const CustomCard = ({title, body, footer}) => {
-    return (
-        <Card>
-            <CardHeader>
+import { Card, CardHeader, CardBody, CardFooter, Text } from '@chakra-ui/react'
+
+export const CustomCard = ({ title, body, footer }) => {
+  return (
+    <Card
+        w="14rem"
+        h="12rem"
+        flexShrink={1}
+        borderWidth="1px"
+        borderColor="gray.200"
+        borderRadius="lg"
+        boxShadow="sm"
+        _hover={{ boxShadow: 'md' }}
+        transition="box-shadow 0.2s ease"
+    >
+      
+        <CardHeader pb={1}>
+            <Text fontFamily="Inter" fontSize="sm" color="gray.500" fontWeight="medium">
                 {title}
-            </CardHeader>
-            <CardBody>
+            </Text>
+        </CardHeader>
+
+        <CardBody py={2}>
+            <Text fontFamily="Inter" fontSize="3xl" fontWeight="semibold" color="gray.900">
                 {body}
-            </CardBody>
-            <CardFooter>
+            </Text>
+        </CardBody>
+
+        <CardFooter pt={1}>
+            <Text fontFamily="Inter" fontSize="sm" color="gray.500">
                 {footer}
-            </CardFooter>
-        </Card>
-    );
+            </Text>
+        </CardFooter>
+    </Card>
+  )
 }
