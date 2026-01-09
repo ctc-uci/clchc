@@ -12,18 +12,19 @@ import {
   Badge,
   HStack,
 } from "@chakra-ui/react";
+import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 
 const QuotaTable = () => {
+  const { backend } = useBackendContext();
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchQuotas = async () => {
       try {
-        const res = await fetch("http://localhost:3001/quota");
-        const data = await res.json();
-        console.log("QUOTA DATA:", data);
-        setRows(data);
+        const response = await backend.get("/quota");
+        console.log("QUOTA DATA:", response.data);
+        setRows(response.data);
       } catch (err) {
         console.error("Failed to fetch quotas", err);
       } finally {
@@ -32,7 +33,7 @@ const QuotaTable = () => {
     };
 
     fetchQuotas();
-  }, []);
+  }, [backend]);
 
   if (loading) {
     return <Text>Loading...</Text>;
