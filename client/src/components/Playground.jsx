@@ -1,6 +1,6 @@
 import { Box, Text } from "@chakra-ui/react";
 
-import QuotaDrawer from "./quotaDrawer";
+import QuotaDrawer from "./QuotaDrawer";
 
 export const Playground = () => {
   return (
