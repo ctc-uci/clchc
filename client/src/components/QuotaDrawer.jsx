@@ -36,7 +36,7 @@ function ProviderDropdown({ providerId, setProviderId }) {
         const res = await backend.get("/providers?expand=user");
         setProviders(res.data);
       } catch (err) {
-        console.log("Error fetching providers:", err);
+        console.error("Error fetching providers:", err);
       }
     };
     fetchProviders();
@@ -107,26 +107,27 @@ function QuotaProgress({ quota, setQuota, progress, setProgress }) {
 
   const percent = quota === 0 ? 0 : (progress / quota) * 100;
 
-  const onChangeProgress = (valueAsString, valueAsNumber) => {
-    if (Number.isNaN(valueAsNumber)) {
-      setProgress(0);
-      return;
-    }
-    if (valueAsNumber > MAX_INPUT_NUMBER) {
-      return;
-    }
-    setProgress(valueAsNumber);
-  };
+  const numberInputHandlerFactory = (inputName) => {
+    let setStateFn;
 
-  const onChangeQuota = (valueAsString, valueAsNumber) => {
-    if (Number.isNaN(valueAsNumber)) {
-      setQuota(0);
-      return;
+    if (inputName === "quota") {
+      setStateFn = setQuota;
+    } else if (inputName === "progress") {
+      setStateFn = setProgress;
+    } else {
+      return () => {}; // in case of invalid case
     }
-    if (valueAsNumber > MAX_INPUT_NUMBER) {
-      return;
-    }
-    setQuota(valueAsNumber);
+
+    return (valueAsString, valueAsNumber) => {
+      if (Number.isNaN(valueAsNumber)) {
+        setStateFn(0);
+        return;
+      }
+      if (valueAsNumber > MAX_INPUT_NUMBER) {
+        return;
+      }
+      setStateFn(valueAsNumber);
+    };
   };
 
   return (
@@ -164,7 +165,7 @@ function QuotaProgress({ quota, setQuota, progress, setProgress }) {
             min={0}
             max={MAX_INPUT_NUMBER}
             variant="unstyled"
-            onChange={onChangeProgress}
+            onChange={numberInputHandlerFactory("progress")}
           >
             <NumberInputField
               textAlign="right"
@@ -181,7 +182,7 @@ function QuotaProgress({ quota, setQuota, progress, setProgress }) {
             min={0}
             max={MAX_INPUT_NUMBER}
             variant="unstyled"
-            onChange={onChangeQuota}
+            onChange={numberInputHandlerFactory("quota")}
           >
             <NumberInputField
               textAlign="left"
@@ -295,7 +296,7 @@ export default function QuotaDrawer() {
     return Math.floor(diffMin / 60);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const formData = {
@@ -309,9 +310,11 @@ export default function QuotaDrawer() {
     };
 
     try {
-      const res = backend.post("/quota", formData);
+      await backend.post("/quota", formData);
+      handleClose();
+      // TODO: Should we redirect to the new quota page?
     } catch (err) {
-      console.log("Error creating a new quota:", err);
+      console.error("Error creating a new quota:", err);
     }
   };
 
@@ -339,7 +342,7 @@ export default function QuotaDrawer() {
       <Drawer
         isOpen={isOpen}
         placement="left"
-        onClose={onClose}
+        onClose={handleClose}
         finalFocusRef={btnRef}
         size="sm"
       >
