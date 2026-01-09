@@ -13,7 +13,6 @@ import {
   DrawerOverlay,
   FormControl,
   FormLabel,
-  HStack,
   Input,
   NumberInput,
   NumberInputField,
@@ -22,14 +21,13 @@ import {
   Stack,
   Text,
   useDisclosure,
-  VStack,
 } from "@chakra-ui/react";
 
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 import { FaPlus } from "react-icons/fa6";
 
-function ProviderDropdown() {
-  const [providers, setProviders] = useState([]);
+function ProviderDropdown({ providerId, setProviderId }) {
+  const [providers, setProviders] = useState(null);
   const { backend } = useBackendContext();
 
   useEffect(() => {
@@ -45,12 +43,19 @@ function ProviderDropdown() {
   }, [backend]);
 
   return (
-    <FormControl>
+    <FormControl isRequired>
       <FormLabel>Provider</FormLabel>
-      <Select placeholder="Select provider">
+      <Select
+        placeholder="Select provider"
+        value={providerId}
+        onChange={(e) => setProviderId(Number(e.target.value))}
+      >
         {providers &&
           providers.map((provider) => (
-            <option key={provider.id}>
+            <option
+              key={provider.id}
+              value={provider.id}
+            >
               Dr. {provider.firstName} {provider.lastName}
             </option>
           ))}
@@ -59,139 +64,197 @@ function ProviderDropdown() {
   );
 }
 
-function QuotaProgress() {
-  const [quota, setQuota] = useState(0); // total
-  const [used, setUsed] = useState(0); // used
+function LocationDropdown({ locationId, setLocationId }) {
+  const [locations, setLocations] = useState(null);
+  const { backend } = useBackendContext();
+
+  useEffect(() => {
+    const fetchLocations = async () => {
+      try {
+        const res = await backend.get("/location");
+        setLocations(res.data);
+      } catch (err) {
+        console.log("Error fetching locations:", err);
+      }
+    };
+    fetchLocations();
+  }, [backend]);
 
   return (
-    <FormControl>
+    <FormControl isRequired>
+      <FormLabel>Location</FormLabel>
+      <Select
+        placeholder="Select location"
+        value={locationId}
+        onChange={(e) => setLocationId(Number(e.target.value))}
+      >
+        {locations &&
+          locations.map((location) => (
+            <option
+              key={location.id}
+              value={location.id}
+            >
+              {location.tagValue}
+            </option>
+          ))}
+      </Select>
+    </FormControl>
+  );
+}
+
+function QuotaProgress({ quota, setQuota, progress, setProgress }) {
+  const MAX_INPUT_NUMBER = 99;
+
+  const percent = quota === 0 ? 0 : (progress / quota) * 100;
+
+  const onChangeProgress = (valueAsString, valueAsNumber) => {
+    if (Number.isNaN(valueAsNumber)) {
+      setProgress(0);
+      return;
+    }
+    if (valueAsNumber > MAX_INPUT_NUMBER) {
+      return;
+    }
+    setProgress(valueAsNumber);
+  };
+
+  const onChangeQuota = (valueAsString, valueAsNumber) => {
+    if (Number.isNaN(valueAsNumber)) {
+      setQuota(0);
+      return;
+    }
+    if (valueAsNumber > MAX_INPUT_NUMBER) {
+      return;
+    }
+    setQuota(valueAsNumber);
+  };
+
+  return (
+    <FormControl isRequired>
       <FormLabel>Progress</FormLabel>
 
       <Box
-        bg="gray.600"
+        bg="gray"
         p={4}
         borderRadius="md"
+        display="flex"
+        flexDirection="column"
       >
-        {/* bar */}
         <Box
           bg="white"
           borderRadius="sm"
           p={1}
         >
           <Progress
-            value={quota === 0 ? 0 : (used / quota) * 100}
-            height="28px"
+            value={percent}
+            height="32px"
             borderRadius="sm"
             bg="white"
           />
         </Box>
 
-        {/* editable used/total */}
-        <VStack
-          mt={6}
-          spacing={0}
+        <Stack
+          direction="row"
           align="center"
+          justify="center"
+          color="white"
         >
-          <HStack
-            spacing={3}
-            align="baseline"
+          <NumberInput
+            value={progress}
+            min={0}
+            max={MAX_INPUT_NUMBER}
+            variant="unstyled"
+            onChange={onChangeProgress}
           >
-            <NumberInput
-              value={used}
-              min={0}
-              onChange={(_, v) => setUsed(v)}
-              variant="unstyled"
-              w="auto"
-            >
-              <NumberInputField
-                textAlign="right"
-                fontSize="72px"
-                fontWeight="300"
-                lineHeight="1"
-                color="white"
-                p={0}
-                w="110px"
-              />
-            </NumberInput>
+            <NumberInputField
+              textAlign="right"
+              fontSize="6xl"
+              p={0}
+            />
+          </NumberInput>
 
-            <Text
-              color="white"
-              fontSize="72px"
-              fontWeight="300"
-              lineHeight="1"
-            >
-              /
-            </Text>
+          <Text fontSize="6xl">/</Text>
 
-            <NumberInput
-              value={quota}
-              min={0}
-              onChange={(_, v) => setQuota(v)}
-              variant="unstyled"
-              w="auto"
-            >
-              <NumberInputField
-                textAlign="left"
-                fontSize="72px"
-                fontWeight="300"
-                lineHeight="1"
-                color="white"
-                p={0}
-                w="110px"
-              />
-            </NumberInput>
-          </HStack>
-        </VStack>
+          <NumberInput
+            value={quota}
+            size="lg"
+            min={0}
+            max={MAX_INPUT_NUMBER}
+            variant="unstyled"
+            onChange={onChangeQuota}
+          >
+            <NumberInputField
+              textAlign="left"
+              fontSize="6xl"
+              p={0}
+            />
+          </NumberInput>
+        </Stack>
       </Box>
     </FormControl>
   );
 }
 
-const HoursInput = () => {
+const TimeInput = ({ startTime, setStartTime, endTime, setEndTime }) => {
   return (
     <Stack
       direction="row"
       gap={2}
     >
-      <FormControl>
+      <FormControl isRequired>
         <FormLabel>Start Time</FormLabel>
-        <Input type="time" />
+        <Input
+          type="time"
+          value={startTime}
+          onChange={(e) => setStartTime(e.target.value)}
+        />
       </FormControl>
+
       <FormControl>
         <FormLabel>End Time</FormLabel>
-        <Input type="time" />
+        <Input
+          type="time"
+          value={endTime}
+          onChange={(e) => setEndTime(e.target.value)}
+        />
       </FormControl>
     </Stack>
   );
 };
 
-const DateInput = () => {
+const DateInput = ({ date, setDate }) => {
   return (
-    <FormControl>
+    <FormControl isRequired>
       <FormLabel>Date</FormLabel>
-      <Input type="date" />
+      <Input
+        type="date"
+        value={date}
+        onChange={(e) => setDate(e.target.value)}
+      />
     </FormControl>
   );
 };
 
-const TypeInput = ({ value, onChange }) => {
+const TypeInput = ({ type, setType }) => {
   return (
     <FormControl>
       <FormLabel>Type</FormLabel>
       <ButtonGroup isAttached>
         <Button
           value="inperson"
-          variant={value === "inperson" ? "solid" : "outline"}
-          colorScheme={value === "inperson" ? "blue" : "gray"}
-          onClick={() => onChange("inperson")}
+          aria-pressed={type === "inperson"}
+          variant={type === "inperson" ? "solid" : "outline"}
+          colorScheme={type === "inperson" ? "blue" : "gray"}
+          onClick={() => setType("inperson")}
         >
           In-person
         </Button>
         <Button
           value="online"
-          variant={value === "online" ? "solid" : "outline"}
-          colorScheme={value === "online" ? "blue" : "gray"}
-          onClick={() => onChange("online")}
+          aria-pressed={type === "online"}
+          variant={type === "online" ? "solid" : "outline"}
+          colorScheme={type === "online" ? "blue" : "gray"}
+          onClick={() => setType("online")}
         >
           Online
         </Button>
@@ -200,31 +263,69 @@ const TypeInput = ({ value, onChange }) => {
   );
 };
 
-function QuotaForm() {
-  const [formData, setFormData] = useState({
-    providerId: null,
-    startTime: "",
-    endTime: "",
-    date: "",
-    type: "inperson",
-  });
-
-  return (
-    <form>
-      <Stack gap={4}>
-        <ProviderDropdown />
-        <HoursInput />
-        <DateInput />
-        <TypeInput />
-        <QuotaProgress />
-      </Stack>
-    </form>
-  );
-}
-
 export default function QuotaDrawer() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const btnRef = React.useRef();
+  const { backend } = useBackendContext();
+
+  const [providerId, setProviderId] = useState("");
+  const [locationId, setLocationId] = useState("");
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
+  const [date, setDate] = useState("");
+  const [type, setType] = useState("inperson");
+  const [quota, setQuota] = useState(0);
+  const [progress, setProgress] = useState(0);
+
+  // Helper function to convert time string to int
+  const getHoursBetween = (startTime, endTime) => {
+    if (!startTime || !endTime) return 0;
+
+    const [startH, startM] = startTime.split(":").map(Number);
+    const [endH, endM] = endTime.split(":").map(Number);
+
+    const startTotal = startH * 60 + startM;
+    const endTotal = endH * 60 + endM;
+    let diffMin = endTotal - startTotal;
+
+    if (diffMin < 0) {
+      diffMin += 24 * 60;
+    }
+
+    return Math.floor(diffMin / 60);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const formData = {
+      providerId,
+      locationId,
+      quota,
+      progress,
+      hours: getHoursBetween(startTime, endTime),
+      appointmentType: type,
+      notes: "", // TODO: Is there an initial notes flow?
+    };
+
+    try {
+      const res = backend.post("/quota", formData);
+    } catch (err) {
+      console.log("Error creating a new quota:", err);
+    }
+  };
+
+  const handleClose = () => {
+    setProviderId("");
+    setLocationId("");
+    setStartTime("");
+    setEndTime("");
+    setDate("");
+    setType("inperson");
+    setQuota(0);
+    setProgress(0);
+    onClose();
+  };
 
   return (
     <>
@@ -237,7 +338,7 @@ export default function QuotaDrawer() {
       </Button>
       <Drawer
         isOpen={isOpen}
-        placement="right"
+        placement="left"
         onClose={onClose}
         finalFocusRef={btnRef}
         size="sm"
@@ -246,38 +347,64 @@ export default function QuotaDrawer() {
         <DrawerContent>
           <DrawerCloseButton />
           <DrawerHeader>Edit Quota</DrawerHeader>
+          <form onSubmit={handleSubmit}>
+            <DrawerBody>
+              <Stack gap={4}>
+                <ProviderDropdown
+                  providerId={providerId}
+                  setProviderId={setProviderId}
+                />
+                <LocationDropdown
+                  locationId={locationId}
+                  setLocationId={setLocationId}
+                />
+                <TimeInput
+                  startTime={startTime}
+                  setStartTime={setStartTime}
+                  endTime={endTime}
+                  setEndTime={setEndTime}
+                />
+                <DateInput
+                  date={date}
+                  setDate={setDate}
+                />
+                <TypeInput
+                  type={type}
+                  setType={setType}
+                />
+                <QuotaProgress
+                  quota={quota}
+                  setQuota={setQuota}
+                  progress={progress}
+                  setProgress={setProgress}
+                />
+              </Stack>
+            </DrawerBody>
 
-          <DrawerBody>
-            <QuotaForm />
-          </DrawerBody>
-
-          <DrawerFooter>
-            <Stack
-              direction="row"
-              justify="space-between"
-              w="100%"
-              pt={8}
-              mt={6}
-            >
-              <Button
-                type="submit"
-                borderRadius="10px"
-                px={10}
+            <DrawerFooter>
+              <Stack
+                direction="row"
+                justify="space-between"
+                w="100%"
               >
-                Save
-              </Button>
+                <Button
+                  type="submit"
+                  px={10}
+                >
+                  Save
+                </Button>
 
-              <Button
-                type="button"
-                variant="outline"
-                borderRadius="10px"
-                px={10}
-                onClick={onClose}
-              >
-                Cancel
-              </Button>
-            </Stack>
-          </DrawerFooter>
+                <Button
+                  type="button"
+                  variant="outline"
+                  px={10}
+                  onClick={handleClose}
+                >
+                  Discard
+                </Button>
+              </Stack>
+            </DrawerFooter>
+          </form>
         </DrawerContent>
       </Drawer>
     </>
