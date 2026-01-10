@@ -4,11 +4,15 @@ import {ArrowUp, ArrowDown} from "lucide-react";
 import api from "./api.js";
 
 export default function ProgressBar({currentProgress, setCurrentProgress, quotaID}) {
-  
+  const handleDecrease = async (quotaID) => {
+    await api.put(quotaID, (prev - 1));
+    setCurrentProgress((prev) => prev - 1);
+  }
 
-  const handleDecrease = () => setCurrentProgress((prev) => prev - 1);
-
-  const handleIncrease = () => setCurrentProgress((prev) => prev + 1);
+  const handleIncrease = async (quotaID) => {
+    await api.put(quotaID, (prev + 1));
+    setCurrentProgress((prev) => prev + 1);
+  };
 
   return (
     <Flex
