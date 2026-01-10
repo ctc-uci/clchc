@@ -4,7 +4,7 @@ import ProgressBar from "./ProgressBar.jsx";
 
 
 export const Playground = () => {
-  const [ currentProgress, setCurrentProgress ] = useState(5);
+  const [ currentProgress, setCurrentProgress ] = useState(6);
 
   return (
     <Box>
