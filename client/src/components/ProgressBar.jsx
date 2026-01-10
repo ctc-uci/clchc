@@ -29,7 +29,7 @@ export default function ProgressBar(props) {
         fontSize="100%"
       >
         <Icon>
-            <ArrowUp />
+            <ArrowDown />
         </Icon>
       </Button>
       <Progress
@@ -54,7 +54,7 @@ export default function ProgressBar(props) {
         fontSize="100%"
       >
         <Icon>
-            <ArrowDown />
+            <ArrowUp />
         </Icon>
       </Button>
     </Flex>
