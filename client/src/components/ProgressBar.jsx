@@ -1,11 +1,10 @@
-import React from "react";
-
+import React, { useState } from "react";
 import { Button, Flex, Progress, Icon, } from "@chakra-ui/react";
-
 import {ArrowUp, ArrowDown} from "lucide-react";
+import api from "./api.js";
 
-export default function ProgressBar(props) {
-  const { width = "172px", currentProgress, setCurrentProgress } = props;
+export default function ProgressBar({currentProgress, setCurrentProgress, quotaID}) {
+  
 
   const handleDecrease = () => setCurrentProgress((prev) => prev - 1);
 
@@ -25,7 +24,7 @@ export default function ProgressBar(props) {
         height="24px"
         border="1px black solid"
         background="white"
-        border-radius="5px"
+        borderRadius="5px"
         fontSize="100%"
       >
         <Icon>
@@ -36,7 +35,7 @@ export default function ProgressBar(props) {
         value={currentProgress}
         max="12"
         colorScheme="gray"
-        width={width}
+        width="172px"
         borderRadius={6}
         border="1px lightgray solid"
         background="gray.50"
