@@ -26,6 +26,13 @@ import {
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 import { FaPlus } from "react-icons/fa6";
 
+const MAX_INPUT_NUMBER = 99;
+
+const TYPE_OPTIONS = [
+  { value: "inperson", label: "In-person" },
+  { value: "telehealth", label: "Telehealth" },
+];
+
 function ProviderDropdown({ providerId, setProviderId }) {
   const [providers, setProviders] = useState(null);
   const { backend } = useBackendContext();
@@ -33,7 +40,7 @@ function ProviderDropdown({ providerId, setProviderId }) {
   useEffect(() => {
     const fetchProviders = async () => {
       try {
-        const res = await backend.get("/providers?expand=user");
+        const res = await backend.get("/providers/summary");
         setProviders(res.data);
       } catch (err) {
         console.error("Error fetching providers:", err);
@@ -56,7 +63,7 @@ function ProviderDropdown({ providerId, setProviderId }) {
               key={provider.id}
               value={provider.id}
             >
-              Dr. {provider.firstName} {provider.lastName}
+              {provider.name}
             </option>
           ))}
       </Select>
@@ -103,21 +110,9 @@ function LocationDropdown({ locationId, setLocationId }) {
 }
 
 function QuotaProgress({ quota, setQuota, progress, setProgress }) {
-  const MAX_INPUT_NUMBER = 99;
-
   const percent = quota === 0 ? 0 : (progress / quota) * 100;
 
-  const numberInputHandlerFactory = (inputName) => {
-    let setStateFn;
-
-    if (inputName === "quota") {
-      setStateFn = setQuota;
-    } else if (inputName === "progress") {
-      setStateFn = setProgress;
-    } else {
-      return () => {}; // in case of invalid case
-    }
-
+  const numberInputHandlerFactory = (setStateFn) => {
     return (valueAsString, valueAsNumber) => {
       if (Number.isNaN(valueAsNumber)) {
         setStateFn(0);
@@ -165,7 +160,7 @@ function QuotaProgress({ quota, setQuota, progress, setProgress }) {
             min={0}
             max={MAX_INPUT_NUMBER}
             variant="unstyled"
-            onChange={numberInputHandlerFactory("progress")}
+            onChange={numberInputHandlerFactory(setProgress)}
           >
             <NumberInputField
               textAlign="right"
@@ -182,7 +177,7 @@ function QuotaProgress({ quota, setQuota, progress, setProgress }) {
             min={0}
             max={MAX_INPUT_NUMBER}
             variant="unstyled"
-            onChange={numberInputHandlerFactory("quota")}
+            onChange={numberInputHandlerFactory(setQuota)}
           >
             <NumberInputField
               textAlign="left"
@@ -241,24 +236,21 @@ const TypeInput = ({ type, setType }) => {
     <FormControl>
       <FormLabel>Type</FormLabel>
       <ButtonGroup isAttached>
-        <Button
-          value="inperson"
-          aria-pressed={type === "inperson"}
-          variant={type === "inperson" ? "solid" : "outline"}
-          colorScheme={type === "inperson" ? "blue" : "gray"}
-          onClick={() => setType("inperson")}
-        >
-          In-person
-        </Button>
-        <Button
-          value="online"
-          aria-pressed={type === "online"}
-          variant={type === "online" ? "solid" : "outline"}
-          colorScheme={type === "online" ? "blue" : "gray"}
-          onClick={() => setType("online")}
-        >
-          Online
-        </Button>
+        {TYPE_OPTIONS.map(({ value, label }) => {
+          const selected = type === value;
+
+          return (
+            <Button
+              key={value}
+              aria-pressed={selected}
+              variant={selected ? "solid" : "outline"}
+              colorScheme={selected ? "blue" : "gray"}
+              onClick={() => setType(value)}
+            >
+              {label}
+            </Button>
+          );
+        })}
       </ButtonGroup>
     </FormControl>
   );
