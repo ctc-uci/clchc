@@ -1,10 +1,10 @@
 import { Card, CardHeader, CardBody, CardFooter, Text } from '@chakra-ui/react'
 
-export const CustomCard = ({ title, body, footer }) => {
+export const CustomCard = ({ title, body, footer, height, width }) => {
   return (
     <Card
-        w="14rem"
-        h="12rem"
+        w={width}
+        h={height}
         flexShrink={1}
         borderWidth="1px"
         borderColor="gray.200"
