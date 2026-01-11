@@ -18,19 +18,27 @@ export default function ProgressBar({
   //populate quota on mount
   useEffect(() => {
     (async () => {
-      const { data } = await backend.get(`/quota/${quotaID}`);
-      quotaRef.current = data[0];
-      setQuota(data[0]);
+      try {
+        const { data } = await backend.get(`/quota/${quotaID}`);
+        quotaRef.current = data[0];
+        setQuota(data[0]);
+      } catch (err) {
+        console.error("Error fetching quota:", err);
+      }
     })();
   }, []);
 
   //update progress in DB
   const updateProgress = async (progress) => {
     if (!quotaRef.current) return;
-    await backend.put(`/quota/${quotaID}`, {
-      ...quotaRef.current,
-      progress,
-    });
+    try {
+      await backend.put(`/quota/${quotaID}`, {
+        ...quotaRef.current,
+        progress,
+      });
+    } catch (err) {
+      console.error("Error updating progress:", err);
+    }
   };
 
   //handlers for buttons
