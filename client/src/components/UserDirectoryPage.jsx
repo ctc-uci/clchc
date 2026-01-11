@@ -1,6 +1,7 @@
 import { SearchIcon, InfoOutlineIcon, DeleteIcon, EditIcon, CalendarIcon } from "@chakra-ui/icons";
-import { Badge, Box, Flex, HStack, Heading, Input, InputGroup, InputLeftElement, Text, Table, Thead, Tbody, Tr, Th, Td, TableContainer, IconButton, Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverBody } from "@chakra-ui/react";
+import { Badge, Box, Flex, HStack, Heading, Input, InputGroup, InputLeftElement, Text, Table, Thead, Tbody, Tr, Th, Td, TableContainer, IconButton } from "@chakra-ui/react";
 import { CustomCard } from "./customCard";
+import InputMask from "react-input-mask";
 
 export const UserDirectory = () => {
 
@@ -21,18 +22,19 @@ export const UserDirectory = () => {
                     </Text>
                 </Box>
 
-                <Box>
-                    <Popover placement="bottom-end">
-                        <PopoverTrigger>
-                            <IconButton icon={<CalendarIcon />} aria-label="Select date" />
-                        </PopoverTrigger>
-                        <PopoverContent width="auto">
-                            <PopoverArrow />
-                            <PopoverBody>
-                                <Input type="date"/>
-                            </PopoverBody>
-                        </PopoverContent>
-                    </Popover>
+                <Box flex="1" display="flex" justifyContent="flex-end">
+                    <InputGroup w="19ch">
+                        <InputLeftElement pointerEvents="none">
+                            <CalendarIcon />
+                        </InputLeftElement>
+                        <Input
+                            textAlign="center"
+                            as={InputMask}
+                            mask="99/99/9999"
+                            placeholder="MM/DD/YYYY"
+                            onChange={(e) => console.log('date input:', e.target.value)}
+                        />
+                    </InputGroup>
                 </Box>
             </Flex>
 
@@ -61,7 +63,7 @@ export const UserDirectory = () => {
 
             <InputGroup maxW="400px" pb={6}>
                 <InputLeftElement pointerEvents="none">
-                <SearchIcon color="gray.400" />
+                    <SearchIcon color="gray.400" />
                 </InputLeftElement>
                 <Input placeholder="Search by name or email..." borderRadius="md"/>
             </InputGroup>

@@ -45,6 +45,7 @@
     "node": ">=18"
   },
   "dependencies": {
-    "@chakra-ui/icons": "^2.2.4"
+    "@chakra-ui/icons": "^2.2.4",
+    "react-input-mask": "^2.0.4"
   }
 }

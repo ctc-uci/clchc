@@ -1,6 +1,7 @@
-import { SearchIcon, EditIcon, CalendarIcon, AddIcon } from "@chakra-ui/icons";
-import { Badge, Box, Button, Flex, HStack, Heading, Input, InputGroup, InputLeftElement, Text, Table, Thead, Tbody, Tr, Th, Td, TableContainer, IconButton, Progress, Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverBody, Portal } from "@chakra-ui/react";
+import { SearchIcon, EditIcon, CalendarIcon } from "@chakra-ui/icons";
+import { Badge, Box, Flex, HStack, Heading, Input, InputGroup, InputLeftElement, Text, Table, Thead, Tbody, Tr, Th, Td, TableContainer, IconButton, Progress, Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverBody, Portal } from "@chakra-ui/react";
 import { CustomCard } from "./customCard";
+import InputMask from "react-input-mask";
 
 export const QuotaTracking = () => {
     return (
@@ -20,23 +21,19 @@ export const QuotaTracking = () => {
                     </Text>
                 </Box>
 
-                <Box>
-                    <Flex align="center" gap={2.5}>
-                        <Popover placement="bottom-end">
-                            <PopoverTrigger>
-                                <IconButton icon={<CalendarIcon />} aria-label="Select date" />
-                            </PopoverTrigger>
-                            <PopoverContent width="auto">
-                                <PopoverArrow />
-                                <PopoverBody>
-                                    <Input type="date" onChange={(e) => setSelectedDate(e.target.value)} />
-                                </PopoverBody>
-                            </PopoverContent>
-                        </Popover>
-                        <Button pl={4} rightIcon={<AddIcon />} colorScheme='teal' variant='solid'>
-                            Create Quota
-                        </Button>
-                    </Flex>
+                <Box flex="1" display="flex" justifyContent="flex-end">
+                    <InputGroup w="19ch">
+                        <InputLeftElement pointerEvents="none">
+                            <CalendarIcon />
+                        </InputLeftElement>
+                        <Input
+                            textAlign="center"
+                            as={InputMask}
+                            mask="99/99/9999"
+                            placeholder="MM/DD/YYYY"
+                            onChange={(e) => console.log('date input:', e.target.value)}
+                        />
+                    </InputGroup>
                 </Box>
             </Flex>
 
@@ -44,14 +41,14 @@ export const QuotaTracking = () => {
                 <HStack spacing={4} minW="min-content">
                     <CustomCard title="Total Progress" body="5/12" />
                     <CustomCard title="Completion Rate" body="73%" footer="Overall Progress"/>
-                    <CustomCard title="Active Providers" body="9" footer="3 Locations"/>
+     <CustomCard title="Active Providers" body="9" footer="3 Locations"/>
                     <CustomCard title="Needs Attention" body="0" footer="Below 40% Progress"/>
                 </HStack>
             </Box>
 
             <InputGroup maxW="400px" pb={6}>
                 <InputLeftElement pointerEvents="none">
-                <SearchIcon color="gray.400" />
+                    <SearchIcon color="gray.400" />
                 </InputLeftElement>
                 <Input placeholder="Search Providers" borderRadius="md"/>
             </InputGroup>

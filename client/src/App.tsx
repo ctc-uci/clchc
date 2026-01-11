@@ -27,11 +27,11 @@ const App = () => {
             <Router>
               <Routes>
                 <Route
-                  path="/user_directory"
+                  path="/user-directory"
                   element={<UserDirectory/>}
                 />
                 <Route
-                  path="/quota_tracking"
+                  path="/quota-tracking"
                   element={<QuotaTracking/>}
                 />
                 <Route
