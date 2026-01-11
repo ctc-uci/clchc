@@ -42,10 +42,10 @@ export const QuotaTracking = () => {
 
             <Box overflowX="auto" py={4} mb={6}>
                 <HStack spacing={4} minW="min-content">
-                    <CustomCard title="Total Progress" body="5/12" />
-                    <CustomCard title="Completion Rate" body="73%" footer="Overall Progress"/>
-                    <CustomCard title="Active Providers" body="9" footer="3 Locations"/>
-                    <CustomCard title="Needs Attention" body="0" footer="Below 40% Progress"/>
+                    <CustomCard title="Total Progress" body="5/12" height="12rem" width="14rem"/>
+                    <CustomCard title="Completion Rate" body="73%" footer="Overall Progress" height="12rem" width="14rem"/>
+                    <CustomCard title="Active Providers" body="9" footer="3 Locations" height="12rem" width="14rem"/>
+                    <CustomCard title="Needs Attention" body="0" footer="Below 40% Progress" height="12rem" width="14rem"/>
                 </HStack>
             </Box>
 

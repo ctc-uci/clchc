@@ -52,10 +52,10 @@ export const UserDirectory = () => {
 
             <Box overflowX="auto" py={4} mb={6}>
                 <HStack spacing={4} minW="min-content">
-                    <CustomCard title="Total Users" body="5" />
-                    <CustomCard title="Managers" body="2" footer="hello"/>
-                    <CustomCard title="Staff" body="2"/>
-                    <CustomCard title="Viewers" body="1"/>
+                    <CustomCard title="Total Users" body="5" height="12rem" width="14rem"/>
+                    <CustomCard title="Managers" body="2" footer="hello" height="12rem" width="14rem"/>
+                    <CustomCard title="Staff" body="2" height="12rem" width="14rem"/>
+                    <CustomCard title="Viewers" body="1" height="12rem" width="14rem"/>
                 </HStack>
             </Box>
 
