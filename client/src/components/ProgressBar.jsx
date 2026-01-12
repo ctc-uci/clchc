@@ -6,50 +6,64 @@ import { ArrowDown, ArrowUp } from "lucide-react";
 
 import { useBackendContext } from "../contexts/hooks/useBackendContext";
 
-export default function ProgressBar({
-  currentProgress,
-  setCurrentProgress,
-  quotaID,
-}) {
+export default function ProgressBar({ quotaID }) {
   const { backend } = useBackendContext();
-  const quotaRef = useRef();
-  const [quota, setQuota] = useState();
+
+  const quotaRef = useRef(null);
+  const [quota, setQuota] = useState(null);
+  const [currentProgress, setCurrentProgress] = useState(0);
 
   //populate quota on mount
   useEffect(() => {
     (async () => {
       try {
         const { data } = await backend.get(`/quota/${quotaID}`);
-        quotaRef.current = data[0];
-        setQuota(data[0]);
+        const q = data?.[0];
+
+        if (!q) return;
+
+
+        quotaRef.current = q;
+        setQuota(q);
+        setCurrentProgress(q.progress ?? 0);
       } catch (err) {
         console.error("Error fetching quota:", err);
       }
     })();
-  }, []);
+  }, [backend, quotaID]);
+
+  const maxProgress = quota?.quota ?? 0;
 
   //update progress in DB
-  const updateProgress = async (progress) => {
+  const updateProgress = async (next) => {
     if (!quotaRef.current) return;
     try {
       await backend.put(`/quota/${quotaID}`, {
         ...quotaRef.current,
-        progress,
+        progress: next,
       });
+
+      quotaRef.current = { ...quotaRef.current, progress: next };
     } catch (err) {
       console.error("Error updating progress:", err);
     }
   };
 
+  const clamp = (n) => Math.max(0, Math.min(n, maxProgress));
+
   //handlers for buttons
   const handleDecrease = async () => {
-    await updateProgress(currentProgress - 1);
-    setCurrentProgress((prev) => prev - 1);
+    const next = clamp(currentProgress - 1);
+    if (next === currentProgress) return;
+    setCurrentProgress(next);
+    await updateProgress(next);
   };
 
   const handleIncrease = async () => {
-    await updateProgress(currentProgress + 1);
-    setCurrentProgress((prev) => prev + 1);
+    const next = clamp(currentProgress + 1);
+    if (next === currentProgress) return;
+    setCurrentProgress(next);
+    await updateProgress(next);
   };
 
   return (
@@ -60,6 +74,7 @@ export default function ProgressBar({
     >
       <Button
         onClick={handleDecrease}
+        isDisabled={currentProgress <= 0}
         width="20px"
         minW={0}
         px={0}
@@ -75,7 +90,7 @@ export default function ProgressBar({
       </Button>
       <Progress
         value={currentProgress}
-        max={quota ? quota.quota : 10}
+        max={maxProgress}
         colorScheme="gray"
         width="172px"
         borderRadius={6}
@@ -84,6 +99,7 @@ export default function ProgressBar({
       />
       <Button
         onClick={handleIncrease}
+        isDisabled={currentProgress >= maxProgress}
         width="20px"
         minW={0}
         px={0}
@@ -98,6 +114,7 @@ export default function ProgressBar({
           <ArrowUp />
         </Icon>
       </Button>
+      <Text>{currentProgress}/{maxProgress}</Text>
     </Flex>
   );
 }
