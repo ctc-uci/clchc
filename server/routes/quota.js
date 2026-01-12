@@ -13,16 +13,18 @@ quotaRouter.post("/", async (req, res) => {
             locationId,
             quota,
             progress,
-            hours,
+            date,
+            startTime,
+            endTime,
             appointmentType,
             notes
         } = req.body;
 
         const result = await db.query(
-            `INSERT INTO quota (provider_id, location_id, quota, progress, hours, appointment_type, notes)
-            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            `INSERT INTO quota (provider_id, location_id, quota, progress, date, start_time, end_time, appointment_type, notes)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
             RETURNING *`, 
-            [providerId, locationId, quota, progress, hours, appointmentType, notes]
+            [providerId, locationId, quota, progress, date, startTime, endTime, appointmentType, notes]
         );
         res.status(200).json(keysToCamel(result));
 
@@ -71,7 +73,9 @@ quotaRouter.put("/:id", async (req, res) => {
             locationId,
             quota,
             progress,
-            hours,
+            date,
+            startTime,
+            endTime,
             appointmentType,
             notes
         } = req.body;
@@ -82,12 +86,14 @@ quotaRouter.put("/:id", async (req, res) => {
             location_id = COALESCE($2, location_id),
             quota = COALESCE($3, quota),
             progress = COALESCE($4, progress),
-            hours = COALESCE($5, hours),
-            appointment_type = COALESCE($6, appointment_type),
-            notes = COALESCE($7, notes)
-            WHERE id = $8
+            date = COALESCE($5, date),
+            start_time = COALESCE($6, start_time),
+            end_time = COALESCE($7, end_time),
+            appointment_type = COALESCE($8, appointment_type),
+            notes = COALESCE($9, notes)
+            WHERE id = $10
             RETURNING *`, 
-            [providerId, locationId, quota, progress, hours, appointmentType, notes, id]
+            [providerId, locationId, quota, progress, date, startTime, endTime, appointmentType, notes, id]
         )
 
         if (result.length === 0) {

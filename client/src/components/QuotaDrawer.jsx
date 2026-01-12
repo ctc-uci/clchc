@@ -271,22 +271,22 @@ export default function QuotaDrawer() {
   const [progress, setProgress] = useState(0);
 
   // Helper function to convert time string to int
-  const getHoursBetween = (startTime, endTime) => {
-    if (!startTime || !endTime) return 0;
+  // const getHoursBetween = (startTime, endTime) => {
+  //   if (!startTime || !endTime) return 0;
 
-    const [startH, startM] = startTime.split(":").map(Number);
-    const [endH, endM] = endTime.split(":").map(Number);
+  //   const [startH, startM] = startTime.split(":").map(Number);
+  //   const [endH, endM] = endTime.split(":").map(Number);
 
-    const startTotal = startH * 60 + startM;
-    const endTotal = endH * 60 + endM;
-    let diffMin = endTotal - startTotal;
+  //   const startTotal = startH * 60 + startM;
+  //   const endTotal = endH * 60 + endM;
+  //   let diffMin = endTotal - startTotal;
 
-    if (diffMin < 0) {
-      diffMin += 24 * 60;
-    }
+  //   if (diffMin < 0) {
+  //     diffMin += 24 * 60;
+  //   }
 
-    return Math.floor(diffMin / 60);
-  };
+  //   return Math.floor(diffMin / 60);
+  // };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -296,7 +296,10 @@ export default function QuotaDrawer() {
       locationId,
       quota,
       progress,
-      hours: getHoursBetween(startTime, endTime),
+      date,
+      startTime,
+      endTime,
+      // hours: getHoursBetween(startTime, endTime),
       appointmentType: type,
       notes: "", // TODO: Is there an initial notes flow?
     };
