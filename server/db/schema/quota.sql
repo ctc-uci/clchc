@@ -8,8 +8,16 @@ CREATE TABLE IF NOT EXISTS quota (
     location_id INTEGER NOT NULL,
     quota INTEGER NOT NULL,
     progress INTEGER NOT NULL DEFAULT 0,
-    hours INTEGER NOT NULL, 
+    date DATE NOT NULL,
+    start_time TIMESTAMP NOT NULL DEFAULT now(),
+    end_time   TIMESTAMP NOT NULL DEFAULT now(),
+    hours INTEGER GENERATED ALWAYS AS (
+        GREATEST(
+            (EXTRACT(epoch FROM (end_time - start_time)) / 3600)::int, 
+            0
+        )
+    ) STORED,
     appointment_type appointment_type NOT NULL,
-    notes TEXT,
+    notes TEXT NOT NULL DEFAULT '',
     FOREIGN KEY (location_id) REFERENCES location(id) ON DELETE CASCADE
 );
