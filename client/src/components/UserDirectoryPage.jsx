@@ -24,11 +24,12 @@ export const UserDirectory = () => {
 
                 <Box flex="1" display="flex" justifyContent="flex-end">
                     <InputGroup w="19ch">
-                        <InputLeftElement pointerEvents="none">
+                        {/* <InputLeftElement pointerEvents="none">
                             <CalendarIcon />
-                        </InputLeftElement>
+                        </InputLeftElement> */}
                         <Input
                             textAlign="center"
+                            type="date"
                             as={InputMask}
                             mask="99/99/9999"
                             placeholder="MM/DD/YYYY"
