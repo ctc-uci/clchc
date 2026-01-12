@@ -12,10 +12,17 @@ CREATE TABLE IF NOT EXISTS quota (
     start_time TIMESTAMP NOT NULL DEFAULT now(),
     end_time   TIMESTAMP NOT NULL DEFAULT now(),
     hours INTEGER GENERATED ALWAYS AS (
-        GREATEST(
-            (EXTRACT(epoch FROM (end_time - start_time)) / 3600)::int, 
-            0
-        )
+        FLOOR(
+            (
+                EXTRACT(EPOCH FROM (
+                    CASE
+                    WHEN end_time >= start_time
+                        THEN (end_time - start_time)
+                    ELSE (end_time - start_time) + INTERVAL '24 hours'
+                    END
+                )) / 3600.0
+            )
+        )::int
     ) STORED,
     appointment_type appointment_type NOT NULL,
     notes TEXT NOT NULL DEFAULT '',
