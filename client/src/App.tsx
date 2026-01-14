@@ -48,6 +48,10 @@ const App = () => {
                   element={<Playground />}
                 />
                 <Route
+                  path="/pp"
+                  element={<ProtectedRoute element={<Playground />} />}
+                />
+                <Route
                   path="/dashboard"
                   element={<ProtectedRoute element={<Dashboard />} />}
                 />
