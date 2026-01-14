@@ -29,7 +29,8 @@
     "node-schedule": "^2.1.1",
     "nodemailer": "^6.9.10",
     "nodemon": "^2.0.14",
-    "pg-promise": "^11.5.4"
+    "pg-promise": "^11.5.4",
+    "vite": "7.3.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
@@ -53,6 +54,6 @@
     "typescript": "5.5.3",
     "typescript-eslint": "^8.1.0",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "1"
+    "vitest": "^4.0.17"
   }
 }
