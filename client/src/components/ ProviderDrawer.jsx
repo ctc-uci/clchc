@@ -10,10 +10,30 @@ import {
   useDisclosure,
   Input,
 } from '@chakra-ui/react'
-import React from "react";
-export const ProviderDrawer = () => {
+import React, { useEffect, useState } from "react";
+import { useBackendContext } from "@/contexts/hooks/useBackendContext";
+const ProviderDrawer = () => {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const btnRef = React.useRef()
+  const { backend } = useBackendContext();
+  const [categories, setCategories] = useState([]);
+  const [loadingCategories, setLoadingCategories] = useState(false);
+
+  useEffect(() => {
+  if (!isOpen) return;
+
+  const fetchDirectoryCategories = async () => {
+    try {
+      const response = await backend.get("/directoryCategories");
+      console.log("DIRECTORY CATEGORIES:", response.data);
+      setCategories(response.data);
+    } catch (err) {
+      console.error("Error fetching directory categories", err);
+    }
+  };
+
+  fetchDirectoryCategories();
+}, [isOpen, backend]);
 
   return (
     <>
@@ -31,9 +51,14 @@ export const ProviderDrawer = () => {
           <DrawerCloseButton />
           <DrawerHeader>Provider Drawer</DrawerHeader>
 
-          <DrawerBody>
-            <Input placeholder='Type here...' />
-          </DrawerBody>
+        <DrawerBody>
+
+        {categories.map((cat) => (
+            <div key={cat.id}>
+            {cat.name} ({cat.inputType}) ({cat.required ? "required" : "optional"})
+            </div>
+        ))}
+        </DrawerBody>
 
           <DrawerFooter>
             <Button variant='outline' mr={3} onClick={onClose}>
@@ -46,3 +71,4 @@ export const ProviderDrawer = () => {
     </>
   )
 }
+export default ProviderDrawer;
