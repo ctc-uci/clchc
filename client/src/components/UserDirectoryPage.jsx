@@ -2,7 +2,6 @@ import { SearchIcon, InfoOutlineIcon} from "@chakra-ui/icons";
 import { Badge, Box, Flex, HStack, Heading, Input, InputGroup, InputLeftElement, Text } from "@chakra-ui/react";
 import { CustomCard } from "./customCard";
 import UserTable from "./userTable";
-import InputMask from "react-input-mask";
 
 export const UserDirectory = () => {
 
@@ -25,15 +24,9 @@ export const UserDirectory = () => {
 
                 <Box flex="1" display="flex" justifyContent="flex-end">
                     <InputGroup w="19ch">
-                        {/* <InputLeftElement pointerEvents="none">
-                            <CalendarIcon />
-                        </InputLeftElement> */}
                         <Input
                             textAlign="center"
                             type="date"
-                            as={InputMask}
-                            mask="99/99/9999"
-                            placeholder="MM/DD/YYYY"
                             onChange={(e) => console.log('date input:', e.target.value)}
                         />
                     </InputGroup>
