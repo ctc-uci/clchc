@@ -1,6 +1,7 @@
-import { SearchIcon, InfoOutlineIcon, DeleteIcon, EditIcon, CalendarIcon } from "@chakra-ui/icons";
-import { Badge, Box, Flex, HStack, Heading, Input, InputGroup, InputLeftElement, Text, Table, Thead, Tbody, Tr, Th, Td, TableContainer, IconButton } from "@chakra-ui/react";
+import { SearchIcon, InfoOutlineIcon} from "@chakra-ui/icons";
+import { Badge, Box, Flex, HStack, Heading, Input, InputGroup, InputLeftElement, Text } from "@chakra-ui/react";
 import { CustomCard } from "./customCard";
+import UserTable from "./userTable";
 import InputMask from "react-input-mask";
 
 export const UserDirectory = () => {
@@ -69,62 +70,7 @@ export const UserDirectory = () => {
                 <Input placeholder="Search by name or email..." borderRadius="md"/>
             </InputGroup>
 
-            <TableContainer borderWidth="1px" borderColor="gray.200" borderRadius="lg">
-                <Table>
-                    <Thead bg="gray.50">
-                        <Tr>
-                            <Th>User</Th>
-                            <Th>Email</Th>
-                            <Th>Role</Th>
-                            <Th>Last Active</Th>
-                            <Th></Th>
-                            <Th></Th>
-                        </Tr>
-                    </Thead>
-                    <Tbody>
-                        <Tr>
-                            <Td>
-                                <Flex direction="column" gap={1}>
-                                    <Text fontWeight="medium">Baby Saja</Text>
-                                    <Flex align="center" gap={1}>
-                                        <Box w={1.5} h={1.5} borderRadius="full" bg="green.600" />
-                                        <Text fontSize="xs" color="green.600">Active</Text>
-                                    </Flex>
-                                </Flex>
-                            </Td>
-                            <Td>baby@saja.com</Td>
-                            <Td>Manager</Td>
-                            <Td>2 hours ago</Td>
-                            <Td>
-                                <IconButton icon={<EditIcon />} size="sm" aria-label="Edit" />
-                            </Td>
-                            <Td>
-                                <IconButton icon={<DeleteIcon />} size="sm" colorScheme="red" aria-label="Delete" />
-                            </Td>
-                        </Tr>
-                        <Tr>
-                            <Td>
-                                <Flex direction="column" gap={1}>
-                                    <Text fontWeight="medium">Allison Huang</Text>
-                                    <Flex align="center" gap={1}>
-                                        <Box w={1.5} h={1.5} borderRadius="full" bg="red.600" />
-                                        <Text fontSize="xs" color="red.600">Inactive</Text>
-                                    </Flex>
-                                </Flex>
-                            </Td>
-                            <Td>allish11@uci.edu</Td>
-                            <Td>Staff</Td>
-                            <Td>67 days ago</Td>
-                            <Td>
-                                <IconButton icon={<EditIcon />} size="sm" aria-label="Edit" />
-                            </Td>
-                            <Td>
-                                <IconButton icon={<DeleteIcon />} size="sm" colorScheme="red" aria-label="Delete" />
-                            </Td>
-                        </Tr>
-                    </Tbody>
-                </Table>
-            </TableContainer>
+            <UserTable></UserTable>
 
         </Box>
   );
