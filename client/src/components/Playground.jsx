@@ -1,8 +1,7 @@
 import React, {useEffect, useState} from "react";
 import { Box, Text } from "@chakra-ui/react";
 import {useBackendContext} from "../contexts/hooks/useBackendContext";
-import { useAuthContext } from "@/contexts/hooks/useAuthContext";
-import { useRoleContext } from "@/contexts/hooks/useRoleContext";
+import ProviderTable from "./ProviderTable";
 
 export const Playground = () => {
   const {backend} = useBackendContext();
@@ -18,11 +17,14 @@ export const Playground = () => {
       
     }) (); 
   }, []);
-  console.log(categories, providers);
   
   return (
     <Box>
       <Text>Place your items here for testing</Text>
+      <ProviderTable
+        providers={providers}
+        providerCategories={categories}
+      />
     </Box>
   );
 };
