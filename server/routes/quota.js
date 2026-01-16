@@ -7,80 +7,113 @@ export const quotaRouter = Router();
 
 // create quota
 quotaRouter.post("/", async (req, res) => {
-    try {
-        const {
-            providerId, 
-            locationId,
-            quota,
-            progress,
-            date,
-            startTime,
-            endTime,
-            appointmentType,
-            notes
-        } = req.body;
-
-        const result = await db.query(
-            `INSERT INTO quota (provider_id, location_id, quota, progress, date, start_time, end_time, appointment_type, notes)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-            RETURNING *`, 
-            [providerId, locationId, quota, progress, date, startTime, endTime, appointmentType, notes]
-        );
-        res.status(200).json(keysToCamel(result));
-
-    } catch (err) {
-        res.status(400).send(err.message);
-    }
-});
-
-
-// get all quotas
-quotaRouter.get("/", async (req, res) => {
-    try {
-      const quotas = await db.query(`SELECT * FROM quota ORDER BY id ASC`);
-
-      res.status(200).json(keysToCamel(quotas));
-    } catch (err) {
-      res.status(400).send(err.message);
-    }
-  });
-  
-// get quotas by id
-quotaRouter.get("/:id", async (req, res) => {
   try {
-    const { id } = req.params
-    const quotas = await db.query(`SELECT * FROM quota WHERE id = $1`, [id]);
+    const {
+      providerId,
+      locationId,
+      quota,
+      progress,
+      date,
+      startTime,
+      endTime,
+      appointmentType,
+      notes,
+    } = req.body;
 
-    if (quotas.length === 0) {
-       return res.status(404).json({ error: `Quota with id ${id} not found.`}); 
-    }
-    else {
-        res.status(200).json(keysToCamel(quotas));
-    }
-    
+    const result = await db.query(
+      `INSERT INTO quota (provider_id, location_id, quota, progress, date, start_time, end_time, appointment_type, notes)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+            RETURNING *`,
+      [
+        providerId,
+        locationId,
+        quota,
+        progress,
+        date,
+        startTime,
+        endTime,
+        appointmentType,
+        notes,
+      ]
+    );
+    res.status(200).json(keysToCamel(result));
   } catch (err) {
     res.status(400).send(err.message);
   }
 });
 
+// get all quotas
+quotaRouter.get("/", async (req, res) => {
+  try {
+    const quotas = await db.query(`SELECT * FROM quota ORDER BY id ASC`);
+
+    res.status(200).json(keysToCamel(quotas));
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+});
+
+// get quota data with location and provider name
+quotaRouter.get("/details", async (req, res) => {
+  try {
+    const { provider } = req.query;
+    const values = []
+    let whereClause = "";
+
+    if (provider) {
+        whereClause = "WHERE p.data->>'name' ILIKE $1";
+        values.push(`%${provider}%`);
+        }
+
+    const results =
+      await db.query(`
+        SELECT q.*, p.data->>'name' AS provider_name, l.tag_value AS location_name 
+        FROM quota q 
+        JOIN providers p ON q.provider_id = p.id 
+        JOIN location l ON q.location_id = l.id
+        ${whereClause}
+        ORDER BY q.id ASC`,
+        values
+        );
+    res.status(200).json(keysToCamel(results));
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+});
+
+// get quotas by id
+quotaRouter.get("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const quotas = await db.query(`SELECT * FROM quota WHERE id = $1`, [id]);
+
+    if (quotas.length === 0) {
+      return res.status(404).json({ error: `Quota with id ${id} not found.` });
+    } else {
+      res.status(200).json(keysToCamel(quotas));
+    }
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+});
 
 // update quota by id
 quotaRouter.put("/:id", async (req, res) => {
-    try {
-        const { id } = req.params
-        const {
-            providerId, 
-            locationId,
-            quota,
-            progress,
-            date,
-            startTime,
-            endTime,
-            appointmentType,
-            notes
-        } = req.body;
-        const result = await db.query(
-            `UPDATE quota
+  try {
+    const { id } = req.params;
+    const {
+      providerId,
+      locationId,
+      quota,
+      progress,
+      date,
+      startTime,
+      endTime,
+      appointmentType,
+      notes,
+    } = req.body;
+    const result = await db.query(
+      `UPDATE quota
             SET
             provider_id = COALESCE($1, provider_id),
             location_id = COALESCE($2, location_id),
@@ -92,36 +125,46 @@ quotaRouter.put("/:id", async (req, res) => {
             appointment_type = COALESCE($8, appointment_type),
             notes = COALESCE($9, notes)
             WHERE id = $10
-            RETURNING *`, 
-            [providerId, locationId, quota, progress, date, startTime, endTime, appointmentType, notes, id]
-        )
+            RETURNING *`,
+      [
+        providerId,
+        locationId,
+        quota,
+        progress,
+        date,
+        startTime,
+        endTime,
+        appointmentType,
+        notes,
+        id,
+      ]
+    );
 
-        if (result.length === 0) {
-            return res.status(404).json({ error: `Quota with id ${id} not found.`}); 
-        }
-        else {
-            res.status(200).json(keysToCamel(result));
-        }
-    } catch (err) {
-        res.status(400).send(err.message);
+    if (result.length === 0) {
+      return res.status(404).json({ error: `Quota with id ${id} not found.` });
+    } else {
+      res.status(200).json(keysToCamel(result));
     }
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
 });
 
 // delete quota by id
 quotaRouter.delete("/:id", async (req, res) => {
-    try {
-        const { id } = req.params
-        const result = await db.query("DELETE FROM quota WHERE id = $1 RETURNING *", [id]);
+  try {
+    const { id } = req.params;
+    const result = await db.query(
+      "DELETE FROM quota WHERE id = $1 RETURNING *",
+      [id]
+    );
 
-        if (result.length === 0) {
-            return res.status(404).json({ error: `Quota with id ${id} not found.`}); 
-        }
-        else {
-            res.status(200).json(keysToCamel(result));
-        }
+    if (result.length === 0) {
+      return res.status(404).json({ error: `Quota with id ${id} not found.` });
+    } else {
+      res.status(200).json(keysToCamel(result));
     }
-    catch (err) {
-        res.status(400).send(err.message)
-    }
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
 });
-

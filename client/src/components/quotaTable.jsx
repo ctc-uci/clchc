@@ -25,7 +25,7 @@ import {
 
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 
-const QuotaTable = () => {
+const QuotaTable = ({ data = [], searchTerm = "" }) => {
   const { backend } = useBackendContext();
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -33,7 +33,9 @@ const QuotaTable = () => {
   useEffect(() => {
     const fetchQuotas = async () => {
       try {
-        const response = await backend.get("/quota");
+        const response = await backend.get("/quota/details", {
+          params: { provider: searchTerm },
+        });
         console.log("QUOTA DATA:", response.data);
         setRows(response.data);
       } catch (err) {
@@ -44,7 +46,7 @@ const QuotaTable = () => {
     };
 
     fetchQuotas();
-  }, [backend]);
+  }, [backend, searchTerm]);
 
   const onSave = async (id, newNote) => {
     const sanitizedNote = newNote.trim();
@@ -126,7 +128,7 @@ const QuotaTable = () => {
               {/* Provider */}
               <Td>
                 <Box>
-                  <Text fontWeight="medium">Provider #{row.providerId}</Text>
+                  <Text fontWeight="medium">{row.providerName}</Text>
                   <Text
                     fontSize="sm"
                     color="gray.500"
@@ -143,7 +145,7 @@ const QuotaTable = () => {
                   py={1}
                   borderRadius="full"
                 >
-                  Location {row.locationId}
+                  {row.locationName}
                 </Badge>
               </Td>
 
