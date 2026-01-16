@@ -47,11 +47,13 @@ const QuotaTable = () => {
   }, [backend]);
 
   const onSave = async (id, newNote) => {
+    const sanitizedNote = newNote.replace(/[\r\n]+/gm, " ").trim();
+
     try {
-      await backend.put(`/quota/${id}`, { notes: newNote });
+      await backend.put(`/quota/${id}`, { notes: sanitizedNote });
       setRows((prevRows) =>
         prevRows.map((row) =>
-          row.id === id ? { ...row, notes: newNote } : row
+          row.id === id ? { ...row, notes: sanitizedNote } : row
         )
       );
     } catch (err) {
