@@ -67,7 +67,7 @@ quotaRouter.get("/details", async (req, res) => {
 
     const results =
       await db.query(`
-        SELECT q.*, p.data->>'name' AS provider_name, l.tag_value AS location_name 
+        SELECT q.*, p.data->>'Name' AS provider_name, l.tag_value AS location_name 
         FROM quota q 
         JOIN providers p ON q.provider_id = p.id 
         JOIN location l ON q.location_id = l.id
