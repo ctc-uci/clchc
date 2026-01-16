@@ -9,6 +9,8 @@ import {
   Button,
   useDisclosure,
   Input,
+  Box,
+  Text,
 } from '@chakra-ui/react'
 import React, { useEffect, useState } from "react";
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
@@ -20,20 +22,22 @@ const ProviderDrawer = () => {
   const [loadingCategories, setLoadingCategories] = useState(false);
 
   useEffect(() => {
-  if (!isOpen) return;
+    if (!isOpen) return;
 
-  const fetchDirectoryCategories = async () => {
-    try {
-      const response = await backend.get("/directoryCategories");
-      console.log("DIRECTORY CATEGORIES:", response.data);
-      setCategories(response.data);
-    } catch (err) {
-      console.error("Error fetching directory categories", err);
-    }
-  };
+    const fetchDirectoryCategories = async () => {
+      try {
+        const response = await backend.get("/directoryCategories");
+        console.log("DIRECTORY CATEGORIES:", response.data);
+        setCategories(response.data);
+      } catch (err) {
+        console.error("Error fetching directory categories", err);
+      }
+    };
 
-  fetchDirectoryCategories();
-}, [isOpen, backend]);
+    fetchDirectoryCategories();
+  }, [isOpen, backend]);
+
+  
 
   return (
     <>
@@ -54,9 +58,12 @@ const ProviderDrawer = () => {
         <DrawerBody>
 
         {categories.map((cat) => (
-            <div key={cat.id}>
+          <Box>
+            <Text key={cat.id}>
             {cat.name} ({cat.inputType}) ({cat.required ? "required" : "optional"})
-            </div>
+            </Text>
+            <Input/>
+          </Box>
         ))}
         </DrawerBody>
 

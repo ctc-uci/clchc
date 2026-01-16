@@ -1,7 +1,6 @@
 import { SearchIcon, InfoOutlineIcon, DeleteIcon, EditIcon, CalendarIcon } from "@chakra-ui/icons";
 import { Badge, Box, Flex, HStack, Heading, Input, InputGroup, InputLeftElement, Text, Table, Thead, Tbody, Tr, Th, Td, TableContainer, IconButton } from "@chakra-ui/react";
 import { CustomCard } from "./customCard";
-import InputMask from "react-input-mask";
 
 export const UserDirectory = () => {
 
