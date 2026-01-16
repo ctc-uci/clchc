@@ -47,7 +47,7 @@ const QuotaTable = () => {
   }, [backend]);
 
   const onSave = async (id, newNote) => {
-    const sanitizedNote = newNote.replace(/[\r\n]+/gm, " ").trim();
+    const sanitizedNote = newNote.trim();
 
     try {
       await backend.put(`/quota/${id}`, { notes: sanitizedNote });
