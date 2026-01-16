@@ -2,8 +2,46 @@ import { SearchIcon, InfoOutlineIcon} from "@chakra-ui/icons";
 import { Badge, Box, Flex, HStack, Heading, Input, InputGroup, InputLeftElement, Text } from "@chakra-ui/react";
 import { CustomCard } from "./customCard";
 import UserTable from "./userTable";
+import { BackendContext } from "../contexts/BackendContext";
+import { useContext, useEffect, useState } from "react";
 
 export const UserDirectory = () => {
+
+    const { backend } = useContext(BackendContext);
+    const [users, setUsers] = useState([]);
+    const [searchQuery, setSearchQuery] = useState("");
+
+    // fetching users
+    useEffect(() => {
+        const fetchUsers = async () => {
+            try {
+                const { data } = await backend.get("/users-js");
+                setUsers(data);
+            } catch (err) {
+                console.error("couldn't fetch users in components/UserDirectoryPage.jsx", err);
+            }
+        };
+
+        fetchUsers();
+    }, [backend]);
+
+    // table delete
+    const handleDelete = async (id) => {
+        try {
+            await backend.delete(`/users-js/${id}`);
+            setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
+        } catch (err) {
+            console.error("couldn't delete user in components/UserDirectoryPage.jsx", err);
+        }
+    };
+
+    // filter data via search bar changes
+    const filteredUsers = users.filter((user) => {
+        const lowerQuery = searchQuery.toLowerCase();
+        const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
+        const email = user.email.toLowerCase();
+        return fullName.includes(lowerQuery) || email.includes(lowerQuery);
+    });
 
     return (
         <Box p={6} maxW="1200px" mx="auto">
@@ -60,10 +98,15 @@ export const UserDirectory = () => {
                 <InputLeftElement pointerEvents="none">
                     <SearchIcon color="gray.400" />
                 </InputLeftElement>
-                <Input placeholder="Search by name or email..." borderRadius="md"/>
+                <Input 
+                    placeholder="Search by name or email..." 
+                    borderRadius="md"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                />
             </InputGroup>
 
-            <UserTable></UserTable>
+            <UserTable users={filteredUsers} onDelete={handleDelete} />
 
         </Box>
   );
