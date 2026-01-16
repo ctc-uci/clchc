@@ -35,6 +35,18 @@ providersRouter.get("/", async (req, res) => {
   }
 });
 
+providersRouter.get("/summary", async (req, res) => {
+  try {
+    const result = await db.any(
+      `SELECT id, data->>'Name' AS name FROM providers;`
+    );
+    res.status(200).json(keysToCamel(result));
+  } catch (err) {
+    console.error(err);
+    res.status(500).send(err.message);
+  }
+});
+
 providersRouter.get("/:id", async (req, res) => {
   try {
     const result = await db.oneOrNone(
