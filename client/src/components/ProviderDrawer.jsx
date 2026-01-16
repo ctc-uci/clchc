@@ -9,15 +9,24 @@ import {
   Button,
   useDisclosure,
   Input,
+  Select,
 } from '@chakra-ui/react'
 import React, { useEffect, useState } from "react";
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 const ProviderDrawer = () => {
+  const [formValues, setFormValues] = useState({});
   const { isOpen, onOpen, onClose } = useDisclosure()
   const btnRef = React.useRef()
   const { backend } = useBackendContext();
   const [categories, setCategories] = useState([]);
   const [loadingCategories, setLoadingCategories] = useState(false);
+
+  const handleInputChange = (categoryId, value) => {
+  setFormValues((prev) => ({
+    ...prev,
+    [categoryId]: value,
+  }));
+  };
 
   useEffect(() => {
   if (!isOpen) return;
@@ -33,6 +42,7 @@ const ProviderDrawer = () => {
   };
 
   fetchDirectoryCategories();
+
 }, [isOpen, backend]);
 
   return (
@@ -50,14 +60,40 @@ const ProviderDrawer = () => {
         <DrawerContent>
           <DrawerCloseButton />
           <DrawerHeader>Provider Drawer</DrawerHeader>
+          <DrawerBody>
+            {categories.map((cat) => (
+              <div key={cat.id} style={{ marginBottom: "16px" }}>
+                <div style={{ fontWeight: 500 }}>
+                  {cat.name}
+                  {cat.isRequired && " *"}
+                </div>
 
-        <DrawerBody>
+                {cat.inputType === "text" && (
+                  <Input
+                    placeholder={cat.name}
+                    value={formValues[cat.id] || ""}
+                    onChange={(e) =>
+                      handleInputChange(cat.id, e.target.value)
+                    }
+                  />
+                )}
 
-        {categories.map((cat) => (
-            <div key={cat.id}>
-            {cat.name} ({cat.inputType}) ({cat.isRequired ? "required" : "optional"})
-            </div>
-        ))}
+                {cat.inputType === "tag" && (
+                  <Select
+                    placeholder={`Select ${cat.name}`}
+                    value={formValues[cat.id] || ""}
+                    onChange={(e) =>
+                      handleInputChange(cat.id, e.target.value)
+                    }
+                  >
+                    <option value="A">A</option>
+                    <option value="B">B</option>
+                    <option value="C">C</option>
+                    <option value="D">D</option>
+                  </Select>
+                )}
+              </div>
+            ))}
         </DrawerBody>
 
           <DrawerFooter>
