@@ -19,7 +19,7 @@ const ProviderDrawer = () => {
   const btnRef = React.useRef()
   const { backend } = useBackendContext();
   const [categories, setCategories] = useState([]);
-  const [loadingCategories, setLoadingCategories] = useState(false);
+  const [tags, setTags] = useState([]);
 
   const handleInputChange = (categoryId, value) => {
   setFormValues((prev) => ({
@@ -40,9 +40,23 @@ const ProviderDrawer = () => {
       console.error("Error fetching directory categories", err);
     }
   };
-
   fetchDirectoryCategories();
 
+}, [isOpen, backend]);
+useEffect(() => {
+  if (!isOpen) return;
+
+  const fetchTags = async () => {
+    try {
+      const response = await backend.get("/tags");
+      console.log("ALL TAGS:", response.data);
+      setTags(response.data);
+    } catch (err) {
+      console.error("Error fetching tags", err);
+    }
+  };
+
+  fetchTags();
 }, [isOpen, backend]);
 
   return (
@@ -61,7 +75,11 @@ const ProviderDrawer = () => {
           <DrawerCloseButton />
           <DrawerHeader>Provider Drawer</DrawerHeader>
           <DrawerBody>
-            {categories.map((cat) => (
+            {categories.map((cat) => {
+                const categoryTags = tags.filter(
+                (tag) => tag.categoryId === cat.id
+                );
+            return (
               <div key={cat.id} style={{ marginBottom: "16px" }}>
                 <div style={{ fontWeight: 500 }}>
                   {cat.name}
@@ -80,20 +98,22 @@ const ProviderDrawer = () => {
 
                 {cat.inputType === "tag" && (
                   <Select
-                    placeholder={`Select ${cat.name}`}
-                    value={formValues[cat.id] || ""}
-                    onChange={(e) =>
-                      handleInputChange(cat.id, e.target.value)
-                    }
-                  >
-                    <option value="A">A</option>
-                    <option value="B">B</option>
-                    <option value="C">C</option>
-                    <option value="D">D</option>
+                  placeholder={`Select ${cat.name}`}
+                  value={formValues[cat.id] || ""}
+                  onChange={(e) =>
+                    handleInputChange(cat.id, e.target.value)
+                  }
+                >
+                  {categoryTags.map((tag) => (
+                    <option key={tag.id} value={tag.tagValue}>
+                      {tag.tagValue}
+                    </option>
+                  ))}
                   </Select>
                 )}
               </div>
-            ))}
+            );
+          })}
         </DrawerBody>
 
           <DrawerFooter>
