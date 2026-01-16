@@ -61,7 +61,7 @@ quotaRouter.get("/details", async (req, res) => {
     let whereClause = "";
 
     if (provider) {
-        whereClause = "WHERE p.data->>'name' ILIKE $1";
+        whereClause = "WHERE p.data->>'Name' ILIKE $1";
         values.push(`%${provider}%`);
         }
 
