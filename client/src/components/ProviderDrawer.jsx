@@ -21,6 +21,29 @@ const ProviderDrawer = () => {
   const [categories, setCategories] = useState([]);
   const [tags, setTags] = useState([]);
 
+const handleSubmit = async () => {
+  try {
+    const payload = {};
+
+    categories.forEach((cat) => {
+      if (formValues[cat.id] !== undefined) {
+        payload[cat.name] = formValues[cat.id];
+      }
+    });
+
+    console.log("POST payload:", payload);
+
+    await backend.post("/providers", {
+      data: payload,
+      note: "", // ## for elliot nathan this note isn't dynamically pullable from directory_categories atm (not in a db field yet)
+    });
+
+    onClose();
+    setFormValues({});
+  } catch (err) {
+    console.error("Failed to submit provider data", err);
+  }
+};
   const handleInputChange = (categoryId, value) => {
   setFormValues((prev) => ({
     ...prev,
@@ -30,6 +53,7 @@ const ProviderDrawer = () => {
 
   useEffect(() => {
   if (!isOpen) return;
+
 
   const fetchDirectoryCategories = async () => {
     try {
@@ -120,7 +144,9 @@ useEffect(() => {
             <Button variant='outline' mr={3} onClick={onClose}>
               Cancel
             </Button>
-            <Button colorScheme='blue'>Save</Button>
+            <Button colorScheme='blue' onClick={handleSubmit}>
+              Save
+            </Button>
           </DrawerFooter>
         </DrawerContent>
       </Drawer>
