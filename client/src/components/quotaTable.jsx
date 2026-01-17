@@ -1,10 +1,9 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { CheckIcon, EditIcon } from "@chakra-ui/icons";
 import {
   Badge,
   Box,
-  HStack,
   IconButton,
   Popover,
   PopoverArrow,
@@ -23,31 +22,9 @@ import {
   Tr,
 } from "@chakra-ui/react";
 
-import { useBackendContext } from "@/contexts/hooks/useBackendContext";
+import ProgressBar from "./ProgressBar";
 
-const QuotaTable = ({ data = [], searchTerm = "" }) => {
-  const { backend } = useBackendContext();
-  const [rows, setRows] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchQuotas = async () => {
-      try {
-        const response = await backend.get("/quota/details", {
-          params: { provider: searchTerm },
-        });
-        console.log("QUOTA DATA:", response.data);
-        setRows(response.data);
-      } catch (err) {
-        console.error("Failed to fetch quotas", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchQuotas();
-  }, [backend, searchTerm]);
-
+const QuotaTable = ({ rows, loading }) => {
   const onSave = async (id, newNote) => {
     const sanitizedNote = newNote.trim();
 
@@ -162,11 +139,7 @@ const QuotaTable = ({ data = [], searchTerm = "" }) => {
 
               {/* Progress */}
               <Td>
-                <HStack spacing={2}>
-                  <Text>
-                    {row.progress}/{row.quota}
-                  </Text>
-                </HStack>
+                <ProgressBar quotaID={row.id} />
               </Td>
 
               {/* Notes */}
