@@ -13,6 +13,7 @@ import {
   HStack,
 } from "@chakra-ui/react";
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
+import QuotaDrawer from "./QuotaDrawer";
 
 const QuotaTable = () => {
   const { backend } = useBackendContext();
@@ -105,7 +106,7 @@ const QuotaTable = () => {
               </Td>
 
               {/* Edit */}
-              <Td textAlign="right">✎</Td>
+              <Td textAlign="right"><QuotaDrawer quotaID={row.id} /></Td>
             </Tr>
           ))}
         </Tbody>
