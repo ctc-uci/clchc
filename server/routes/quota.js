@@ -57,24 +57,24 @@ quotaRouter.get("/", async (req, res) => {
 quotaRouter.get("/details", async (req, res) => {
   try {
     const { provider } = req.query;
-    const values = []
+    const values = [];
     let whereClause = "";
 
     if (provider) {
-        whereClause = "WHERE p.data->>'Name' ILIKE $1";
-        values.push(`%${provider}%`);
-        }
+      whereClause = "WHERE p.data->>'Name' ILIKE $1";
+      values.push(`%${provider}%`);
+    }
 
-    const results =
-      await db.query(`
+    const results = await db.query(
+      `
         SELECT q.*, p.data->>'Name' AS provider_name, l.tag_value AS location_name 
         FROM quota q 
         JOIN providers p ON q.provider_id = p.id 
         JOIN location l ON q.location_id = l.id
         ${whereClause}
         ORDER BY q.id ASC`,
-        values
-        );
+      values
+    );
     res.status(200).json(keysToCamel(results));
   } catch (err) {
     res.status(400).send(err.message);
