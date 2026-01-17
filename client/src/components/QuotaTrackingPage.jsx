@@ -49,7 +49,7 @@ export const QuotaTracking = () => {
   const debouncedFetch = useMemo(() => {
     return debounce((provider) => {
       fetchQuotas(provider);
-    }, 300);
+    }, 300); // TODO: If we have multiple debounced inputs, we should set a universal delay in a constants file.
   }, [fetchQuotas]);
 
   // Handle cleanup
@@ -61,6 +61,7 @@ export const QuotaTracking = () => {
 
   useEffect(() => {
     if (!providerQuery) {
+      // If the search input is empty, immediately fetch all quotas
       debouncedFetch.cancel();
       fetchQuotas();
       return;
