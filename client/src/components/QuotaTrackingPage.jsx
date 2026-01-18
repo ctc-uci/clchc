@@ -3,6 +3,7 @@ import { Badge, Box, Button, Flex, HStack, Heading, Input, InputGroup, InputLeft
 import { CustomCard } from "./customCard";
 import InputMask from "react-input-mask";
 import QuotaTable from "./quotaTable";
+import { Navbar } from "@/components/Navbar";
 
 export const QuotaTracking = () => {
     return (
@@ -60,7 +61,7 @@ export const QuotaTracking = () => {
             </InputGroup>
 
             <QuotaTable></QuotaTable>
-
+            <Navbar />
         </Box>
     );
 }
