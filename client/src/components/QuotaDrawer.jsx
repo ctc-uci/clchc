@@ -28,7 +28,7 @@ import {
 // bowen
 
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
-import { FaPen, FaPlus } from "react-icons/fa6";
+import { LuPencil } from "react-icons/lu";
 
 const MAX_INPUT_NUMBER = 99;
 
@@ -404,7 +404,7 @@ export default function QuotaDrawer({ quotaID = 0 }) {
         as={IconButton}
         ref={btnRef}
         aria-label={quotaID ? "Edit quota" : "Create quota"}
-        icon={<FaPen style={{ background: 'transparent' }} />}
+        icon={<LuPencil style={{ background: 'transparent', size: '40px' }} />}
         onClick={onOpen}
         variant="unstyled"
         color="inherit"
