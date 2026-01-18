@@ -1,5 +1,6 @@
 import React from "react";
 import { Box, Button, Divider, Grid, Flex, Text } from "@chakra-ui/react";
+import { Navbar } from "@/components/Navbar";
 
 export const ProviderDirectoryPage = () => {
   return (
@@ -41,6 +42,7 @@ export const ProviderDirectoryPage = () => {
           <GridDivider left="75%" />
         </Grid>
       </Box>
+      <Navbar />
     </Box>
   );
 };
