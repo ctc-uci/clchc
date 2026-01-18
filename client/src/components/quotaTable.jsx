@@ -24,6 +24,7 @@ import {
 } from "@chakra-ui/react";
 
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
+import QuotaDrawer from "./QuotaDrawer";
 
 const QuotaTable = () => {
   const { backend } = useBackendContext();
@@ -177,13 +178,7 @@ const QuotaTable = () => {
               </Td>
 
               {/* Edit */}
-              <Td>
-                <IconButton
-                  aria-label="Edit"
-                  borderRadius="16px"
-                  icon={<EditIcon />}
-                ></IconButton>
-              </Td>
+              <Td textAlign="right"><QuotaDrawer quotaID={row.id} /></Td>
             </Tr>
           ))}
         </Tbody>
