@@ -1,17 +1,28 @@
 import { useEffect, useState } from "react";
+
+import { CheckIcon, EditIcon } from "@chakra-ui/icons";
 import {
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-  TableContainer,
-  Box,
-  Text,
   Badge,
+  Box,
   HStack,
+  IconButton,
+  Popover,
+  PopoverArrow,
+  PopoverBody,
+  PopoverContent,
+  PopoverTrigger,
+  Portal,
+  Table,
+  TableContainer,
+  Tbody,
+  Td,
+  Text,
+  Textarea,
+  Th,
+  Thead,
+  Tr,
 } from "@chakra-ui/react";
+
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 import QuotaDrawer from "./QuotaDrawer";
 
@@ -35,6 +46,62 @@ const QuotaTable = () => {
 
     fetchQuotas();
   }, [backend]);
+
+  const onSave = async (id, newNote) => {
+    const sanitizedNote = newNote.trim();
+
+    try {
+      await backend.put(`/quota/${id}`, { notes: sanitizedNote });
+      setRows((prevRows) =>
+        prevRows.map((row) =>
+          row.id === id ? { ...row, notes: sanitizedNote } : row
+        )
+      );
+    } catch (err) {
+      console.error("Could not update note", err);
+    }
+  };
+
+  const EditableNote = ({ quotaId, initialNote, onSave }) => {
+    const [tempNote, setTempNote] = useState(initialNote);
+
+    return (
+      <Popover trigger="click">
+        <PopoverTrigger>
+          <Box maxWidth="100px">
+            <Text
+              isTruncated
+              textDecoration="underline"
+              textUnderlineOffset="3px"
+              color="gray.600"
+              noOfLines={1}
+            >
+              {initialNote}
+            </Text>
+          </Box>
+        </PopoverTrigger>
+        <Portal>
+          <PopoverContent bg="white">
+            <PopoverArrow />
+            <PopoverBody>
+              <Textarea
+                size="lg"
+                width="100%"
+                value={tempNote}
+                onChange={(e) => setTempNote(e.target.value)}
+              ></Textarea>
+              <IconButton
+                aria-label="Save"
+                borderRadius="16px"
+                icon={<CheckIcon />}
+                onClick={() => onSave(quotaId, tempNote)}
+              ></IconButton>
+            </PopoverBody>
+          </PopoverContent>
+        </Portal>
+      </Popover>
+    );
+  };
 
   if (loading) {
     return <Text>Loading...</Text>;
@@ -60,10 +127,11 @@ const QuotaTable = () => {
               {/* Provider */}
               <Td>
                 <Box>
-                  <Text fontWeight="medium">
-                    Provider #{row.providerId}
-                  </Text>
-                  <Text fontSize="sm" color="gray.500">
+                  <Text fontWeight="medium">Provider #{row.providerId}</Text>
+                  <Text
+                    fontSize="sm"
+                    color="gray.500"
+                  >
                     {row.hours} hours
                   </Text>
                 </Box>
@@ -71,7 +139,11 @@ const QuotaTable = () => {
 
               {/* Location */}
               <Td>
-                <Badge px={3} py={1} borderRadius="full">
+                <Badge
+                  px={3}
+                  py={1}
+                  borderRadius="full"
+                >
                   Location {row.locationId}
                 </Badge>
               </Td>
@@ -83,9 +155,7 @@ const QuotaTable = () => {
                   py={1}
                   borderRadius="full"
                 >
-                  <Text textTransform="capitalize">
-                    {row.appointmentType}
-                  </Text>
+                  <Text textTransform="capitalize">{row.appointmentType}</Text>
                 </Badge>
               </Td>
 
@@ -100,9 +170,11 @@ const QuotaTable = () => {
 
               {/* Notes */}
               <Td>
-                <Text color="gray.600" noOfLines={1}>
-                  {row.notes}
-                </Text>
+                <EditableNote
+                  quotaId={row.id}
+                  initialNote={row.notes}
+                  onSave={onSave}
+                ></EditableNote>
               </Td>
 
               {/* Edit */}
