@@ -1,6 +1,21 @@
-import { SearchIcon, EditIcon, CalendarIcon, AddIcon } from "@chakra-ui/icons";
-import { Badge, Box, Button, Flex, HStack, Heading, Input, InputGroup, InputLeftElement, Text, Table, Thead, Tbody, Tr, Th, Td, TableContainer, IconButton, Progress, Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverBody, Portal } from "@chakra-ui/react";
-import { CustomCard } from "./customCard";
+import { useCallback, useEffect, useMemo, useState } from "react";
+
+import { AddIcon, SearchIcon } from "@chakra-ui/icons";
+import {
+  Badge,
+  Box,
+  Button,
+  Flex,
+  Heading,
+  HStack,
+  Input,
+  InputGroup,
+  InputLeftElement,
+  Text,
+} from "@chakra-ui/react";
+
+import { useBackendContext } from "@/contexts/hooks/useBackendContext";
+import debounce from "lodash.debounce";
 import InputMask from "react-input-mask";
 import QuotaTable from "./quotaTable";
 import { Navbar } from "@/components/Navbar";
@@ -63,5 +78,73 @@ export const QuotaTracking = () => {
             <QuotaTable></QuotaTable>
             <Navbar />
         </Box>
-    );
-}
+
+        <Button
+          leftIcon={<AddIcon />}
+          colorScheme="blue"
+          ml={4}
+        >
+          Create Quota
+        </Button>
+      </Flex>
+
+      <Box
+        overflowX="auto"
+        py={4}
+        mb={6}
+      >
+        <HStack
+          spacing={4}
+          minW="min-content"
+        >
+          <CustomCard
+            title="Total Progress"
+            body="5/12"
+            height="12rem"
+            width="14rem"
+          />
+          <CustomCard
+            title="Completion Rate"
+            body="73%"
+            footer="Overall Progress"
+            height="12rem"
+            width="14rem"
+          />
+          <CustomCard
+            title="Active Providers"
+            body="9"
+            footer="3 Locations"
+            height="12rem"
+            width="14rem"
+          />
+          <CustomCard
+            title="Needs Attention"
+            body="0"
+            footer="Below 40% Progress"
+            height="12rem"
+            width="14rem"
+          />
+        </HStack>
+      </Box>
+
+      <InputGroup
+        maxW="400px"
+        pb={6}
+      >
+        <InputLeftElement pointerEvents="none">
+          <SearchIcon color="gray.400" />
+        </InputLeftElement>
+        <Input
+          placeholder="Search Providers"
+          borderRadius="md"
+          onChange={handleChange}
+        />
+      </InputGroup>
+
+      <QuotaTable
+        rows={rows}
+        loading={loading}
+      />
+    </Box>
+  );
+};
