@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { CheckIcon, EditIcon } from "@chakra-ui/icons";
 import {
   Badge,
   Box,
+  HStack,
   IconButton,
   Popover,
   PopoverArrow,
@@ -22,9 +23,29 @@ import {
   Tr,
 } from "@chakra-ui/react";
 
-import ProgressBar from "./ProgressBar";
+import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 
-const QuotaTable = ({ rows, loading }) => {
+const QuotaTable = () => {
+  const { backend } = useBackendContext();
+  const [rows, setRows] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchQuotas = async () => {
+      try {
+        const response = await backend.get("/quota");
+        console.log("QUOTA DATA:", response.data);
+        setRows(response.data);
+      } catch (err) {
+        console.error("Failed to fetch quotas", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchQuotas();
+  }, [backend]);
+
   const onSave = async (id, newNote) => {
     const sanitizedNote = newNote.trim();
 
@@ -105,7 +126,7 @@ const QuotaTable = ({ rows, loading }) => {
               {/* Provider */}
               <Td>
                 <Box>
-                  <Text fontWeight="medium">{row.providerName}</Text>
+                  <Text fontWeight="medium">Provider #{row.providerId}</Text>
                   <Text
                     fontSize="sm"
                     color="gray.500"
@@ -122,7 +143,7 @@ const QuotaTable = ({ rows, loading }) => {
                   py={1}
                   borderRadius="full"
                 >
-                  {row.locationName}
+                  Location {row.locationId}
                 </Badge>
               </Td>
 
@@ -139,7 +160,11 @@ const QuotaTable = ({ rows, loading }) => {
 
               {/* Progress */}
               <Td>
-                <ProgressBar quotaID={row.id} />
+                <HStack spacing={2}>
+                  <Text>
+                    {row.progress}/{row.quota}
+                  </Text>
+                </HStack>
               </Td>
 
               {/* Notes */}
