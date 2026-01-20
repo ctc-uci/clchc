@@ -19,6 +19,7 @@ import debounce from "lodash.debounce";
 import InputMask from "react-input-mask";
 
 import { CustomCard } from "./customCard";
+import Navbar from "./Navbar";
 import QuotaTable from "./QuotaTable";
 
 export const QuotaTracking = () => {
@@ -191,6 +192,7 @@ export const QuotaTracking = () => {
         rows={rows}
         loading={loading}
       />
+      <Navbar />
     </Box>
   );
 };
