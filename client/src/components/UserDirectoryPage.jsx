@@ -2,7 +2,6 @@ import { SearchIcon, InfoOutlineIcon, DeleteIcon, EditIcon, CalendarIcon } from 
 import { Badge, Box, Flex, HStack, Heading, Input, InputGroup, InputLeftElement, Text, Table, Thead, Tbody, Tr, Th, Td, TableContainer, IconButton } from "@chakra-ui/react";
 import { CustomCard } from "./customCard";
 import InputMask from "react-input-mask";
-import { Navbar } from "@/components/Navbar";
 
 export const UserDirectory = () => {
 
@@ -126,7 +125,7 @@ export const UserDirectory = () => {
                     </Tbody>
                 </Table>
             </TableContainer>
-            <Navbar />
+
         </Box>
   );
 };

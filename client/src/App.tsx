@@ -7,7 +7,6 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { Signup } from "@/components/signup/Signup";
 import { QuotaTracking } from "@/components/QuotaTrackingPage";
 import { UserDirectory } from "@/components/UserDirectoryPage";
-import {ProviderDirectoryPage} from "@/components/ProviderDirectoryPage";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { BackendProvider } from "@/contexts/BackendContext";
 import { RoleProvider } from "@/contexts/RoleContext";
@@ -50,10 +49,6 @@ const App = () => {
                 <Route
                   path="/dashboard"
                   element={<ProtectedRoute element={<Dashboard />} />}
-                />
-                <Route
-                  path="/provider-directory"
-                  element={<ProviderDirectoryPage />}
                 />
                 <Route
                   path="/admin"
