@@ -25,7 +25,8 @@ usersJsRouter.get('/', async(req,res)=>{
         const result = await db.query('SELECT * from users');
         res.status(200).json(keysToCamel(result));
     } catch(err){
-        res.status(500).send(err.message);
+        console.error('Error fetching users:', err);
+        res.status(500).json({ error: err.message });
     }
 })
 // Get a user by ID
