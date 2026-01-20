@@ -4,6 +4,8 @@ import { CustomCard } from "./customCard";
 import UserTable from "./userTable";
 import { BackendContext } from "../contexts/BackendContext";
 import { useContext, useEffect, useState } from "react";
+import InputMask from "react-input-mask";
+import { Navbar } from "@/components/Navbar";
 
 export const UserDirectory = () => {
 
@@ -107,7 +109,7 @@ export const UserDirectory = () => {
             </InputGroup>
 
             <UserTable users={filteredUsers} onDelete={handleDelete} />
-
+            <Navbar />
         </Box>
   );
 };

@@ -2,6 +2,8 @@ import { SearchIcon, EditIcon, AddIcon } from "@chakra-ui/icons";
 import { Badge, Box, Button, Flex, HStack, Heading, Input, InputGroup, InputLeftElement, Text, Table, Thead, Tbody, Tr, Th, Td, TableContainer, IconButton, Progress, Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverBody, Portal } from "@chakra-ui/react";
 import { CustomCard } from "./customCard";
 import InputMask from "react-input-mask";
+import QuotaTable from "./quotaTable";
+import { Navbar } from "@/components/Navbar";
 
 export const QuotaTracking = () => {
     return (
@@ -58,97 +60,8 @@ export const QuotaTracking = () => {
                 <Input placeholder="Search Providers" borderRadius="md"/>
             </InputGroup>
 
-            <TableContainer borderWidth="1px" borderColor="gray.200" borderRadius="lg">
-                <Table>
-                    <Thead bg="gray.50">
-                        <Tr>
-                            <Th>Providers</Th>
-                            <Th>Location</Th>
-                            <Th>Type</Th>
-                            <Th>Progress</Th>
-                            <Th>Notes</Th>
-                            <Th></Th>
-                        </Tr>
-                    </Thead>
-                    <Tbody>
-                        <Tr>
-                            <Td>
-                                <Flex direction="column" gap={1}>
-                                    <Text fontWeight="medium">Dr. Seuss</Text>
-                                    <Flex align="center" gap={1}>
-                                        <Text fontSize="xs" color="gray.600">10:00 AM - 11:00 AM</Text>
-                                    </Flex>
-                                </Flex>
-                            </Td>
-                            <Td>
-                                <Badge colorScheme="gray" borderRadius="full" px={2} py={0.5} fontSize="xs">Main Clinic</Badge>
-                            </Td>
-                            <Td>
-                                <Badge colorScheme="yellow" borderRadius="full" px={2} py={0.5} fontSize="xs">In-Person</Badge>
-                            </Td>
-                            <Td><Progress value={80} colorScheme="gray"/></Td>
-                            <Td>
-                                <Popover trigger="hover">
-                                    <PopoverTrigger>
-                                        <Text noOfLines={1} cursor="pointer" _hover={{ textDecoration: "underline" }}>
-                                            This is a sample paragraph that will...
-                                        </Text>
-                                    </PopoverTrigger>
-                                    <Portal>
-                                        <PopoverContent bg="white">
-                                            <PopoverArrow />
-                                            <PopoverBody>
-                                                <Text>This is a sample paragraph that will be shown in this white text box on hover.</Text>
-                                            </PopoverBody>
-                                        </PopoverContent>
-                                    </Portal>
-                                </Popover>
-                            </Td>
-                            <Td>
-                                <IconButton icon={<EditIcon />} size="sm" aria-label="Edit" />
-                            </Td>
-                        </Tr>
-                        <Tr>
-                            <Td>
-                                <Flex direction="column" gap={1}>
-                                    <Text fontWeight="medium">Dr. Mango</Text>
-                                    <Flex align="center" gap={1}>
-                                        <Text fontSize="xs" color="gray.600">1:00 PM - 4:30 PM</Text>
-                                    </Flex>
-                                </Flex>
-                            </Td>
-                            <Td>
-                                <Badge colorScheme="gray" borderRadius="full" px={2} py={0.5} fontSize="xs">Eastside Center</Badge>
-                            </Td>
-                            <Td>
-                                <Badge colorScheme="green" borderRadius="full" px={2} py={0.5} fontSize="xs">Telehealth</Badge>
-                            </Td>
-                            <Td><Progress value={80} colorScheme="gray"/></Td>
-                            <Td>
-                                <Popover trigger="hover">
-                                    <PopoverTrigger>
-                                        <Text noOfLines={1} cursor="pointer" _hover={{ textDecoration: "underline" }}>
-                                            This is a sample paragraph that will...
-                                        </Text>
-                                    </PopoverTrigger>
-                                    <Portal>
-                                        <PopoverContent bg="white">
-                                            <PopoverArrow />
-                                            <PopoverBody>
-                                                <Text>This is a sample paragraph that will be shown in this white text box on hover.</Text>
-                                            </PopoverBody>
-                                        </PopoverContent>
-                                    </Portal>
-                                </Popover>
-                            </Td>
-                            <Td>
-                                <IconButton icon={<EditIcon />} size="sm" aria-label="Edit" />
-                            </Td>
-                        </Tr>
-                    </Tbody>
-                </Table>
-            </TableContainer>
-
+            <QuotaTable></QuotaTable>
+            <Navbar />
         </Box>
     );
 }
