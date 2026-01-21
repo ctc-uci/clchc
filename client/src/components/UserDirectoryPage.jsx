@@ -1,8 +1,49 @@
-import { SearchIcon, InfoOutlineIcon, DeleteIcon, EditIcon, CalendarIcon } from "@chakra-ui/icons";
-import { Badge, Box, Flex, HStack, Heading, Input, InputGroup, InputLeftElement, Text, Table, Thead, Tbody, Tr, Th, Td, TableContainer, IconButton } from "@chakra-ui/react";
+import { SearchIcon, InfoOutlineIcon} from "@chakra-ui/icons";
+import { Badge, Box, Flex, HStack, Heading, Input, InputGroup, InputLeftElement, Text } from "@chakra-ui/react";
 import { CustomCard } from "./customCard";
+import UserTable from "./userTable";
+import { BackendContext } from "../contexts/BackendContext";
+import { useContext, useEffect, useState } from "react";
+import InputMask from "react-input-mask";
+import { Navbar } from "@/components/Navbar";
 
 export const UserDirectory = () => {
+
+    const { backend } = useContext(BackendContext);
+    const [users, setUsers] = useState([]);
+    const [searchQuery, setSearchQuery] = useState("");
+
+    // fetching users
+    useEffect(() => {
+        const fetchUsers = async () => {
+            try {
+                const { data } = await backend.get("/users-js");
+                setUsers(data);
+            } catch (err) {
+                console.error("couldn't fetch users in components/UserDirectoryPage.jsx", err);
+            }
+        };
+
+        fetchUsers();
+    }, [backend]);
+
+    // table delete
+    const handleDelete = async (id) => {
+        try {
+            await backend.delete(`/users-js/${id}`);
+            setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
+        } catch (err) {
+            console.error("couldn't delete user in components/UserDirectoryPage.jsx", err);
+        }
+    };
+
+    // filter data via search bar changes
+    const filteredUsers = users.filter((user) => {
+        const lowerQuery = searchQuery.toLowerCase();
+        const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
+        const email = user.email.toLowerCase();
+        return fullName.includes(lowerQuery) || email.includes(lowerQuery);
+    });
 
     return (
         <Box p={6} maxW="1200px" mx="auto">
@@ -23,15 +64,9 @@ export const UserDirectory = () => {
 
                 <Box flex="1" display="flex" justifyContent="flex-end">
                     <InputGroup w="19ch">
-                        {/* <InputLeftElement pointerEvents="none">
-                            <CalendarIcon />
-                        </InputLeftElement> */}
                         <Input
                             textAlign="center"
                             type="date"
-                            as={InputMask}
-                            mask="99/99/9999"
-                            placeholder="MM/DD/YYYY"
                             onChange={(e) => console.log('date input:', e.target.value)}
                         />
                     </InputGroup>
@@ -65,66 +100,16 @@ export const UserDirectory = () => {
                 <InputLeftElement pointerEvents="none">
                     <SearchIcon color="gray.400" />
                 </InputLeftElement>
-                <Input placeholder="Search by name or email..." borderRadius="md"/>
+                <Input 
+                    placeholder="Search by name or email..." 
+                    borderRadius="md"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                />
             </InputGroup>
 
-            <TableContainer borderWidth="1px" borderColor="gray.200" borderRadius="lg">
-                <Table>
-                    <Thead bg="gray.50">
-                        <Tr>
-                            <Th>User</Th>
-                            <Th>Email</Th>
-                            <Th>Role</Th>
-                            <Th>Last Active</Th>
-                            <Th></Th>
-                            <Th></Th>
-                        </Tr>
-                    </Thead>
-                    <Tbody>
-                        <Tr>
-                            <Td>
-                                <Flex direction="column" gap={1}>
-                                    <Text fontWeight="medium">Baby Saja</Text>
-                                    <Flex align="center" gap={1}>
-                                        <Box w={1.5} h={1.5} borderRadius="full" bg="green.600" />
-                                        <Text fontSize="xs" color="green.600">Active</Text>
-                                    </Flex>
-                                </Flex>
-                            </Td>
-                            <Td>baby@saja.com</Td>
-                            <Td>Manager</Td>
-                            <Td>2 hours ago</Td>
-                            <Td>
-                                <IconButton icon={<EditIcon />} size="sm" aria-label="Edit" />
-                            </Td>
-                            <Td>
-                                <IconButton icon={<DeleteIcon />} size="sm" colorScheme="red" aria-label="Delete" />
-                            </Td>
-                        </Tr>
-                        <Tr>
-                            <Td>
-                                <Flex direction="column" gap={1}>
-                                    <Text fontWeight="medium">Allison Huang</Text>
-                                    <Flex align="center" gap={1}>
-                                        <Box w={1.5} h={1.5} borderRadius="full" bg="red.600" />
-                                        <Text fontSize="xs" color="red.600">Inactive</Text>
-                                    </Flex>
-                                </Flex>
-                            </Td>
-                            <Td>allish11@uci.edu</Td>
-                            <Td>Staff</Td>
-                            <Td>67 days ago</Td>
-                            <Td>
-                                <IconButton icon={<EditIcon />} size="sm" aria-label="Edit" />
-                            </Td>
-                            <Td>
-                                <IconButton icon={<DeleteIcon />} size="sm" colorScheme="red" aria-label="Delete" />
-                            </Td>
-                        </Tr>
-                    </Tbody>
-                </Table>
-            </TableContainer>
-
+            <UserTable users={filteredUsers} onDelete={handleDelete} />
+            <Navbar />
         </Box>
   );
 };
