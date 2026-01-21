@@ -14,7 +14,10 @@ import {
 import React, { useEffect, useState } from "react";
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 const ProviderDrawer = () => {
-  const [formValues, setFormValues] = useState({});
+  const [formValues, setFormValues] = useState({
+    data: {},
+    notes: "",
+  });
   const { isOpen, onOpen, onClose } = useDisclosure()
   const btnRef = React.useRef()
   const { backend } = useBackendContext();
@@ -26,16 +29,16 @@ const handleSubmit = async () => {
     const payload = {};
 
     categories.forEach((cat) => {
-      if (formValues[cat.id] !== undefined) {
-        payload[cat.name] = formValues[cat.id];
+      if (formValues.data[cat.id] !== undefined) {
+        payload[cat.name] = formValues.data[cat.id];
       }
     });
 
-    console.log("POST payload:", payload);
+    console.log("POST payload:", formValues.notes);
 
     await backend.post("/providers", {
       data: payload,
-      note: "", // ## for elliot nathan this note isn't dynamically pullable from directory_categories atm (not in a db field yet)
+      note: formValues.notes,
     });
 
     onClose();
@@ -45,11 +48,21 @@ const handleSubmit = async () => {
   }
 };
   const handleInputChange = (categoryId, value) => {
-  setFormValues((prev) => ({
-    ...prev,
-    [categoryId]: value,
-  }));
+    setFormValues(prev => ({
+      ...prev,
+      data: {
+        ...prev.data,
+        [categoryId]: value,
+      },
+    }));
   };
+
+  const handleNotesChange = (value) => {
+    setFormValues((prev) => ({
+      ...prev,
+      notes: value
+    }));
+  }
 
   useEffect(() => {
   if (!isOpen) return;
@@ -113,7 +126,7 @@ useEffect(() => {
                 {cat.inputType === "text" && (
                   <Input
                     placeholder={cat.name}
-                    value={formValues[cat.id] || ""}
+                    value={formValues.data[cat.id] || ""}
                     onChange={(e) =>
                       handleInputChange(cat.id, e.target.value)
                     }
@@ -123,7 +136,7 @@ useEffect(() => {
                 {cat.inputType === "tag" && (
                   <Select
                   placeholder={`Select ${cat.name}`}
-                  value={formValues[cat.id] || ""}
+                  value={formValues.data[cat.id] || ""}
                   onChange={(e) =>
                     handleInputChange(cat.id, e.target.value)
                   }
@@ -138,6 +151,17 @@ useEffect(() => {
               </div>
             );
           })}
+          <div key="notes" style={{ marginBottom: "16px" }}>
+                <div style={{ fontWeight: 500 }}>
+                  Notes
+                </div>
+          </div>
+          <Input 
+            placeholder="Notes"
+            value={formValues.notes || ""}
+            onChange={(e) =>
+              handleNotesChange(e.target.value)
+          }/>
         </DrawerBody>
 
           <DrawerFooter>
