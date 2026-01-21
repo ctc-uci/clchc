@@ -1,10 +1,9 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { CheckIcon, EditIcon } from "@chakra-ui/icons";
 import {
   Badge,
   Box,
-  HStack,
   IconButton,
   Popover,
   PopoverArrow,
@@ -23,33 +22,9 @@ import {
   Tr,
 } from "@chakra-ui/react";
 
-import { useBackendContext } from "@/contexts/hooks/useBackendContext";
-import QuotaDrawer from "./QuotaDrawer";
-import { useDisclosure } from "@chakra-ui/react";
+import ProgressBar from "./ProgressBar";
 
-const QuotaTable = () => {
-  const { backend } = useBackendContext();
-  const [rows, setRows] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [editingQuotaId, setEditingQuotaId] = useState(null);
-  const { isOpen: isDrawerOpen, onOpen: onDrawerOpen, onClose: onDrawerClose } = useDisclosure();
-
-  useEffect(() => {
-    const fetchQuotas = async () => {
-      try {
-        const response = await backend.get("/quota");
-        console.log("QUOTA DATA:", response.data);
-        setRows(response.data);
-      } catch (err) {
-        console.error("Failed to fetch quotas", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchQuotas();
-  }, [backend]);
-
+const QuotaTable = ({ rows, loading }) => {
   const onSave = async (id, newNote) => {
     const sanitizedNote = newNote.trim();
 
@@ -130,7 +105,7 @@ const QuotaTable = () => {
               {/* Provider */}
               <Td>
                 <Box>
-                  <Text fontWeight="medium">Provider #{row.providerId}</Text>
+                  <Text fontWeight="medium">{row.providerName}</Text>
                   <Text
                     fontSize="sm"
                     color="gray.500"
@@ -147,7 +122,7 @@ const QuotaTable = () => {
                   py={1}
                   borderRadius="full"
                 >
-                  Location {row.locationId}
+                  {row.locationName}
                 </Badge>
               </Td>
 
@@ -164,11 +139,7 @@ const QuotaTable = () => {
 
               {/* Progress */}
               <Td>
-                <HStack spacing={2}>
-                  <Text>
-                    {row.progress}/{row.quota}
-                  </Text>
-                </HStack>
+                <ProgressBar quotaID={row.id} />
               </Td>
 
               {/* Notes */}

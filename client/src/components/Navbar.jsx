@@ -44,8 +44,8 @@ export const Navbar = () => {
             Quota Tracking
             </Link>
 
-            <Link as={NavLink} to="/providor-directory" style={activeStyle} {...baseLinkProps}>
-            Providor Directory
+            <Link as={NavLink} to="/provider-directory" style={activeStyle} {...baseLinkProps}>
+            Provider Directory
             </Link>
 
             {role !== "viewer" && role !== "ccs" ? (

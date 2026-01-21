@@ -1,6 +1,7 @@
-import { QuotaTracking } from "./QuotaTrackingPage";
-
+import ProviderDrawer from "./ProviderDrawer";
 export const Playground = () => {
-  return <QuotaTracking />;
+  return (
+    <ProviderDrawer/>
+  );
 };
 
