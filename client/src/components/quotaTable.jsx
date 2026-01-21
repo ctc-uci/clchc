@@ -25,11 +25,14 @@ import {
 
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 import QuotaDrawer from "./QuotaDrawer";
+import { useDisclosure } from "@chakra-ui/react";
 
 const QuotaTable = () => {
   const { backend } = useBackendContext();
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [editingQuotaId, setEditingQuotaId] = useState(null);
+  const { isOpen: isDrawerOpen, onOpen: onDrawerOpen, onClose: onDrawerClose } = useDisclosure();
 
   useEffect(() => {
     const fetchQuotas = async () => {
@@ -178,11 +181,41 @@ const QuotaTable = () => {
               </Td>
 
               {/* Edit */}
-              <Td textAlign="right"><QuotaDrawer quotaID={row.id} /></Td>
+              <Td textAlign="right">
+                <IconButton
+                  aria-label="Edit quota"
+                  icon={<EditIcon />}
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => {
+                    setEditingQuotaId(row.id);
+                    onDrawerOpen();
+                  }}
+                />
+              </Td>
             </Tr>
           ))}
         </Tbody>
       </Table>
+      <QuotaDrawer
+        quotaID={editingQuotaId || 0}
+        isOpen={isDrawerOpen}
+        onOpen={onDrawerOpen}
+        onClose={() => {
+          setEditingQuotaId(null);
+          onDrawerClose();
+          // Refetch quotas after edit
+          const fetchQuotas = async () => {
+            try {
+              const response = await backend.get("/quota");
+              setRows(response.data);
+            } catch (err) {
+              console.error("Failed to fetch quotas", err);
+            }
+          };
+          fetchQuotas();
+        }}
+      />
     </TableContainer>
   );
 };

@@ -5,7 +5,6 @@ import {
   Box,
   Button,
   ButtonGroup,
-  IconButton,
   Drawer,
   DrawerBody,
   DrawerCloseButton,
@@ -28,7 +27,6 @@ import {
 // bowen
 
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
-import { LuPencil } from "react-icons/lu";
 
 const MAX_INPUT_NUMBER = 99;
 
@@ -300,8 +298,11 @@ const TypeInput = ({ type, setType }) => {
   );
 };
 
-export default function QuotaDrawer({ quotaID = 0 }) {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+export default function QuotaDrawer({ quotaID = 0, isOpen: externalIsOpen, onOpen: externalOnOpen, onClose: externalOnClose }) {
+  const internalDisclosure = useDisclosure();
+  const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalDisclosure.isOpen;
+  const onOpen = externalOnOpen || internalDisclosure.onOpen;
+  const onClose = externalOnClose || internalDisclosure.onClose;
   const btnRef = React.useRef();
   const { backend } = useBackendContext();
 
@@ -399,26 +400,13 @@ export default function QuotaDrawer({ quotaID = 0 }) {
   };
 
   return (
-    <>
-      <Button
-        as={IconButton}
-        ref={btnRef}
-        aria-label={quotaID ? "Edit quota" : "Create quota"}
-        icon={<LuPencil style={{ background: 'transparent', size: '40px' }} />}
-        onClick={onOpen}
-        variant="unstyled"
-        color="inherit"
-        _hover={{ bg: "transparent" }}
-        _active={{ bg: "transparent" }}
-        _focus={{ boxShadow: "none" }}
-      />
-      <Drawer
-        isOpen={isOpen}
-        placement="left"
-        onClose={handleClose}
-        finalFocusRef={btnRef}
-        size="sm"
-      >
+    <Drawer
+      isOpen={isOpen}
+      placement="left"
+      onClose={handleClose}
+      finalFocusRef={btnRef}
+      size="sm"
+    >
         <DrawerOverlay />
         <DrawerContent>
           <DrawerCloseButton />
@@ -488,6 +476,5 @@ export default function QuotaDrawer({ quotaID = 0 }) {
           </form>
         </DrawerContent>
       </Drawer>
-    </>
   );
 }
