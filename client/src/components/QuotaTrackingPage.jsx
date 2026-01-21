@@ -1,10 +1,13 @@
 import { SearchIcon, EditIcon, CalendarIcon, AddIcon } from "@chakra-ui/icons";
-import { Badge, Box, Button, Flex, HStack, Heading, Input, InputGroup, InputLeftElement, Text, Table, Thead, Tbody, Tr, Th, Td, TableContainer, IconButton, Progress, Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverBody, Portal } from "@chakra-ui/react";
+import { Badge, Box, Button, Flex, HStack, Heading, Input, InputGroup, InputLeftElement, Text, Table, Thead, Tbody, Tr, Th, Td, TableContainer, IconButton, Progress, Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverBody, Portal, useDisclosure } from "@chakra-ui/react";
 import { CustomCard } from "./customCard";
 import InputMask from "react-input-mask";
 import QuotaTable from "./quotaTable";
+import QuotaDrawer from "./QuotaDrawer";
 
 export const QuotaTracking = () => {
+    const { isOpen: isCreateDrawerOpen, onOpen: onCreateDrawerOpen, onClose: onCreateDrawerClose } = useDisclosure();
+
     return (
         <Box p={6} maxW="1200px" mx="auto">
             <Flex justify="space-between" align="flex-start" mb={6}>
@@ -38,7 +41,12 @@ export const QuotaTracking = () => {
                     </InputGroup>
                 </Box>
 
-                <Button leftIcon={<AddIcon />} colorScheme="blue" ml={4}>
+                <Button 
+                    leftIcon={<AddIcon />} 
+                    colorScheme="blue" 
+                    ml={4}
+                    onClick={onCreateDrawerOpen}
+                >
                     Create Quota
                 </Button>
             </Flex>
@@ -60,6 +68,13 @@ export const QuotaTracking = () => {
             </InputGroup>
 
             <QuotaTable></QuotaTable>
+
+            <QuotaDrawer
+                quotaID={0}
+                isOpen={isCreateDrawerOpen}
+                onOpen={onCreateDrawerOpen}
+                onClose={onCreateDrawerClose}
+            />
 
         </Box>
     );
