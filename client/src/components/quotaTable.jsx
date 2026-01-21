@@ -22,9 +22,12 @@ import {
   Tr,
 } from "@chakra-ui/react";
 
+import { useBackendContext } from "@/contexts/hooks/useBackendContext";
+
 import ProgressBar from "./ProgressBar";
 
-const QuotaTable = ({ rows, loading }) => {
+const QuotaTable = ({ rows, loading, setRows }) => {
+  const { backend } = useBackendContext();
   const onSave = async (id, newNote) => {
     const sanitizedNote = newNote.trim();
 

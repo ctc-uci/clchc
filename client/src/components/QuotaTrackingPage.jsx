@@ -191,6 +191,7 @@ export const QuotaTracking = () => {
       <QuotaTable
         rows={rows}
         loading={loading}
+        setRows={setRows}
       />
       <Navbar />
     </Box>
