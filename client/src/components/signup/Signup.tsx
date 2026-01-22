@@ -14,15 +14,14 @@ import {
   VStack,
 } from "@chakra-ui/react";
 
+import { useAuthContext } from "@/contexts/hooks/useAuthContext";
+import { useBackendContext } from "@/contexts/hooks/useBackendContext";
+import { authenticateGoogleUser } from "@/utils/auth/providers";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { FaGoogle } from "react-icons/fa6";
 import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
-
-import { useAuthContext } from "@/contexts/hooks/useAuthContext";
-import { useBackendContext } from "@/contexts/hooks/useBackendContext";
-import { authenticateGoogleUser } from "@/utils/auth/providers";
 
 const signupSchema = z.object({
   email: z.string().email("Invalid email address"),
