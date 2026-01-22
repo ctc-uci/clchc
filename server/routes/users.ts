@@ -37,14 +37,23 @@ usersRouter.delete("/:firebaseUid", async (req, res) => {
   try {
     const { firebaseUid } = req.params;
 
-    await admin.auth().deleteUser(firebaseUid);
+    const checkResult = await db.query(
+      "SELECT firebase_uid FROM users WHERE firebase_uid = $1",
+      [firebaseUid]
+    );
+
+    if (checkResult.rows.length === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
     const user = await db.query("DELETE FROM users WHERE firebase_uid = $1", [
       firebaseUid,
     ]);
+    await admin.auth().deleteUser(firebaseUid);
 
-    res.status(200).json(keysToCamel(user));
+    res.status(204).json(keysToCamel(user));
   } catch (err) {
-    res.status(400).send(err.message);
+    res.status(500).send(err.message);
   }
 });
 
