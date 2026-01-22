@@ -20,24 +20,35 @@ import {
   Th,
   Thead,
   Tr,
+  useDisclosure,
 } from "@chakra-ui/react";
 
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 
 import ProgressBar from "./ProgressBar";
+import QuotaDrawer from "./QuotaDrawer";
 
-const QuotaTable = ({ rows, loading, setRows }) => {
+const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
   const { backend } = useBackendContext();
+  const [editingQuotaId, setEditingQuotaId] = useState(null);
+  const {
+    isOpen: isDrawerOpen,
+    onOpen: onDrawerOpen,
+    onClose: onDrawerClose,
+  } = useDisclosure();
+
   const onSave = async (id, newNote) => {
     const sanitizedNote = newNote.trim();
 
     try {
       await backend.put(`/quota/${id}`, { notes: sanitizedNote });
-      setRows((prevRows) =>
-        prevRows.map((row) =>
-          row.id === id ? { ...row, notes: sanitizedNote } : row
-        )
-      );
+      if (onRowsUpdate) {
+        onRowsUpdate((prevRows) =>
+          prevRows.map((row) =>
+            row.id === id ? { ...row, notes: sanitizedNote } : row
+          )
+        );
+      }
     } catch (err) {
       console.error("Could not update note", err);
     }
@@ -155,17 +166,35 @@ const QuotaTable = ({ rows, loading, setRows }) => {
               </Td>
 
               {/* Edit */}
-              <Td>
+              <Td textAlign="right">
                 <IconButton
-                  aria-label="Edit"
-                  borderRadius="16px"
+                  aria-label="Edit quota"
                   icon={<EditIcon />}
-                ></IconButton>
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => {
+                    setEditingQuotaId(row.id);
+                    onDrawerOpen();
+                  }}
+                />
               </Td>
             </Tr>
           ))}
         </Tbody>
       </Table>
+      <QuotaDrawer
+        quotaID={editingQuotaId || 0}
+        isOpen={isDrawerOpen}
+        onOpen={onDrawerOpen}
+        onClose={() => {
+          setEditingQuotaId(null);
+          onDrawerClose();
+          if (onRowsUpdate) {
+            // Trigger parent to refetch by passing a non-function value
+            onRowsUpdate(null);
+          }
+        }}
+      />
     </TableContainer>
   );
 };

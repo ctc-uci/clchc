@@ -12,6 +12,7 @@ import {
   InputGroup,
   InputLeftElement,
   Text,
+  useDisclosure,
 } from "@chakra-ui/react";
 
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
@@ -20,13 +21,15 @@ import InputMask from "react-input-mask";
 
 import { CustomCard } from "./customCard";
 import Navbar from "./Navbar";
-import QuotaTable from "./QuotaTable";
+import QuotaTable from "./quotaTable";
+import QuotaDrawer from "./QuotaDrawer";
 
 export const QuotaTracking = () => {
   const { backend } = useBackendContext();
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [providerQuery, setProviderQuery] = useState("");
+  const { isOpen: isCreateDrawerOpen, onOpen: onCreateDrawerOpen, onClose: onCreateDrawerClose } = useDisclosure();
 
   const fetchQuotas = useCallback(
     async (provider) => {
@@ -126,10 +129,11 @@ export const QuotaTracking = () => {
           </InputGroup>
         </Box>
 
-        <Button
-          leftIcon={<AddIcon />}
-          colorScheme="blue"
+        <Button 
+          leftIcon={<AddIcon />} 
+          colorScheme="blue" 
           ml={4}
+          onClick={onCreateDrawerOpen}
         >
           Create Quota
         </Button>
@@ -191,8 +195,23 @@ export const QuotaTracking = () => {
       <QuotaTable
         rows={rows}
         loading={loading}
-        setRows={setRows}
+        onRowsUpdate={(updater) => {
+          if (typeof updater === 'function') {
+            setRows(updater);
+          } else {
+            // If it's a trigger to refetch, call fetchQuotas
+            fetchQuotas(providerQuery);
+          }
+        }}
       />
+      
+      <QuotaDrawer
+        quotaID={0}
+        isOpen={isCreateDrawerOpen}
+        onOpen={onCreateDrawerOpen}
+        onClose={onCreateDrawerClose}
+      />
+          
       <Navbar />
     </Box>
   );
