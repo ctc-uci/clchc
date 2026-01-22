@@ -39,6 +39,21 @@ export const verifyToken = async (
  *
  * @param requiredRole a list of roles that can use this route
  */
+
+const ROLE_HIERARCHY = {
+  master: 4,
+  ccm: 3,
+  ccs: 2,
+  viewer: 1,
+};
+
+const hasPermission = (userRole: string, requiredRole: string): boolean => {
+  // master bypasses all checks
+  if (userRole === "master") return true;
+
+  return ROLE_HIERARCHY[userRole] >= ROLE_HIERARCHY[requiredRole];
+};
+
 export const verifyRole = (requiredRole: string | string[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -58,8 +73,10 @@ export const verifyRole = (requiredRole: string | string[]) => {
         [decodedToken.uid]
       );
 
-      // admins should be allowed to access all routes
-      if (roles.includes(users.at(0).role) || users.at(0).role === "admin") {
+      const userRole = users.at(0)?.role;
+      const hasAccess = roles.some((role) => hasPermission(userRole, role));
+
+      if (hasAccess) {
         next();
       } else {
         res
