@@ -13,11 +13,11 @@ import {
   Text,
 } from "@chakra-ui/react";
 
-import { Navbar } from "@/components/Navbar";
+import { CustomCard } from "@/components/common/CustomCard";
+import { Navbar } from "@/components/layout/Navbar";
+import { BackendContext } from "@/contexts/BackendContext";
 import InputMask from "react-input-mask";
 
-import { BackendContext } from "../contexts/BackendContext";
-import { CustomCard } from "./CustomCard";
 import UserTable from "./UserTable";
 
 export const UserDirectory = () => {

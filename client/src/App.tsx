@@ -4,10 +4,10 @@ import { Dashboard } from "@/components/dashboard/Dashboard";
 import { Login } from "@/components/login/Login";
 import { Playground } from "@/components/Playground";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { ProviderDirectoryPage } from "@/components/provider-directory/ProviderDirectoryPage";
+import { QuotaTracking } from "@/components/quota-tracking/QuotaTrackingPage";
 import { Signup } from "@/components/signup/Signup";
-import { QuotaTracking } from "@/components/QuotaTrackingPage";
-import { UserDirectory } from "@/components/UserDirectoryPage";
-import {ProviderDirectoryPage} from "@/components/ProviderDirectoryPage";
+import { UserDirectory } from "@/components/user-directory/UserDirectoryPage";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { BackendProvider } from "@/contexts/BackendContext";
 import { RoleProvider } from "@/contexts/RoleContext";
@@ -29,11 +29,11 @@ const App = () => {
               <Routes>
                 <Route
                   path="/user-directory"
-                  element={<UserDirectory/>}
+                  element={<UserDirectory />}
                 />
                 <Route
                   path="/quota-tracking"
-                  element={<QuotaTracking/>}
+                  element={<QuotaTracking />}
                 />
                 <Route
                   path="/login"

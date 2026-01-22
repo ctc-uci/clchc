@@ -15,13 +15,13 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 
+import { CustomCard } from "@/components/common/CustomCard";
+import Navbar from "@/components/layout/Navbar";
+import QuotaDrawer from "@/components/quota-tracking/QuotaDrawer";
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 import debounce from "lodash.debounce";
 import InputMask from "react-input-mask";
 
-import { CustomCard } from "./CustomCard";
-import Navbar from "./Navbar";
-import QuotaDrawer from "./QuotaDrawer";
 import QuotaTable from "./QuotaTable";
 
 export const QuotaTracking = () => {

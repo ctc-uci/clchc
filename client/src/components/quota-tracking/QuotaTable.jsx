@@ -23,10 +23,9 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 
+import ProgressBar from "@/components/quota-tracking/ProgressBar";
+import QuotaDrawer from "@/components/quota-tracking/QuotaDrawer";
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
-
-import ProgressBar from "./ProgressBar";
-import QuotaDrawer from "./QuotaDrawer";
 
 const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
   const { backend } = useBackendContext();
