@@ -25,10 +25,14 @@ export const ProviderDirectoryPage = () => {
   }, [backend]);
 
   return (
-    <Box p={8}>
+    <Box
+      p={6}
+      maxW="1200px"
+      mx="auto"
+    >
       {/* Overview Card */}
       <Box
-        width="2083px"
+        maxWidth="1200px"
         height="261px"
         bg="#E2E2E2"
         borderRadius="13px"
