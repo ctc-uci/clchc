@@ -1,8 +1,6 @@
 import { useState } from "react";
 
 import { CheckIcon, EditIcon } from "@chakra-ui/icons";
-import { useBackendContext } from "@/contexts/hooks/useBackendContext";
-import QuotaDrawer from "./QuotaDrawer";
 import {
   Badge,
   Box,
@@ -28,11 +26,16 @@ import {
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 
 import ProgressBar from "./ProgressBar";
+import QuotaDrawer from "./QuotaDrawer";
 
 const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
   const { backend } = useBackendContext();
   const [editingQuotaId, setEditingQuotaId] = useState(null);
-  const { isOpen: isDrawerOpen, onOpen: onDrawerOpen, onClose: onDrawerClose } = useDisclosure();
+  const {
+    isOpen: isDrawerOpen,
+    onOpen: onDrawerOpen,
+    onClose: onDrawerClose,
+  } = useDisclosure();
 
   const onSave = async (id, newNote) => {
     const sanitizedNote = newNote.trim();
