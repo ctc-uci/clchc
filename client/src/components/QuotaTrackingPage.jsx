@@ -12,6 +12,7 @@ import {
   InputGroup,
   InputLeftElement,
   Text,
+  useDisclosure,
 } from "@chakra-ui/react";
 
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
@@ -20,7 +21,7 @@ import InputMask from "react-input-mask";
 
 import { CustomCard } from "./customCard";
 import Navbar from "./Navbar";
-import QuotaTable from "./QuotaTable";
+import QuotaTable from "./quotaTable";
 import QuotaDrawer from "./QuotaDrawer";
 
 export const QuotaTracking = () => {
@@ -194,6 +195,14 @@ export const QuotaTracking = () => {
       <QuotaTable
         rows={rows}
         loading={loading}
+        onRowsUpdate={(updater) => {
+          if (typeof updater === 'function') {
+            setRows(updater);
+          } else {
+            // If it's a trigger to refetch, call fetchQuotas
+            fetchQuotas(providerQuery);
+          }
+        }}
       />
       
       <QuotaDrawer

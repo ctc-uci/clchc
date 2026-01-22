@@ -1,6 +1,8 @@
 import { useState } from "react";
 
 import { CheckIcon, EditIcon } from "@chakra-ui/icons";
+import { useBackendContext } from "@/contexts/hooks/useBackendContext";
+import QuotaDrawer from "./QuotaDrawer";
 import {
   Badge,
   Box,
@@ -20,21 +22,28 @@ import {
   Th,
   Thead,
   Tr,
+  useDisclosure,
 } from "@chakra-ui/react";
 
 import ProgressBar from "./ProgressBar";
 
-const QuotaTable = ({ rows, loading }) => {
+const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
+  const { backend } = useBackendContext();
+  const [editingQuotaId, setEditingQuotaId] = useState(null);
+  const { isOpen: isDrawerOpen, onOpen: onDrawerOpen, onClose: onDrawerClose } = useDisclosure();
+
   const onSave = async (id, newNote) => {
     const sanitizedNote = newNote.trim();
 
     try {
       await backend.put(`/quota/${id}`, { notes: sanitizedNote });
-      setRows((prevRows) =>
-        prevRows.map((row) =>
-          row.id === id ? { ...row, notes: sanitizedNote } : row
-        )
-      );
+      if (onRowsUpdate) {
+        onRowsUpdate((prevRows) =>
+          prevRows.map((row) =>
+            row.id === id ? { ...row, notes: sanitizedNote } : row
+          )
+        );
+      }
     } catch (err) {
       console.error("Could not update note", err);
     }
@@ -175,16 +184,10 @@ const QuotaTable = ({ rows, loading }) => {
         onClose={() => {
           setEditingQuotaId(null);
           onDrawerClose();
-          // Refetch quotas after edit
-          const fetchQuotas = async () => {
-            try {
-              const response = await backend.get("/quota");
-              setRows(response.data);
-            } catch (err) {
-              console.error("Failed to fetch quotas", err);
-            }
-          };
-          fetchQuotas();
+          if (onRowsUpdate) {
+            // Trigger parent to refetch by passing a non-function value
+            onRowsUpdate(null);
+          }
         }}
       />
     </TableContainer>
