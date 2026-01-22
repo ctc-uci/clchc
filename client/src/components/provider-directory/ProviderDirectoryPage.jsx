@@ -1,6 +1,8 @@
 import React from "react";
-import { Box, Button, Divider, Grid, Flex, Text } from "@chakra-ui/react";
-import { Navbar } from "@/components/Navbar";
+
+import { Box, Button, Divider, Flex, Grid, Text } from "@chakra-ui/react";
+
+import { Navbar } from "@/components/layout/Navbar";
 
 export const ProviderDirectoryPage = () => {
   return (
@@ -16,25 +18,43 @@ export const ProviderDirectoryPage = () => {
       >
         {/* Header */}
         <Box mb={4}>
-          <Text fontSize="xl" fontWeight="semibold">
+          <Text
+            fontSize="xl"
+            fontWeight="semibold"
+          >
             Overview
           </Text>
-          <Text fontSize="lg" color="gray.600">
+          <Text
+            fontSize="lg"
+            color="gray.600"
+          >
             Summary of provider
           </Text>
         </Box>
 
-        <HorizontalDivider/>
+        <HorizontalDivider />
 
         {/* Stats */}
         <Grid
           templateColumns="repeat(4, 1fr)"
           position="relative"
         >
-          <StatItem label="New Providers" value="5" />
-          <StatItem label="Total Providers" value="500" />
-          <StatItem label="Providers per Location" value="4" />
-          <StatItem label="Specialties Covered" value="4" />
+          <StatItem
+            label="New Providers"
+            value="5"
+          />
+          <StatItem
+            label="Total Providers"
+            value="500"
+          />
+          <StatItem
+            label="Providers per Location"
+            value="4"
+          />
+          <StatItem
+            label="Specialties Covered"
+            value="4"
+          />
 
           {/* Vertical dividers */}
           <GridDivider left="25%" />
@@ -50,10 +70,17 @@ export const ProviderDirectoryPage = () => {
 /* Reusable Stat Item */
 const StatItem = ({ label, value }) => (
   <Box textAlign="left">
-    <Text fontSize="lg" color="gray.700" mb={1}>
+    <Text
+      fontSize="lg"
+      color="gray.700"
+      mb={1}
+    >
       {label}
     </Text>
-    <Text fontSize="3xl" fontWeight="bold">
+    <Text
+      fontSize="3xl"
+      fontWeight="bold"
+    >
       {value}
     </Text>
   </Box>
@@ -61,8 +88,8 @@ const StatItem = ({ label, value }) => (
 
 /* Horizontal Divider */
 const HorizontalDivider = () => (
-  <Divider 
-    borderColor="black.400" 
+  <Divider
+    borderColor="black.400"
     length="1,906px"
   />
 );

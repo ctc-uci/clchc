@@ -1,6 +1,5 @@
-import { QuotaTracking } from "./QuotaTrackingPage";
+import { QuotaTracking } from "@/components/quota-tracking/QuotaTrackingPage";
 
 export const Playground = () => {
   return <QuotaTracking />;
 };
-
