@@ -49,16 +49,29 @@ usersRouter.delete("/:firebaseUid", async (req, res) => {
 });
 
 // Create user
+// TODO: add verifyAuth
 usersRouter.post("/create", async (req, res) => {
   try {
-    const { email, firebaseUid } = req.body;
+    const { firebaseUid, firstName, lastName, email } = req.body;
 
-    const user = await db.query(
-      "INSERT INTO users (email, firebase_uid) VALUES ($1, $2) RETURNING *",
-      [email, firebaseUid]
+    const existing = await db.query(
+      "SELECT * FROM users WHERE firebase_uid = $1",
+      [firebaseUid]
     );
 
-    res.status(200).json(keysToCamel(user));
+    // No action: just return existing user
+    if (existing && existing.length > 0) {
+      return res.status(200).json(keysToCamel(existing[0]));
+    }
+
+    const result = await db.query(
+      `INSERT INTO users (firebase_uid, first_name, last_name, email, status, role)
+       VALUES ($1, $2, $3, $4, 'pending', 'viewer')
+       RETURNING *`,
+      [firebaseUid, firstName, lastName, email]
+    );
+
+    res.status(201).json(keysToCamel(result));
   } catch (err) {
     res.status(500).send(err.message);
   }
