@@ -1,18 +1,20 @@
 import { verifyToken } from "@/middleware";
-import { quotaRouter } from "@/routes/quota";
-import { providersRouter } from "@/routes/providers";
-import { sampleRouter } from "@/routes/sample"; // TODO: delete sample router
-import { versionLogRouter } from "@/routes/versionLog";
-import { usersRouter } from "@/routes/users";
-import { usersJsRouter } from "../routes/userRoutes.js";
-import { tagsRouter } from "@/routes/tags";
 import { directoryCategoriesRouter } from "@/routes/directory_categories";
-import  { locationRouter }  from "@/routes/location";
+import { locationRouter } from "@/routes/location";
+import { providersRouter } from "@/routes/providers";
+import { quotaRouter } from "@/routes/quota";
+import { sampleRouter } from "@/routes/sample"; // TODO: delete sample router
+
+import { tagsRouter } from "@/routes/tags";
+import { usersRouter } from "@/routes/users";
+import { versionLogRouter } from "@/routes/versionLog";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 import schedule from "node-schedule"; // TODO: Keep only if scheduling cronjobs
+
+import { usersJsRouter } from "../routes/userRoutes.js";
 
 dotenv.config();
 
