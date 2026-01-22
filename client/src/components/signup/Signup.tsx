@@ -53,7 +53,7 @@ export const Signup = () => {
       });
 
       if (user) {
-        navigate("/dashboard");
+        navigate("/quota-tracking");
       }
     } catch (err) {
       if (err instanceof Error) {
