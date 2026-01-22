@@ -1,10 +1,29 @@
-import React from "react";
+import { useEffect, useState } from "react";
 
 import { Box, Button, Divider, Flex, Grid, Text } from "@chakra-ui/react";
 
 import { Navbar } from "@/components/layout/Navbar";
+import ProviderTable from "@/components/provider-directory/ProviderTable";
+import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 
 export const ProviderDirectoryPage = () => {
+  const [providers, setProviders] = useState(null);
+  const [providerCategories, setProviderCategories] = useState(null);
+
+  const { backend } = useBackendContext();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const [providerData, catData] = await Promise.all([
+        backend.get("/providers"),
+        backend.get("/directoryCategories"),
+      ]);
+      setProviders(providerData.data);
+      setProviderCategories(catData.data);
+    };
+    fetchData();
+  }, [backend]);
+
   return (
     <Box p={8}>
       {/* Overview Card */}
@@ -62,6 +81,17 @@ export const ProviderDirectoryPage = () => {
           <GridDivider left="75%" />
         </Grid>
       </Box>
+
+      {providers && providerCategories ? (
+        <Box>
+          <ProviderTable
+            providers={providers}
+            providerCategories={providerCategories}
+          />
+        </Box>
+      ) : (
+        <Text>Loading</Text>
+      )}
       <Navbar />
     </Box>
   );
