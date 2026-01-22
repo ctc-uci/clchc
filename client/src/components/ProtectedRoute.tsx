@@ -1,14 +1,11 @@
-import { useAuthContext } from "@/contexts/hooks/useAuthContext";
-import { useRoleContext } from "@/contexts/hooks/useRoleContext";
 import { Navigate } from "react-router-dom";
 
-import type { User as DbUser } from "../types/user";
-
-type DbUserRole = DbUser["role"];
+import { useAuthContext } from "@/contexts/hooks/useAuthContext";
+import { useRoleContext } from "@/contexts/hooks/useRoleContext";
 
 interface ProtectedRouteProps {
   element: JSX.Element;
-  allowedRoles?: DbUserRole | DbUserRole[];
+  allowedRoles?: string | string[];
 }
 
 export const ProtectedRoute = ({
@@ -18,9 +15,7 @@ export const ProtectedRoute = ({
   const { currentUser } = useAuthContext();
   const { role } = useRoleContext();
 
-  const roles: DbUserRole[] = Array.isArray(allowedRoles)
-    ? allowedRoles
-    : [allowedRoles];
+  const roles = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
   const isValidRole = getIsValidRole(roles, role);
   return currentUser && isValidRole ? (
     element
@@ -38,29 +33,10 @@ export const ProtectedRoute = ({
  * @param roles a list of roles which may access this route
  * @param role the current user's role
  */
-
-const ROLE_HIERARCHY: Record<DbUserRole, number> = {
-  master: 4,
-  ccm: 3,
-  ccs: 2,
-  viewer: 1,
-};
-
-const hasPermission = (
-  userRole: DbUserRole,
-  requiredRole: DbUserRole
-): boolean => {
-  if (userRole === "master") return true;
-  return ROLE_HIERARCHY[userRole] >= ROLE_HIERARCHY[requiredRole];
-};
-
-function getIsValidRole(roles: DbUserRole[], role: DbUserRole | undefined) {
-  // No roles specified = public route
-  if (roles.length === 0) return true;
-
-  // No role = unauthorized
-  if (!role) return false;
-
-  // Check if user's role meets ANY of the required roles hierarchically
-  return roles.some((requiredRole) => hasPermission(role, requiredRole));
+function getIsValidRole(roles: string[], role: string | undefined) {
+  return (
+    roles.length === 0 ||
+    (role !== undefined && roles.includes(role)) ||
+    role === "admin"
+  );
 }
