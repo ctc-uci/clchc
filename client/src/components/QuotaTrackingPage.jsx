@@ -19,17 +19,21 @@ import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 import debounce from "lodash.debounce";
 import InputMask from "react-input-mask";
 
-import { CustomCard } from "./customCard";
+import { CustomCard } from "./CustomCard";
 import Navbar from "./Navbar";
-import QuotaTable from "./quotaTable";
 import QuotaDrawer from "./QuotaDrawer";
+import QuotaTable from "./QuotaTable";
 
 export const QuotaTracking = () => {
   const { backend } = useBackendContext();
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [providerQuery, setProviderQuery] = useState("");
-  const { isOpen: isCreateDrawerOpen, onOpen: onCreateDrawerOpen, onClose: onCreateDrawerClose } = useDisclosure();
+  const {
+    isOpen: isCreateDrawerOpen,
+    onOpen: onCreateDrawerOpen,
+    onClose: onCreateDrawerClose,
+  } = useDisclosure();
 
   const fetchQuotas = useCallback(
     async (provider) => {
@@ -129,9 +133,9 @@ export const QuotaTracking = () => {
           </InputGroup>
         </Box>
 
-        <Button 
-          leftIcon={<AddIcon />} 
-          colorScheme="blue" 
+        <Button
+          leftIcon={<AddIcon />}
+          colorScheme="blue"
           ml={4}
           onClick={onCreateDrawerOpen}
         >
@@ -196,7 +200,7 @@ export const QuotaTracking = () => {
         rows={rows}
         loading={loading}
         onRowsUpdate={(updater) => {
-          if (typeof updater === 'function') {
+          if (typeof updater === "function") {
             setRows(updater);
           } else {
             // If it's a trigger to refetch, call fetchQuotas
@@ -204,14 +208,14 @@ export const QuotaTracking = () => {
           }
         }}
       />
-      
+
       <QuotaDrawer
         quotaID={0}
         isOpen={isCreateDrawerOpen}
         onOpen={onCreateDrawerOpen}
         onClose={onCreateDrawerClose}
       />
-          
+
       <Navbar />
     </Box>
   );
