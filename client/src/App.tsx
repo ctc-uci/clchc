@@ -34,7 +34,8 @@ const App = () => {
                 />
                 <Route
                   path="/user-settings/personal-info"
-                  element={<Settings view={PERSONAL_INFO} />}
+                  element={<ProtectedRoute element={<Settings view={PERSONAL_INFO}/>} />}
+
                 />
                 <Route
                   path="/user-settings/delete-account"

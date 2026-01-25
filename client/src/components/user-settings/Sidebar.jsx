@@ -7,14 +7,18 @@ import {
     VStack
 } from "@chakra-ui/react";
 import { PERSONAL_INFO, CALCULATION_FACTOR, DELETE_ACCOUNT } from "./Settings";
+import { useAuthContext } from "@/contexts/hooks/useAuthContext";
+import { useRoleContext } from "@/contexts/hooks/useRoleContext";
 
 export default function Sidebar({ currentView, setCurrentView }) {
-
+    const {currentUser} = useAuthContext(); // deconstructing context to get user info
+    const {role} = useRoleContext();
+    console.log(currentUser)
     const User = () => (
         <VStack align="center">
             <Avatar size="2xl" />
-            <Text>First Last</Text>
-            <Text>Role</Text>
+            <Text>{currentUser.displayName || currentUser.email}</Text>
+            <Text>{role}</Text>
         </VStack>
     )
 
