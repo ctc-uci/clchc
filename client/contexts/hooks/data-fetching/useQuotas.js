@@ -5,9 +5,9 @@ export const useQuotas = (filter = {}) => {
   return useQuery({
     queryKey: ["quotas", filter],
     queryFn: async () => {
-      let allQuotas = await api.quotas.getAll(); // call your API module
+      let allQuotas = await api.quotas.getAll();
 
-      // simple client-side filtering by provider name
+      // client-side filtering by provider name
       if (filter.provider) {
         allQuotas = allQuotas.filter((q) =>
           q.providerName.toLowerCase().includes(filter.provider.toLowerCase())

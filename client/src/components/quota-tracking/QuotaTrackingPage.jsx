@@ -21,12 +21,12 @@ import QuotaDrawer from "@/components/quota-tracking/QuotaDrawer";
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 import debounce from "lodash.debounce";
 import InputMask from "react-input-mask";
+import { useQuotas } from "../../../contexts/hooks/data-fetching/useQuotas";
 
 import QuotaTable from "./QuotaTable";
 
 export const QuotaTracking = () => {
   const { backend } = useBackendContext();
-  const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [providerQuery, setProviderQuery] = useState("");
   const {
@@ -34,31 +34,13 @@ export const QuotaTracking = () => {
     onOpen: onCreateDrawerOpen,
     onClose: onCreateDrawerClose,
   } = useDisclosure();
-
-  const fetchQuotas = useCallback(
-    async (provider) => {
-      let endpoint = `/quota/details`;
-
-      if (provider) {
-        endpoint += `?provider=${provider}`;
-      }
-      try {
-        const response = await backend.get(endpoint);
-        setRows(response.data);
-      } catch (err) {
-        console.error("Failed to fetch quotas", err);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [backend]
-  );
+  const { data: quotas, isLoading, error, refetch } = useQuotas({ provider: providerQuery });
 
   const debouncedFetch = useMemo(() => {
-    return debounce((provider) => {
-      fetchQuotas(provider);
+    return debounce((query) => {
+      refetch({ provider : query });
     }, 300); // TODO: If we have multiple debounced inputs, we should set a universal delay in a constants file.
-  }, [fetchQuotas]);
+  }, [refetch]);
 
   // Handle cleanup
   useEffect(() => {
@@ -71,11 +53,11 @@ export const QuotaTracking = () => {
     if (!providerQuery) {
       // If the search input is empty, immediately fetch all quotas
       debouncedFetch.cancel();
-      fetchQuotas();
+      refetch({ provider: "" });
       return;
     }
     debouncedFetch(providerQuery);
-  }, [fetchQuotas, providerQuery, debouncedFetch]);
+  }, [providerQuery, debouncedFetch, refetch]);
 
   const handleChange = (e) => {
     setProviderQuery(e.target.value);
@@ -197,16 +179,9 @@ export const QuotaTracking = () => {
       </InputGroup>
 
       <QuotaTable
-        rows={rows}
-        loading={loading}
-        onRowsUpdate={(updater) => {
-          if (typeof updater === "function") {
-            setRows(updater);
-          } else {
-            // If it's a trigger to refetch, call fetchQuotas
-            fetchQuotas(providerQuery);
-          }
-        }}
+        rows={quotas}
+        loading={isLoading}
+        onRowsUpdate={() => refetch({ provider: providerQuery })}
       />
 
       <QuotaDrawer
