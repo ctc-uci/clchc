@@ -11,6 +11,7 @@ import { UserDirectory } from "@/components/user-directory/UserDirectoryPage";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { BackendProvider } from "@/contexts/BackendContext";
 import { RoleProvider } from "@/contexts/RoleContext";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { CookiesProvider } from "react-cookie";
 import {
   Navigate,
@@ -19,70 +20,74 @@ import {
   Routes,
 } from "react-router-dom";
 
+const queryClient = new QueryClient();
+
 const App = () => {
   return (
-    <CookiesProvider>
-      <BackendProvider>
-        <AuthProvider>
-          <RoleProvider>
-            <Router>
-              <Routes>
-                <Route
-                  path="/user-directory"
-                  element={<UserDirectory />}
-                />
-                <Route
-                  path="/quota-tracking"
-                  element={<QuotaTracking />}
-                />
-                <Route
-                  path="/login"
-                  element={<Login />}
-                />
-                <Route
-                  path="/signup"
-                  element={<Signup />}
-                />
-                <Route
-                  path="/playground"
-                  element={<Playground />}
-                />
-                <Route
-                  path="/dashboard"
-                  element={<ProtectedRoute element={<Dashboard />} />}
-                />
-                <Route
-                  path="/provider-directory"
-                  element={<ProviderDirectoryPage />}
-                />
-                <Route
-                  path="/admin"
-                  element={
-                    <ProtectedRoute
-                      element={<Admin />}
-                      allowedRoles={"ccm"}
-                    />
-                  }
-                />
-                <Route
-                  path="/"
-                  element={
-                    <Navigate
-                      to="/login"
-                      replace
-                    />
-                  }
-                />
-                <Route
-                  path="*"
-                  element={<ProtectedRoute element={<CatchAll />} />}
-                />
-              </Routes>
-            </Router>
-          </RoleProvider>
-        </AuthProvider>
-      </BackendProvider>
-    </CookiesProvider>
+    <QueryClientProvider client={queryClient}>
+      <CookiesProvider>
+        <BackendProvider>
+          <AuthProvider>
+            <RoleProvider>
+              <Router>
+                <Routes>
+                  <Route
+                    path="/user-directory"
+                    element={<UserDirectory />}
+                  />
+                  <Route
+                    path="/quota-tracking"
+                    element={<QuotaTracking />}
+                  />
+                  <Route
+                    path="/login"
+                    element={<Login />}
+                  />
+                  <Route
+                    path="/signup"
+                    element={<Signup />}
+                  />
+                  <Route
+                    path="/playground"
+                    element={<Playground />}
+                  />
+                  <Route
+                    path="/dashboard"
+                    element={<ProtectedRoute element={<Dashboard />} />}
+                  />
+                  <Route
+                    path="/provider-directory"
+                    element={<ProviderDirectoryPage />}
+                  />
+                  <Route
+                    path="/admin"
+                    element={
+                      <ProtectedRoute
+                        element={<Admin />}
+                        allowedRoles={"ccm"}
+                      />
+                    }
+                  />
+                  <Route
+                    path="/"
+                    element={
+                      <Navigate
+                        to="/login"
+                        replace
+                      />
+                    }
+                  />
+                  <Route
+                    path="*"
+                    element={<ProtectedRoute element={<CatchAll />} />}
+                  />
+                </Routes>
+              </Router>
+            </RoleProvider>
+          </AuthProvider>
+        </BackendProvider>
+      </CookiesProvider>
+    </QueryClientProvider>
   );
 };
 
