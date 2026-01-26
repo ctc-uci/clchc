@@ -1,10 +1,21 @@
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../../../../server/api.js'
 
-export function useQuotas() {
+export const useQuotas = (filter = {}) => {
   return useQuery({
-    queryKey: ['quotas'],
-    queryFn: api.quotas.getAll,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    queryKey: ["quotas", filter],
+    queryFn: async () => {
+      let allQuotas = await api.quotas.getAll(); // call your API module
+
+      // simple client-side filtering by provider name
+      if (filter.provider) {
+        allQuotas = allQuotas.filter((q) =>
+          q.providerName.toLowerCase().includes(filter.provider.toLowerCase())
+        );
+      }
+
+      return allQuotas;
+    },
+    keepPreviousData: true,
   });
-}
+};
