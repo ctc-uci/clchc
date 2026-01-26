@@ -41,7 +41,7 @@ export const api = {
   },
   quotas: {
     getAll: async() => {
-        const res = await fetch(`${API_BASE}/quota`);
+        const res = await fetch(`${API_BASE}/quota/details`);
         if (!res.ok) {
             throw new Error(`Failed to getch quotas: ${res.status}`);
         }
