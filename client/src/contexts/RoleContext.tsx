@@ -11,6 +11,7 @@ type DbUserRole = DbUser["role"];
 interface RoleContextProps {
   role: DbUserRole | undefined;
   loading: boolean;
+  refetch: () => Promise<void>;
 }
 
 export const RoleContext = createContext<RoleContextProps | null>(null);
@@ -21,13 +22,28 @@ export const RoleProvider = ({ children }: { children: ReactNode }) => {
   const [role, setRole] = useState<DbUserRole | undefined>();
   const [loading, setLoading] = useState(true);
 
+  const fetchRole = async (uid: string) => {
+    try {
+      const response = await backend.get(`/users/${uid}`);
+      setRole((response.data as User[]).at(0)?.role);
+    } catch (e) {
+      console.error(`Error fetching role: ${e.message}`);
+      setRole(undefined);
+    }
+  };
+
+  const refetch = async () => {
+    const user = auth.currentUser;
+    if (user) {
+      await fetchRole(user.uid);
+    }
+  };
+
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       try {
         if (user) {
-          const response = await backend.get(`/users/${user.uid}`);
-
-          setRole((response.data as User[]).at(0)?.role);
+          fetchRole(user.uid);
         } else {
           setRole(undefined);
         }
@@ -43,7 +59,7 @@ export const RoleProvider = ({ children }: { children: ReactNode }) => {
   }, [backend]);
 
   return (
-    <RoleContext.Provider value={{ role, loading }}>
+    <RoleContext.Provider value={{ role, loading, refetch }}>
       {loading ? <Spinner /> : children}
     </RoleContext.Provider>
   );

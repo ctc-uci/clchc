@@ -87,7 +87,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const handleRedirectResult = async (
     backend: AxiosInstance,
     navigate: NavigateFunction,
-    toast: CreateToastFnReturn
+    toast: CreateToastFnReturn,
+    refetch: () => Promise<void>
   ) => {
     try {
       const result = await getRedirectResult(auth);
@@ -103,6 +104,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               lastName:
                 result.user.displayName?.split(" ").slice(1).join(" ") || "",
             });
+
+            await refetch();
           } catch (e) {
             await backend.delete(`/users/${result.user.uid}`);
             const errorMessage =
