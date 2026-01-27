@@ -1,14 +1,22 @@
 import { useEffect, useState } from "react";
 
-import { Box, Button, Divider, Flex, Grid, Text } from "@chakra-ui/react";
+import { Box, Button, Divider, Flex, Grid, Text, useDisclosure } from "@chakra-ui/react";
 
 import { Navbar } from "@/components/layout/Navbar";
 import ProviderTable from "@/components/provider-directory/ProviderTable";
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
+import CategoryDrawer from "@/components/provider-directory/CategoryDrawer";
+import { useRoleContext } from "@/contexts/hooks/useRoleContext";
 
 export const ProviderDirectoryPage = () => {
   const [providers, setProviders] = useState(null);
   const [providerCategories, setProviderCategories] = useState(null);
+  const { role, loading } = useRoleContext();
+  const {
+      isOpen: isCreateDrawerOpen,
+      onOpen: onCreateDrawerOpen,
+      onClose: onCreateDrawerClose,
+    } = useDisclosure();
 
   const { backend } = useBackendContext();
 
@@ -86,6 +94,14 @@ export const ProviderDirectoryPage = () => {
         </Grid>
       </Box>
 
+       {role !== "viewer" && role !== "ccs" ? (
+          <>
+            <Button onClick={()=>{onCreateDrawerOpen()}}>Add New Category</Button>
+          </>
+        ) : (
+          <></>
+        )}
+
       {providers && providerCategories ? (
         <Box>
           <ProviderTable
@@ -96,6 +112,9 @@ export const ProviderDirectoryPage = () => {
       ) : (
         <Text>Loading</Text>
       )}
+      <CategoryDrawer isOpen={isCreateDrawerOpen}
+        onOpen={onCreateDrawerOpen}
+        onClose={onCreateDrawerClose}/>
       <Navbar />
     </Box>
   );

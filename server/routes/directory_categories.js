@@ -1,6 +1,7 @@
 import { keysToCamel } from "@/common/utils";
 import { db } from "@/db/db-pgp"; // TODO: replace this db with
 import { Router } from "express";
+import { verifyToken, verifyRole } from "@/middleware"; // <-- add this
 
 export const directoryCategoriesRouter = Router();
 
@@ -33,10 +34,9 @@ directoryCategoriesRouter.get("/:id", async (req, res) => {
 });
 
 // Adds a new category
-directoryCategoriesRouter.post("/", async (req, res) => {
+directoryCategoriesRouter.post("/", verifyToken, verifyRole("ccm"), async (req, res) => {
   try {
     const { name, inputType, isRequired, columnOrder } = req.body;
-
     const categories = await db.query(
       "INSERT INTO directory_categories (name, input_type, is_required, column_order) VALUES ($1, $2, $3, $4) RETURNING *",
       [name, inputType, isRequired, columnOrder]

@@ -8,6 +8,10 @@ import {
   Th,
   Thead,
   Tr,
+  Wrap,
+  WrapItem,
+  Tag,
+  Text
 } from "@chakra-ui/react";
 
 export default function ProviderTable({ providers, providerCategories }) {
@@ -34,10 +38,48 @@ export default function ProviderTable({ providers, providerCategories }) {
    * Will be used by Body subcomponent.
    * @returns <Tr> with each cell of necessary provider info <Td>.
    */
+  const renderCellValue = (provider, cat) => {
+    const raw = provider?.data?.[cat.name];
+
+    // Treat undefined/null/"" as missing
+    const isMissing =
+      raw === undefined || raw === null || (typeof raw === "string" && raw.trim() === "");
+
+    if (isMissing) {
+      // Defaults per inputType
+      if (cat.inputType === "tag") return <Text color="gray.400">No tags</Text>;
+      return <Text color="gray.400">—</Text>; // default for "text" (and any other types)
+    }
+
+    // Format per inputType
+    if (cat.inputType === "tag") {
+      // Support either array or comma-separated string
+      const tags = Array.isArray(raw)
+        ? raw
+        : String(raw)
+            .split(",")
+            .map((t) => t.trim())
+            .filter(Boolean);
+
+      return (
+        <Wrap>
+          {tags.map((t) => (
+            <WrapItem key={t}>
+              <Tag>{t}</Tag>
+            </WrapItem>
+          ))}
+        </Wrap>
+      );
+    }
+
+    // Default rendering for text/anything else
+    return String(raw);
+  };
+
   const ProviderRow = ({ provider }) => {
     const getCells = () =>
       providerCategories.map((cat) => (
-        <Td key={cat.name}>{provider.data[cat.name]}</Td>
+        <Td key={cat.name}>{renderCellValue(provider, cat)}</Td>
       ));
 
     return <Tr>{getCells()}</Tr>;
