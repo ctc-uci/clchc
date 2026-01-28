@@ -1,6 +1,7 @@
 import { useCallback, useEffect } from "react";
 
 import {
+  Box,
   Button,
   Center,
   Link as ChakraLink,
@@ -8,8 +9,10 @@ import {
   FormErrorMessage,
   FormHelperText,
   Heading,
+  Image,
   Input,
   Stack,
+  Text,
   useToast,
   VStack,
 } from "@chakra-ui/react";
@@ -106,11 +109,15 @@ export const Login = () => {
   }, [backend, handleRedirectResult, navigate, toast]);
 
   return (
-    <VStack
-      spacing={8}
-      sx={{ width: 300, marginX: "auto" }}
+    <Box
+      mt={64}
+      mx={12}
     >
-      <Heading>Login</Heading>
+      <VStack
+        spacing={6}
+        sx={{ width: 500, marginX: "auto" }}
+      >
+        {/* <Heading>Login</Heading>
 
       <form
         onSubmit={handleSubmit(handleLogin)}
@@ -168,17 +175,47 @@ export const Login = () => {
             Login
           </Button>
         </Stack>
-      </form>
+      </form> */}
+        <Image
+          src="/clchc-logo.svg"
+          alt="Celebrating Life Community Health Center"
+          maxW="600px"
+          mb={16}
+        />
 
-      <Button
-        leftIcon={<FaGoogle />}
-        variant={"solid"}
-        size={"lg"}
-        onClick={handleGoogleLogin}
-        sx={{ width: "100%" }}
-      >
-        Login with Google
-      </Button>
-    </VStack>
+        <Button
+          variant="outline"
+          bg="white"
+          border="1px solid #DADCE0"
+          boxShadow="lg"
+          size={"lg"}
+          onClick={handleGoogleLogin}
+          w="50%"
+          justifyContent="flex-start"
+        >
+          <Image
+            src="/google.svg"
+            alt="Google"
+            boxSize="18px"
+            mr={4}
+          />
+          <Text
+            fontSize="md"
+            fontWeight="medium"
+            color="#3C4043"
+          >
+            Sign in with Google
+          </Text>
+        </Button>
+        <Text
+          fontSize="sm"
+          color="#696969"
+          fontWeight="semibold"
+          textAlign="center"
+        >
+          Please use your @clchc.org email address to sign in
+        </Text>
+      </VStack>
+    </Box>
   );
 };
