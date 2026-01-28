@@ -19,6 +19,8 @@ import {
   Routes,
 } from "react-router-dom";
 
+import { PendingApprovalPage } from "./components/login/PendingApprovalPage";
+
 const App = () => {
   return (
     <CookiesProvider>
@@ -38,6 +40,10 @@ const App = () => {
                 <Route
                   path="/login"
                   element={<Login />}
+                />
+                <Route
+                  path="/pending-approval"
+                  element={<PendingApprovalPage />}
                 />
                 <Route
                   path="/signup"
