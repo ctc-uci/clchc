@@ -20,7 +20,6 @@ import Navbar from "@/components/layout/Navbar";
 import QuotaDrawer from "@/components/quota-tracking/QuotaDrawer";
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 import debounce from "lodash.debounce";
-import InputMask from "react-input-mask";
 
 import QuotaTable from "./QuotaTable";
 
@@ -29,6 +28,11 @@ export const QuotaTracking = () => {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [providerQuery, setProviderQuery] = useState("");
+
+  // get current date and reformat
+  const today = new Date();
+  const [selectedDate, setSelectedDate] = useState(today.toISOString().split('T')[0]);
+
   const {
     isOpen: isCreateDrawerOpen,
     onOpen: onCreateDrawerOpen,
@@ -36,12 +40,20 @@ export const QuotaTracking = () => {
   } = useDisclosure();
 
   const fetchQuotas = useCallback(
-    async (provider) => {
-      let endpoint = `/quota/details`;
+    async (provider, date) => {
+      setLoading(true);
 
-      if (provider) {
-        endpoint += `?provider=${provider}`;
+      let endpoint = `/quota/details`;
+      const params = [];
+      
+      if (provider) params.push(`provider=${provider}`);
+      if (date) params.push(`date=${date}`);
+
+      if (params.length) {
+        endpoint += `?${params.join("&")}`;
+        console.log(endpoint);
       }
+      
       try {
         const response = await backend.get(endpoint);
         setRows(response.data);
@@ -55,9 +67,9 @@ export const QuotaTracking = () => {
   );
 
   const debouncedFetch = useMemo(() => {
-    return debounce((provider) => {
-      fetchQuotas(provider);
-    }, 300); // TODO: If we have multiple debounced inputs, we should set a universal delay in a constants file.
+    return debounce((provider, date) => {
+      fetchQuotas(provider, date);
+    }, 300);
   }, [fetchQuotas]);
 
   // Handle cleanup
@@ -68,14 +80,16 @@ export const QuotaTracking = () => {
   }, [debouncedFetch]);
 
   useEffect(() => {
+    debouncedFetch.cancel();
+
     if (!providerQuery) {
-      // If the search input is empty, immediately fetch all quotas
-      debouncedFetch.cancel();
-      fetchQuotas();
+      fetchQuotas("", selectedDate);
       return;
     }
-    debouncedFetch(providerQuery);
-  }, [fetchQuotas, providerQuery, debouncedFetch]);
+
+    debouncedFetch(providerQuery, selectedDate);
+  }, [providerQuery, selectedDate, fetchQuotas, debouncedFetch]);
+
 
   const handleChange = (e) => {
     setProviderQuery(e.target.value);
@@ -125,10 +139,12 @@ export const QuotaTracking = () => {
             <Input
               textAlign="center"
               type="date"
-              as={InputMask}
-              mask="99/99/9999"
-              placeholder="MM/DD/YYYY"
-              onChange={(e) => console.log("date input:", e.target.value)}
+              value={selectedDate}
+              onChange={(e) => {
+                setSelectedDate(e.target.value)
+                console.log(e.target.value)
+                }
+              }
             />
           </InputGroup>
         </Box>
@@ -203,8 +219,7 @@ export const QuotaTracking = () => {
           if (typeof updater === "function") {
             setRows(updater);
           } else {
-            // If it's a trigger to refetch, call fetchQuotas
-            fetchQuotas(providerQuery);
+            fetchQuotas(providerQuery, selectedDate);
           }
         }}
       />
