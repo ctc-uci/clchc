@@ -20,15 +20,16 @@ export const ProviderDirectoryPage = () => {
 
   const { backend } = useBackendContext();
 
+  const fetchData = async () => {
+    const [providerData, catData] = await Promise.all([
+      backend.get("/providers"),
+      backend.get("/directoryCategories"),
+    ]);
+    setProviders(providerData.data);
+    setProviderCategories(catData.data);
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      const [providerData, catData] = await Promise.all([
-        backend.get("/providers"),
-        backend.get("/directoryCategories"),
-      ]);
-      setProviders(providerData.data);
-      setProviderCategories(catData.data);
-    };
     fetchData();
   }, [backend]);
 
@@ -114,7 +115,8 @@ export const ProviderDirectoryPage = () => {
       )}
       <CategoryDrawer isOpen={isCreateDrawerOpen}
         onOpen={onCreateDrawerOpen}
-        onClose={onCreateDrawerClose}/>
+        onClose={onCreateDrawerClose}
+        onSaved={fetchData}/>
       <Navbar />
     </Box>
   );

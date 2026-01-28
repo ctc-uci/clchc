@@ -20,7 +20,7 @@ import {
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 import { useRoleContext } from "@/contexts/hooks/useRoleContext";
 
-const CategoryDrawer = ({ isOpen, onClose }) => {
+const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
   const [name, setName] = useState("");
   const [inputType, setInputType] = useState("");
   const [isRequired, setIsRequired] = useState(false);
@@ -36,15 +36,27 @@ const CategoryDrawer = ({ isOpen, onClose }) => {
   const handleSubmit = async () => {
     try {
       console.log(role);
-      await backend.post("/directoryCategories", {
+      const dateCreated = new Date().toISOString();
+      const res = await backend.post("/directoryCategories", {
         name,
         inputType,
         isRequired,
+        dateCreated,
         columnOrder,
       });
-      console.log(name, inputType, isRequired, columnOrder);
+      console.log("Create response:", res?.data);
+
+      onClose();
+      setName("");
+      setInputType("");
+      setIsRequired(false);
+      setColumnOrder(0);
+      if (typeof onSaved === "function") {
+        onSaved(res?.data);
+      }
     } catch (err) {
-      console.error("Failed to create category", err);
+      // console.error("Failed to create category", err);
+      console.error("Failed to create category", err?.response?.status, err?.response?.data || err.message);
     }
   };
 
@@ -93,7 +105,7 @@ const CategoryDrawer = ({ isOpen, onClose }) => {
                 <FormLabel>Column Order</FormLabel>
                 <Input
                   type="text"
-                  onChange={(e) => setColumnOrderNumber(Number(e.target.value))}
+                  onChange={(e) => setColumnOrder(Number(e.target.value))}
                 />
               </FormControl>
             </Stack>
