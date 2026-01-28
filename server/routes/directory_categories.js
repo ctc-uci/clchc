@@ -37,6 +37,13 @@ directoryCategoriesRouter.get("/:id", async (req, res) => {
 directoryCategoriesRouter.post("/", verifyToken, verifyRole("ccm"), async (req, res) => {
   try {
     const { name, inputType, isRequired, columnOrder } = req.body;
+    
+    // update all columnOrders >= new columnOrder to shift right
+    await db.query(
+      "UPDATE directory_categories SET column_order = column_order + 1 WHERE column_order >= $1",
+      [columnOrder]
+    );
+
     const categories = await db.query(
       "INSERT INTO directory_categories (name, input_type, is_required, column_order) VALUES ($1, $2, $3, $4) RETURNING *",
       [name, inputType, isRequired, columnOrder]

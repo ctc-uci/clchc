@@ -15,12 +15,15 @@ import {
 } from "@chakra-ui/react";
 
 export default function ProviderTable({ providers, providerCategories }) {
+  // sort categories by columnOrder
+  
+  const sortedCategories = [...providerCategories].sort((a, b) => a.columnOrder - b.columnOrder);
   /**
    * Making table header by mapping categories from providerCategories
    * @returns <Thead> with each category as a cell in the header row.
    */
   const Header = () => {
-    const columns = providerCategories.map((cat) => (
+    const columns = sortedCategories.map((cat) => (
       <Th key={cat.name}>{cat.name}</Th>
     ));
 
@@ -47,8 +50,8 @@ export default function ProviderTable({ providers, providerCategories }) {
 
     if (isMissing) {
       // Defaults per inputType
-      if (cat.inputType === "tag") return <Text color="gray.400">No tags</Text>;
-      return <Text color="gray.400">—</Text>; // default for "text" (and any other types)
+      if (cat.inputType === "tag") return <Text color="gray.400">NO TAGS SELECTED</Text>;
+      return <Text color="gray.400">""</Text>; // default for "text" (and any other types)
     }
 
     // Format per inputType
