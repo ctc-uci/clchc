@@ -117,7 +117,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             });
           }
         }
-        navigate("/quota-tracking");
+        const user = response.data;
+
+        if (user.status === "pending") {
+          navigate("/pending-approval");
+        } else if (user.status === "approved") {
+          navigate("/quota-tracking");
+        }
       }
     } catch (error) {
       console.error("Redirect result error:", error);
