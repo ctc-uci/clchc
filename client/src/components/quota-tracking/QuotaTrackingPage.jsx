@@ -29,6 +29,7 @@ export const QuotaTracking = () => {
   const [loading, setLoading] = useState(true);
   const [providerQuery, setProviderQuery] = useState("");
 
+  // get current date and reformat
   const today = new Date();
   const [selectedDate, setSelectedDate] = useState(today.toISOString().split('T')[0]);
 
