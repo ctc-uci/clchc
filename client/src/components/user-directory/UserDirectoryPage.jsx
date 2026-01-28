@@ -19,6 +19,7 @@ import { BackendContext } from "@/contexts/BackendContext";
 import InputMask from "react-input-mask";
 
 import UserTable from "./UserTable";
+import {UserPendingStatusList} from "./UserPendingStatusList";
 
 export const UserDirectory = () => {
   const { backend } = useContext(BackendContext);
@@ -113,7 +114,7 @@ export const UserDirectory = () => {
         </Box>
       </Flex>
 
-      <Box
+      {/* <Box
         borderWidth="1px"
         borderColor="yellow.300"
         bg="yellow.50"
@@ -142,7 +143,8 @@ export const UserDirectory = () => {
             2
           </Badge>
         </Flex>
-      </Box>
+      </Box> */}
+      <UserPendingStatusList />
 
       <Heading
         size="sm"
