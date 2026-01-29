@@ -32,15 +32,34 @@ export const UserPendingStatusList = () => {
         checkPendingStatus();
     }, [backend]);
 
-    //If a user is denied, remove them from the pending list
-    const handleUserDenied = (userId) => {
-        setPendingUsers((prev) => prev.filter((user) => user.id !== userId));
-    };
+    //When Approve Button is clicked, update user status to active
+    const handleApprove = async (id) => {
+    try {
+        console.log("Approving user with ID:", id);
 
-    //If the user is approved, remove them from the pending list and their status is now active
-    //Redirect them to the Quota Tracking page
-    const handleUserApproved = (userId) => {
-        setPendingUsers((prev) => prev.filter((user) => user.id !== userId));
+        await backend.put(`users-js/${id}`, {
+        status: "approved",
+        });
+
+        setPendingUsers((prev) =>
+        prev.filter((user) => user.id !== id)
+        );
+    } catch (err) {
+        console.error("Couldn't approve user", err);
+    }
+    };
+    
+    //When Deny Button is clicked, delete user from database
+    const handleDeny = async (id) => {
+        try {
+            await backend.delete(`/users-js/${id}`);
+            setPendingUsers((prev) => prev.filter((user) => user.id !== id));
+        } catch (err) {
+            console.error(
+                "couldn't deny user in components/UserPendingStatus.jsx",
+                err
+            );
+        }
     };
 
     return (
@@ -75,11 +94,13 @@ export const UserPendingStatusList = () => {
                     justify="space-between"
                     boxShadow="sm"
                 >
+                    {/* Placeholder Icon */}
+                    <WarningIcon />
                     {/* Left */}
                     <HStack spacing={3} minW="260px">
                         <Avatar size="sm" />
                         <Box>
-                            <Text fontWeight="medium">{req.name}</Text>
+                            <Text fontWeight="medium">{req.firstName} {req.lastName}</Text>
                             <Text fontSize="sm" color="gray.500">
                             {req.email}
                             </Text>
@@ -87,8 +108,9 @@ export const UserPendingStatusList = () => {
                     </HStack>
 
                     {/* Date */}
+                    {/* Currently, we do not have the date requested stored so I left it as this */}
                     <Text fontSize="sm" color="gray.500">
-                    Requested {req.date}
+                    Requested
                     </Text>
 
                     {/* Role */}
@@ -96,10 +118,10 @@ export const UserPendingStatusList = () => {
 
                     {/* Actions */}
                     <HStack spacing={2}>
-                        <Button size="sm" colorScheme="blackAlpha">
+                        <Button size="sm" colorScheme="blackAlpha" onClick={() => handleApprove(req.id)}>
                             ✓ Approve
                         </Button>
-                        <Button size="sm" variant="outline">
+                        <Button size="sm" variant="outline" onClick={() => handleDeny(req.id)}>
                             ✕ Deny
                         </Button>
                     </HStack>

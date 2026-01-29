@@ -63,7 +63,7 @@ usersJsRouter.put('/:id', async(req,res)=>{
         WHERE id=$8 RETURNING *`,
         [firebaseUid, role, firstName, lastName, email, status, apptCalcFactor, id]
         );
-        if (!result || result.length === 0) {
+        if (result.rowCount === 0) {
             return res.status(404).json({ error: "User not found." });
         }
         res.status(200).json(keysToCamel(result));
