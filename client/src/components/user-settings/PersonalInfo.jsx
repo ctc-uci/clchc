@@ -1,6 +1,4 @@
 import React, {useState, useEffect} from "react";
-import { useBackendContext } from "@/contexts/hooks/useBackendContext";
-import { useAuthContext } from "@/contexts/hooks/useAuthContext";
 import {
     FormControl,
     FormLabel,
@@ -11,23 +9,12 @@ import {
     Button,
     Text
 } from "@chakra-ui/react";
+import useUser from "./useUser";
 
 export default function PersonalInfo(){
-    const {backend} = useBackendContext();
-    const {currentUser} = useAuthContext();
-    const [errorMessage, setErrorMessage] = useState("");
-    const [userInfo, setUserInfo] = useState();
-    useEffect(() => {
-        (async() => {
-            try{
-                const {data} = await backend.get(`/users/${currentUser.uid}`);
-                setUserInfo(data[0]);
-            }
-            catch (e){
-                setErrorMessage(e.message);
-            }
-        })();
-    }, []);
+    const { userInfo, setUserInfo, errorMessage, updateUser } = useUser();
+
+  
     if(!userInfo){return null};
     /**
      * useEffect(function, dependencyArray)
@@ -36,20 +23,10 @@ export default function PersonalInfo(){
      * If you do have dependencies, it would run the effect every time the dependency changes
      */
 
-    const updateUser = (key, value) => {
+    const updateUserProp = (key, value) => {
         setUserInfo(prev => ({...prev, [key]:value}))
     }
 
-    const saveChanges = async () => {
-        try {
-            await backend.put(`/users/${currentUser.uid}`,
-                {firstName: userInfo.firstName, lastName: userInfo.lastName, email: userInfo.email});
-            alert("Changes saved successfully.");
-        }
-        catch (e){
-            setErrorMessage(e.message);
-        }
-    }
 
     /**
      * const funcName = async () => {
@@ -65,7 +42,7 @@ export default function PersonalInfo(){
                     <FormLabel>First name</FormLabel>
                     <Input
                         value={userInfo.firstName}
-                        onChange={(e) => updateUser("firstName", e.target.value)}
+                        onChange={(e) => updateUserProp("firstName", e.target.value)}
                     />
                 </Grid>
             </FormControl>
@@ -74,7 +51,7 @@ export default function PersonalInfo(){
                     <FormLabel>Last name</FormLabel>
                     <Input
                         value={userInfo.lastName}
-                        onChange={(e) => updateUser("lastName", e.target.value)}
+                        onChange={(e) => updateUserProp("lastName", e.target.value)}
                     />
                 </Grid>
             </FormControl><FormControl>
@@ -82,7 +59,7 @@ export default function PersonalInfo(){
                     <FormLabel>Email address</FormLabel>
                     <Input
                         value={userInfo.email}
-                        onChange={(e) => updateUser("email", e.target.value)}
+                        onChange={(e) => updateUserProp("email", e.target.value)}
                     />
                 </Grid>
             </FormControl>
@@ -95,7 +72,7 @@ export default function PersonalInfo(){
                     />
                 </Grid>
             </FormControl>
-            <Button onClick={saveChanges}>Apply changes</Button>
+            <Button onClick={updateUser}>Apply changes</Button>
             <Text>{errorMessage}</Text>
         </Grid>
     )
