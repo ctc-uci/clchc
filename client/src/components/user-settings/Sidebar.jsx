@@ -11,9 +11,8 @@ import { useAuthContext } from "@/contexts/hooks/useAuthContext";
 import { useRoleContext } from "@/contexts/hooks/useRoleContext";
 
 export default function Sidebar({ currentView, setCurrentView }) {
-    const {currentUser} = useAuthContext(); // deconstructing context to get user info
-    const {role} = useRoleContext();
-    console.log(currentUser)
+    const { currentUser } = useAuthContext(); // deconstructing context to get user info
+    const { role } = useRoleContext();
     const User = () => (
         <VStack align="center">
             <Avatar size="2xl" />
@@ -22,10 +21,16 @@ export default function Sidebar({ currentView, setCurrentView }) {
         </VStack>
     )
 
+    const FactorButton = () => {
+        return role === "ccm" || role === "master"
+            ? <Button onClick={() => setCurrentView(CALCULATION_FACTOR)}>Calculation Factor</Button>
+            : null;
+    }
+
     const NavButtons = () => (
         <VStack align="stretch" spacing="1em">
             <Button onClick={() => setCurrentView(PERSONAL_INFO)}>Personal Information</Button>
-            <Button onClick={() => setCurrentView(CALCULATION_FACTOR)}>Calculation Factor</Button>
+            <FactorButton />
             <Button>Log out</Button>
             <Button onClick={() => setCurrentView(DELETE_ACCOUNT)}>Delete Account</Button>
         </VStack>

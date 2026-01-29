@@ -16,7 +16,7 @@ export const CALCULATION_FACTOR = "calculation-factor";
 export function Settings({view=PERSONAL_INFO}) {
     // State to determine which "tab" being shown in the View.
     const [currentView, setCurrentView] = useState(view);
-    
+    console.log(currentView);
     return(
         <Grid
         templateColumns="auto 1fr">
