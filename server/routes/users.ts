@@ -134,8 +134,6 @@ usersRouter.put("/:firebaseUid", async (req, res) => {
   try {
     const { firebaseUid } = req.params;
     const { firstName, lastName, email } = req.body;
-    console.log("PARAMS:", firebaseUid);
-    console.log("BODY:", firstName, lastName, email);
     const result = await db.query(
       `UPDATE users 
         SET 

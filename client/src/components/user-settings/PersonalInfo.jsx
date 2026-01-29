@@ -28,7 +28,6 @@ export default function PersonalInfo(){
             }
         })();
     }, []);
-    console.log(userInfo);
     if(!userInfo){return null};
     /**
      * useEffect(function, dependencyArray)
