@@ -128,3 +128,28 @@ usersRouter.put("/update/set-role", verifyRole("admin"), async (req, res) => {
     res.status(400).send(err.message);
   }
 });
+
+// Update a user's firstName, lastName, email by firebse UID (for user settings)
+usersRouter.put("/:firebaseUid", async (req, res) => {
+  try {
+    const { firebaseUid } = req.params;
+    const { firstName, lastName, email } = req.body;
+    console.log("PARAMS:", firebaseUid);
+    console.log("BODY:", firstName, lastName, email);
+    const result = await db.query(
+      `UPDATE users 
+        SET 
+        first_name = COALESCE($1, first_name), 
+        last_name = COALESCE($2, last_name), 
+        email = COALESCE($3, email)
+        WHERE firebase_uid = $4 RETURNING *`,
+      [firstName, lastName, email, firebaseUid]
+    );
+    if (!result || result.length === 0) {
+      return res.status(404).json({ error: "User not found." });
+    }
+    res.status(200).json(keysToCamel(result));
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+});

@@ -28,6 +28,7 @@ export default function PersonalInfo(){
             }
         })();
     }, []);
+    console.log(userInfo);
     if(!userInfo){return null};
     /**
      * useEffect(function, dependencyArray)
@@ -42,7 +43,8 @@ export default function PersonalInfo(){
 
     const saveChanges = async () => {
         try {
-            await backend.put(`/users/update`, userInfo);
+            await backend.put(`/users/${currentUser.uid}`,
+                {firstName: userInfo.firstName, lastName: userInfo.lastName, email: userInfo.email});
             alert("Changes saved successfully.");
         }
         catch (e){
