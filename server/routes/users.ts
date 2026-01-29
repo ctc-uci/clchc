@@ -129,6 +129,22 @@ usersRouter.put("/update/set-role", verifyRole("admin"), async (req, res) => {
   }
 });
 
+// Update appointment calc factor
+usersRouter.put("/update/set-calc-factor", verifyRole("ccm"), async(req, res) => {
+  try{
+    const {factor, firebaseUid} = req.body;
+    console.log(firebaseUid);
+    const user = await db.query(
+      "UPDATE users SET appt_calc_factor = $1 WHERE firebase_uid = $2 RETURNING *",
+      [factor, firebaseUid]
+    );
+
+    res.status(200).json(keysToCamel(user));
+  } catch(err){
+    res.status(400).send(err.message);
+  }
+})
+
 // Update a user's firstName, lastName, email by firebse UID (for user settings)
 usersRouter.put("/:firebaseUid", async (req, res) => {
   try {
