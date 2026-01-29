@@ -19,7 +19,6 @@ export default function useUser() {
             }
         })();
     }, []);
-    console.log(userInfo);
     /**
      * useEffect(function, dependencyArray)
      * useEffect(() => {
