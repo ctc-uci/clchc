@@ -42,19 +42,12 @@ usersRouter.delete("/:firebaseUid", async (req, res) => {
       [firebaseUid]
     );
 
-<<<<<<< HEAD
     if (checkResult.length === 0) {
       return res.status(404).json({ error: "User not found" });
     }
 
     await admin.auth().deleteUser(firebaseUid);
     
-=======
-    // if (checkResult.length === 0) {
-    //   return res.status(404).json({ error: "User not found" });
-    // }
-    await admin.auth().deleteUser(firebaseUid);
->>>>>>> be75ee2 (Personal info and quota calc factor ui + delete route fix)
     const user = await db.query("DELETE FROM users WHERE firebase_uid = $1", [
       firebaseUid,
     ]);

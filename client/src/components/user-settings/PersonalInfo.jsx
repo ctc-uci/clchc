@@ -45,7 +45,7 @@ export default function PersonalInfo() {
       borderRadius="1em"
       padding="1.5em"
       margin="1.5em"
-      height:auto
+      height:auto="true"
     >
       <FormControl>
         <Text
