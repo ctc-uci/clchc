@@ -9,6 +9,7 @@ import {
   Grid,
   Input,
   Text,
+  VStack,
 } from "@chakra-ui/react";
 
 import useUser from "./useUser";
@@ -37,37 +38,48 @@ export default function PersonalInfo() {
    */
 
   return (
-    <Grid
+    <VStack
       align="stretch"
       spacing="2em"
       backgroundColor="#ddd"
       borderRadius="1em"
       padding="1.5em"
+      margin="1.5em"
+      height:auto
     >
       <FormControl>
+        <Text
+          fontSize={20}
+          fontWeight={"bold"}
+        >
+          Personal Information
+        </Text>
         <Grid>
-          <FormLabel>First name</FormLabel>
+          <FormLabel>First Name</FormLabel>
           <Input
             value={userInfo.firstName}
             onChange={(e) => updateUserProp("firstName", e.target.value)}
+            bg="gray.100"
           />
         </Grid>
       </FormControl>
       <FormControl>
         <Grid>
-          <FormLabel>Last name</FormLabel>
+          <FormLabel>Last Name</FormLabel>
           <Input
             value={userInfo.lastName}
             onChange={(e) => updateUserProp("lastName", e.target.value)}
+            bg="gray.100"
           />
         </Grid>
       </FormControl>
       <FormControl>
         <Grid>
-          <FormLabel>Email address</FormLabel>
+          <FormLabel>Email Address</FormLabel>
           <Input
             value={userInfo.email}
             onChange={(e) => updateUserProp("email", e.target.value)}
+            bg="gray.100"
           />
         </Grid>
       </FormControl>
@@ -77,11 +89,12 @@ export default function PersonalInfo() {
           <Input
             value={userInfo.role}
             readOnly={true}
+            bg="gray.100"
           />
         </Grid>
       </FormControl>
       <Button onClick={updateUser}>Apply changes</Button>
       <Text>{errorMessage}</Text>
-    </Grid>
+    </VStack>
   );
 }

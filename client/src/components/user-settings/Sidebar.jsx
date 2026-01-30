@@ -90,6 +90,7 @@ export default function Sidebar({ currentView, setCurrentView }) {
         backgroundColor="#ddd"
         borderRadius="1em"
         padding="1.5em"
+        margin="1.5em"
       >
         <User />
         <NavButtons />
