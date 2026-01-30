@@ -45,8 +45,8 @@ export default function LogoutModal({ isOpen, onClose }) {
                     <ModalBody fontSize="1.25em">Are you sure you want to log out of {role}?</ModalBody>
                     <ModalFooter>
                         <HStack gap="1.5em">
-                            <Button onClick={onClose}>CANCEL</Button>
-                            <Button onClick={handleLogout} backgroundColor="#bbb">LOGOUT</Button>
+                            <Button onClick={onClose}>Cancel</Button>
+                            <Button onClick={handleLogout} backgroundColor="#bbb">Logout</Button>
                         </HStack>
                     </ModalFooter>
                 </Grid>

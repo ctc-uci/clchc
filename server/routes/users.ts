@@ -42,14 +42,15 @@ usersRouter.delete("/:firebaseUid", async (req, res) => {
       [firebaseUid]
     );
 
-    if (checkResult.rows.length === 0) {
+    if (checkResult.length === 0) {
       return res.status(404).json({ error: "User not found" });
     }
 
+    await admin.auth().deleteUser(firebaseUid);
+    
     const user = await db.query("DELETE FROM users WHERE firebase_uid = $1", [
       firebaseUid,
     ]);
-    await admin.auth().deleteUser(firebaseUid);
 
     res.status(204).json(keysToCamel(user));
   } catch (err) {
