@@ -4,20 +4,22 @@ import {
   Box,
   Button,
   Flex,
-  HStack,
   FormControl,
   FormErrorMessage,
   Grid,
+  HStack,
   Input,
   Text,
 } from "@chakra-ui/react";
 
 import { useAuthContext } from "@/contexts/hooks/useAuthContext";
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
+import { useNavigate } from "react-router-dom";
 
 export default function DeleteAccount() {
   const { backend } = useBackendContext();
   const { currentUser } = useAuthContext();
+  const navigate = useNavigate();
   const [input, setInput] = useState("");
 
   const handleDelete = async () => {
@@ -25,6 +27,7 @@ export default function DeleteAccount() {
       if (input === "DELETE") {
         await backend.delete(`/users/${currentUser.uid}`);
       }
+      navigate("/login");
     } catch (e) {
       alert("Incorrect.");
     }
@@ -34,7 +37,6 @@ export default function DeleteAccount() {
 
   const Instructions = () => (
     <>
-
       <Text>
         Are you sure? Deleting your account is permament and will remove all
         your information from the database. This action{" "}
@@ -48,7 +50,7 @@ export default function DeleteAccount() {
       </Text>
       <Text>To confirm this, type "DELETE"</Text>
     </>
-  )
+  );
 
   // Written as function, not component to prevent it from
   // rerendering to avoid losing focus on input
@@ -64,10 +66,12 @@ export default function DeleteAccount() {
         isDisabled={isDisabled}
         _hover={isDisabled ? "none" : undefined}
         backgroundColor="#bbb"
-        onClick={handleDelete}>Delete Account
+        onClick={handleDelete}
+      >
+        Delete Account
       </Button>
     </HStack>
-  )
+  );
 
   return (
     <Flex
@@ -79,7 +83,10 @@ export default function DeleteAccount() {
       <FormControl>
         <Grid gap="2em">
           <Text fontSize={20}>Deleting Account</Text>
-          <Grid gap="2em" marginLeft="1.5em">
+          <Grid
+            gap="2em"
+            marginLeft="1.5em"
+          >
             <Instructions />
             {renderDeleteControls()}
           </Grid>
