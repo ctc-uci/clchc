@@ -51,7 +51,7 @@ export default function ProviderTable({ providers, providerCategories }) {
     if (isMissing) {
       // Defaults per inputType
       if (cat.inputType === "tag") return <Text color="gray.400">NO TAGS SELECTED</Text>;
-      return <Text color="gray.400">""</Text>; // default for "text" (and any other types)
+      return <Text color="gray.400"></Text>; // default for "text" (and any other types)
     }
 
     // Format per inputType

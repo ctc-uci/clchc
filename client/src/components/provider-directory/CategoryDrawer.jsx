@@ -28,21 +28,19 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
   const { backend } = useBackendContext();
   const { role, loading } = useRoleContext();
 
-  useEffect(() => {
-    console.log("CategoryDrawer role context:", { loading, role, isOpen });
-  }, [loading, role, isOpen]);
+  
 
 
   const handleSubmit = async () => {
     try {
-      console.log(role);
       const dateCreated = new Date().toISOString();
+      const adjustedColumnOrder = columnOrder - 1;
       const res = await backend.post("/directoryCategories", {
         name,
         inputType,
         isRequired,
         dateCreated,
-        columnOrder,
+        columnOrder: adjustedColumnOrder,
       });
       console.log("Create response:", res?.data);
 
@@ -81,21 +79,25 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
                   onChange={(e) => setName(e.target.value)}
                 />
               </FormControl>
-              <RadioGroup
-                onChange={setInputType}
-                value={inputType}
-              >
-                <Stack direction="row">
-                  <Radio value="text">Text</Radio>
-                  <Radio value="tag">Tag</Radio>
-                </Stack>
-              </RadioGroup>
+              <FormControl isRequired>
+                <FormLabel>Input Type</FormLabel>
+                <RadioGroup
+                  onChange={setInputType}
+                  value={inputType}
+                >
+                  <Stack direction="row">
+                    <Radio value="text">Text</Radio>
+                    <Radio value="tag">Tag</Radio>
+                  </Stack>
+                </RadioGroup>
+              </FormControl>
 
               <label>
                 {" "}
                 Optional?
                 <input
                   type="checkbox"
+                  style={{ marginLeft: "8px" }}
                   checked={isRequired}
                   onChange={(e) => setIsRequired(e.target.checked)}
                 />

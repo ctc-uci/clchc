@@ -8,7 +8,7 @@ export const directoryCategoriesRouter = Router();
 // Get all directory categories
 directoryCategoriesRouter.get("/", async (req, res) => {
   try {
-    const categories = await db.query(`SELECT * FROM directory_categories`);
+    const categories = await db.query(`SELECT * FROM directory_categories ORDER BY column_order`);
 
     res.status(200).json(keysToCamel(categories));
   } catch (err) {
