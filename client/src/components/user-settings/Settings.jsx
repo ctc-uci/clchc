@@ -18,7 +18,10 @@ export function Settings({ view = PERSONAL_INFO }) {
     const [currentView, setCurrentView] = useState(view);
     return (
         <Grid
-            templateColumns="auto 1fr">
+            templateColumns="auto 1fr"
+            padding="2em"
+            gap="2em"
+        >
             <Sidebar
                 currentView={currentView}
                 setCurrentView={setCurrentView}

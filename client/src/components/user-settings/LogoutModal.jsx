@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 
 import {
     Button,
+    HStack,
+    Grid,
+    Text,
     Modal,
     ModalBody,
     ModalCloseButton,
@@ -22,7 +25,7 @@ import {
 
 import { Login } from "/src/components/login/Login.tsx";
 
-export default function LogoutModal({isOpen, onClose}) {
+export default function LogoutModal({ isOpen, onClose }) {
     const { role } = useRoleContext();
     const [userInfo] = useState();
     const navigate = useNavigate();
@@ -37,13 +40,17 @@ export default function LogoutModal({isOpen, onClose}) {
         >
             <ModalOverlay />
             <ModalContent>
-                <ModalHeader>Logout</ModalHeader>
-                <ModalBody>Are you sure you want to logout of {role}?</ModalBody>
-                <ModalFooter>
-                    <Button onClick={handleLogout}>LOGOUT</Button>
-                    <Button onClick={onClose}>CANCEL</Button>
-                </ModalFooter>
+                <Grid placeItems="center">
+                    <ModalHeader fontSize="3xl">Logout</ModalHeader>
+                    <ModalBody fontSize="1.25em">Are you sure you want to log out of {role}?</ModalBody>
+                    <ModalFooter>
+                        <HStack gap="1.5em">
+                            <Button onClick={onClose}>CANCEL</Button>
+                            <Button onClick={handleLogout} backgroundColor="#bbb">LOGOUT</Button>
+                        </HStack>
+                    </ModalFooter>
+                </Grid>
             </ModalContent>
-        </Modal>
+        </Modal >
     );
 }
