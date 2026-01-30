@@ -27,7 +27,7 @@ export default function QuotaCalcFactor() {
             <Text>Quota Calculation Factor</Text>
             <Text>This value...overriden</Text>
             <NumberInput
-                value={factor}
+                value={isNaN(factor) ? 0 : factor}
                 onChange={(_, val) => setFactor(val)}
             >
                 <NumberInputField />

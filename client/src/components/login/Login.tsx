@@ -20,7 +20,7 @@ import { authenticateGoogleUser } from "@/utils/auth/providers";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { FaGoogle } from "react-icons/fa6";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, Route, Routes } from "react-router-dom";
 import { z } from "zod";
 
 const signinSchema = z.object({
@@ -110,6 +110,7 @@ export const Login = () => {
       spacing={8}
       sx={{ width: 300, marginX: "auto" }}
     >
+      <Routes><Route path="/login" element={<Login/>}/></Routes>
       <Heading>Login</Heading>
 
       <form
