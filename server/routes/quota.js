@@ -87,9 +87,6 @@ quotaRouter.get("/details", async (req, res) => {
       values
     );
     res.status(200).json(keysToCamel(results));
-
-    console.log(values);
-
   } catch (err) {
     res.status(400).send(err.message);
   }

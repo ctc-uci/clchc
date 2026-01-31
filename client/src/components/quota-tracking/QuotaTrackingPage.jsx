@@ -31,7 +31,7 @@ export const QuotaTracking = () => {
 
   // get current date and reformat
   const today = new Date();
-  const [selectedDate, setSelectedDate] = useState(today.toISOString().split('T')[0]);
+  const [selectedDate, setSelectedDate] = useState(today.toLocaleString().split(',')[0]);
 
   const {
     isOpen: isCreateDrawerOpen,
@@ -51,7 +51,6 @@ export const QuotaTracking = () => {
 
       if (params.length) {
         endpoint += `?${params.join("&")}`;
-        console.log(endpoint);
       }
       
       try {
@@ -142,7 +141,6 @@ export const QuotaTracking = () => {
               value={selectedDate}
               onChange={(e) => {
                 setSelectedDate(e.target.value)
-                console.log(e.target.value)
                 }
               }
             />
