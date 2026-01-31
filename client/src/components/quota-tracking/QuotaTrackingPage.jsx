@@ -31,7 +31,7 @@ export const QuotaTracking = () => {
 
   // get current date and reformat
   const today = new Date();
-  const [selectedDate, setSelectedDate] = useState(today.toLocaleString().split(',')[0]);
+  const [selectedDate, setSelectedDate] = useState(today.toLocaleDateString("en-CA"));
 
   const {
     isOpen: isCreateDrawerOpen,
