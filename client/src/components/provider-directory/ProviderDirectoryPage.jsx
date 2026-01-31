@@ -95,7 +95,7 @@ export const ProviderDirectoryPage = () => {
         </Grid>
       </Box>
 
-       {role !== "viewer" && role !== "ccs" ? (
+       {role === "ccm" || role === "master" ? (
           <>
             <Button onClick={()=>{onCreateDrawerOpen()}}>Add New Category</Button>
           </>
