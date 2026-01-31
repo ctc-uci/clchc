@@ -24,13 +24,38 @@ export const UserDirectory = () => {
   const { backend } = useContext(BackendContext);
   const [users, setUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-
+  const [cardValues, setCardValues] = useState({
+    total: 0,
+    managers: 0,
+    staff: 0,
+    viewers: 0,
+  })
   // fetching users
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         const { data } = await backend.get("/users-js");
         setUsers(data);
+        let total = 0; 
+        let managers = 0; 
+        let staff = 0; 
+        let viewers = 0;
+        for (const user of data) {
+          total++;
+          if (user.role == "master" || user.role == "ccm") {
+            managers++;
+          } else if (user.role == "ccs") {
+            staff++;
+          } else if (user.role == "viewer") {
+            viewers++;
+          }
+          setCardValues({
+            total: total, 
+            managers: managers,
+            staff: staff, 
+            viewers: viewers,
+          });
+        }
       } catch (err) {
         console.error(
           "couldn't fetch users in components/UserDirectoryPage.jsx",
@@ -163,26 +188,25 @@ export const UserDirectory = () => {
         >
           <CustomCard
             title="Total Users"
-            body="5"
+            body={cardValues.total}
             height="12rem"
             width="14rem"
           />
           <CustomCard
             title="Managers"
-            body="2"
-            footer="hello"
+            body={cardValues.managers}
             height="12rem"
             width="14rem"
           />
           <CustomCard
             title="Staff"
-            body="2"
+            body={cardValues.staff}
             height="12rem"
             width="14rem"
           />
           <CustomCard
             title="Viewers"
-            body="1"
+            body={cardValues.viewers}
             height="12rem"
             width="14rem"
           />
