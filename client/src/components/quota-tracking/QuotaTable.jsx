@@ -99,9 +99,9 @@ const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
   }
 
   return (
-    <TableContainer>
+    <TableContainer borderWidth="1px" borderColor="gray.200" borderRadius="lg">
       <Table variant="simple">
-        <Thead>
+        <Thead bg="gray.50">
           <Tr>
             <Th>Providers</Th>
             <Th>Location</Th>
