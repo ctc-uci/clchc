@@ -16,7 +16,6 @@ import {
 import { CustomCard } from "@/components/common/CustomCard";
 import { Navbar } from "@/components/layout/Navbar";
 import { BackendContext } from "@/contexts/BackendContext";
-import InputMask from "react-input-mask";
 
 import UserTable from "./UserTable";
 
@@ -24,47 +23,28 @@ export const UserDirectory = () => {
   const { backend } = useContext(BackendContext);
   const [users, setUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [cardValues, setCardValues] = useState({
-    total: 0,
-    managers: 0,
-    staff: 0,
-    viewers: 0,
-  })
-  // fetching users
+  const [userStats, setUserStats] = useState({});
+
   useEffect(() => {
-    const fetchUsers = async () => {
+    // Fetches users and user stats in parallel
+    const fetchUserInfo = async () => {
       try {
-        const { data } = await backend.get("/users-js");
-        setUsers(data);
-        let total = 0; 
-        let managers = 0; 
-        let staff = 0; 
-        let viewers = 0;
-        for (const user of data) {
-          total++;
-          if (user.role == "master" || user.role == "ccm") {
-            managers++;
-          } else if (user.role == "ccs") {
-            staff++;
-          } else if (user.role == "viewer") {
-            viewers++;
-          }
-          setCardValues({
-            total: total, 
-            managers: managers,
-            staff: staff, 
-            viewers: viewers,
-          });
-        }
+        const [usersRes, statsRes] = await Promise.all([
+          backend.get("/users-js"),
+          backend.get("/users/stats"),
+        ]);
+
+        setUsers(usersRes.data);
+        setUserStats(statsRes.data);
       } catch (err) {
         console.error(
-          "couldn't fetch users in components/UserDirectoryPage.jsx",
+          "couldn't fetch user info in components/UserDirectoryPage.jsx",
           err
         );
       }
     };
 
-    fetchUsers();
+    fetchUserInfo();
   }, [backend]);
 
   // table delete
@@ -188,28 +168,20 @@ export const UserDirectory = () => {
         >
           <CustomCard
             title="Total Users"
-            body={cardValues.total}
+            body={userStats.total}
             height="12rem"
             width="14rem"
           />
-          <CustomCard
-            title="Managers"
-            body={cardValues.managers}
-            height="12rem"
-            width="14rem"
-          />
-          <CustomCard
-            title="Staff"
-            body={cardValues.staff}
-            height="12rem"
-            width="14rem"
-          />
-          <CustomCard
-            title="Viewers"
-            body={cardValues.viewers}
-            height="12rem"
-            width="14rem"
-          />
+          {userStats.byRole &&
+            userStats.byRole.map((userStat) => (
+              <CustomCard
+                key={userStat.role}
+                title={userStat.role}
+                body={userStat.count}
+                height="12rem"
+                width="14rem"
+              />
+            ))}
         </HStack>
       </Box>
 
