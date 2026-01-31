@@ -108,9 +108,8 @@ export const UserPendingStatusList = () => {
                     </HStack>
 
                     {/* Date */}
-                    {/* Currently, we do not have the date requested stored so I left it as this */}
                     <Text fontSize="sm" color="gray.500">
-                    Requested
+                        Request Date
                     </Text>
 
                     {/* Role */}

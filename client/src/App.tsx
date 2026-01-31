@@ -1,7 +1,7 @@
 import { Admin } from "@/components/admin/Admin";
 import { CatchAll } from "@/components/CatchAll";
 import { Dashboard } from "@/components/dashboard/Dashboard";
-import { Login } from "@/components/login/Login";
+import { Login } from "@/components/login/login";
 import { Playground } from "@/components/Playground";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { ProviderDirectoryPage } from "@/components/provider-directory/ProviderDirectoryPage";

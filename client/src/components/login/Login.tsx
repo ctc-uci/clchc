@@ -101,7 +101,15 @@ export const Login = () => {
   };
 
   const handleGoogleLogin = async () => {
-    await authenticateGoogleUser();
+    try {
+      await authenticateGoogleUser();
+    } catch (err) {
+      toast({
+        title: "Google sign-in failed",
+        status: "error",
+        variant: "subtle",
+      });
+    }
   };
 
   useEffect(() => {
@@ -117,65 +125,6 @@ export const Login = () => {
         spacing={6}
         sx={{ width: 500, marginX: "auto" }}
       >
-        {/* <Heading>Login</Heading>
-
-      <form
-        onSubmit={handleSubmit(handleLogin)}
-        style={{ width: "100%" }}
-      >
-        <Stack spacing={2}>
-          <FormControl
-            isInvalid={!!errors.email}
-            w={"100%"}
-          >
-            <Center>
-              <Input
-                placeholder="Email"
-                type="email"
-                size={"lg"}
-                {...register("email")}
-                name="email"
-                isRequired
-                autoComplete="email"
-              />
-            </Center>
-            <FormErrorMessage>
-              {errors.email?.message?.toString()}
-            </FormErrorMessage>
-          </FormControl>
-          <FormControl isInvalid={!!errors.password}>
-            <Center>
-              <Input
-                placeholder="Password"
-                type="password"
-                size={"lg"}
-                {...register("password")}
-                name="password"
-                isRequired
-                autoComplete="current-password"
-              />
-            </Center>
-            <FormErrorMessage>
-              {errors.password?.message?.toString()}
-            </FormErrorMessage>
-            <ChakraLink
-              as={Link}
-              to="/signup"
-            >
-              <FormHelperText>Click here to sign up</FormHelperText>
-            </ChakraLink>
-          </FormControl>
-
-          <Button
-            type="submit"
-            size={"lg"}
-            sx={{ width: "100%" }}
-            isDisabled={Object.keys(errors).length > 0}
-          >
-            Login
-          </Button>
-        </Stack>
-      </form> */}
         <Image
           src="/clchc-logo.svg"
           alt="Celebrating Life Community Health Center"
