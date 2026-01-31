@@ -65,7 +65,7 @@ export const Navbar = () => {
           Provider Directory
         </Link>
 
-        {role !== "viewer" && role !== "ccs" ? (
+        {role === "ccm" && role === "master" ? (
           <>
             <Link
               as={NavLink}
