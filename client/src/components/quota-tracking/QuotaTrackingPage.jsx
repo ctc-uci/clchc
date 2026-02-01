@@ -20,27 +20,63 @@ import Navbar from "@/components/layout/Navbar";
 import QuotaDrawer from "@/components/quota-tracking/QuotaDrawer";
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 import debounce from "lodash.debounce";
-import InputMask from "react-input-mask";
-import { useQuotas } from "../../../contexts/hooks/data-fetching/useQuotas";
 
 import QuotaTable from "./QuotaTable";
+import { useQuotas, 
+  useQuotaById, 
+  useUpdateQuota,
+  useCreateQuota,
+ } from "../../../contexts/hooks/data-fetching/useQuotas";
 
 export const QuotaTracking = () => {
   const { backend } = useBackendContext();
+  const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [providerQuery, setProviderQuery] = useState("");
+  const { data: quotas = [], isLoading, error } = useQuotas();
+  const displayedRows = providerQuery ? rows : quotas;
+
+  // get current date and reformat
+  const today = new Date();
+  const [selectedDate, setSelectedDate] = useState(today.toLocaleDateString("en-CA"));
+
   const {
     isOpen: isCreateDrawerOpen,
     onOpen: onCreateDrawerOpen,
     onClose: onCreateDrawerClose,
   } = useDisclosure();
-  const { data: quotas, isLoading, error, refetch } = useQuotas({ provider: providerQuery });
+
+  const fetchQuotas = useCallback(
+    async (provider, date) => {
+      setLoading(true);
+
+      let endpoint = `/quota/details`;
+      const params = [];
+      
+      if (provider) params.push(`provider=${provider}`);
+      if (date) params.push(`date=${date}`);
+
+      if (params.length) {
+        endpoint += `?${params.join("&")}`;
+      }
+      
+      try {
+        const response = await backend.get(endpoint);
+        setRows(response.data);
+      } catch (err) {
+        console.error("Failed to fetch quotas", err);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [backend]
+  );
 
   const debouncedFetch = useMemo(() => {
-    return debounce((query) => {
-      refetch({ provider : query });
-    }, 300); // TODO: If we have multiple debounced inputs, we should set a universal delay in a constants file.
-  }, [refetch]);
+    return debounce((provider, date) => {
+      fetchQuotas(provider, date);
+    }, 300);
+  }, [fetchQuotas]);
 
   // Handle cleanup
   useEffect(() => {
@@ -50,19 +86,24 @@ export const QuotaTracking = () => {
   }, [debouncedFetch]);
 
   useEffect(() => {
+    debouncedFetch.cancel();
+
     if (!providerQuery) {
-      // If the search input is empty, immediately fetch all quotas
-      debouncedFetch.cancel();
-      refetch({ provider: "" });
+      fetchQuotas("", selectedDate);
       return;
     }
-    debouncedFetch(providerQuery);
-  }, [providerQuery, debouncedFetch, refetch]);
+
+    debouncedFetch(providerQuery, selectedDate);
+  }, [providerQuery, selectedDate, fetchQuotas, debouncedFetch]);
+
 
   const handleChange = (e) => {
     setProviderQuery(e.target.value);
   };
 
+  if (isLoading) {
+    return <div>Loading quotas...</div>;
+  }
   return (
     <Box
       p={6}
@@ -107,10 +148,11 @@ export const QuotaTracking = () => {
             <Input
               textAlign="center"
               type="date"
-              as={InputMask}
-              mask="99/99/9999"
-              placeholder="MM/DD/YYYY"
-              onChange={(e) => console.log("date input:", e.target.value)}
+              value={selectedDate}
+              onChange={(e) => {
+                setSelectedDate(e.target.value)
+                }
+              }
             />
           </InputGroup>
         </Box>
@@ -179,9 +221,15 @@ export const QuotaTracking = () => {
       </InputGroup>
 
       <QuotaTable
-        rows={quotas}
-        loading={isLoading}
-        onRowsUpdate={() => refetch({ provider: providerQuery })}
+        rows={displayedRows}
+        loading={loading}
+        onRowsUpdate={(updater) => {
+          if (typeof updater === "function") {
+            setRows(updater);
+          } else {
+            fetchQuotas(providerQuery, selectedDate);
+          }
+        }}
       />
 
       <QuotaDrawer
