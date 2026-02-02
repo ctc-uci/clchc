@@ -12,12 +12,16 @@ import {
   VStack,
 } from "@chakra-ui/react";
 
-import useFactor from "./useFactor";
 import useUser from "./useUser";
 
 export default function QuotaCalcFactor() {
   const { userInfo, updateQuota } = useUser();
-  const { factor, setFactor } = useFactor(userInfo);
+  const [factor, setFactor] = useState(0);
+
+  useEffect(() => {
+    if (!userInfo) return;
+    setFactor(userInfo.apptCalcFactor ?? 0);
+  }, [userInfo]);
 
   const handleClick = async () => {
     await updateQuota(factor);
