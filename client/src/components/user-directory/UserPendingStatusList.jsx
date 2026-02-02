@@ -12,14 +12,8 @@ export const UserPendingStatusList = () => {
         const checkPendingStatus = async () => {
             try {
                 // Fetch all users that have pending status
-                const response = await backend.get(`/users`);
-                const userData = response.data;
-
-                const pending = userData.filter(
-                    (user) => user.status?.toLowerCase() === "pending"
-                );
-
-                setPendingUsers(pending);
+                const response = await backend.get("/users-js", { params: { status: "pending" } });
+                setPendingUsers(response.data);
 
             } catch (err) {
                 console.error(
@@ -35,8 +29,6 @@ export const UserPendingStatusList = () => {
     //When Approve Button is clicked, update user status to active
     const handleApprove = async (id) => {
     try {
-        console.log("Approving user with ID:", id);
-
         await backend.put(`users-js/${id}`, {
         status: "approved",
         });

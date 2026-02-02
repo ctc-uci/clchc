@@ -43,7 +43,7 @@ export const PendingApprovalPage = () => {
     };
 
     checkApproval();
-  }, [currentUser, backend, navigate]);
+  }, []);
 
 
   return (
