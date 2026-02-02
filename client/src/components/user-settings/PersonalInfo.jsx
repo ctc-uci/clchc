@@ -20,12 +20,6 @@ export default function PersonalInfo() {
   if (!userInfo) {
     return null;
   }
-  /**
-   * useEffect(function, dependencyArray)
-   * useEffect(() => {
-   * }, [])    [] means no dependencies which means useEffect only runs the first time you render/mount
-   * If you do have dependencies, it would run the effect every time the dependency changes
-   */
 
   const updateUserProp = (key, value) => {
     setUserInfo((prev) => ({ ...prev, [key]: value }));
