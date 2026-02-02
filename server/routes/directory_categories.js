@@ -1,13 +1,14 @@
 import { keysToCamel } from "@/common/utils";
 import { db } from "@/db/db-pgp"; // TODO: replace this db with
 import { Router } from "express";
+import { verifyToken, verifyRole } from "@/middleware"; // <-- add this
 
 export const directoryCategoriesRouter = Router();
 
 // Get all directory categories
 directoryCategoriesRouter.get("/", async (req, res) => {
   try {
-    const categories = await db.query(`SELECT * FROM directory_categories`);
+    const categories = await db.query(`SELECT * FROM directory_categories ORDER BY column_order`);
 
     res.status(200).json(keysToCamel(categories));
   } catch (err) {
@@ -33,9 +34,15 @@ directoryCategoriesRouter.get("/:id", async (req, res) => {
 });
 
 // Adds a new category
-directoryCategoriesRouter.post("/", async (req, res) => {
+directoryCategoriesRouter.post("/", verifyToken, verifyRole("ccm"), async (req, res) => {
   try {
     const { name, inputType, isRequired, columnOrder } = req.body;
+    
+    // update all columnOrders >= new columnOrder to shift right
+    await db.query(
+      "UPDATE directory_categories SET column_order = column_order + 1 WHERE column_order >= $1",
+      [columnOrder]
+    );
 
     const categories = await db.query(
       "INSERT INTO directory_categories (name, input_type, is_required, column_order) VALUES ($1, $2, $3, $4) RETURNING *",
