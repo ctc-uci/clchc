@@ -15,17 +15,13 @@ import {
 } from "@chakra-ui/react";
 
 import { useRoleContext } from "@/contexts/hooks/useRoleContext";
-import { useNavigate } from "react-router-dom";
-
-import { Login } from "/src/components/login/Login.tsx";
+import { useAuthContext } from "@/contexts/hooks/useAuthContext";
 
 export default function LogoutModal({ isOpen, onClose }) {
   const { role } = useRoleContext();
+  const { logout } = useAuthContext();
   const [userInfo] = useState();
-  const navigate = useNavigate();
-  const handleLogout = () => {
-    navigate("/login");
-  };
+  const handleLogout = () => logout();
 
   return (
     <Modal
