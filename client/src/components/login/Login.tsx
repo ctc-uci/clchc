@@ -1,17 +1,10 @@
-import { useCallback, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import {
   Box,
   Button,
-  Center,
-  Link as ChakraLink,
-  FormControl,
-  FormErrorMessage,
-  FormHelperText,
-  Heading,
   Image,
-  Input,
-  Stack,
+  Spinner,
   Text,
   useToast,
   VStack,
@@ -22,8 +15,7 @@ import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 import { authenticateGoogleUser } from "@/utils/auth/providers";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { FaGoogle } from "react-icons/fa6";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 
 const signinSchema = z.object({
@@ -37,7 +29,7 @@ export const Login = () => {
   const navigate = useNavigate();
   const toast = useToast();
 
-  const { login, handleRedirectResult } = useAuthContext();
+  const { handleRedirectResult } = useAuthContext();
   const { backend } = useBackendContext();
 
   const {
@@ -49,56 +41,56 @@ export const Login = () => {
     mode: "onBlur",
   });
 
-  const toastLoginError = useCallback(
-    (msg: string) => {
-      toast({
-        title: "An error occurred while signing in",
-        description: msg,
-        status: "error",
-        variant: "subtle",
-      });
-    },
-    [toast]
-  );
+  // const toastLoginError = useCallback(
+  //   (msg: string) => {
+  //     toast({
+  //       title: "An error occurred while signing in",
+  //       description: msg,
+  //       status: "error",
+  //       variant: "subtle",
+  //     });
+  //   },
+  //   [toast]
+  // );
 
-  const handleLogin = async (data: SigninFormValues) => {
-    try {
-      await login({
-        email: data.email,
-        password: data.password,
-      });
+  // const handleLogin = async (data: SigninFormValues) => {
+  //   try {
+  //     await login({
+  //       email: data.email,
+  //       password: data.password,
+  //     });
 
-      navigate("/quota-tracking");
-    } catch (err) {
-      const errorCode = err.code;
-      const firebaseErrorMsg = err.message;
+  //     navigate("/quota-tracking");
+  //   } catch (err) {
+  //     const errorCode = err.code;
+  //     const firebaseErrorMsg = err.message;
 
-      switch (errorCode) {
-        case "auth/wrong-password":
-        case "auth/invalid-credential":
-        case "auth/invalid-email":
-        case "auth/user-not-found":
-          toastLoginError(
-            "Email address or password does not match our records!"
-          );
-          break;
-        case "auth/unverified-email":
-          toastLoginError("Please verify your email address.");
-          break;
-        case "auth/user-disabled":
-          toastLoginError("This account has been disabled.");
-          break;
-        case "auth/too-many-requests":
-          toastLoginError("Too many attempts. Please try again later.");
-          break;
-        case "auth/user-signed-out":
-          toastLoginError("You have been signed out. Please sign in again.");
-          break;
-        default:
-          toastLoginError(firebaseErrorMsg);
-      }
-    }
-  };
+  //     switch (errorCode) {
+  //       case "auth/wrong-password":
+  //       case "auth/invalid-credential":
+  //       case "auth/invalid-email":
+  //       case "auth/user-not-found":
+  //         toastLoginError(
+  //           "Email address or password does not match our records!"
+  //         );
+  //         break;
+  //       case "auth/unverified-email":
+  //         toastLoginError("Please verify your email address.");
+  //         break;
+  //       case "auth/user-disabled":
+  //         toastLoginError("This account has been disabled.");
+  //         break;
+  //       case "auth/too-many-requests":
+  //         toastLoginError("Too many attempts. Please try again later.");
+  //         break;
+  //       case "auth/user-signed-out":
+  //         toastLoginError("You have been signed out. Please sign in again.");
+  //         break;
+  //       default:
+  //         toastLoginError(firebaseErrorMsg);
+  //     }
+  //   }
+  // };
 
   const handleGoogleLogin = async () => {
     try {
@@ -112,9 +104,22 @@ export const Login = () => {
     }
   };
 
+  // useEffect(() => {
+  //   handleRedirectResult(backend, navigate, toast);
+  // }, [backend, handleRedirectResult, navigate, toast]);
+  
+  const [checkingRedirect, setCheckingRedirect] = useState(true);
+
   useEffect(() => {
-    handleRedirectResult(backend, navigate, toast);
-  }, [backend, handleRedirectResult, navigate, toast]);
+    if (!backend) return;
+
+    (async () => {
+      await handleRedirectResult(backend, navigate, toast);
+      setCheckingRedirect(false);
+    })();
+  }, [backend, navigate, toast]);
+
+  if (checkingRedirect) return <Spinner />;
 
   return (
     <Box
