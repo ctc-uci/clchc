@@ -31,12 +31,6 @@ export default function PersonalInfo() {
     setUserInfo((prev) => ({ ...prev, [key]: value }));
   };
 
-  /**
-   * const funcName = async () => {
-   *     const {content} = await promise();
-   * }
-   */
-
   return (
     <VStack
       align="stretch"
