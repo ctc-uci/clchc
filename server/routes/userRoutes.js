@@ -19,16 +19,29 @@ usersJsRouter.post('/',async(req,res) =>{
         res.status(500).send(err.message);
   }
 })
-// Get all users
-usersJsRouter.get('/', async(req,res)=>{
-    try{
-        const result = await db.query('SELECT * from users');
-        res.status(200).json(keysToCamel(result));
-    } catch(err){
-        console.error('Error fetching users:', err);
-        res.status(500).json({ error: err.message });
-    }
-})
+
+// Get all users w/ optional status filter
+usersJsRouter.get("/", async (req, res) => {
+  try {
+    const { status } = req.query;
+
+    const result = await db.query(
+      status
+        ? "SELECT * FROM users WHERE status::text = $1"
+        : "SELECT * FROM users",
+      status ? [String(status)] : []
+    );
+
+    return res.status(200).json(keysToCamel(result));
+  } catch (err) {
+    console.error("Error fetching users:", err);
+    return res.status(500).json({
+      error: err instanceof Error ? err.message : "Unknown error",
+    });
+  }
+});
+
+
 // Get a user by ID
 usersJsRouter.get('/:id', async(req,res)=>{
     try{
