@@ -54,6 +54,25 @@ export const QuotaTracking = () => {
     onClose: onCreateDrawerClose,
   } = useDisclosure();
 
+  const fetchQuotas = useCallback(
+    async (provider) => {
+      let endpoint = `/quota/details`;
+
+      if (provider) {
+        endpoint += `?provider=${provider}`;
+      }
+      try {
+        const response = await backend.get(endpoint);
+        setRows(response.data);
+      } catch (err) {
+        console.error("Failed to fetch quotas", err);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [backend]
+  );
+
   const debouncedFetch = useMemo(() => {
     return debounce(() => {
       refetch();
