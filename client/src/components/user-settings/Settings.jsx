@@ -1,9 +1,5 @@
-import {
-    Box,
-    Flex,
-    Grid,
-    Button
-} from "@chakra-ui/react";
+import React, {useState} from "react";
+import {Grid} from "@chakra-ui/react";
 import Sidebar from "./Sidebar.jsx";
 import View from "./View.jsx";
 
