@@ -8,7 +8,7 @@ import { ProviderDirectoryPage } from "@/components/provider-directory/ProviderD
 import { QuotaTracking } from "@/components/quota-tracking/QuotaTrackingPage";
 import { Signup } from "@/components/signup/Signup";
 import { UserDirectory } from "@/components/user-directory/UserDirectoryPage";
-import { Settings, PERSONAL_INFO, CALCULATION_FACTOR, DELETE_ACCOUNT } from "@/components/user-settings/Settings";
+import { Settings } from "@/components/user-settings/Settings";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { BackendProvider } from "@/contexts/BackendContext";
 import { RoleProvider } from "@/contexts/RoleContext";
@@ -33,17 +33,8 @@ const App = () => {
                   element={<UserDirectory />}
                 />
                 <Route
-                  path="/user-settings/personal-info"
-                  element={<ProtectedRoute element={<Settings view={PERSONAL_INFO}/>} />}
-
-                />
-                <Route
-                  path="/user-settings/delete-account"
-                  element={<Settings view={DELETE_ACCOUNT} />}
-                />
-                <Route
-                  path="/user-settings/calculation-factor"
-                  element={<Settings view={CALCULATION_FACTOR} />}
+                  path="/user-settings/:section"
+                  element={<ProtectedRoute element={<Settings />} />}
                 />
                 <Route
                   path="/quota-tracking"
