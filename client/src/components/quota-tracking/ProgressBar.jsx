@@ -4,21 +4,21 @@ import { Button, Flex, Icon, Progress, Text } from "@chakra-ui/react";
 
 import { ArrowDown, ArrowUp } from "lucide-react";
 
+import {
+  useQuotaById,
+  useUpdateQuota,
+} from "../../../contexts/hooks/data-fetching/useQuotas";
 import { useBackendContext } from "../../contexts/hooks/useBackendContext";
-import { useUpdateQuota, useQuotaById } from "../../../contexts/hooks/data-fetching/useQuotas";
 
 export default function ProgressBar({ quotaID }) {
-  const { backend } = useBackendContext();
-
   const quotaRef = useRef(null);
   // const [quota, setQuota] = useState(null);
-  const { mutate: updateQuota, isLoading: isUpdating, error: updateError } = useUpdateQuota();
   const {
-      data: quota,
-      isLoading,
-      error,
-      refetch,
-    } = useQuotaById(quotaID);
+    mutate: updateQuota,
+    isLoading: isUpdating,
+    error: updateError,
+  } = useUpdateQuota();
+  const { data: quota, isLoading, error, refetch } = useQuotaById(quotaID);
   const maxProgress = quota?.quota ?? 0;
   const current = quota?.progress ?? 0;
   const [currentProgress, setCurrentProgress] = useState(current);
@@ -36,7 +36,7 @@ export default function ProgressBar({ quotaID }) {
     if (!currentQuota) return;
 
     try {
-      await updateQuota({ id: quotaID, data: { progress: next }});
+      await updateQuota({ id: quotaID, data: { progress: next } });
     } catch (err) {
       console.error("Error updating progress:", err);
     }

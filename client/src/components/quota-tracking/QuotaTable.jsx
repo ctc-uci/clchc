@@ -26,12 +26,10 @@ import {
 import ProgressBar from "@/components/quota-tracking/ProgressBar";
 import QuotaDrawer from "@/components/quota-tracking/QuotaDrawer";
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
-import { 
-  useUpdateQuota,
- } from "../../../contexts/hooks/data-fetching/useQuotas";
+
+import { useUpdateQuota } from "../../../contexts/hooks/data-fetching/useQuotas";
 
 const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
-  const { backend } = useBackendContext();
   const [editingQuotaId, setEditingQuotaId] = useState(null);
   const {
     isOpen: isDrawerOpen,
@@ -39,7 +37,11 @@ const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
     onClose: onDrawerClose,
   } = useDisclosure();
 
-  const { mutate: updateQuota, isLoading: isUpdating, error: updateError } = useUpdateQuota();
+  const {
+    mutate: updateQuota,
+    isLoading: isUpdating,
+    error: updateError,
+  } = useUpdateQuota();
 
   const onSave = async (id, newNote) => {
     const sanitizedNote = newNote.trim();
@@ -104,7 +106,11 @@ const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
   }
 
   return (
-    <TableContainer borderWidth="1px" borderColor="gray.200" borderRadius="lg">
+    <TableContainer
+      borderWidth="1px"
+      borderColor="gray.200"
+      borderRadius="lg"
+    >
       <Table variant="simple">
         <Thead bg="gray.50">
           <Tr>
