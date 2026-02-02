@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useMemo } from "react";
 
 import { InfoOutlineIcon, SearchIcon } from "@chakra-ui/icons";
 import {
@@ -16,42 +16,38 @@ import {
 import { CustomCard } from "@/components/common/CustomCard";
 import { Navbar } from "@/components/layout/Navbar";
 import { BackendContext } from "@/contexts/BackendContext";
-
+import debounce from "lodash.debounce";
+import { useUsers, useUsersStats, useDeleteUser } from "../../../contexts/hooks/data-fetching/useUsers";
 import UserTable from "./UserTable";
 
 export const UserDirectory = () => {
   const { backend } = useContext(BackendContext);
-  const [users, setUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [userStats, setUserStats] = useState({});
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
+  const [ userId, setUserId ] = useState(null)
+  const {
+      data: users,
+      isLoading,
+      error,
+      refetch,
+  } = useUsers({ user: debouncedSearchQuery });
+  const {
+    data: userStats = [],
+    isStatsLoading,
+    statsError,
+    statsRefetch,
+  } = useUsersStats();
 
-  useEffect(() => {
-    // Fetches users and user stats in parallel
-    const fetchUserInfo = async () => {
-      try {
-        const [usersRes, statsRes] = await Promise.all([
-          backend.get("/users-js"),
-          backend.get("/users/stats"),
-        ]);
-
-        setUsers(usersRes.data);
-        setUserStats(statsRes.data);
-      } catch (err) {
-        console.error(
-          "couldn't fetch user info in components/UserDirectoryPage.jsx",
-          err
-        );
-      }
-    };
-
-    fetchUserInfo();
-  }, [backend]);
+  const {
+      mutate: deleteUser,
+      isLoading: isDeleting,
+      error: deleteError,
+    } = useDeleteUser({ user: debouncedSearchQuery });
 
   // table delete
-  const handleDelete = async (id) => {
+  const handleDelete = async (userId) => {
     try {
-      await backend.delete(`/users-js/${id}`);
-      setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
+      deleteUser(userId)
     } catch (err) {
       console.error(
         "couldn't delete user in components/UserDirectoryPage.jsx",
@@ -60,13 +56,40 @@ export const UserDirectory = () => {
     }
   };
 
-  // filter data via search bar changes
-  const filteredUsers = users.filter((user) => {
-    const lowerQuery = searchQuery.toLowerCase();
-    const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
-    const email = user.email.toLowerCase();
-    return fullName.includes(lowerQuery) || email.includes(lowerQuery);
-  });
+  const debouncedFetch = useMemo(() => {
+      return debounce(() => {
+        refetch();
+      }, 300);
+    }, [refetch]);
+  
+    useEffect(() => {
+      const handler = setTimeout(() => {
+        setDebouncedSearchQuery(searchQuery);
+      }, 300);
+  
+      return () => clearTimeout(handler);
+    }, [searchQuery]);
+  
+    useEffect(() => {
+      if (!searchQuery) return; // no fetch if search is empty
+  
+      debouncedFetch();
+  
+      return () => {
+        debouncedFetch.cancel();
+      };
+    }, [searchQuery, debouncedFetch]);
+  
+    const handleChange = (e) => {
+      setSearchQuery(e.target.value);
+    };
+
+  if (isStatsLoading) {
+    return <div> User stats loading... </div>
+  }
+  if (statsError) {
+  return <div>Failed to load user stats</div>;
+}
 
   return (
     <Box
@@ -196,12 +219,13 @@ export const UserDirectory = () => {
           placeholder="Search by name or email..."
           borderRadius="md"
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={handleChange}
         />
       </InputGroup>
 
       <UserTable
-        users={filteredUsers}
+        users={users}
+        loading ={isLoading}
         onDelete={handleDelete}
       />
       <Navbar />

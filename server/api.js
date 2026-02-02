@@ -83,8 +83,12 @@ export const api = {
     },
   },
   users: {
-    getAll: async () => {
-      const res = await fetch(`${API_BASE}/users-js`);
+    getAll: async ({ params }) => {
+        let url = `${API_BASE}/users-js`;
+      if (params instanceof URLSearchParams) {
+        url += `?${params.toString()}`;
+      }
+      const res = await fetch(url);
       if (!res.ok) {
         throw new Error(`Failed to get users: ${res.status}`);
       }
@@ -98,7 +102,10 @@ export const api = {
       return res.json();
     },
     delete: async (id) => {
-      const res = await fetch(`${API_BASE}/users-js/${id}`);
+      const res = await fetch(`${API_BASE}/users-js/${id}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+      });
       if (!res.ok) {
         throw new Error(`Failed to delete user ${id}: ${res.status}`);
       }

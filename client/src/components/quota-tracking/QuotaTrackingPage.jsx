@@ -36,7 +36,7 @@ export const QuotaTracking = () => {
   );
 
   const {
-    data: quotas,
+    data: quotas = [],
     isLoading,
     error,
     refetch,

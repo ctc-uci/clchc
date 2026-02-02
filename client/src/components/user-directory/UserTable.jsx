@@ -12,7 +12,7 @@ import {
   Tr,
 } from "@chakra-ui/react";
 
-export default function UserTable({ users, onDelete}) {
+export default function UserTable({ users, loading, onDelete}) {
 
   // different badge colors per role, can delete if dtm
   const roleColors = {
@@ -22,6 +22,9 @@ export default function UserTable({ users, onDelete}) {
     viewer: "yellow",
   };
 
+  if (loading) {
+    return <div> Loading users... </div>
+  }
   return (
     <TableContainer borderWidth="1px" borderColor="gray.200" borderRadius="lg">
       <Table>
