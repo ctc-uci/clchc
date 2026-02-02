@@ -18,6 +18,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { BackendContext } from "@/contexts/BackendContext";
 
 import UserTable from "./UserTable";
+import {UserPendingStatusList} from "./UserPendingStatusList";
 
 export const UserDirectory = () => {
   const { backend } = useContext(BackendContext);
@@ -117,36 +118,8 @@ export const UserDirectory = () => {
           </InputGroup>
         </Box>
       </Flex>
-
-      <Box
-        borderWidth="1px"
-        borderColor="yellow.300"
-        bg="yellow.50"
-        borderRadius="lg"
-        p={4}
-        mb={8}
-      >
-        <Flex
-          align="center"
-          gap={2}
-        >
-          <InfoOutlineIcon></InfoOutlineIcon>
-          <Text
-            fontWeight="medium"
-            color="gray.700"
-          >
-            Pending Requests
-          </Text>
-          <Badge
-            borderRadius="full"
-            px={1.5}
-            py={0.3}
-            colorScheme="red"
-            variant="solid"
-          >
-            2
-          </Badge>
-        </Flex>
+      <Box mb={8}>      
+        <UserPendingStatusList />
       </Box>
 
       <Heading

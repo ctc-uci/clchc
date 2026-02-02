@@ -93,8 +93,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const result = await getRedirectResult(auth);
 
+      if (!result?.user) return;
+
       if (result) {
         const response = await backend.get(`/users/${result.user.uid}`);
+
         if (response.data.length === 0) {
           try {
             await backend.post("/users/create", {
@@ -117,7 +120,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             });
           }
         }
-        navigate("/quota-tracking");
+        const user = response.data[0];
+
+        if (user.status === "pending") {
+          navigate("/pending-approval", { replace: true });
+        } else {
+          navigate("/quota-tracking", { replace: true });
+        }
       }
     } catch (error) {
       console.error("Redirect result error:", error);

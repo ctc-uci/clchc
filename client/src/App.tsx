@@ -1,7 +1,7 @@
 import { Admin } from "@/components/admin/Admin";
 import { CatchAll } from "@/components/CatchAll";
 import { Dashboard } from "@/components/dashboard/Dashboard";
-import { Login } from "@/components/login/Login";
+import { Login } from "@/components/login/login";
 import { Playground } from "@/components/Playground";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { ProviderDirectoryPage } from "@/components/provider-directory/ProviderDirectoryPage";
@@ -18,6 +18,8 @@ import {
   BrowserRouter as Router,
   Routes,
 } from "react-router-dom";
+
+import { PendingApprovalPage } from "./components/login/PendingApprovalPage";
 
 const App = () => {
   return (
@@ -38,6 +40,10 @@ const App = () => {
                 <Route
                   path="/login"
                   element={<Login />}
+                />
+                <Route
+                  path="/pending-approval"
+                  element={<PendingApprovalPage />}
                 />
                 <Route
                   path="/signup"

@@ -1,6 +1,7 @@
 import { useCallback, useEffect } from "react";
 
 import {
+  Box,
   Button,
   Center,
   Link as ChakraLink,
@@ -8,8 +9,10 @@ import {
   FormErrorMessage,
   FormHelperText,
   Heading,
+  Image,
   Input,
   Stack,
+  Text,
   useToast,
   VStack,
 } from "@chakra-ui/react";
@@ -98,7 +101,15 @@ export const Login = () => {
   };
 
   const handleGoogleLogin = async () => {
-    await authenticateGoogleUser();
+    try {
+      await authenticateGoogleUser();
+    } catch (err) {
+      toast({
+        title: "Google sign-in failed",
+        status: "error",
+        variant: "subtle",
+      });
+    }
   };
 
   useEffect(() => {
@@ -106,79 +117,54 @@ export const Login = () => {
   }, [backend, handleRedirectResult, navigate, toast]);
 
   return (
-    <VStack
-      spacing={8}
-      sx={{ width: 300, marginX: "auto" }}
+    <Box
+      mt={64}
+      mx={12}
     >
-      <Heading>Login</Heading>
-
-      <form
-        onSubmit={handleSubmit(handleLogin)}
-        style={{ width: "100%" }}
+      <VStack
+        spacing={6}
+        sx={{ width: 500, marginX: "auto" }}
       >
-        <Stack spacing={2}>
-          <FormControl
-            isInvalid={!!errors.email}
-            w={"100%"}
-          >
-            <Center>
-              <Input
-                placeholder="Email"
-                type="email"
-                size={"lg"}
-                {...register("email")}
-                name="email"
-                isRequired
-                autoComplete="email"
-              />
-            </Center>
-            <FormErrorMessage>
-              {errors.email?.message?.toString()}
-            </FormErrorMessage>
-          </FormControl>
-          <FormControl isInvalid={!!errors.password}>
-            <Center>
-              <Input
-                placeholder="Password"
-                type="password"
-                size={"lg"}
-                {...register("password")}
-                name="password"
-                isRequired
-                autoComplete="current-password"
-              />
-            </Center>
-            <FormErrorMessage>
-              {errors.password?.message?.toString()}
-            </FormErrorMessage>
-            <ChakraLink
-              as={Link}
-              to="/signup"
-            >
-              <FormHelperText>Click here to sign up</FormHelperText>
-            </ChakraLink>
-          </FormControl>
+        <Image
+          src="/clchc-logo.svg"
+          alt="Celebrating Life Community Health Center"
+          maxW="600px"
+          mb={16}
+        />
 
-          <Button
-            type="submit"
-            size={"lg"}
-            sx={{ width: "100%" }}
-            isDisabled={Object.keys(errors).length > 0}
+        <Button
+          variant="outline"
+          bg="white"
+          border="1px solid #DADCE0"
+          boxShadow="lg"
+          size={"lg"}
+          onClick={handleGoogleLogin}
+          w="50%"
+          justifyContent="flex-start"
+        >
+          <Image
+            src="/google.svg"
+            alt="Google"
+            boxSize="18px"
+            mr={4}
+          />
+          <Text
+            fontSize="md"
+            fontWeight="medium"
+            color="#3C4043"
           >
-            Login
-          </Button>
-        </Stack>
-      </form>
-
-      <Button
-        leftIcon={<FaGoogle />}
-        variant={"solid"}
-        size={"lg"}
-        onClick={handleGoogleLogin}
-        sx={{ width: "100%" }}
-      >
-        Login with Google
-      </Button>
-    </VStack>
+            Sign in with Google
+          </Text>
+        </Button>
+        <Text
+          fontSize="sm"
+          color="#696969"
+          fontWeight="semibold"
+          textAlign="center"
+        >
+          Please use your @clchc.org email address to sign in
+        </Text>
+      </VStack>
+    </Box>
   );
 };
