@@ -20,7 +20,7 @@ import { authenticateGoogleUser } from "@/utils/auth/providers";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { FaGoogle } from "react-icons/fa6";
-import { Link, Route, Routes, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
 
 const signinSchema = z.object({
