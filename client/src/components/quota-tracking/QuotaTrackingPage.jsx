@@ -21,24 +21,32 @@ import QuotaDrawer from "@/components/quota-tracking/QuotaDrawer";
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 import debounce from "lodash.debounce";
 
+import {
+  useQuotas,
+} from "../../../contexts/hooks/data-fetching/useQuotas";
 import QuotaTable from "./QuotaTable";
-import { useQuotas, 
-  useQuotaById, 
-  useUpdateQuota,
-  useCreateQuota,
- } from "../../../contexts/hooks/data-fetching/useQuotas";
 
 export const QuotaTracking = () => {
   const { backend } = useBackendContext();
-  const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [providerQuery, setProviderQuery] = useState("");
-  const { data: quotas = [], isLoading, error } = useQuotas();
-  const displayedRows = providerQuery ? rows : quotas;
+  const [debouncedProviderQuery, setDebouncedProviderQuery] = useState("");
 
   // get current date and reformat
   const today = new Date();
-  const [selectedDate, setSelectedDate] = useState(today.toLocaleDateString("en-CA"));
+  const [selectedDate, setSelectedDate] = useState(
+    today.toLocaleDateString("en-CA")
+  );
+
+  const {
+    data: quotas,
+    isLoading,
+    error,
+    refetch,
+  } = useQuotas({
+    date: selectedDate,
+    provider: debouncedProviderQuery,
+  });
 
   const {
     isOpen: isCreateDrawerOpen,
@@ -46,64 +54,34 @@ export const QuotaTracking = () => {
     onClose: onCreateDrawerClose,
   } = useDisclosure();
 
-  const fetchQuotas = useCallback(
-    async (provider, date) => {
-      setLoading(true);
-
-      let endpoint = `/quota/details`;
-      const params = [];
-      
-      if (provider) params.push(`provider=${provider}`);
-      if (date) params.push(`date=${date}`);
-
-      if (params.length) {
-        endpoint += `?${params.join("&")}`;
-      }
-      
-      try {
-        const response = await backend.get(endpoint);
-        setRows(response.data);
-      } catch (err) {
-        console.error("Failed to fetch quotas", err);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [backend]
-  );
-
   const debouncedFetch = useMemo(() => {
-    return debounce((provider, date) => {
-      fetchQuotas(provider, date);
+    return debounce(() => {
+      refetch();
     }, 300);
-  }, [fetchQuotas]);
+  }, [refetch]);
 
-  // Handle cleanup
   useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedProviderQuery(providerQuery);
+    }, 300);
+
+    return () => clearTimeout(handler);
+  }, [providerQuery]);
+
+  useEffect(() => {
+    if (!providerQuery) return; // no fetch if search is empty
+
+    debouncedFetch();
+
     return () => {
       debouncedFetch.cancel();
     };
-  }, [debouncedFetch]);
-
-  useEffect(() => {
-    debouncedFetch.cancel();
-
-    if (!providerQuery) {
-      fetchQuotas("", selectedDate);
-      return;
-    }
-
-    debouncedFetch(providerQuery, selectedDate);
-  }, [providerQuery, selectedDate, fetchQuotas, debouncedFetch]);
-
+  }, [providerQuery, selectedDate, debouncedFetch]);
 
   const handleChange = (e) => {
     setProviderQuery(e.target.value);
   };
 
-  if (isLoading) {
-    return <div>Loading quotas...</div>;
-  }
   return (
     <Box
       p={6}
@@ -150,9 +128,8 @@ export const QuotaTracking = () => {
               type="date"
               value={selectedDate}
               onChange={(e) => {
-                setSelectedDate(e.target.value)
-                }
-              }
+                setSelectedDate(e.target.value);
+              }}
             />
           </InputGroup>
         </Box>
@@ -221,8 +198,8 @@ export const QuotaTracking = () => {
       </InputGroup>
 
       <QuotaTable
-        rows={displayedRows}
-        loading={loading}
+        rows={quotas}
+        loading={isLoading}
         onRowsUpdate={(updater) => {
           if (typeof updater === "function") {
             setRows(updater);

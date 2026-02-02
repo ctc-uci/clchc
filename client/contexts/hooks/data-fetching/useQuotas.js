@@ -1,21 +1,27 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '../../../../server/api.js'
 
-export const useQuotas = () => {
+export const useQuotas = ({ date, provider } = {}) => {
   return useQuery({
-    queryKey: ["quotas"],
+    queryKey: ["quotas", { date, provider }],
     queryFn: async () => {
-      console.log("fetching quotas");
-      return api.quotas.getAll();
+      console.log("Fetching quotas (react-query)", { date, provider });
+
+      const params = new URLSearchParams();
+      if (date) params.append("date", date);
+      if (provider) params.append("provider", provider);
+
+      return api.quotas.getAll({ params });
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 60 * 1000, // 1 min
+    refetchInterval: 60 * 1000, // 1 min
   });
 };
 
 export const useQuotaById = (id) => {
   return useQuery({
     queryKey: ["quota", id],
-    queryFn: () => api.quotas.getById(id),
+    queryFn: async () => api.quotas.getById(id),
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
@@ -26,6 +32,7 @@ export const useUpdateQuota = () => {
   return useMutation({
     mutationFn: ({ id, data }) => api.quotas.update(id, data),
     onMutate: ({ id, data }) => {
+      // Optimistic update
       const previousQuotas = queryClient.getQueryData(["quotas"]);
       queryClient.setQueryData(["quotas"], old =>
         old.map(q => q.id === id ? { ...q, ...data } : q)

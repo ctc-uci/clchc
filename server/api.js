@@ -40,8 +40,13 @@ export const api = {
     }
   },
   quotas: {
-    getAll: async() => {
-        const res = await fetch(`${API_BASE}/quota/details`);
+    getAll: async({ params }) => {
+        let url = `${API_BASE}/quota/details`;
+        if (params instanceof URLSearchParams) {
+            url += `?${params.toString()}`;
+        }
+
+        const res = await fetch(url);
         if (!res.ok) {
             throw new Error(`Failed to getch quotas: ${res.status}`);
         }

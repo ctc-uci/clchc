@@ -5,6 +5,6 @@ export function useUsers() {
   return useQuery({
     queryKey: ['users'],
     queryFn: api.users.getAll,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchInterval: 60 * 1000, // 1 min
   });
 }
