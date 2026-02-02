@@ -45,7 +45,7 @@ const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
     const sanitizedNote = newNote.trim();
 
     try {
-      await updateQuota({ id, data: { notes: sanitizedNote } });
+      updateQuota({ id, data: { notes: sanitizedNote } });
       if (onRowsUpdate) {
         onRowsUpdate((prevRows) =>
           prevRows.map((row) =>

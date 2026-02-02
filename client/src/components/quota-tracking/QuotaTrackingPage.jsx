@@ -27,8 +27,7 @@ import {
 import QuotaTable from "./QuotaTable";
 
 export const QuotaTracking = () => {
-  const { backend } = useBackendContext();
-  const [loading, setLoading] = useState(true);
+  const [rows, setRows] = useState([]);
   const [providerQuery, setProviderQuery] = useState("");
   const [debouncedProviderQuery, setDebouncedProviderQuery] = useState("");
 
@@ -53,25 +52,6 @@ export const QuotaTracking = () => {
     onOpen: onCreateDrawerOpen,
     onClose: onCreateDrawerClose,
   } = useDisclosure();
-
-  const fetchQuotas = useCallback(
-    async (provider) => {
-      let endpoint = `/quota/details`;
-
-      if (provider) {
-        endpoint += `?provider=${provider}`;
-      }
-      try {
-        const response = await backend.get(endpoint);
-        setRows(response.data);
-      } catch (err) {
-        console.error("Failed to fetch quotas", err);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [backend]
-  );
 
   const debouncedFetch = useMemo(() => {
     return debounce(() => {
