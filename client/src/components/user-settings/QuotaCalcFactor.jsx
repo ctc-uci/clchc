@@ -21,7 +21,6 @@ export default function QuotaCalcFactor() {
 
   const handleClick = async () => {
     await updateQuota(factor);
-    alert("Changes saved.");
   };
 
   return (
