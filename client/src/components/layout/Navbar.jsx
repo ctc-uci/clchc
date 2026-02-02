@@ -90,7 +90,7 @@ export const Navbar = () => {
 
         <Link
           as={NavLink}
-          to="/user-settings/personal-info"
+          to="/settings"
           style={activeStyle}
           {...baseLinkProps}
         >
