@@ -1,57 +1,103 @@
-import { Router } from 'express';
-import { db } from '@/db/db-pgp';
-import { keysToCamel } from '@/common/utils';
+import { keysToCamel } from "@/common/utils";
+import { db } from "@/db/db-pgp";
+import { Router } from "express";
 
 export const usersJsRouter = Router();
 
 // Create a new user
-usersJsRouter.post('/',async(req,res) =>{
-    try {
-        const { firebaseUid, role, firstName, lastName, email, status, apptCalcFactor } = req.body;
-        
-        const result = await db.query(
-        'INSERT INTO users (firebase_uid, role, first_name, last_name, email, status, appt_calc_factor) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
-        [firebaseUid, role, firstName, lastName, email, status, apptCalcFactor]
-        );
-        
-        res.status(201).json(keysToCamel(result));
+usersJsRouter.post("/", async (req, res) => {
+  try {
+    const {
+      firebaseUid,
+      role,
+      firstName,
+      lastName,
+      email,
+      status,
+      apptCalcFactor,
+    } = req.body;
+
+    const result = await db.query(
+      "INSERT INTO users (firebase_uid, role, first_name, last_name, email, status, appt_calc_factor) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *",
+      [firebaseUid, role, firstName, lastName, email, status, apptCalcFactor]
+    );
+
+    res.status(201).json(keysToCamel(result));
   } catch (err) {
-        res.status(500).send(err.message);
+    res.status(500).send(err.message);
   }
-})
+});
 // Get all users
-usersJsRouter.get('/', async(req,res)=>{
-    try{
-        const result = await db.query('SELECT * from users');
-        res.status(200).json(keysToCamel(result));
-    } catch(err){
-        console.error('Error fetching users:', err);
-        res.status(500).json({ error: err.message });
+usersJsRouter.get("/", async (req, res) => {
+  try {
+    const { user } = req.query;
+
+    let whereClause = "";
+    const values = [];
+    const conditions = [];
+
+    if (user) {
+      conditions.push(`
+                (
+                first_name ILIKE $${values.length + 1}
+                OR last_name ILIKE $${values.length + 1}
+                OR email ILIKE $${values.length + 1}
+                )
+            `);
+      values.push(`%${user}%`);
     }
-})
+
+    if (conditions.length > 0) {
+      whereClause = "WHERE " + conditions.join(" AND ");
+    }
+
+    const result = await db.query(
+      `
+        SELECT *
+        FROM users
+        ${whereClause}
+        ORDER BY id ASC
+      `,
+      values
+    );
+    res.status(200).json(keysToCamel(result));
+  } catch (err) {
+    console.error("Error fetching users:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Get a user by ID
-usersJsRouter.get('/:id', async(req,res)=>{
-    try{
-        const {id} = req.params
+usersJsRouter.get("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
 
-        const result = await db.query('SELECT * from users WHERE id=$1',[id]);
+    const result = await db.query("SELECT * from users WHERE id=$1", [id]);
 
-        if (!result || result.length === 0) {
-            return res.status(404).json({ error: "User not found." });
-        }
-        res.status(200).json(keysToCamel(result));
-    } catch(err){
-        res.status(500).send(err.message);
+    if (!result || result.length === 0) {
+      return res.status(404).json({ error: "User not found." });
     }
+    res.status(200).json(keysToCamel(result));
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
 });
 // Update a user by ID
-usersJsRouter.put('/:id', async(req,res)=>{
-    try{
-        const {id} = req.params;
-        const {firebaseUid, role, firstName, lastName, email, status, apptCalcFactor} = req.body;
-        
-        const result = await db.query(
-        `UPDATE users 
+usersJsRouter.put("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      firebaseUid,
+      role,
+      firstName,
+      lastName,
+      email,
+      status,
+      apptCalcFactor,
+    } = req.body;
+
+    const result = await db.query(
+      `UPDATE users 
         SET 
         firebase_uid = COALESCE($1, firebase_uid), 
         role = COALESCE($2, role), 
@@ -61,29 +107,40 @@ usersJsRouter.put('/:id', async(req,res)=>{
         status = COALESCE($6, status), 
         appt_calc_factor = COALESCE($7, appt_calc_factor) 
         WHERE id=$8 RETURNING *`,
-        [firebaseUid, role, firstName, lastName, email, status, apptCalcFactor, id]
-        );
-        if (!result || result.length === 0) {
-            return res.status(404).json({ error: "User not found." });
-        }
-        res.status(200).json(keysToCamel(result));
-    } catch(err){
-        res.status(500).send(err.message); 
+      [
+        firebaseUid,
+        role,
+        firstName,
+        lastName,
+        email,
+        status,
+        apptCalcFactor,
+        id,
+      ]
+    );
+    if (!result || result.length === 0) {
+      return res.status(404).json({ error: "User not found." });
     }
+    res.status(200).json(keysToCamel(result));
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
 });
 // Delete a user by ID
-usersJsRouter.delete('/:id', async(req,res)=>{
-    try{
-        const {id} = req.params;
+usersJsRouter.delete("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
 
-        const result = await db.query('DELETE FROM users WHERE id=$1 RETURNING *',[id]);
+    const result = await db.query("DELETE FROM users WHERE id=$1 RETURNING *", [
+      id,
+    ]);
 
-        if (!result || result.length === 0) {
-            return res.status(404).json({ error: "User not found." });
-        }
-
-        res.status(200).json(keysToCamel(result));
-    } catch(err){
-        res.status(500).send(err.message);
+    if (!result || result.length === 0) {
+      return res.status(404).json({ error: "User not found." });
     }
+
+    res.status(200).json(keysToCamel(result));
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
 });
