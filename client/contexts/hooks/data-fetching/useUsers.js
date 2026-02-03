@@ -5,7 +5,7 @@ export const useUsers = ({ user, status } = {}) => {
   return useQuery({
     queryKey: ['users', { user, status }],
     queryFn: async () => {
-      console.log("Fetching users (react-query)", { user });
+      console.log("Fetching users (react-query)", user, status );
 
       const params = new URLSearchParams();
       if (user) params.append("user", user);

@@ -31,7 +31,7 @@ export const UserDirectory = () => {
       isLoading,
       error,
       refetch,
-  } = useUsers({ user: debouncedSearchQuery });
+  } = useUsers({ user: debouncedSearchQuery, status: "approved" });
   const {
     data: userStats = [],
     isStatsLoading,
