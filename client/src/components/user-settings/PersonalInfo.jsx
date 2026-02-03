@@ -40,7 +40,7 @@ export default function PersonalInfo() {
 
   const updateUser = async () => {
     try {
-      await backend.put(`/users/${currentUser.uid}`, {
+      await backend.put(`/users-js/firebase/${currentUser.uid}`, {
         firstName: userInfo.firstName,
         lastName: userInfo.lastName,
         email: userInfo.email,
