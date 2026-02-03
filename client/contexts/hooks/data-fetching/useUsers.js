@@ -1,14 +1,15 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '../../../../server/api.js'
 
-export const useUsers = ({ user } = {}) => {
+export const useUsers = ({ user, status } = {}) => {
   return useQuery({
-    queryKey: ['users', { user }],
+    queryKey: ['users', { user, status }],
     queryFn: async () => {
       console.log("Fetching users (react-query)", { user });
 
       const params = new URLSearchParams();
       if (user) params.append("user", user);
+      if (status) params.append("status", status)
 
       return api.users.getAll({ params });
     },
@@ -30,7 +31,21 @@ export function useUsersStats() {
   });
 }
 
-export const useDeleteUser = ({ user } = {}) => {
+export const useUpdateUser = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, data }) => {
+      return api.users.update(id, data)
+    },
+    onSuccess: () => {
+      // Refetch after mutation to update frontend data
+      queryClient.invalidateQueries({ queryKey: ["users"], exact: false });
+    },
+  });
+};
+
+export const useDeleteUser = () => {
   const queryClient = useQueryClient();
 
   return useMutation({

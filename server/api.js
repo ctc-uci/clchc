@@ -118,6 +118,17 @@ export const api = {
       }
       return res.json();
     },
+    update: async (id, data) => {
+      const res = await fetch(`${API_BASE}/users-js/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) {
+        throw new Error(`Failed to update quota ${id}: ${res.status}`);
+      }
+      return res.json();
+    },
   },
   locations: {
     getAll: async () => {

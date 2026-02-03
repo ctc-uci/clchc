@@ -43,7 +43,7 @@ export const UserDirectory = () => {
       mutate: deleteUser,
       isLoading: isDeleting,
       error: deleteError,
-    } = useDeleteUser({ user: debouncedSearchQuery });
+    } = useDeleteUser();
 
   // table delete
   const handleDelete = async (userId) => {
