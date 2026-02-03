@@ -12,16 +12,40 @@ import {
   VStack,
 } from "@chakra-ui/react";
 
-import useUser from "./useUser";
+import { useAuthContext } from "@/contexts/hooks/useAuthContext";
+import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 
 export default function QuotaCalcFactor() {
-  const { userInfo, updateQuota } = useUser();
+  const { backend } = useBackendContext();
+  const { currentUser } = useAuthContext();
+
+  const [userInfo, setUserInfo] = useState(null);
   const [factor, setFactor] = useState(0);
+
+  useEffect(() => {
+    if (!currentUser?.uid) return;
+
+    (async () => {
+      try {
+        const { data } = await backend.get(`/users/${currentUser.uid}`);
+        setUserInfo(data?.[0] ?? null);
+      } catch (e) {
+        console.error("Failed to fetch user info:", e);
+      }
+    })();
+  }, [backend, currentUser?.uid]);
 
   useEffect(() => {
     if (!userInfo) return;
     setFactor(userInfo.apptCalcFactor ?? 0);
   }, [userInfo]);
+
+  const updateQuota = async (newQuota) => {
+    await backend.put("users/update/set-calc-factor", {
+      factor: newQuota,
+      firebaseUid: userInfo.firebaseUid,
+    });
+  };
 
   const handleClick = async () => {
     await updateQuota(factor);
