@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 
 import {
   Button,
-  Flex,
   NumberDecrementStepper,
   NumberIncrementStepper,
   NumberInput,
@@ -28,22 +27,19 @@ export default function QuotaCalcFactor() {
     (async () => {
       try {
         const { data } = await backend.get(`/users/${currentUser.uid}`);
-        setUserInfo(data?.[0] ?? null);
+        const user = data?.[0] ?? null;
+        setUserInfo(user);
+        setFactor(user?.apptCalcFactor ?? 0);
       } catch (e) {
         console.error("Failed to fetch user info:", e);
       }
     })();
   }, [backend, currentUser?.uid]);
 
-  useEffect(() => {
-    if (!userInfo) return;
-    setFactor(userInfo.apptCalcFactor ?? 0);
-  }, [userInfo]);
-
   const updateQuota = async (newQuota) => {
-    await backend.put("users/update/set-calc-factor", {
-      factor: newQuota,
-      firebaseUid: userInfo.firebaseUid,
+    if (!currentUser?.uid) return;
+    await backend.put(`/users-js/${currentUser.uid}`, {
+      apptCalcFactor: newQuota,
     });
   };
 
@@ -66,13 +62,17 @@ export default function QuotaCalcFactor() {
       >
         Quota Calculation Factor
       </Text>
+
       <Text>
         This value is used to automatically calculate appointment quotas when
         creating new schedules. Individual quotas can still be overridden.
       </Text>
+
       <NumberInput
-        value={isNaN(factor) ? 0 : factor}
-        onChange={(_, val) => setFactor(val)}
+        value={Number.isFinite(factor) ? factor : 0}
+        onChange={(_, valueAsNumber) => {
+          setFactor(Number.isFinite(valueAsNumber) ? valueAsNumber : 0);
+        }}
         bg="gray.100"
       >
         <NumberInputField />
@@ -82,7 +82,12 @@ export default function QuotaCalcFactor() {
         </NumberInputStepper>
       </NumberInput>
 
-      <Button onClick={handleClick}>Save Changes</Button>
+      <Button
+        onClick={handleClick}
+        isDisabled={!currentUser?.uid}
+      >
+        Save Changes
+      </Button>
     </VStack>
   );
 }
