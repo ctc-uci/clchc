@@ -67,35 +67,35 @@ usersJsRouter.get("/:id", async (req, res) => {
 });
 
 // Update a user by ID
-// usersJsRouter.put('/:id', async(req,res)=>{
-//     try{
-//         const {id} = req.params;
-//         const {firebaseUid, role, firstName, lastName, email, status, apptCalcFactor} = req.body;
+usersJsRouter.put('/:id', async(req,res)=>{
+    try{
+        const {id} = req.params;
+        const {firebaseUid, role, firstName, lastName, email, status, apptCalcFactor} = req.body;
 
-//         const result = await db.query(
-//         `UPDATE users
-//         SET
-//         firebase_uid = COALESCE($1, firebase_uid),
-//         role = COALESCE($2, role),
-//         first_name = COALESCE($3, first_name),
-//         last_name = COALESCE($4, last_name),
-//         email = COALESCE($5, email),
-//         status = COALESCE($6, status),
-//         appt_calc_factor = COALESCE($7, appt_calc_factor)
-//         WHERE id=$8 RETURNING *`,
-//         [firebaseUid, role, firstName, lastName, email, status, apptCalcFactor, id]
-//         );
-//         if (!result || result.length === 0) {
-//             return res.status(404).json({ error: "User not found." });
-//         }
-//         res.status(200).json(keysToCamel(result));
-//     } catch(err){
-//         res.status(500).send(err.message);
-//     }
-// });
+        const result = await db.query(
+        `UPDATE users
+        SET
+        firebase_uid = COALESCE($1, firebase_uid),
+        role = COALESCE($2, role),
+        first_name = COALESCE($3, first_name),
+        last_name = COALESCE($4, last_name),
+        email = COALESCE($5, email),
+        status = COALESCE($6, status),
+        appt_calc_factor = COALESCE($7, appt_calc_factor)
+        WHERE id=$8 RETURNING *`,
+        [firebaseUid, role, firstName, lastName, email, status, apptCalcFactor, id]
+        );
+        if (!result || result.length === 0) {
+            return res.status(404).json({ error: "User not found." });
+        }
+        res.status(200).json(keysToCamel(result));
+    } catch(err){
+        res.status(500).send(err.message);
+    }
+});
 
 // Update a user by Firebase ID
-usersJsRouter.put("/:firebaseUid", verifyRole("ccm"), async (req, res) => {
+usersJsRouter.put("/firebase/:firebaseUid", verifyRole("ccm"), async (req, res) => {
   console.log("ROUTE IS BEING HIT");
   try {
     const { firebaseUid } = req.params;
