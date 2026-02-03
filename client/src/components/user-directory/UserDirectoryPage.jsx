@@ -16,30 +16,36 @@ import {
 import { CustomCard } from "@/components/common/CustomCard";
 import { Navbar } from "@/components/layout/Navbar";
 import { BackendContext } from "@/contexts/BackendContext";
-import InputMask from "react-input-mask";
 
 import UserTable from "./UserTable";
+import {UserPendingStatusList} from "./UserPendingStatusList";
 
 export const UserDirectory = () => {
   const { backend } = useContext(BackendContext);
   const [users, setUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [userStats, setUserStats] = useState({});
 
-  // fetching users
   useEffect(() => {
-    const fetchUsers = async () => {
+    // Fetches users and user stats in parallel
+    const fetchUserInfo = async () => {
       try {
-        const { data } = await backend.get("/users-js");
-        setUsers(data);
+        const [usersRes, statsRes] = await Promise.all([
+          backend.get("/users-js"),
+          backend.get("/users/stats"),
+        ]);
+
+        setUsers(usersRes.data);
+        setUserStats(statsRes.data);
       } catch (err) {
         console.error(
-          "couldn't fetch users in components/UserDirectoryPage.jsx",
+          "couldn't fetch user info in components/UserDirectoryPage.jsx",
           err
         );
       }
     };
 
-    fetchUsers();
+    fetchUserInfo();
   }, [backend]);
 
   // table delete
@@ -112,36 +118,8 @@ export const UserDirectory = () => {
           </InputGroup>
         </Box>
       </Flex>
-
-      <Box
-        borderWidth="1px"
-        borderColor="yellow.300"
-        bg="yellow.50"
-        borderRadius="lg"
-        p={4}
-        mb={8}
-      >
-        <Flex
-          align="center"
-          gap={2}
-        >
-          <InfoOutlineIcon></InfoOutlineIcon>
-          <Text
-            fontWeight="medium"
-            color="gray.700"
-          >
-            Pending Requests
-          </Text>
-          <Badge
-            borderRadius="full"
-            px={1.5}
-            py={0.3}
-            colorScheme="red"
-            variant="solid"
-          >
-            2
-          </Badge>
-        </Flex>
+      <Box mb={8}>      
+        <UserPendingStatusList />
       </Box>
 
       <Heading
@@ -163,29 +141,20 @@ export const UserDirectory = () => {
         >
           <CustomCard
             title="Total Users"
-            body="5"
+            body={userStats.total}
             height="12rem"
             width="14rem"
           />
-          <CustomCard
-            title="Managers"
-            body="2"
-            footer="hello"
-            height="12rem"
-            width="14rem"
-          />
-          <CustomCard
-            title="Staff"
-            body="2"
-            height="12rem"
-            width="14rem"
-          />
-          <CustomCard
-            title="Viewers"
-            body="1"
-            height="12rem"
-            width="14rem"
-          />
+          {userStats.byRole &&
+            userStats.byRole.map((userStat) => (
+              <CustomCard
+                key={userStat.role}
+                title={userStat.role}
+                body={userStat.count}
+                height="12rem"
+                width="14rem"
+              />
+            ))}
         </HStack>
       </Box>
 

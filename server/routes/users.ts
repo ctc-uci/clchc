@@ -6,12 +6,57 @@ import { Router } from "express";
 
 export const usersRouter = Router();
 
+const ROLE_MAP = {
+  master: "Managers",
+  ccm: "Managers",
+  ccs: "Staff",
+  viewer: "Viewers",
+};
+
+const ROLE_ORDER = ["Managers", "Staff", "Viewers"];
+
 // Get all users
 usersRouter.get("/", async (req, res) => {
   try {
     const users = await db.query(`SELECT * FROM users ORDER BY id ASC`);
 
     res.status(200).json(keysToCamel(users));
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+});
+
+// Get statistics of all users
+usersRouter.get("/stats", async (req, res) => {
+  try {
+    const [roleCounts, totalCount] = await db.multi(`
+      SELECT role, COUNT(*)::int AS count
+      FROM users
+      GROUP BY role;
+
+      SELECT COUNT(*)::int AS total
+      FROM users;
+    `);
+
+    if (!roleCounts || !totalCount) {
+      return res.status(404).send("User stats not found");
+    }
+
+    const aggregated = {};
+    roleCounts.forEach(({ role, count }) => {
+      const displayRole = ROLE_MAP[role] || role;
+      aggregated[displayRole] = (aggregated[displayRole] || 0) + count;
+    });
+
+    const byRole = ROLE_ORDER.map((role) => ({
+      role,
+      count: aggregated[role] || 0,
+    }));
+
+    res.status(200).json({
+      total: totalCount[0].total,
+      byRole,
+    });
   } catch (err) {
     res.status(400).send(err.message);
   }

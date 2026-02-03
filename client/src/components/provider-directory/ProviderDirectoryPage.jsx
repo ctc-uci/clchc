@@ -1,26 +1,35 @@
 import { useEffect, useState } from "react";
 
-import { Box, Button, Divider, Flex, Grid, Text } from "@chakra-ui/react";
+import { Box, Button, Divider, Flex, Grid, Text, useDisclosure } from "@chakra-ui/react";
 
 import { Navbar } from "@/components/layout/Navbar";
 import ProviderTable from "@/components/provider-directory/ProviderTable";
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
+import CategoryDrawer from "@/components/provider-directory/CategoryDrawer";
+import { useRoleContext } from "@/contexts/hooks/useRoleContext";
 
 export const ProviderDirectoryPage = () => {
   const [providers, setProviders] = useState(null);
   const [providerCategories, setProviderCategories] = useState(null);
+  const { role, loading } = useRoleContext();
+  const {
+      isOpen: isCreateDrawerOpen,
+      onOpen: onCreateDrawerOpen,
+      onClose: onCreateDrawerClose,
+    } = useDisclosure();
 
   const { backend } = useBackendContext();
 
+  const fetchData = async () => {
+    const [providerData, catData] = await Promise.all([
+      backend.get("/providers"),
+      backend.get("/directoryCategories"),
+    ]);
+    setProviders(providerData.data);
+    setProviderCategories(catData.data);
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      const [providerData, catData] = await Promise.all([
-        backend.get("/providers"),
-        backend.get("/directoryCategories"),
-      ]);
-      setProviders(providerData.data);
-      setProviderCategories(catData.data);
-    };
     fetchData();
   }, [backend]);
 
@@ -86,6 +95,14 @@ export const ProviderDirectoryPage = () => {
         </Grid>
       </Box>
 
+       {role === "ccm" || role === "master" ? (
+          <>
+            <Button onClick={()=>{onCreateDrawerOpen()}}>Add New Category</Button>
+          </>
+        ) : (
+          <></>
+        )}
+
       {providers && providerCategories ? (
         <Box>
           <ProviderTable
@@ -96,6 +113,10 @@ export const ProviderDirectoryPage = () => {
       ) : (
         <Text>Loading</Text>
       )}
+      <CategoryDrawer isOpen={isCreateDrawerOpen}
+        onOpen={onCreateDrawerOpen}
+        onClose={onCreateDrawerClose}
+        onSaved={fetchData}/>
       <Navbar />
     </Box>
   );
