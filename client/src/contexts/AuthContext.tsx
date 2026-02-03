@@ -92,37 +92,47 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   ) => {
     try {
       const result = await getRedirectResult(auth);
+      
+      if (!result?.user) return;
 
-      if (result) {
-        const response = await backend.get(`/users/${result.user.uid}`);
-        if (response.data.length === 0) {
-          try {
-            await backend.post("/users/create", {
-              email: result.user.email,
-              firebaseUid: result.user.uid,
-              firstName: result.user.displayName?.split(" ")[0] || "",
-              lastName:
-                result.user.displayName?.split(" ").slice(1).join(" ") || "",
-            });
+      let response = await backend.get(`/users/${result.user.uid}`);
 
-            await refetch();
-          } catch (e) {
-            await backend.delete(`/users/${result.user.uid}`);
-            const errorMessage =
-              e instanceof Error ? e.message : "Unknown error";
-            toast({
-              title: "An error occurred",
-              description: `Account was not created: ${errorMessage}`,
-              status: "error",
-            });
-          }
+      if (response.data.length === 0) {
+        try {
+          response = await backend.post("/users/create", {
+            email: result.user.email,
+            firebaseUid: result.user.uid,
+            firstName: result.user.displayName?.split(" ")[0] || "",
+            lastName: result.user.displayName?.split(" ").slice(1).join(" ") || "",
+          });
+
+        } catch (e) {
+          await backend.delete(`/users/${result.user.uid}`);
+          const errorMessage = e instanceof Error ? e.message : "Unknown error";
+          toast({
+            title: "An error occurred",
+            description: `Account was not created: ${errorMessage}`,
+            status: "error",
+          });
+          return;
         }
-        navigate("/quota-tracking");
       }
+
+      const data = response.data;
+      const user = Array.isArray(data) ? data[0] : data;
+
+      if (!user) return;
+
+      navigate(
+        user.status === "pending" ? "/pending-approval" : "/quota-tracking",
+        { replace: true }
+      );
+      
     } catch (error) {
       console.error("Redirect result error:", error);
     }
   };
+
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {

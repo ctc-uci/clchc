@@ -1,13 +1,14 @@
 import { Admin } from "@/components/admin/Admin";
 import { CatchAll } from "@/components/CatchAll";
 import { Dashboard } from "@/components/dashboard/Dashboard";
-import { Login } from "@/components/login/Login";
+import { Login } from "@/components/login/login";
 import { Playground } from "@/components/Playground";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { ProviderDirectoryPage } from "@/components/provider-directory/ProviderDirectoryPage";
 import { QuotaTracking } from "@/components/quota-tracking/QuotaTrackingPage";
 import { Signup } from "@/components/signup/Signup";
 import { UserDirectory } from "@/components/user-directory/UserDirectoryPage";
+import { PERSONAL_INFO, Settings } from "@/components/user-settings/Settings";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { BackendProvider } from "@/contexts/BackendContext";
 import { RoleProvider } from "@/contexts/RoleContext";
@@ -19,6 +20,8 @@ import {
   BrowserRouter as Router,
   Routes,
 } from "react-router-dom";
+
+import { PendingApprovalPage } from "./components/login/PendingApprovalPage";
 
 const queryClient = new QueryClient();
 
@@ -36,12 +39,24 @@ const App = () => {
                     element={<UserDirectory />}
                   />
                   <Route
+                    path="/settings"
+                    element={
+                      <ProtectedRoute
+                        element={<Settings view={PERSONAL_INFO} />}
+                      />
+                    }
+                  />
+                  <Route
                     path="/quota-tracking"
                     element={<QuotaTracking />}
                   />
                   <Route
                     path="/login"
                     element={<Login />}
+                  />
+                  <Route
+                    path="/pending-approval"
+                    element={<PendingApprovalPage />}
                   />
                   <Route
                     path="/signup"
