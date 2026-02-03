@@ -9,6 +9,13 @@ export const api = {
       }
       return res.json();
     },
+    getSummary: async () => {
+        const res = await fetch(`${API_BASE}/providers/summary`);
+        if (!res.ok) {
+            throw new Error(`Failed to fetch providers: ${res.status}`);
+        }
+        return res.json();
+    }
   },
   directoryCategories: {
     getAll: async () => {
@@ -112,4 +119,13 @@ export const api = {
       return res.json();
     },
   },
+  locations: {
+    getAll: async () => {
+      const res = await fetch(`${API_BASE}/location`);
+      if (!res.ok) {
+        throw new Error(`Failed to get locations: ${res.status}`);
+      }
+      return res.json();
+    },
+  }
 };

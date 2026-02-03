@@ -24,9 +24,11 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 
-// bowen
+// bowen hi bowen
 
-import { useBackendContext } from "@/contexts/hooks/useBackendContext";
+import { useCreateQuota, useQuotaById, useUpdateQuota } from "../../../contexts/hooks/data-fetching/useQuotas";
+import { useProvidersSummary } from "../../../contexts/hooks/data-fetching/useProviders";
+import { useLocations } from "../../../contexts/hooks/data-fetching/useLocations";
 
 const MAX_INPUT_NUMBER = 99;
 
@@ -74,20 +76,7 @@ function formatTimeForInput(value) {
 }
 
 function ProviderDropdown({ providerId, setProviderId }) {
-  const [providers, setProviders] = useState(null);
-  const { backend } = useBackendContext();
-
-  useEffect(() => {
-    const fetchProviders = async () => {
-      try {
-        const res = await backend.get("/providers/summary");
-        setProviders(res.data);
-      } catch (err) {
-        console.error("Error fetching providers:", err);
-      }
-    };
-    fetchProviders();
-  }, [backend]);
+  const { data: providers, isLoading: loadingSummary, error: summaryError} = useProvidersSummary()
 
   return (
     <FormControl isRequired>
@@ -114,20 +103,7 @@ function ProviderDropdown({ providerId, setProviderId }) {
 }
 
 function LocationDropdown({ locationId, setLocationId }) {
-  const [locations, setLocations] = useState(null);
-  const { backend } = useBackendContext();
-
-  useEffect(() => {
-    const fetchLocations = async () => {
-      try {
-        const res = await backend.get("/location");
-        setLocations(res.data);
-      } catch (err) {
-        console.log("Error fetching locations:", err);
-      }
-    };
-    fetchLocations();
-  }, [backend]);
+  const { data: locations, isLoading: loadingLocations, error: locationError} = useLocations()
 
   return (
     <FormControl isRequired>
@@ -304,7 +280,18 @@ export default function QuotaDrawer({ quotaID = 0, isOpen: externalIsOpen, onOpe
   const onOpen = externalOnOpen || internalDisclosure.onOpen;
   const onClose = externalOnClose || internalDisclosure.onClose;
   const btnRef = React.useRef();
-  const { backend } = useBackendContext();
+  const [quota, setQuota] = useState(0)
+  const { data: quotaData, isLoading, error, refetch } = useQuotaById(quotaID, isOpen && !!quotaID);
+  const {
+      mutate: createQuota,
+      isLoading: isCreating,
+      error: createError,
+    } = useCreateQuota();
+  const {
+      mutate: updateQuota,
+      isLoading: isUpdating,
+      error: updateError,
+    } = useUpdateQuota();
 
   const [providerId, setProviderId] = useState("");
   const [locationId, setLocationId] = useState("");
@@ -312,8 +299,8 @@ export default function QuotaDrawer({ quotaID = 0, isOpen: externalIsOpen, onOpe
   const [endTime, setEndTime] = useState("");
   const [date, setDate] = useState("");
   const [type, setType] = useState("inperson");
-  const [quota, setQuota] = useState(0);
   const [progress, setProgress] = useState(0);
+
 
   useEffect(() => {
     // Initialize the form each time the drawer opens
@@ -321,8 +308,6 @@ export default function QuotaDrawer({ quotaID = 0, isOpen: externalIsOpen, onOpe
 
     const fetchQuotaDetails = async () => {
       try {
-        const res = await backend.get(`/quota/${quotaID}`);
-        const quotaData = res.data[0];
         setProviderId(quotaData.providerId ?? "");
         setLocationId(quotaData.locationId ?? "");
         setStartTime(
@@ -354,7 +339,7 @@ export default function QuotaDrawer({ quotaID = 0, isOpen: externalIsOpen, onOpe
       setQuota(0);
       setProgress(0);
     }
-  }, [isOpen, quotaID, backend]);
+  }, [isOpen, quotaID]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -374,10 +359,10 @@ export default function QuotaDrawer({ quotaID = 0, isOpen: externalIsOpen, onOpe
 
     try {
       if (quotaID) {
-        await backend.put(`/quota/${quotaID}`, formData);
+        await updateQuota({ id: quotaID, data: formData })
         handleClose();
       } else {
-        await backend.post("/quota", formData);
+        await createQuota(formData)
         handleClose();
       }
 
@@ -398,6 +383,10 @@ export default function QuotaDrawer({ quotaID = 0, isOpen: externalIsOpen, onOpe
     setProgress(0);
     onClose();
   };
+
+  if (isLoading) {
+    return <div> Loading quota </div>
+  }
 
   return (
     <Drawer

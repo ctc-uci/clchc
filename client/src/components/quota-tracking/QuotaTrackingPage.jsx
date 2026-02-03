@@ -201,7 +201,7 @@ export const QuotaTracking = () => {
           if (typeof updater === "function") {
             setRows(updater);
           } else {
-            fetchQuotas(providerQuery, selectedDate);
+            refetch;
           }
         }}
       />

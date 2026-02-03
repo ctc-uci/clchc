@@ -18,7 +18,7 @@ export const useQuotas = ({ date, provider } = {}) => {
   });
 };
 
-export const useQuotaById = (id) => {
+export const useQuotaById = (id, enabled = true) => {
   return useQuery({
     queryKey: ["quota", id],
     queryFn: async () => {
@@ -28,6 +28,7 @@ export const useQuotaById = (id) => {
       return quota;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
+    enabled: enabled
   });
 };
 
@@ -38,18 +39,22 @@ export const useUpdateQuota = () => {
     mutationFn: ({ id, data }) => {
       return api.quotas.update(id, data)
     },
-    onSettled: () => {
+    onSuccess: () => {
       // Refetch after mutation to update frontend data
       queryClient.invalidateQueries({ queryKey: ["quotas"] });
+      queryClient.invalidateQueries({ queryKey: ["quota"], exact: false });
     },
   });
 };
 
 export const useCreateQuota = () => {
+  const queryClient = useQueryClient();
+  
   return useMutation({
     mutationFn: (newQuota) => api.quotas.create(newQuota),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["quotas"] });
+      queryClient.invalidateQueries({ queryKey: ["quota"], exact: false });
     },
   });
 };
