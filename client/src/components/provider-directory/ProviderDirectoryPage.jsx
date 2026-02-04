@@ -7,31 +7,32 @@ import ProviderTable from "@/components/provider-directory/ProviderTable";
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 import CategoryDrawer from "@/components/provider-directory/CategoryDrawer";
 import { useRoleContext } from "@/contexts/hooks/useRoleContext";
+import { useProviders } from "../../../contexts/hooks/data-fetching/useProviders";
+import { useDirectoryCategories } from "../../../contexts/hooks/data-fetching/useDirectoryCategories";
 
 export const ProviderDirectoryPage = () => {
-  const [providers, setProviders] = useState(null);
-  const [providerCategories, setProviderCategories] = useState(null);
   const { role, loading } = useRoleContext();
   const {
       isOpen: isCreateDrawerOpen,
       onOpen: onCreateDrawerOpen,
       onClose: onCreateDrawerClose,
     } = useDisclosure();
+  const {
+    data: providers = [],
+    isLoading,
+    error,
+  } = useProviders();
+  const {
+    data: providerCategories = [],
+    isLoading: loadingCategories,
+    error: errorCategories,
+  } = useDirectoryCategories();
 
   const { backend } = useBackendContext();
 
-  const fetchData = async () => {
-    const [providerData, catData] = await Promise.all([
-      backend.get("/providers"),
-      backend.get("/directoryCategories"),
-    ]);
-    setProviders(providerData.data);
-    setProviderCategories(catData.data);
+  if (isLoading || loadingCategories) {
+    return <div> Loading providers and categories </div>
   };
-
-  useEffect(() => {
-    fetchData();
-  }, [backend]);
 
   return (
     <Box
@@ -116,7 +117,8 @@ export const ProviderDirectoryPage = () => {
       <CategoryDrawer isOpen={isCreateDrawerOpen}
         onOpen={onCreateDrawerOpen}
         onClose={onCreateDrawerClose}
-        onSaved={fetchData}/>
+        // onSaved={fetchData}
+      />
       <Navbar />
     </Box>
   );
