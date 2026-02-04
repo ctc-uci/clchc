@@ -31,7 +31,7 @@ export const useCreateProvider = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (newProvider) => api.quotas.create(newProvider),
+    mutationFn: (newProvider) => api.providers.create(newProvider),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["providers"] });
     },

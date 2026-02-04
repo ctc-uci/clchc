@@ -14,7 +14,7 @@ import {
   Text
 } from "@chakra-ui/react";
 
-export default function ProviderTable({ providers, providerCategories }) {
+export default function ProviderTable({ providers, providerCategories, isLoading }) {
   // sort categories by columnOrder
   
   const sortedCategories = [...providerCategories].sort((a, b) => a.columnOrder - b.columnOrder);
@@ -81,7 +81,7 @@ export default function ProviderTable({ providers, providerCategories }) {
 
   const ProviderRow = ({ provider }) => {
     const getCells = () =>
-      providerCategories.map((cat) => (
+      sortedCategories.map((cat) => (
         <Td key={cat.name}>{renderCellValue(provider, cat)}</Td>
       ));
 
@@ -102,6 +102,9 @@ export default function ProviderTable({ providers, providerCategories }) {
     return <Tbody>{rows}</Tbody>;
   };
 
+  if (isLoading) {
+    return <div> Loading providers and categories... </div>
+  }
   return (
     <TableContainer>
       <Table>

@@ -30,10 +30,6 @@ export const ProviderDirectoryPage = () => {
 
   const { backend } = useBackendContext();
 
-  if (isLoading || loadingCategories) {
-    return <div> Loading providers and categories </div>
-  };
-
   return (
     <Box
       p={6}
@@ -109,6 +105,7 @@ export const ProviderDirectoryPage = () => {
           <ProviderTable
             providers={providers}
             providerCategories={providerCategories}
+            loading={isLoading || loadingCategories}
           />
         </Box>
       ) : (

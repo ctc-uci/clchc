@@ -19,6 +19,7 @@ import {
 
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 import { useRoleContext } from "@/contexts/hooks/useRoleContext";
+import { useCreateCategory } from "../../../contexts/hooks/data-fetching/useDirectoryCategories";
 
 const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
   const [name, setName] = useState("");
@@ -27,31 +28,30 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
   const [columnOrder, setColumnOrder] = useState(0);
   const { backend } = useBackendContext();
   const { role, loading } = useRoleContext();
-
-  
-
+  const {
+    mutate: createCategory,
+    isLoading: isCreating,
+    error: createError,
+  } = useCreateCategory();
 
   const handleSubmit = async () => {
     try {
       const dateCreated = new Date().toISOString();
-      const adjustedColumnOrder = columnOrder - 1;
-      const res = await backend.post("/directoryCategories", {
+      let formData = {
         name,
         inputType,
         isRequired,
-        dateCreated,
-        columnOrder: adjustedColumnOrder,
-      });
-      console.log("Create response:", res?.data);
+        // dateCreated,
+        columnOrder: columnOrder
+      }
+      console.log(formData)
+      await createCategory(formData);
 
       onClose();
       setName("");
       setInputType("");
       setIsRequired(false);
       setColumnOrder(0);
-      if (typeof onSaved === "function") {
-        onSaved(res?.data);
-      }
     } catch (err) {
       // console.error("Failed to create category", err);
       console.error("Failed to create category", err?.response?.status, err?.response?.data || err.message);

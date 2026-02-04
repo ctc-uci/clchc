@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { api } from '../../../../server/api.js'
 
 export function useDirectoryCategories() {
@@ -13,3 +13,14 @@ export function useDirectoryCategories() {
     refetchInterval: 60 * 1000, // 1 min
   });
 }
+
+export const useCreateCategory = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (newCategory) => api.directoryCategories.create(newCategory),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["directoryCategories"] });
+    },
+  });
+};
