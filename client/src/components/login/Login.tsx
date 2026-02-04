@@ -29,7 +29,7 @@ export const Login = () => {
   const navigate = useNavigate();
   const toast = useToast();
 
-  const { handleRedirectResult } = useAuthContext();
+  const { currentUser, handleRedirectResult } = useAuthContext();
   const { backend } = useBackendContext();
 
   const {
@@ -94,7 +94,25 @@ export const Login = () => {
 
   const handleGoogleLogin = async () => {
     try {
-      await authenticateGoogleUser();
+      const result = await authenticateGoogleUser();
+  
+      if (!result?.user || !backend) return;
+  
+      const response = await backend.get(`/users/${result.user.uid}`);
+  
+      const user = Array.isArray(response.data)
+        ? response.data[0]
+        : response.data;
+  
+      if (!user) return;
+  
+      navigate(
+        user.status === "pending"
+          ? "/pending-approval"
+          : "/quota-tracking",
+        { replace: true }
+      );
+  
     } catch (err) {
       toast({
         title: "Google sign-in failed",
@@ -104,12 +122,6 @@ export const Login = () => {
     }
   };
 
-  // useEffect(() => {
-  //   handleRedirectResult(backend, navigate, toast);
-  // }, [backend, handleRedirectResult, navigate, toast]);
-  
-  const [checkingRedirect, setCheckingRedirect] = useState(true);
-
   useEffect(() => {
     if (!backend) return;
 
@@ -117,7 +129,35 @@ export const Login = () => {
       await handleRedirectResult(backend, navigate, toast);
       setCheckingRedirect(false);
     })();
-  }, [backend, navigate, toast]);
+  }, [backend, handleRedirectResult, navigate, toast]);
+
+
+  // useEffect(() => {
+  //   handleRedirectResult(backend, navigate, toast);
+  // }, [backend, handleRedirectResult, navigate, toast]);
+  
+  const [checkingRedirect, setCheckingRedirect] = useState(true);
+
+  useEffect(() => {
+    if (!currentUser || !backend) return;
+
+    (async () => {
+      const response = await backend.get(`/users/${currentUser.uid}`);
+
+      const user = Array.isArray(response.data)
+        ? response.data[0]
+        : response.data;
+
+      if (!user) return;
+
+      navigate(
+        user.status === "pending"
+          ? "/pending-approval"
+          : "/quota-tracking",
+        { replace: true }
+      );
+    })();
+  }, [currentUser, backend, navigate]);
 
   if (checkingRedirect) return <Spinner />;
 
