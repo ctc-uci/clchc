@@ -11,6 +11,7 @@ import {
   Input,
   InputGroup,
   InputLeftElement,
+  Tag,
   Text,
   useDisclosure,
 } from "@chakra-ui/react";
@@ -85,13 +86,25 @@ export const ProviderDirectoryPage = () => {
       maxW="1200px"
       mx="auto"
     >
-      <Heading
-        size="2xl"
-        fontWeight="medium"
+      <Flex
+        alignItems="center"
+        gap={3}
         mb={5}
       >
-        Provider Directory
-      </Heading>
+        <Heading
+          size="2xl"
+          fontWeight="medium"
+        >
+          Provider Directory
+        </Heading>
+        <Tag
+          bg="yellow.300"
+          color="black"
+          fontSize="lg"
+        >
+          {role}
+        </Tag>
+      </Flex>
       <Text
         size="lg"
         fontWeight="normal"
@@ -122,9 +135,6 @@ export const ProviderDirectoryPage = () => {
           mb={5}
         >
           <Button
-            onClick={() => {
-              onCreateDrawerOpen();
-            }}
             bg="black"
             color="white"
             _hover={{ bg: "gray.800" }}
