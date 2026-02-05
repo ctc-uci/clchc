@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { SearchIcon } from "@chakra-ui/icons";
 import {
@@ -38,20 +38,19 @@ export const ProviderDirectoryPage = () => {
 
   const fetchData = async (provider = "") => {
     let endpoint = "/providers";
-  
+
     if (provider) {
       endpoint += `?search=${provider}`;
     }
-  
+
     const [providerData, catData] = await Promise.all([
       backend.get(endpoint),
       backend.get("/directoryCategories"),
     ]);
-  
+
     setProviders(providerData.data);
     setProviderCategories(catData.data);
   };
-  
 
   const debouncedFetch = useMemo(() => {
     return debounce((provider) => {
@@ -115,43 +114,43 @@ export const ProviderDirectoryPage = () => {
         All current active providers in network
       </Text>
 
-      <InputGroup
-        maxW="400px"
-        pb={6}
-      >
-        <InputLeftElement pointerEvents="none">
-          <SearchIcon color="gray.400" />
-        </InputLeftElement>
-        <Input
-          placeholder="Search Providers"
-          borderRadius="md"
-          onChange={handleChange}
-        />
-      </InputGroup>
-
       {role === "ccm" || role === "master" ? (
         <Flex
-          justifyContent="flex-end"
+          justifyContent="space-between"
+          alignItems="center"
           mb={5}
+          gap={4}
         >
-          <Button
-            bg="black"
-            color="white"
-            _hover={{ bg: "gray.800" }}
-            marginRight="1.5em"
-          >
-            Manage
-          </Button>
-          <Button
-            onClick={() => {
-              onCreateDrawerOpen();
-            }}
-            bg="black"
-            color="white"
-            _hover={{ bg: "gray.800" }}
-          >
-            Add New
-          </Button>
+          <InputGroup maxW="600px">
+            <InputLeftElement pointerEvents="none">
+              <SearchIcon color="gray.400" />
+            </InputLeftElement>
+            <Input
+              placeholder="Search Providers"
+              borderRadius="md"
+              onChange={handleChange}
+            />
+          </InputGroup>
+
+          <Flex gap={3}>
+            <Button
+              bg="black"
+              color="white"
+              _hover={{ bg: "gray.800" }}
+            >
+              Manage
+            </Button>
+            <Button
+              onClick={() => {
+                onCreateDrawerOpen();
+              }}
+              bg="black"
+              color="white"
+              _hover={{ bg: "gray.800" }}
+            >
+              Add New
+            </Button>
+          </Flex>
         </Flex>
       ) : (
         <></>
