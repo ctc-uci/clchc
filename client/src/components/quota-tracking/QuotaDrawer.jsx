@@ -298,7 +298,7 @@ const TypeInput = ({ type, setType }) => {
   );
 };
 
-export default function QuotaDrawer({ quotaID = 0, isOpen: externalIsOpen, onOpen: externalOnOpen, onClose: externalOnClose }) {
+export default function QuotaDrawer({ quotaID = 0, isOpen: externalIsOpen, onOpen: externalOnOpen, onClose: externalOnClose, defaultDate }) {
   const internalDisclosure = useDisclosure();
   const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalDisclosure.isOpen;
   const onOpen = externalOnOpen || internalDisclosure.onOpen;
@@ -349,12 +349,12 @@ export default function QuotaDrawer({ quotaID = 0, isOpen: externalIsOpen, onOpe
       setLocationId("");
       setStartTime("");
       setEndTime("");
-      setDate("");
+      setDate(defaultDate ? formatDateForInput(defaultDate) : "");
       setType("inperson");
       setQuota(0);
       setProgress(0);
     }
-  }, [isOpen, quotaID, backend]);
+  }, [isOpen, quotaID, backend, defaultDate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

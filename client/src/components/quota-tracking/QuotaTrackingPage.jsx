@@ -19,12 +19,19 @@ import { CustomCard } from "@/components/common/CustomCard";
 import Navbar from "@/components/layout/Navbar";
 import QuotaDrawer from "@/components/quota-tracking/QuotaDrawer";
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
+
+import { useRoleContext } from "@/contexts/hooks/useRoleContext";
+
 import debounce from "lodash.debounce";
+
 
 import QuotaTable from "./QuotaTable";
 
 export const QuotaTracking = () => {
   const { backend } = useBackendContext();
+
+  const { role } = useRoleContext();
+
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [providerQuery, setProviderQuery] = useState("");
@@ -118,7 +125,7 @@ export const QuotaTracking = () => {
               py={0.5}
               fontSize="xs"
             >
-              Master
+              {role ?? "Viewer"}
             </Badge>
           </Flex>
           <Text
@@ -227,6 +234,7 @@ export const QuotaTracking = () => {
         isOpen={isCreateDrawerOpen}
         onOpen={onCreateDrawerOpen}
         onClose={onCreateDrawerClose}
+        defaultDate={selectedDate}
       />
 
       <Navbar />
