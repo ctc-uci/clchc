@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { Box, Button, Divider, Flex, Grid, Text, useDisclosure } from "@chakra-ui/react";
+import { Box, Button, Divider, Flex, Grid, Text, useDisclosure, Heading} from "@chakra-ui/react";
 
 import { Navbar } from "@/components/layout/Navbar";
 import ProviderTable from "@/components/provider-directory/ProviderTable";
@@ -34,11 +34,13 @@ export const ProviderDirectoryPage = () => {
   }, [backend]);
 
   return (
+    
     <Box
       p={6}
       maxW="1200px"
       mx="auto"
     >
+      <Heading>Provider Directory</Heading>
       {/* Overview Card */}
       <Box
         maxWidth="1200px"
