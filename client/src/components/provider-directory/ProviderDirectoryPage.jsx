@@ -66,15 +66,32 @@ export const ProviderDirectoryPage = () => {
       </Text>
 
       {role === "ccm" || role === "master" ? (
-        <>
+        <Flex
+          justifyContent="flex-end"
+          mb={5}
+        >
           <Button
             onClick={() => {
               onCreateDrawerOpen();
             }}
+            bg="black"
+            color="white"
+            _hover={{ bg: "gray.800" }}
+            marginRight="1.5em"
           >
-            Add New Category
+            Manage
           </Button>
-        </>
+          <Button
+            onClick={() => {
+              onCreateDrawerOpen();
+            }}
+            bg="black"
+            color="white"
+            _hover={{ bg: "gray.800" }}
+          >
+            Add New
+          </Button>
+        </Flex>
       ) : (
         <></>
       )}
