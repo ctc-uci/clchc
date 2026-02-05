@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 
-import { SearchIcon } from "@chakra-ui/icons";
+import { AddIcon, HamburgerIcon, SearchIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
@@ -136,6 +136,7 @@ export const ProviderDirectoryPage = () => {
               bg="black"
               color="white"
               _hover={{ bg: "gray.800" }}
+              rightIcon={<HamburgerIcon />}
             >
               Manage
             </Button>
@@ -146,6 +147,7 @@ export const ProviderDirectoryPage = () => {
               bg="black"
               color="white"
               _hover={{ bg: "gray.800" }}
+              rightIcon={<AddIcon />}
             >
               Add New
             </Button>
