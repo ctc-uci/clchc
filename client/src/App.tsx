@@ -1,7 +1,7 @@
 import { Admin } from "@/components/admin/Admin";
 import { CatchAll } from "@/components/CatchAll";
 import { Dashboard } from "@/components/dashboard/Dashboard";
-import { Login } from "@/components/login/login";
+import { Login } from "@/components/login/Login";
 import { Playground } from "@/components/Playground";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { ProviderDirectoryPage } from "@/components/provider-directory/ProviderDirectoryPage";
@@ -21,6 +21,7 @@ import {
 } from "react-router-dom";
 
 import { PendingApprovalPage } from "./components/login/PendingApprovalPage";
+import { VersionLogPage } from "./components/version-log/VersionLogPage";
 
 const App = () => {
   return (
@@ -36,7 +37,11 @@ const App = () => {
                 />
                 <Route
                   path="/settings"
-                  element={<ProtectedRoute element={<Settings view={PERSONAL_INFO}/>} />}
+                  element={
+                    <ProtectedRoute
+                      element={<Settings view={PERSONAL_INFO} />}
+                    />
+                  }
                 />
                 <Route
                   path="/quota-tracking"
@@ -65,6 +70,10 @@ const App = () => {
                 <Route
                   path="/provider-directory"
                   element={<ProviderDirectoryPage />}
+                />
+                <Route
+                  path="/version-log"
+                  element={<VersionLogPage />}
                 />
                 <Route
                   path="/admin"

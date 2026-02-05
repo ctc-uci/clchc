@@ -24,7 +24,7 @@ export const RoleProvider = ({ children }: { children: ReactNode }) => {
 
   const fetchRole = async (uid: string) => {
     try {
-      const response = await backend.get(`/users/${uid}`);
+      const response = await backend.get(`/users/firebase/${uid}`);
       setRole((response.data as User[]).at(0)?.role);
     } catch (e) {
       console.error(`Error fetching role: ${e.message}`);
