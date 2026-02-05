@@ -12,7 +12,7 @@ export const UserPendingStatusList = () => {
         const checkPendingStatus = async () => {
             try {
                 // Fetch all users that have pending status
-                const response = await backend.get("/users-js", { params: { status: "pending" } });
+                const response = await backend.get("/users", { params: { status: "pending" } });
                 setPendingUsers(response.data);
 
             } catch (err) {
@@ -29,7 +29,7 @@ export const UserPendingStatusList = () => {
     //When Approve Button is clicked, update user status to active
     const handleApprove = async (id) => {
     try {
-        await backend.put(`users-js/${id}`, {
+        await backend.put(`users/${id}`, {
         status: "approved",
         });
 
@@ -44,7 +44,7 @@ export const UserPendingStatusList = () => {
     //When Deny Button is clicked, delete user from database
     const handleDeny = async (id) => {
         try {
-            await backend.delete(`/users-js/${id}`);
+            await backend.delete(`/users/${id}`);
             setPendingUsers((prev) => prev.filter((user) => user.id !== id));
         } catch (err) {
             console.error(

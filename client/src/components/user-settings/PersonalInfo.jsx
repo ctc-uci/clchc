@@ -24,7 +24,7 @@ export default function PersonalInfo() {
 
     (async () => {
       try {
-        const { data } = await backend.get(`/users/${currentUser.uid}`);
+        const { data } = await backend.get(`/users/firebase/${currentUser.uid}`);
         setUserInfo(data?.[0] ?? null);
       } catch (e) {
         console.error("Failed to fetch user info:", e);
@@ -40,7 +40,7 @@ export default function PersonalInfo() {
 
   const updateUser = async () => {
     try {
-      await backend.put(`/users-js/firebase/${currentUser.uid}`, {
+      await backend.put(`/users/firebase/${currentUser.uid}`, {
         firstName: userInfo.firstName,
         lastName: userInfo.lastName,
         email: userInfo.email,
