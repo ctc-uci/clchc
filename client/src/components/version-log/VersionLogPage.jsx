@@ -1,12 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { InfoOutlineIcon, SearchIcon } from "@chakra-ui/icons";
+import { SearchIcon } from "@chakra-ui/icons";
 import {
   Badge,
   Box,
   Flex,
   Heading,
-  HStack,
   Input,
   InputGroup,
   InputLeftElement,
@@ -24,12 +23,12 @@ export const VersionLogPage = () => {
   const [logs, setLogs] = useState([]);
   const { backend } = useBackendContext();
   const [searchQuery, setSearchQuery] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   // reference QuotaTrackingPage
 
   const fetchVersionLogs = useCallback(
     async (searchQuery) => {
-      setLoading(true);
+      setLoading(true); // Only display loading text on initial load
       const params = new URLSearchParams();
 
       if (searchQuery) {
@@ -132,13 +131,6 @@ export const VersionLogPage = () => {
         <VersionLogTable
           loading={loading}
           logs={logs}
-          onRowsUpdate={(updater) => {
-            if (typeof updater === "function") {
-              setLogs(updater);
-            } else {
-              fetchVersionLogs(searchQuery);
-            }
-          }}
         />
       </Stack>
 

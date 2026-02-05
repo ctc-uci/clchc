@@ -12,10 +12,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 
-const VersionLogTable = ({ loading, logs, onRowsUpdate }) => {
-  if (loading) {
-    return <div> Loading version logs... </div>;
-  }
+const VersionLogTable = ({ loading, logs }) => {
   return (
     <VStack
       spacing={3}
@@ -49,7 +46,7 @@ const VersionLogTable = ({ loading, logs, onRowsUpdate }) => {
                     py={6}
                     color="gray.500"
                   >
-                    No version history available
+                    {loading ? "Loading..." : "No version history available"}
                   </Text>
                 </Td>
               </Tr>
