@@ -29,7 +29,7 @@ export const Login = () => {
   const navigate = useNavigate();
   const toast = useToast();
 
-  const { currentUser, handleRedirectResult } = useAuthContext();
+  const { handleRedirectResult } = useAuthContext();
   const { backend } = useBackendContext();
 
   const {
@@ -94,25 +94,7 @@ export const Login = () => {
 
   const handleGoogleLogin = async () => {
     try {
-      const result = await authenticateGoogleUser();
-  
-      if (!result?.user || !backend) return;
-  
-      const response = await backend.get(`/users/${result.user.uid}`);
-  
-      const user = Array.isArray(response.data)
-        ? response.data[0]
-        : response.data;
-  
-      if (!user) return;
-  
-      navigate(
-        user.status === "pending"
-          ? "/pending-approval"
-          : "/quota-tracking",
-        { replace: true }
-      );
-  
+      await authenticateGoogleUser();
     } catch (err) {
       toast({
         title: "Google sign-in failed",
@@ -122,16 +104,6 @@ export const Login = () => {
     }
   };
 
-  useEffect(() => {
-    if (!backend) return;
-
-    (async () => {
-      await handleRedirectResult(backend, navigate, toast);
-      setCheckingRedirect(false);
-    })();
-  }, [backend, handleRedirectResult, navigate, toast]);
-
-
   // useEffect(() => {
   //   handleRedirectResult(backend, navigate, toast);
   // }, [backend, handleRedirectResult, navigate, toast]);
@@ -139,25 +111,13 @@ export const Login = () => {
   const [checkingRedirect, setCheckingRedirect] = useState(true);
 
   useEffect(() => {
-    if (!currentUser || !backend) return;
+    if (!backend) return;
 
     (async () => {
-      const response = await backend.get(`/users/${currentUser.uid}`);
-
-      const user = Array.isArray(response.data)
-        ? response.data[0]
-        : response.data;
-
-      if (!user) return;
-
-      navigate(
-        user.status === "pending"
-          ? "/pending-approval"
-          : "/quota-tracking",
-        { replace: true }
-      );
+      await handleRedirectResult(backend, navigate, toast);
+      setCheckingRedirect(false);
     })();
-  }, [currentUser, backend, navigate]);
+  }, [backend, navigate, toast]);
 
   if (checkingRedirect) return <Spinner />;
 

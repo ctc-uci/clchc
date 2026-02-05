@@ -1,9 +1,8 @@
 import {
   FacebookAuthProvider,
   GoogleAuthProvider,
-  signInWithPopup,
+  signInWithRedirect,
 } from "firebase/auth";
-
 
 import { auth } from "./firebase";
 
@@ -15,12 +14,12 @@ const googleProvider = new GoogleAuthProvider();
  *
  * @see {@link client/docs/signInWithRedirect.md} for more detailed documentation.
  */
-// const patchedSignInWithRedirect = signInWithRedirect;
+const patchedSignInWithRedirect = signInWithRedirect;
 
 export async function authenticateFacebookUser() {
-  await signInWithPopup(auth, facebookProvider);
+  await patchedSignInWithRedirect(auth, facebookProvider);
 }
 
 export async function authenticateGoogleUser() {
-  await signInWithPopup(auth, googleProvider);
+  await patchedSignInWithRedirect(auth, googleProvider);
 }
