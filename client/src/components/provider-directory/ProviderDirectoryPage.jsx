@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 
+import { SearchIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
@@ -7,6 +8,9 @@ import {
   Flex,
   Grid,
   Heading,
+  Input,
+  InputGroup,
+  InputLeftElement,
   Text,
   useDisclosure,
 } from "@chakra-ui/react";
@@ -16,10 +20,12 @@ import CategoryDrawer from "@/components/provider-directory/CategoryDrawer";
 import ProviderTable from "@/components/provider-directory/ProviderTable";
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 import { useRoleContext } from "@/contexts/hooks/useRoleContext";
+import debounce from "lodash.debounce";
 
 export const ProviderDirectoryPage = () => {
   const [providers, setProviders] = useState(null);
   const [providerCategories, setProviderCategories] = useState(null);
+  const [providerQuery, setProviderQuery] = useState("");
   const { role, loading } = useRoleContext();
   const {
     isOpen: isCreateDrawerOpen,
@@ -29,18 +35,49 @@ export const ProviderDirectoryPage = () => {
 
   const { backend } = useBackendContext();
 
-  const fetchData = async () => {
+  const fetchData = async (provider = "") => {
+    let endpoint = "/providers";
+  
+    if (provider) {
+      endpoint += `?search=${provider}`;
+    }
+  
     const [providerData, catData] = await Promise.all([
-      backend.get("/providers"),
+      backend.get(endpoint),
       backend.get("/directoryCategories"),
     ]);
+  
     setProviders(providerData.data);
     setProviderCategories(catData.data);
   };
+  
+
+  const debouncedFetch = useMemo(() => {
+    return debounce((provider) => {
+      fetchData(provider);
+    }, 300);
+  }, [fetchData]);
 
   useEffect(() => {
-    fetchData();
-  }, [backend]);
+    return () => {
+      debouncedFetch.cancel();
+    };
+  }, [debouncedFetch]);
+
+  useEffect(() => {
+    debouncedFetch.cancel();
+
+    if (!providerQuery) {
+      fetchData("");
+      return;
+    }
+
+    debouncedFetch(providerQuery);
+  }, [providerQuery, fetchData, debouncedFetch]);
+
+  const handleChange = (e) => {
+    setProviderQuery(e.target.value);
+  };
 
   return (
     <Box
@@ -64,6 +101,20 @@ export const ProviderDirectoryPage = () => {
         {" "}
         All current active providers in network
       </Text>
+
+      <InputGroup
+        maxW="400px"
+        pb={6}
+      >
+        <InputLeftElement pointerEvents="none">
+          <SearchIcon color="gray.400" />
+        </InputLeftElement>
+        <Input
+          placeholder="Search Providers"
+          borderRadius="md"
+          onChange={handleChange}
+        />
+      </InputGroup>
 
       {role === "ccm" || role === "master" ? (
         <Flex

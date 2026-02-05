@@ -31,7 +31,9 @@ export const QuotaTracking = () => {
 
   // get current date and reformat
   const today = new Date();
-  const [selectedDate, setSelectedDate] = useState(today.toLocaleDateString("en-CA"));
+  const [selectedDate, setSelectedDate] = useState(
+    today.toLocaleDateString("en-CA")
+  );
 
   const {
     isOpen: isCreateDrawerOpen,
@@ -45,14 +47,14 @@ export const QuotaTracking = () => {
 
       let endpoint = `/quota/details`;
       const params = [];
-      
+
       if (provider) params.push(`provider=${provider}`);
       if (date) params.push(`date=${date}`);
 
       if (params.length) {
         endpoint += `?${params.join("&")}`;
       }
-      
+
       try {
         const response = await backend.get(endpoint);
         setRows(response.data);
@@ -88,7 +90,6 @@ export const QuotaTracking = () => {
 
     debouncedFetch(providerQuery, selectedDate);
   }, [providerQuery, selectedDate, fetchQuotas, debouncedFetch]);
-
 
   const handleChange = (e) => {
     setProviderQuery(e.target.value);
@@ -140,9 +141,8 @@ export const QuotaTracking = () => {
               type="date"
               value={selectedDate}
               onChange={(e) => {
-                setSelectedDate(e.target.value)
-                }
-              }
+                setSelectedDate(e.target.value);
+              }}
             />
           </InputGroup>
         </Box>
