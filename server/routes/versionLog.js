@@ -61,7 +61,7 @@ versionLogRouter.get("/details", async (req, res) => {
         $1::text IS NULL
         OR "users".first_name ILIKE '%' || $1 || '%'
         OR "users".last_name ILIKE '%' || $1 || '%'
-        OR providers.data->>'name' ILIKE '%' || $1 || '%'
+        OR providers.data->>'Name' ILIKE '%' || $1 || '%'
       )
       ORDER BY version_log.id ASC
       `,

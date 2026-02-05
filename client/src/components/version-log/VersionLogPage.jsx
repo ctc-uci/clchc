@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { InfoOutlineIcon, SearchIcon } from "@chakra-ui/icons";
 import {
@@ -15,6 +15,7 @@ import {
 } from "@chakra-ui/react";
 
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
+import debounce from "lodash.debounce";
 
 import Navbar from "../layout/Navbar";
 import VersionLogTable from "./VersionLogTable";
@@ -22,35 +23,41 @@ import VersionLogTable from "./VersionLogTable";
 export const VersionLogPage = () => {
   const [logs, setLogs] = useState([]);
   const { backend } = useBackendContext();
-  // make a new state to track what's in the search bar
+  const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(false);
   // reference QuotaTrackingPage
 
-  const fetchVersionLogs = async () => {
-    try {
+  const fetchVersionLogs = useCallback(
+    async (searchQuery) => {
+      setLoading(true);
       const params = new URLSearchParams();
 
-      if (query) {
-        params.set("q", provider);
+      if (searchQuery) {
+        params.set("q", searchQuery);
       }
 
       const endpoint = `/versionLog/details${params.toString() ? `?${params}` : ""}`;
-      const response = await backend.get(endpoint);
-
-      setLogs(response.data);
-    } catch (err) {
-      console.log("Failed to fetch version logs", err);
-    }
-  };
+      try {
+        const response = await backend.get(endpoint);
+        setLogs(response.data);
+      } catch (err) {
+        console.log("Failed to fetch version logs", err);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [backend]
+  );
 
   useEffect(() => {
     fetchVersionLogs();
-  }, [backend]);
+  }, [fetchVersionLogs]);
 
   const debouncedFetch = useMemo(() => {
-    return debounce((provider, date) => {
-      fetchQuotas(provider, date);
+    return debounce((q) => {
+      fetchVersionLogs(q);
     }, 300);
-  }, [fetchQuotas]);
+  }, [fetchVersionLogs]);
 
   // Handle cleanup
   useEffect(() => {
@@ -59,7 +66,21 @@ export const VersionLogPage = () => {
     };
   }, [debouncedFetch]);
 
+  useEffect(() => {
+    debouncedFetch.cancel();
+
+    if (!searchQuery) {
+      fetchVersionLogs("");
+      return;
+    }
+
+    debouncedFetch(searchQuery);
+  }, [searchQuery, fetchVersionLogs, debouncedFetch]);
+
   // handleChange
+  const handleChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
 
   return (
     <Box
@@ -105,10 +126,20 @@ export const VersionLogPage = () => {
           <Input
             placeholder="Search Version Log"
             borderRadius="md"
-            //   onChange={handleChange}
+            onChange={handleChange}
           />
         </InputGroup>
-        <VersionLogTable logs={logs} />
+        <VersionLogTable
+          loading={loading}
+          logs={logs}
+          onRowsUpdate={(updater) => {
+            if (typeof updater === "function") {
+              setLogs(updater);
+            } else {
+              fetchVersionLogs(searchQuery);
+            }
+          }}
+        />
       </Stack>
 
       <Navbar />
