@@ -1,11 +1,20 @@
 import { useEffect, useState } from "react";
 
-import { Box, Button, Divider, Flex, Grid, Text, useDisclosure, Heading} from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Divider,
+  Flex,
+  Grid,
+  Heading,
+  Text,
+  useDisclosure,
+} from "@chakra-ui/react";
 
 import { Navbar } from "@/components/layout/Navbar";
+import CategoryDrawer from "@/components/provider-directory/CategoryDrawer";
 import ProviderTable from "@/components/provider-directory/ProviderTable";
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
-import CategoryDrawer from "@/components/provider-directory/CategoryDrawer";
 import { useRoleContext } from "@/contexts/hooks/useRoleContext";
 
 export const ProviderDirectoryPage = () => {
@@ -13,10 +22,10 @@ export const ProviderDirectoryPage = () => {
   const [providerCategories, setProviderCategories] = useState(null);
   const { role, loading } = useRoleContext();
   const {
-      isOpen: isCreateDrawerOpen,
-      onOpen: onCreateDrawerOpen,
-      onClose: onCreateDrawerClose,
-    } = useDisclosure();
+    isOpen: isCreateDrawerOpen,
+    onOpen: onCreateDrawerOpen,
+    onClose: onCreateDrawerClose,
+  } = useDisclosure();
 
   const { backend } = useBackendContext();
 
@@ -34,76 +43,41 @@ export const ProviderDirectoryPage = () => {
   }, [backend]);
 
   return (
-    
     <Box
       p={6}
       maxW="1200px"
       mx="auto"
     >
-      <Heading>Provider Directory</Heading>
-      {/* Overview Card */}
-      <Box
-        maxWidth="1200px"
-        height="261px"
-        bg="#E2E2E2"
-        borderRadius="13px"
-        p={6}
-        mb={10}
+      <Heading
+        size="2xl"
+        fontWeight="medium"
+        mb={5}
       >
-        {/* Header */}
-        <Box mb={4}>
-          <Text
-            fontSize="xl"
-            fontWeight="semibold"
+        Provider Directory
+      </Heading>
+      <Text
+        size="lg"
+        fontWeight="normal"
+        color="#00000080"
+        mb={5}
+      >
+        {" "}
+        All current active providers in network
+      </Text>
+
+      {role === "ccm" || role === "master" ? (
+        <>
+          <Button
+            onClick={() => {
+              onCreateDrawerOpen();
+            }}
           >
-            Overview
-          </Text>
-          <Text
-            fontSize="lg"
-            color="gray.600"
-          >
-            Summary of provider
-          </Text>
-        </Box>
-
-        <HorizontalDivider />
-
-        {/* Stats */}
-        <Grid
-          templateColumns="repeat(4, 1fr)"
-          position="relative"
-        >
-          <StatItem
-            label="New Providers"
-            value="5"
-          />
-          <StatItem
-            label="Total Providers"
-            value="500"
-          />
-          <StatItem
-            label="Providers per Location"
-            value="4"
-          />
-          <StatItem
-            label="Specialties Covered"
-            value="4"
-          />
-
-          {/* Vertical dividers */}
-          <GridDivider left="25%" />
-          <GridDivider left="50%" />
-          <GridDivider left="75%" />
-        </Grid>
-      </Box>
-
-       {role === "ccm" || role === "master" ? (
-          <>
-            <Button onClick={()=>{onCreateDrawerOpen()}}>Add New Category</Button>
-          </>
-        ) : (
-          <></>
-        )}
+            Add New Category
+          </Button>
+        </>
+      ) : (
+        <></>
+      )}
 
       {providers && providerCategories ? (
         <Box>
@@ -115,10 +89,12 @@ export const ProviderDirectoryPage = () => {
       ) : (
         <Text>Loading</Text>
       )}
-      <CategoryDrawer isOpen={isCreateDrawerOpen}
+      <CategoryDrawer
+        isOpen={isCreateDrawerOpen}
         onOpen={onCreateDrawerOpen}
         onClose={onCreateDrawerClose}
-        onSaved={fetchData}/>
+        onSaved={fetchData}
+      />
       <Navbar />
     </Box>
   );
