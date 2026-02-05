@@ -1,17 +1,18 @@
-import { Router } from "express";
-import { db } from "@/db/db-pgp";
 import { keysToCamel } from "@/common/utils";
-
+import { db } from "@/db/db-pgp";
+import { Router } from "express";
 
 export const versionLogRouter = Router();
-
 
 versionLogRouter.post("/", async (req, res) => {
   try {
     const { userId, quotaId, action } = req.body;
 
-    if(!userId || !quotaId || !action){
-      return res.status(404).json({error: "Parameters not sufficient; userId, quotaId, and action are required."});
+    if (!userId || !quotaId || !action) {
+      return res.status(404).json({
+        error:
+          "Parameters not sufficient; userId, quotaId, and action are required.",
+      });
     }
 
     const result = await db.query(
@@ -28,7 +29,50 @@ versionLogRouter.post("/", async (req, res) => {
 
 versionLogRouter.get("/", async (req, res) => {
   try {
-    const versionLogs = await db.query(`SELECT * FROM version_log ORDER BY id ASC`);
+    const versionLogs = await db.query(
+      `SELECT * FROM version_log ORDER BY id ASC`
+    );
+
+    res.status(200).json(keysToCamel(versionLogs));
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+});
+
+versionLogRouter.get("/details", async (req, res) => {
+  const { q } = req.query;
+
+  try {
+    const versionLogs = await db.query(
+      `
+      SELECT
+        version_log.id AS id,
+        version_log.*,
+        quota.date,
+        quota.end_time AS time,
+        "users".first_name,
+        "users".last_name,
+        providers.data AS provider_data
+      FROM version_log
+      JOIN quota ON version_log.quota_id = quota.id
+      JOIN "users" ON version_log.user_id = "users".id
+      JOIN providers ON quota.provider_id = providers.id
+      WHERE (
+        $1::text IS NULL
+        OR "users".first_name ILIKE '%' || $1 || '%'
+        OR "users".last_name ILIKE '%' || $1 || '%'
+        OR providers.data->>'name' ILIKE '%' || $1 || '%'
+      )
+      ORDER BY version_log.id ASC
+      `,
+      [q ?? null]
+    );
+
+    if (!versionLogs) {
+      return res
+        .status(404)
+        .json({ error: `Version log details with id ${id} not found.` });
+    }
 
     res.status(200).json(keysToCamel(versionLogs));
   } catch (err) {
@@ -39,12 +83,13 @@ versionLogRouter.get("/", async (req, res) => {
 versionLogRouter.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const versionLog = await db.query("SELECT * FROM version_log WHERE id = $1", [
-      id,
-    ]);
+    const versionLog = await db.query(
+      "SELECT * FROM version_log WHERE id = $1",
+      [id]
+    );
 
-    if(versionLog.length === 0){
-      return res.status(404).json({ error: `id: ${id} was not found.` })
+    if (versionLog.length === 0) {
+      return res.status(404).json({ error: `id: ${id} was not found.` });
     }
 
     res.status(200).json(keysToCamel(versionLog));
@@ -67,8 +112,8 @@ versionLogRouter.put("/:id", async (req, res) => {
       [userId, quotaId, action, id]
     );
 
-    if(updated.length === 0){
-      return res.status(404).json({ error: `id: ${id} was not found.` })
+    if (updated.length === 0) {
+      return res.status(404).json({ error: `id: ${id} was not found.` });
     }
 
     res.status(200).json(keysToCamel(updated));
@@ -86,8 +131,8 @@ versionLogRouter.delete("/:id", async (req, res) => {
       [id]
     );
 
-    if(deleted.length === 0){
-      return res.status(404).json({ error: `id: ${id} was not found.` })
+    if (deleted.length === 0) {
+      return res.status(404).json({ error: `id: ${id} was not found.` });
     }
 
     res.status(200).json(keysToCamel(deleted));
