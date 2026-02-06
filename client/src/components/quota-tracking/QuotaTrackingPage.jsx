@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { AddIcon, SearchIcon } from "@chakra-ui/icons";
 import {
@@ -19,7 +19,7 @@ import { CustomCard } from "@/components/common/CustomCard";
 import Navbar from "@/components/layout/Navbar";
 import QuotaDrawer from "@/components/quota-tracking/QuotaDrawer";
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
-import debounce from "lodash.debounce";
+import { useDebounce } from "@/hooks/useDebounce";
 
 import QuotaTable from "./QuotaTable";
 
@@ -31,7 +31,9 @@ export const QuotaTracking = () => {
 
   // get current date and reformat
   const today = new Date();
-  const [selectedDate, setSelectedDate] = useState(today.toLocaleDateString("en-CA"));
+  const [selectedDate, setSelectedDate] = useState(
+    today.toLocaleDateString("en-CA")
+  );
 
   const {
     isOpen: isCreateDrawerOpen,
@@ -45,14 +47,14 @@ export const QuotaTracking = () => {
 
       let endpoint = `/quota/details`;
       const params = [];
-      
+
       if (provider) params.push(`provider=${provider}`);
       if (date) params.push(`date=${date}`);
 
       if (params.length) {
         endpoint += `?${params.join("&")}`;
       }
-      
+
       try {
         const response = await backend.get(endpoint);
         setRows(response.data);
@@ -65,18 +67,7 @@ export const QuotaTracking = () => {
     [backend]
   );
 
-  const debouncedFetch = useMemo(() => {
-    return debounce((provider, date) => {
-      fetchQuotas(provider, date);
-    }, 300);
-  }, [fetchQuotas]);
-
-  // Handle cleanup
-  useEffect(() => {
-    return () => {
-      debouncedFetch.cancel();
-    };
-  }, [debouncedFetch]);
+  const debouncedFetch = useDebounce(fetchQuotas);
 
   useEffect(() => {
     debouncedFetch.cancel();
@@ -88,7 +79,6 @@ export const QuotaTracking = () => {
 
     debouncedFetch(providerQuery, selectedDate);
   }, [providerQuery, selectedDate, fetchQuotas, debouncedFetch]);
-
 
   const handleChange = (e) => {
     setProviderQuery(e.target.value);
@@ -140,9 +130,8 @@ export const QuotaTracking = () => {
               type="date"
               value={selectedDate}
               onChange={(e) => {
-                setSelectedDate(e.target.value)
-                }
-              }
+                setSelectedDate(e.target.value);
+              }}
             />
           </InputGroup>
         </Box>
