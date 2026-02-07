@@ -3,7 +3,7 @@ import { admin } from "@/config/firebase";
 import { db } from "@/db/db-pgp"; // TODO: replace this db with
 import { verifyRole } from "@/middleware";
 import { Router } from "express";
-import { notifyCcmNewUserRequest } from "../utils/emailService";
+import { notifyCcmNewUserRequest } from "@/utils/emailService";
 
 export const usersRouter = Router();
 
@@ -52,7 +52,7 @@ usersRouter.post("/", async (req, res) => {
       ]
     );
     
-    notifyCcmNewUserRequest(`${firstName} ${lastName}`, email).catch(console.error);
+    notifyCcmNewUserRequest(`${firstName} ${lastName}`, email);
 
     res.status(201).json(keysToCamel(result[0]));
   } catch (err) {
