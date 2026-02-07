@@ -21,6 +21,7 @@ import {
   Select,
   Stack,
   Text,
+  Textarea,
   useDisclosure,
 } from "@chakra-ui/react";
 
@@ -314,6 +315,7 @@ export default function QuotaDrawer({ quotaID = 0, isOpen: externalIsOpen, onOpe
   const [type, setType] = useState("inperson");
   const [quota, setQuota] = useState(0);
   const [progress, setProgress] = useState(0);
+  const [notes, setNotes] = useState("");
 
   useEffect(() => {
     // Initialize the form each time the drawer opens
@@ -337,6 +339,7 @@ export default function QuotaDrawer({ quotaID = 0, isOpen: externalIsOpen, onOpe
         );
         setQuota(quotaData.quota ?? 0);
         setProgress(quotaData.progress ?? 0);
+        setNotes(quotaData.notes ?? "");
       } catch (err) {
         console.error("Error fetching quota details:", err);
       }
@@ -353,6 +356,7 @@ export default function QuotaDrawer({ quotaID = 0, isOpen: externalIsOpen, onOpe
       setType("inperson");
       setQuota(0);
       setProgress(0);
+      setNotes("");
     }
   }, [isOpen, quotaID, backend, defaultDate]);
 
@@ -369,7 +373,7 @@ export default function QuotaDrawer({ quotaID = 0, isOpen: externalIsOpen, onOpe
       endTime: formatTimeForInput(endTime),
       // hours: getHoursBetween(startTime, endTime),
       appointmentType: type,
-      notes: "", // TODO: Is there an initial notes flow?
+      notes: notes,
     };
 
     try {
@@ -396,6 +400,7 @@ export default function QuotaDrawer({ quotaID = 0, isOpen: externalIsOpen, onOpe
     setType("inperson");
     setQuota(0);
     setProgress(0);
+    setNotes("");
     onClose();
   };
 
@@ -423,24 +428,44 @@ export default function QuotaDrawer({ quotaID = 0, isOpen: externalIsOpen, onOpe
                   providerId={providerId}
                   setProviderId={setProviderId}
                 />
-                <LocationDropdown
-                  locationId={locationId}
-                  setLocationId={setLocationId}
-                />
-                <TimeInput
-                  startTime={startTime}
-                  setStartTime={setStartTime}
-                  endTime={endTime}
-                  setEndTime={setEndTime}
-                />
-                <DateInput
-                  date={date}
-                  setDate={setDate}
-                />
-                <TypeInput
-                  type={type}
-                  setType={setType}
-                />
+                <Stack
+                  direction="row"
+                  gap={2}
+                >
+                  <DateInput
+                    date={date}
+                    setDate={setDate}
+                  />
+                  <TimeInput
+                    startTime={startTime}
+                    setStartTime={setStartTime}
+                    endTime={endTime}
+                    setEndTime={setEndTime}
+                  />
+                </Stack>
+                <Stack
+                  direction="row"
+                  gap={2}
+                >
+                  <LocationDropdown
+                    locationId={locationId}
+                    setLocationId={setLocationId}
+                  />
+                  <TypeInput
+                    type={type}
+                    setType={setType}
+                  />
+                </Stack>
+                <FormControl>
+                  <FormLabel>Daily Notes</FormLabel>
+                  <Textarea
+                    placeholder="Start typing..."
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    resize="vertical"
+                    minHeight="80px"
+                  />
+                </FormControl>
                 <QuotaProgress
                   quota={quota}
                   setQuota={setQuota}
