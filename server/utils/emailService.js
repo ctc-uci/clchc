@@ -1,11 +1,13 @@
 import nodemailer from "nodemailer";
 import escapeHtml from "escape-html";
+import { db } from "@/db/db-pgp";
 
 export async function notifyCcmNewUserRequest(name, email) {
   
-  // Validate email/password
+  // Validate email/password, early return if not configured.
   if (!process.env.EMAIL_USER || !process.env.EMAIL_APP_PASSWORD) {
     console.warn("Email service not configured.");
+    return;
   }
 
   // Sanitize
@@ -29,9 +31,15 @@ export async function notifyCcmNewUserRequest(name, email) {
       </div>
     `;
 
+    // Query for CCM's email address
+    const rows = await db.query(`SELECT email FROM users WHERE role = 'ccm'`);
+    // Validate email
+    if (!rows || !rows.length) throw new Error("Cannot find ccm.");
+    const ccmEmail = rows[0].email;
+
     await transporter.sendMail({
       from: `"Admin" <${process.env.EMAIL_USER}>`,
-      to: "meredil3@uci.edu",
+      to: ccmEmail,
       subject: "New User Request",
       text: `New user request from ${sanitizedName} (${sanitizedEmail})`,
       html: emailMessage,
