@@ -93,13 +93,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const result = await getRedirectResult(auth);
       
-      
       if (!result?.user) return;
-      let response = await backend.get(`/users/firebase/${result.user.uid}`);
+
+      let response = await backend.get(`/users/${result.user.uid}`);
 
       if (response.data.length === 0) {
         try {
-          response = await backend.post("/users", {
+          response = await backend.post("/users/create", {
             email: result.user.email,
             firebaseUid: result.user.uid,
             firstName: result.user.displayName?.split(" ")[0] || "",
@@ -107,7 +107,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           });
 
         } catch (e) {
-          await backend.delete(`/users/firebase/${result.user.uid}`);
+          await backend.delete(`/users/${result.user.uid}`);
           const errorMessage = e instanceof Error ? e.message : "Unknown error";
           toast({
             title: "An error occurred",

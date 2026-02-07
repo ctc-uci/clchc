@@ -25,7 +25,7 @@ export default function DeleteAccount() {
   const handleDelete = async () => {
     try {
       if (input === "DELETE") {
-        await backend.delete(`/users/firebase/${currentUser.uid}`);
+        await backend.delete(`/users/${currentUser.uid}`);
       }
       navigate("/login");
     } catch (e) {

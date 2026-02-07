@@ -26,7 +26,7 @@ export default function QuotaCalcFactor() {
 
     (async () => {
       try {
-        const { data } = await backend.get(`/users/firebase/${currentUser.uid}`);
+        const { data } = await backend.get(`/users/${currentUser.uid}`);
         const user = data?.[0] ?? null;
         setUserInfo(user);
         setFactor(user?.apptCalcFactor ?? 0);
@@ -38,7 +38,7 @@ export default function QuotaCalcFactor() {
 
   const updateQuota = async (newQuota) => {
     if (!currentUser?.uid) return;
-    await backend.put(`/users/firebase/${currentUser.uid}`, {
+    await backend.put(`/users-js/firebase/${currentUser.uid}`, {
       apptCalcFactor: newQuota,
     });
   };
