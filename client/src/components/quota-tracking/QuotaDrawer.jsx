@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+
 // import { Pencil } from 'lucide-react';
 
 import {
@@ -12,6 +13,7 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerOverlay,
+  Flex,
   FormControl,
   FormLabel,
   Input,
@@ -93,7 +95,7 @@ function ProviderDropdown({ providerId, setProviderId }) {
     <FormControl isRequired>
       <FormLabel>Provider</FormLabel>
       <Select
-        placeholder="Select provider"
+        placeholder=" "
         value={providerId === "" ? "" : String(providerId)}
         onChange={(e) => {
           setProviderId(Number(e.target.value));
@@ -130,10 +132,13 @@ function LocationDropdown({ locationId, setLocationId }) {
   }, [backend]);
 
   return (
-    <FormControl isRequired>
+    <FormControl
+      isRequired
+      w="50%"
+    >
       <FormLabel>Location</FormLabel>
       <Select
-        placeholder="Select location"
+        placeholder=" "
         value={locationId === "" ? "" : String(locationId)}
         onChange={(e) => setLocationId(Number(e.target.value))}
       >
@@ -169,103 +174,129 @@ function QuotaProgress({ quota, setQuota, progress, setProgress }) {
 
   return (
     <FormControl isRequired>
-      <FormLabel>Progress</FormLabel>
-
-      <Box
-        bg="gray"
-        p={4}
-        borderRadius="md"
-        display="flex"
-        flexDirection="column"
-      >
+      <FormLabel>Appointment Quota</FormLabel>
+      <>
+        <Progress
+          value={percent}
+          height="16px"
+          borderRadius="4px "
+          bg="#0000000F"
+          my={2}
+        />
         <Box
-          bg="white"
-          borderRadius="sm"
-          p={1}
+          // bg="#0000000F"
+          px={4}
+          borderRadius="md"
+          display="flex"
+          flexDirection="column"
         >
-          <Progress
-            value={percent}
-            height="32px"
-            borderRadius="sm"
-            bg="white"
-          />
+          <Stack
+            direction="row"
+            align="center"
+            justify="center"
+            color="white"
+            height="92px"
+            gap="40px"
+          >
+            <NumberInput
+              value={progress}
+              min={0}
+              max={MAX_INPUT_NUMBER}
+              variant="unstyled"
+              onChange={numberInputHandlerFactory(setProgress)}
+              border="1px"
+              borderColor="gray.300"
+              borderRadius="6px"
+              size="lg"
+            >
+              <NumberInputField
+                textAlign="center"
+                fontSize="4xl"
+                p={0}
+                color="black"
+                placeholder=" "
+              />
+            </NumberInput>
+
+            <Text
+              fontSize="4xl"
+              fontWeight="bold"
+              color="black"
+              // mx={10}
+            >
+              /
+            </Text>
+
+            <NumberInput
+              value={quota}
+              size="lg"
+              min={0}
+              max={MAX_INPUT_NUMBER}
+              variant="unstyled"
+              onChange={numberInputHandlerFactory(setQuota)}
+              border="1px"
+              borderColor="gray.300"
+              borderRadius="6px"
+            >
+              <NumberInputField
+                textAlign="center"
+                fontSize="4xl"
+                p={0}
+                color="black"
+              />
+            </NumberInput>
+          </Stack>
         </Box>
-
-        <Stack
-          direction="row"
-          align="center"
-          justify="center"
-          color="white"
-        >
-          <NumberInput
-            value={progress}
-            min={0}
-            max={MAX_INPUT_NUMBER}
-            variant="unstyled"
-            onChange={numberInputHandlerFactory(setProgress)}
-          >
-            <NumberInputField
-              textAlign="right"
-              fontSize="6xl"
-              p={0}
-            />
-          </NumberInput>
-
-          <Text fontSize="6xl">/</Text>
-
-          <NumberInput
-            value={quota}
-            size="lg"
-            min={0}
-            max={MAX_INPUT_NUMBER}
-            variant="unstyled"
-            onChange={numberInputHandlerFactory(setQuota)}
-          >
-            <NumberInputField
-              textAlign="left"
-              fontSize="6xl"
-              p={0}
-            />
-          </NumberInput>
-        </Stack>
-      </Box>
+      </>
     </FormControl>
   );
 }
 
 const TimeInput = ({ startTime, setStartTime, endTime, setEndTime }) => {
   return (
-    <Stack
-      direction="row"
-      gap={2}
+    <Flex
+      direction="column"
+      // paddingLeft={4}
+      width="50%"
     >
       <FormControl isRequired>
-        <FormLabel>Start Time</FormLabel>
-        <Input
-          type="time"
-          value={startTime ?? ""}
-          onChange={(e) => setStartTime(e.target.value)}
-        />
+        <FormLabel>Hours</FormLabel>
+        <Flex>
+          <Input
+            size="md"
+            type="text"
+            value={startTime ?? ""}
+            onChange={(e) => setStartTime(e.target.value)}
+            marginRight={2}
+          />
+          <Input
+            size="md"
+            type="text"
+            value={endTime ?? ""}
+            onChange={(e) => setEndTime(e.target.value)}
+          />
+        </Flex>
       </FormControl>
-
-      <FormControl>
-        <FormLabel>End Time</FormLabel>
-        <Input
-          type="time"
-          value={endTime ?? ""}
-          onChange={(e) => setEndTime(e.target.value)}
-        />
-      </FormControl>
-    </Stack>
+    </Flex>
   );
 };
 
 const DateInput = ({ date, setDate }) => {
   return (
-    <FormControl isRequired>
+    <FormControl
+      isRequired
+      w="45%"
+    >
       <FormLabel>Date</FormLabel>
-      <Input
+      {/* <Input
+        size="md"
         type="date"
+        value={date ?? ""}
+        onChange={(e) => setDate(e.target.value)}
+      /> */}
+
+      <Select
+        placeholder=" "
         value={date ?? ""}
         onChange={(e) => setDate(e.target.value)}
       />
@@ -275,32 +306,71 @@ const DateInput = ({ date, setDate }) => {
 
 const TypeInput = ({ type, setType }) => {
   return (
-    <FormControl>
-      <FormLabel>Type</FormLabel>
-      <ButtonGroup isAttached>
-        {TYPE_OPTIONS.map(({ value, label }) => {
-          const selected = type === value;
+    // <FormControl>
+    //   <FormLabel>Type</FormLabel>
 
-          return (
-            <Button
-              key={value}
-              aria-pressed={selected}
-              variant={selected ? "solid" : "outline"}
-              colorScheme={selected ? "blue" : "gray"}
-              onClick={() => setType(value)}
-            >
-              {label}
-            </Button>
-          );
-        })}
-      </ButtonGroup>
+    //   <ButtonGroup isAttached>
+    //     {TYPE_OPTIONS.map(({ value, label }) => {
+    //       const selected = type === value;
+
+    //       return (
+    //         <Button
+    //           key={value}
+    //           aria-pressed={selected}
+    //           variant={selected ? "solid" : "outline"}
+    //           colorScheme={selected ? "blue" : "gray"}
+    //           onClick={() => setType(value)}
+    //         >
+    //           {label}
+    //         </Button>
+    //       );
+    //     })}
+    //   </ButtonGroup>
+    // </FormControl>
+    <FormControl w="43%">
+      <FormLabel>Type</FormLabel>
+      <Select
+        placeholder=" "
+        value={type ?? ""}
+        onChange={(e) => setType(e.target.value)}
+      >
+        {TYPE_OPTIONS.map(({ value, label }) => (
+          <option
+            key={value}
+            value={value}
+          >
+            {label}
+          </option>
+        ))}
+      </Select>
     </FormControl>
   );
 };
 
-export default function QuotaDrawer({ quotaID = 0, isOpen: externalIsOpen, onOpen: externalOnOpen, onClose: externalOnClose }) {
+const DailyNoteInput = ({ note, setNote }) => {
+  return (
+    <FormControl>
+      <FormLabel>Daily Notes</FormLabel>
+      <Input
+        placeholder="Start typing..."
+        size="md"
+        type="text"
+        value={note ?? ""}
+        onChange={(e) => setNote(e.target.value)}
+      />
+    </FormControl>
+  );
+};
+
+export default function QuotaDrawer({
+  quotaID = 0,
+  isOpen: externalIsOpen,
+  onOpen: externalOnOpen,
+  onClose: externalOnClose,
+}) {
   const internalDisclosure = useDisclosure();
-  const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalDisclosure.isOpen;
+  const isOpen =
+    externalIsOpen !== undefined ? externalIsOpen : internalDisclosure.isOpen;
   const onOpen = externalOnOpen || internalDisclosure.onOpen;
   const onClose = externalOnClose || internalDisclosure.onClose;
   const btnRef = React.useRef();
@@ -311,7 +381,7 @@ export default function QuotaDrawer({ quotaID = 0, isOpen: externalIsOpen, onOpe
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [date, setDate] = useState("");
-  const [type, setType] = useState("inperson");
+  const [type, setType] = useState("");
   const [quota, setQuota] = useState(0);
   const [progress, setProgress] = useState(0);
 
@@ -332,9 +402,7 @@ export default function QuotaDrawer({ quotaID = 0, isOpen: externalIsOpen, onOpe
           quotaData.endTime ? formatTimeForInput(quotaData.endTime) : ""
         );
         setDate(quotaData.date ? formatDateForInput(quotaData.date) : "");
-        setType(
-          quotaData.appointmentType ? quotaData.appointmentType : "inperson"
-        );
+        setType(quotaData.appointmentType ?? "");
         setQuota(quotaData.quota ?? 0);
         setProgress(quotaData.progress ?? 0);
       } catch (err) {
@@ -350,7 +418,7 @@ export default function QuotaDrawer({ quotaID = 0, isOpen: externalIsOpen, onOpe
       setStartTime("");
       setEndTime("");
       setDate("");
-      setType("inperson");
+      setType("");
       setQuota(0);
       setProgress(0);
     }
@@ -393,7 +461,7 @@ export default function QuotaDrawer({ quotaID = 0, isOpen: externalIsOpen, onOpe
     setStartTime("");
     setEndTime("");
     setDate("");
-    setType("inperson");
+    setType("");
     setQuota(0);
     setProgress(0);
     onClose();
@@ -407,25 +475,26 @@ export default function QuotaDrawer({ quotaID = 0, isOpen: externalIsOpen, onOpe
       finalFocusRef={btnRef}
       size="sm"
     >
-        <DrawerOverlay />
-        <DrawerContent>
-          <DrawerCloseButton />
-          {quotaID ? (
-            <DrawerHeader>Edit Quota</DrawerHeader>
-          ) : (
-            <DrawerHeader>Create Quota</DrawerHeader>
-          )}
+      <DrawerOverlay />
+      <DrawerContent>
+        <DrawerCloseButton />
+        {quotaID ? (
+          <DrawerHeader>Edit Quota</DrawerHeader>
+        ) : (
+          <DrawerHeader>Create Quota</DrawerHeader>
+        )}
 
-          <form onSubmit={handleSubmit}>
-            <DrawerBody>
-              <Stack gap={4}>
-                <ProviderDropdown
-                  providerId={providerId}
-                  setProviderId={setProviderId}
-                />
-                <LocationDropdown
-                  locationId={locationId}
-                  setLocationId={setLocationId}
+        <form onSubmit={handleSubmit}>
+          <DrawerBody>
+            <Stack gap={4}>
+              <ProviderDropdown
+                providerId={providerId}
+                setProviderId={setProviderId}
+              />
+              <Flex justify="space-between">
+                <DateInput
+                  date={date}
+                  setDate={setDate}
                 />
                 <TimeInput
                   startTime={startTime}
@@ -433,48 +502,63 @@ export default function QuotaDrawer({ quotaID = 0, isOpen: externalIsOpen, onOpe
                   endTime={endTime}
                   setEndTime={setEndTime}
                 />
-                <DateInput
-                  date={date}
-                  setDate={setDate}
+              </Flex>
+              <Flex justify="space-between">
+                <LocationDropdown
+                  locationId={locationId}
+                  setLocationId={setLocationId}
                 />
+
                 <TypeInput
                   type={type}
                   setType={setType}
                 />
-                <QuotaProgress
-                  quota={quota}
-                  setQuota={setQuota}
-                  progress={progress}
-                  setProgress={setProgress}
-                />
-              </Stack>
-            </DrawerBody>
+              </Flex>
 
-            <DrawerFooter>
-              <Stack
-                direction="row"
-                justify="space-between"
-                w="100%"
+              <DailyNoteInput />
+
+              <QuotaProgress
+                quota={quota}
+                setQuota={setQuota}
+                progress={progress}
+                setProgress={setProgress}
+              />
+            </Stack>
+          </DrawerBody>
+
+          <DrawerFooter position="absolute" bottom={0} w="100%">
+            <Stack
+              direction="row"
+              justify="space-between"
+              w="100%"
+              gap="20px"
+            >
+              <Button
+                type="button"
+                variant="outline"
+                px={10}
+                width="50%"
+                onClick={handleClose}
+                borderRadius="4px"
+                borderColor="#0000003D"
               >
-                <Button
-                  type="submit"
-                  px={10}
-                >
-                  Save
-                </Button>
+                Cancel
+              </Button>
 
-                <Button
-                  type="button"
-                  variant="outline"
-                  px={10}
-                  onClick={handleClose}
-                >
-                  Discard
-                </Button>
-              </Stack>
-            </DrawerFooter>
-          </form>
-        </DrawerContent>
-      </Drawer>
+              <Button
+                type="submit"
+                px={10}
+                width="50%"
+                bg="black"
+                color="white"
+                borderRadius="4px"
+              >
+                Save
+              </Button>
+            </Stack>
+          </DrawerFooter>
+        </form>
+      </DrawerContent>
+    </Drawer>
   );
 }
