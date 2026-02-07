@@ -4,7 +4,7 @@ import { Button, Flex, Icon, Progress, Text } from "@chakra-ui/react";
 
 import { ArrowDown, ArrowUp } from "lucide-react";
 
-import { useBackendContext } from "../contexts/hooks/useBackendContext";
+import { useBackendContext } from "../../contexts/hooks/useBackendContext";
 
 export default function ProgressBar({ quotaID }) {
   const { backend } = useBackendContext();
@@ -21,7 +21,6 @@ export default function ProgressBar({ quotaID }) {
         const q = data?.[0];
 
         if (!q) return;
-
 
         quotaRef.current = q;
         setQuota(q);
@@ -114,7 +113,9 @@ export default function ProgressBar({ quotaID }) {
           <ArrowUp />
         </Icon>
       </Button>
-      <Text>{currentProgress}/{maxProgress}</Text>
+      <Text>
+        {currentProgress}/{maxProgress}
+      </Text>
     </Flex>
   );
 }

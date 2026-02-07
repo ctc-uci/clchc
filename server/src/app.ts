@@ -1,13 +1,13 @@
 import { verifyToken } from "@/middleware";
-import { quotaRouter } from "@/routes/quota";
-import { providersRouter } from "@/routes/providers";
-import { sampleRouter } from "@/routes/sample"; // TODO: delete sample router
-import { versionLogRouter } from "@/routes/versionLog";
-import { usersRouter } from "@/routes/users";
-import { usersJsRouter } from "../routes/userRoutes.js";
-import { tagsRouter } from "@/routes/tags";
 import { directoryCategoriesRouter } from "@/routes/directory_categories";
-import  { locationRouter }  from "@/routes/location";
+import { locationRouter } from "@/routes/location";
+import { providersRouter } from "@/routes/providers";
+import { quotaRouter } from "@/routes/quota";
+import { sampleRouter } from "@/routes/sample"; // TODO: delete sample router
+
+import { tagsRouter } from "@/routes/tags";
+import { usersRouter } from "@/routes/users";
+import { versionLogRouter } from "@/routes/versionLog";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -39,7 +39,6 @@ if (process.env.NODE_ENV === "production") {
 
 app.use("/", sampleRouter); // TODO: delete sample endpoint
 app.use("/users", usersRouter);
-app.use("/users-js", usersJsRouter);
 app.use("/versionLog", versionLogRouter);
 app.use("/tags", tagsRouter);
 app.use("/quota", quotaRouter);

@@ -4,9 +4,11 @@ import { Dashboard } from "@/components/dashboard/Dashboard";
 import { Login } from "@/components/login/Login";
 import { Playground } from "@/components/Playground";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { ProviderDirectoryPage } from "@/components/provider-directory/ProviderDirectoryPage";
+import { QuotaTracking } from "@/components/quota-tracking/QuotaTrackingPage";
 import { Signup } from "@/components/signup/Signup";
-import { QuotaTracking } from "@/components/QuotaTrackingPage";
-import { UserDirectory } from "@/components/UserDirectoryPage";
+import { UserDirectory } from "@/components/user-directory/UserDirectoryPage";
+import { PERSONAL_INFO, Settings } from "@/components/user-settings/Settings";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { BackendProvider } from "@/contexts/BackendContext";
 import { RoleProvider } from "@/contexts/RoleContext";
@@ -18,6 +20,9 @@ import {
   Routes,
 } from "react-router-dom";
 
+import { PendingApprovalPage } from "./components/login/PendingApprovalPage";
+import { VersionLogPage } from "./components/version-log/VersionLogPage";
+
 const App = () => {
   return (
     <CookiesProvider>
@@ -28,15 +33,27 @@ const App = () => {
               <Routes>
                 <Route
                   path="/user-directory"
-                  element={<UserDirectory/>}
+                  element={<UserDirectory />}
+                />
+                <Route
+                  path="/settings"
+                  element={
+                    <ProtectedRoute
+                      element={<Settings view={PERSONAL_INFO} />}
+                    />
+                  }
                 />
                 <Route
                   path="/quota-tracking"
-                  element={<QuotaTracking/>}
+                  element={<QuotaTracking />}
                 />
                 <Route
                   path="/login"
                   element={<Login />}
+                />
+                <Route
+                  path="/pending-approval"
+                  element={<PendingApprovalPage />}
                 />
                 <Route
                   path="/signup"
@@ -51,11 +68,19 @@ const App = () => {
                   element={<ProtectedRoute element={<Dashboard />} />}
                 />
                 <Route
+                  path="/provider-directory"
+                  element={<ProviderDirectoryPage />}
+                />
+                <Route
+                  path="/version-log"
+                  element={<VersionLogPage />}
+                />
+                <Route
                   path="/admin"
                   element={
                     <ProtectedRoute
                       element={<Admin />}
-                      allowedRoles={["admin"]}
+                      allowedRoles={"ccm"}
                     />
                   }
                 />

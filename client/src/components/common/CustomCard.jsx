@@ -15,19 +15,19 @@ export const CustomCard = ({ title, body, footer, height, width }) => {
     >
       
         <CardHeader pb={1}>
-            <Text fontFamily="Inter" fontSize="sm" color="gray.500" fontWeight="medium">
+            <Text fontSize="sm" color="gray.500" fontWeight="medium">
                 {title}
             </Text>
         </CardHeader>
 
         <CardBody py={2}>
-            <Text fontFamily="Inter" fontSize="3xl" fontWeight="semibold" color="gray.900">
+            <Text fontSize="3xl" fontWeight="semibold" color="gray.900">
                 {body}
             </Text>
         </CardBody>
 
         <CardFooter pt={1}>
-            <Text fontFamily="Inter" fontSize="sm" color="gray.500">
+            <Text fontSize="sm" color="gray.500">
                 {footer}
             </Text>
         </CardFooter>

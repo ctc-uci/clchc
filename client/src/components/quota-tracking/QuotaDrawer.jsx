@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+// import { Pencil } from 'lucide-react';
 
 import {
   Box,
@@ -23,8 +24,9 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 
+// bowen
+
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
-import { FaPlus } from "react-icons/fa6";
 
 const MAX_INPUT_NUMBER = 99;
 
@@ -32,6 +34,44 @@ const TYPE_OPTIONS = [
   { value: "inperson", label: "In-person" },
   { value: "telehealth", label: "Telehealth" },
 ];
+
+// Helpers to normalize API date/time values for HTML inputs
+function formatDateForInput(value) {
+  if (!value) return "";
+  if (typeof value === "string" && value.length >= 10) {
+    return value.slice(0, 10);
+  }
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return "";
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+function formatTimeForInput(value) {
+  if (!value) return "";
+  if (typeof value === "string") {
+    // Strings like HH:mm:ss or HH:mm:ssZ → take HH:mm
+    const m = value.match(/^(\d{1,2}):(\d{2})/);
+    if (m) return `${m[1].padStart(2, "0")}:${m[2]}`;
+    // ISO datetime → parse to local HH:mm
+    if (value.includes("T")) {
+      const d = new Date(value);
+      if (!Number.isNaN(d.getTime())) {
+        const hh = String(d.getHours()).padStart(2, "0");
+        const mm = String(d.getMinutes()).padStart(2, "0");
+        return `${hh}:${mm}`;
+      }
+    }
+  }
+  // Date object fallback
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return "";
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mm = String(d.getMinutes()).padStart(2, "0");
+  return `${hh}:${mm}`;
+}
 
 function ProviderDropdown({ providerId, setProviderId }) {
   const [providers, setProviders] = useState(null);
@@ -54,8 +94,10 @@ function ProviderDropdown({ providerId, setProviderId }) {
       <FormLabel>Provider</FormLabel>
       <Select
         placeholder="Select provider"
-        value={providerId}
-        onChange={(e) => setProviderId(Number(e.target.value))}
+        value={providerId === "" ? "" : String(providerId)}
+        onChange={(e) => {
+          setProviderId(Number(e.target.value));
+        }}
       >
         {providers &&
           providers.map((provider) => (
@@ -92,7 +134,7 @@ function LocationDropdown({ locationId, setLocationId }) {
       <FormLabel>Location</FormLabel>
       <Select
         placeholder="Select location"
-        value={locationId}
+        value={locationId === "" ? "" : String(locationId)}
         onChange={(e) => setLocationId(Number(e.target.value))}
       >
         {locations &&
@@ -201,7 +243,7 @@ const TimeInput = ({ startTime, setStartTime, endTime, setEndTime }) => {
         <FormLabel>Start Time</FormLabel>
         <Input
           type="time"
-          value={startTime}
+          value={startTime ?? ""}
           onChange={(e) => setStartTime(e.target.value)}
         />
       </FormControl>
@@ -210,7 +252,7 @@ const TimeInput = ({ startTime, setStartTime, endTime, setEndTime }) => {
         <FormLabel>End Time</FormLabel>
         <Input
           type="time"
-          value={endTime}
+          value={endTime ?? ""}
           onChange={(e) => setEndTime(e.target.value)}
         />
       </FormControl>
@@ -224,7 +266,7 @@ const DateInput = ({ date, setDate }) => {
       <FormLabel>Date</FormLabel>
       <Input
         type="date"
-        value={date}
+        value={date ?? ""}
         onChange={(e) => setDate(e.target.value)}
       />
     </FormControl>
@@ -256,8 +298,11 @@ const TypeInput = ({ type, setType }) => {
   );
 };
 
-export default function QuotaDrawer() {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+export default function QuotaDrawer({ quotaID = 0, isOpen: externalIsOpen, onOpen: externalOnOpen, onClose: externalOnClose }) {
+  const internalDisclosure = useDisclosure();
+  const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalDisclosure.isOpen;
+  const onOpen = externalOnOpen || internalDisclosure.onOpen;
+  const onClose = externalOnClose || internalDisclosure.onClose;
   const btnRef = React.useRef();
   const { backend } = useBackendContext();
 
@@ -270,23 +315,46 @@ export default function QuotaDrawer() {
   const [quota, setQuota] = useState(0);
   const [progress, setProgress] = useState(0);
 
-  // Helper function to convert time string to int
-  // const getHoursBetween = (startTime, endTime) => {
-  //   if (!startTime || !endTime) return 0;
+  useEffect(() => {
+    // Initialize the form each time the drawer opens
+    if (!isOpen) return;
 
-  //   const [startH, startM] = startTime.split(":").map(Number);
-  //   const [endH, endM] = endTime.split(":").map(Number);
+    const fetchQuotaDetails = async () => {
+      try {
+        const res = await backend.get(`/quota/${quotaID}`);
+        const quotaData = res.data[0];
+        setProviderId(quotaData.providerId ?? "");
+        setLocationId(quotaData.locationId ?? "");
+        setStartTime(
+          quotaData.startTime ? formatTimeForInput(quotaData.startTime) : ""
+        );
+        setEndTime(
+          quotaData.endTime ? formatTimeForInput(quotaData.endTime) : ""
+        );
+        setDate(quotaData.date ? formatDateForInput(quotaData.date) : "");
+        setType(
+          quotaData.appointmentType ? quotaData.appointmentType : "inperson"
+        );
+        setQuota(quotaData.quota ?? 0);
+        setProgress(quotaData.progress ?? 0);
+      } catch (err) {
+        console.error("Error fetching quota details:", err);
+      }
+    };
 
-  //   const startTotal = startH * 60 + startM;
-  //   const endTotal = endH * 60 + endM;
-  //   let diffMin = endTotal - startTotal;
-
-  //   if (diffMin < 0) {
-  //     diffMin += 24 * 60;
-  //   }
-
-  //   return Math.floor(diffMin / 60);
-  // };
+    if (quotaID) {
+      fetchQuotaDetails();
+    } else {
+      setProviderId("");
+      setLocationId("");
+      setStartTime("");
+      setEndTime("");
+      setDate("");
+      setType("inperson");
+      setQuota(0);
+      setProgress(0);
+    }
+  }, [isOpen, quotaID, backend]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -296,17 +364,23 @@ export default function QuotaDrawer() {
       locationId,
       quota,
       progress,
-      date,
-      startTime,
-      endTime,
+      date: formatDateForInput(date),
+      startTime: formatTimeForInput(startTime),
+      endTime: formatTimeForInput(endTime),
       // hours: getHoursBetween(startTime, endTime),
       appointmentType: type,
       notes: "", // TODO: Is there an initial notes flow?
     };
 
     try {
-      await backend.post("/quota", formData);
-      handleClose();
+      if (quotaID) {
+        await backend.put(`/quota/${quotaID}`, formData);
+        handleClose();
+      } else {
+        await backend.post("/quota", formData);
+        handleClose();
+      }
+
       // TODO: Should we redirect to the new quota page?
     } catch (err) {
       console.error("Error creating a new quota:", err);
@@ -326,25 +400,22 @@ export default function QuotaDrawer() {
   };
 
   return (
-    <>
-      <Button
-        ref={btnRef}
-        rightIcon={<FaPlus />}
-        onClick={onOpen}
-      >
-        Create Quota
-      </Button>
-      <Drawer
-        isOpen={isOpen}
-        placement="left"
-        onClose={handleClose}
-        finalFocusRef={btnRef}
-        size="sm"
-      >
+    <Drawer
+      isOpen={isOpen}
+      placement="left"
+      onClose={handleClose}
+      finalFocusRef={btnRef}
+      size="sm"
+    >
         <DrawerOverlay />
         <DrawerContent>
           <DrawerCloseButton />
-          <DrawerHeader>Edit Quota</DrawerHeader>
+          {quotaID ? (
+            <DrawerHeader>Edit Quota</DrawerHeader>
+          ) : (
+            <DrawerHeader>Create Quota</DrawerHeader>
+          )}
+
           <form onSubmit={handleSubmit}>
             <DrawerBody>
               <Stack gap={4}>
@@ -405,6 +476,5 @@ export default function QuotaDrawer() {
           </form>
         </DrawerContent>
       </Drawer>
-    </>
   );
 }

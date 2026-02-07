@@ -1,0 +1,308 @@
+import { keysToCamel } from "@/common/utils";
+import { admin } from "@/config/firebase";
+import { db } from "@/db/db-pgp"; // TODO: replace this db with
+import { verifyRole } from "@/middleware";
+import { Router } from "express";
+
+export const usersRouter = Router();
+
+const ROLE_MAP = {
+  master: "Managers",
+  ccm: "Managers",
+  ccs: "Staff",
+  viewer: "Viewers",
+};
+
+const ROLE_ORDER = ["Managers", "Staff", "Viewers"];
+
+// Create new user
+usersRouter.post("/", async (req, res) => {
+  try {
+    const {
+      firebaseUid,
+      firstName,
+      lastName,
+      email
+    } = req.body;
+
+    const existing = await db.query(
+      "SELECT * FROM users WHERE firebase_uid = $1",
+      [firebaseUid]
+    );
+    
+    if (existing && existing.length > 0) {
+      return res.status(200).json(keysToCamel(existing[0]));
+    }
+    
+    const result = await db.query(
+      `INSERT INTO users (
+        firebase_uid,
+        first_name,
+        last_name,
+        email
+      )
+      VALUES ($1, $2, $3, $4)
+      RETURNING *`,
+      [
+        firebaseUid,
+        firstName,
+        lastName,
+        email
+      ]
+    );
+    console.log('fdsfdsf');
+
+    res.status(201).json(keysToCamel(result[0]));
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+// Get all users w/ optional status filter
+usersRouter.get("/", async (req, res) => {
+  try {
+    const { status } = req.query;
+
+    const result = await db.query(
+      status
+        ? "SELECT * FROM users WHERE status::text = $1"
+        : "SELECT * FROM users",
+      status ? [String(status)] : []
+    );
+
+    return res.status(200).json(keysToCamel(result));
+  } catch (err) {
+    console.error("Error fetching users:", err);
+    return res.status(500).json({
+      error: err instanceof Error ? err.message : "Unknown error",
+    });
+  }
+});
+
+// Get statistics of all users
+usersRouter.get("/stats", async (req, res) => {
+  try {
+    const [roleCounts, totalCount] = await db.multi(`
+      SELECT role, COUNT(*)::int AS count
+      FROM users
+      GROUP BY role;
+
+      SELECT COUNT(*)::int AS total
+      FROM users;
+    `);
+
+    if (!roleCounts || !totalCount) {
+      return res.status(404).send("User stats not found");
+    }
+
+    const aggregated = {};
+    roleCounts.forEach(({ role, count }) => {
+      const displayRole = ROLE_MAP[role] || role;
+      aggregated[displayRole] = (aggregated[displayRole] || 0) + count;
+    });
+
+    const byRole = ROLE_ORDER.map((role) => ({
+      role,
+      count: aggregated[role] || 0,
+    }));
+
+    res.status(200).json({
+      total: totalCount[0].total,
+      byRole,
+    });
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+});
+
+// Get user by ID
+usersRouter.get("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await db.query("SELECT * from users WHERE id=$1", [id]);
+
+    res.status(200).json(keysToCamel(result));
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+// Get a user by Firebase ID
+usersRouter.get("/firebase/:firebaseUid", async (req, res) => {
+  try {
+    const { firebaseUid } = req.params;
+
+    const result = await db.query("SELECT * FROM users WHERE firebase_uid = $1", [firebaseUid]);
+    
+    res.status(200).json(keysToCamel(result));
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+});
+
+
+// Delete a user by ID, both in Firebase and NPO DB
+usersRouter.delete("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const users = await db.query(
+      "SELECT firebase_uid FROM users WHERE id = $1",
+      [id]
+    );
+    console.log('users', users);
+    if (!users || users.length === 0) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    const { firebaseUid } = keysToCamel(users[0]);
+
+    await admin.auth().deleteUser(firebaseUid);
+
+    const deleted = await db.query(
+      "DELETE FROM users WHERE id = $1 RETURNING *",
+      [id]
+    );
+
+    res.status(200).json(keysToCamel(deleted));
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+
+// Delete a user by Firebase ID, both in Firebase and NPO DB
+usersRouter.delete("/firebase/:firebaseUid", async (req, res) => {
+  try {
+    const { firebaseUid } = req.params;
+
+    const checkResult = await db.query(
+      "SELECT firebase_uid FROM users WHERE firebase_uid = $1",
+      [firebaseUid]
+    );
+
+    if (checkResult.length === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    await admin.auth().deleteUser(firebaseUid);
+    
+    const user = await db.query("DELETE FROM users WHERE firebase_uid = $1", [firebaseUid]);
+
+    res.status(204).json(keysToCamel(user));
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+// Update a user by ID
+usersRouter.put("/:id", async (req, res, next) => {
+  const { role, status, apptCalcFactor } = req.body;
+
+  const isSensitiveUpdate =
+    role !== undefined || status !== undefined || apptCalcFactor !== undefined;
+
+  if (isSensitiveUpdate) {
+    return verifyRole("ccm")(req, res, next);
+  }
+
+  return next();
+}, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { firebaseUid, role, firstName, lastName, email, status, apptCalcFactor } = req.body;
+
+    const result = await db.query(
+      `UPDATE users
+         SET
+           firebase_uid = COALESCE($1, firebase_uid),
+           role = COALESCE($2, role),
+           first_name = COALESCE($3, first_name),
+           last_name = COALESCE($4, last_name),
+           email = COALESCE($5, email),
+           status = COALESCE($6, status),
+           appt_calc_factor = COALESCE($7, appt_calc_factor)
+         WHERE id = $8
+         RETURNING *`,
+      [firebaseUid, role, firstName, lastName, email, status, apptCalcFactor, id]
+    );
+
+    if (!result || result.length === 0) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    return res.status(200).json(keysToCamel(result[0]));
+  } catch (err) {
+    return res.status(500).send(err.message);
+  }
+});
+
+// Update a user by Firebase ID
+usersRouter.put("/firebase/:firebaseUid", async (req, res, next) => {
+  const { role, status, apptCalcFactor } = req.body;
+
+  const isSensitiveUpdate =
+    role !== undefined || status !== undefined || apptCalcFactor !== undefined;
+
+  if (isSensitiveUpdate) {
+    // run your existing middleware only when needed
+    return verifyRole("ccm")(req, res, next);
+  }
+
+  return next();
+}, async (req, res) => {
+  try {
+    const { firebaseUid } = req.params;
+    const { role, firstName, lastName, email, status, apptCalcFactor } = req.body;
+
+    const result = await db.query(
+      `UPDATE users
+         SET
+           role = COALESCE($1, role),
+           first_name = COALESCE($2, first_name),
+           last_name = COALESCE($3, last_name),
+           email = COALESCE($4, email),
+           status = COALESCE($5, status),
+           appt_calc_factor = COALESCE($6, appt_calc_factor)
+         WHERE firebase_uid = $7
+         RETURNING *`,
+      [role, firstName, lastName, email, status, apptCalcFactor, firebaseUid]
+    );
+
+    if (!result || result.length === 0) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    return res.status(200).json(keysToCamel(result[0]));
+  } catch (err) {
+    return res.status(500).send(err.message);
+  }
+});
+
+
+// Get all users (as admin)
+usersRouter.get("/admin/all", verifyRole("admin"), async (req, res) => {
+  try {
+    const users = await db.query(`SELECT * FROM users`);
+
+    res.status(200).json(keysToCamel(users));
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+});
+
+usersRouter.put("/update/set-role", verifyRole("admin"), async (req, res) => {
+  try {
+    const { role, firebaseUid } = req.body;
+
+    const user = await db.query(
+      "UPDATE users SET role = $1 WHERE firebase_uid = $2 RETURNING *",
+      [role, firebaseUid]
+    );
+
+    res.status(200).json(keysToCamel(user));
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+});

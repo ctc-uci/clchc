@@ -23,6 +23,7 @@
     "axios": "^1.7.4",
     "firebase": "10.12.5",
     "framer-motion": "^11.3.27",
+    "lodash.debounce": "^4.0.8",
     "lucide-react": "^0.562.0",
     "patch-package": "^8.0.0",
     "postinstall-postinstall": "^2.1.0",
