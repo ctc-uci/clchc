@@ -32,6 +32,7 @@ import { LockIcon } from "@chakra-ui/icons";
 // bowen
 
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
+import { useAuthContext } from "@/contexts/hooks/useAuthContext";
 
 const MAX_INPUT_NUMBER = 99;
 
@@ -529,8 +530,10 @@ export default function QuotaDrawer({
   const onClose = externalOnClose || internalDisclosure.onClose;
   const btnRef = React.useRef();
   const { backend } = useBackendContext();
+  const { currentUser } = useAuthContext();
 
   const [providerId, setProviderId] = useState("");
+  const [apptCalcFactor, setApptCalcFactor] = useState(null);
   const [locationId, setLocationId] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
@@ -542,6 +545,53 @@ export default function QuotaDrawer({
   const [isLocked, setIsLocked] = useState(false);
   // const [lockEdit, setLockEdit] = useState(false);
   const isDev = import.meta.env?.DEV;
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (!currentUser?.uid) {
+        console.log("No currentUser available yet");
+        return;
+      }
+      
+      try {
+        console.log("Fetching user profile for:", currentUser.uid);
+        const res = await backend.get(`/users/${currentUser.uid}`);
+        const userData = res.data[0];
+        console.log("User data:", userData);
+        const factor = userData?.apptCalcFactor ?? null;
+        console.log("apptCalcFactor:", factor);
+        setApptCalcFactor(factor);
+      } catch (err) {
+        console.error("Error fetching user profile:", err);
+      }
+    };
+
+    fetchUserProfile();
+  }, [currentUser, backend]);
+
+  useEffect(() => {
+    // Auto-calculate endTime based on startTime and apptCalcFactor
+    if (!startTime || apptCalcFactor === null) return;
+
+    try {
+      console.log("Calculating end time with startTime:", startTime, "and apptCalcFactor:", apptCalcFactor);
+      const [hours, minutes] = startTime.split(':').map(Number);
+      if (isNaN(hours) || isNaN(minutes)) return;
+
+      const startDate = new Date();
+      startDate.setHours(hours, minutes, 0, 0);
+      
+      const hoursToAdd = apptCalcFactor;
+      startDate.setMinutes(startDate.getMinutes() + hoursToAdd * 60);
+      
+      const endHours = String(startDate.getHours()).padStart(2, '0');
+      const endMinutes = String(startDate.getMinutes()).padStart(2, '0');
+      
+      setEndTime(`${endHours}:${endMinutes}`);
+    } catch (err) {
+      console.error("Error calculating end time:", err);
+    }
+  }, [startTime, apptCalcFactor]);
 
   useEffect(() => {
     // Initialize the form each time the drawer opens
