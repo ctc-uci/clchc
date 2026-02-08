@@ -1,16 +1,12 @@
 import { Admin } from "@/components/admin/Admin";
 import { CatchAll } from "@/components/CatchAll";
 import { Dashboard } from "@/components/dashboard/Dashboard";
-import { Login } from "@/components/login/login";
+import { Login } from "./components/login/Login";
 import { Playground } from "@/components/Playground";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { ProviderDirectoryPage } from "@/components/provider-directory/ProviderDirectoryPage";
 import { QuotaTracking } from "@/components/quota-tracking/QuotaTrackingPage";
-import { ProviderDirectoryPage } from "@/components/provider-directory/ProviderDirectoryPage";
-import { QuotaTracking } from "@/components/quota-tracking/QuotaTrackingPage";
 import { Signup } from "@/components/signup/Signup";
-import { UserDirectory } from "@/components/user-directory/UserDirectoryPage";
-import { PERSONAL_INFO, Settings } from "@/components/user-settings/Settings";
 import { UserDirectory } from "@/components/user-directory/UserDirectoryPage";
 import { PERSONAL_INFO, Settings } from "@/components/user-settings/Settings";
 import { AuthProvider } from "@/contexts/AuthContext";
@@ -50,7 +46,6 @@ const App = () => {
                 <Route
                   path="/quota-tracking"
                   element={<QuotaTracking />}
-                  element={<QuotaTracking />}
                 />
                 <Route
                   path="/login"
@@ -89,7 +84,6 @@ const App = () => {
                   element={
                     <ProtectedRoute
                       element={<Admin />}
-                      allowedRoles={"ccm"}
                       allowedRoles={"ccm"}
                     />
                   }
