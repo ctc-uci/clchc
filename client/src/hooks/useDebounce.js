@@ -4,10 +4,7 @@ import debounce from "lodash.debounce";
 
 export function useDebounce(fn, delay = 300) {
   const fnRef = useRef(fn); // prevent debounce function recreation
-
-  useEffect(() => {
-    fnRef.current = fn;
-  }, [fn]);
+  fnRef.current = fn;
 
   const debouncedFn = useMemo(() => {
     return debounce((...args) => {
