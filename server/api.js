@@ -92,7 +92,7 @@ export const api = {
   },
   users: {
     getAll: async ({ params }) => {
-        let url = `${API_BASE}/users-js`;
+        let url = `${API_BASE}/users`;
       if (params instanceof URLSearchParams) {
         url += `?${params.toString()}`;
       }
@@ -110,7 +110,7 @@ export const api = {
       return res.json();
     },
     delete: async (id) => {
-      const res = await fetch(`${API_BASE}/users-js/${id}`, {
+      const res = await fetch(`${API_BASE}/users/${id}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
       });
@@ -120,7 +120,7 @@ export const api = {
       return res.json();
     },
     update: async (id, data) => {
-      const res = await fetch(`${API_BASE}/users-js/${id}`, {
+      const res = await fetch(`${API_BASE}/users/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),

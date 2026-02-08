@@ -44,7 +44,7 @@ export const UserDirectory = () => {
       isLoading: isDeleting,
       error: deleteError,
     } = useDeleteUser();
-
+  
   // table delete
   const handleDelete = async (userId) => {
     try {

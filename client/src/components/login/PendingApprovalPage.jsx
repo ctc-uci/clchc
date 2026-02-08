@@ -29,7 +29,7 @@ export const PendingApprovalPage = () => {
       }
 
       try {
-        const res = await backend.get(`/users/${currentUser.uid}`);
+        const res = await backend.get(`/users/firebase/${currentUser.uid}`);
         const users = res.data[0];
 
         if (users?.status === "approved") {

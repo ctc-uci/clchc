@@ -14,8 +14,6 @@ import dotenv from "dotenv";
 import express from "express";
 import schedule from "node-schedule"; // TODO: Keep only if scheduling cronjobs
 
-import { usersJsRouter } from "../routes/userRoutes.js";
-
 dotenv.config();
 
 schedule.scheduleJob("0 0 0 0 0", () => console.info("Hello Cron Job!")); // TODO: delete sample cronjob
@@ -41,7 +39,6 @@ if (process.env.NODE_ENV === "production") {
 
 app.use("/", sampleRouter); // TODO: delete sample endpoint
 app.use("/users", usersRouter);
-app.use("/users-js", usersJsRouter);
 app.use("/versionLog", versionLogRouter);
 app.use("/tags", tagsRouter);
 app.use("/quota", quotaRouter);

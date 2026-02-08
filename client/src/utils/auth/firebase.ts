@@ -12,7 +12,7 @@ const firebaseConfig = {
    * @see {@link https://firebase.google.com/docs/auth/web/redirect-best-practices#proxy-requests} for the officially documented reasons why.
    * @see {@link client/docs/signInWithRedirect.md} for more detailed documentation.
    */
-  authDomain: import.meta.env.VITE_FIREBASE_AUTHDOMAIN,
+  authDomain: import.meta.env.VITE_FRONTEND_HOSTNAME,
   projectId: import.meta.env.VITE_FIREBASE_PROJECTID,
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGEBUCKET,
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGINGSENDERID,
