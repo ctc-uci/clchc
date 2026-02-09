@@ -21,7 +21,7 @@ import QuotaDrawer from "@/components/quota-tracking/QuotaDrawer";
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 import debounce from "lodash.debounce";
 
-import { useQuotas } from "../../../contexts/hooks/data-fetching/useQuotas";
+import { useQuotas } from "@/contexts/hooks/data-fetching/useQuotas";
 import QuotaTable from "./QuotaTable";
 
 export const QuotaTracking = () => {

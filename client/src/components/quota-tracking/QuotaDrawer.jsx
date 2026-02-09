@@ -26,9 +26,9 @@ import {
 
 // bowen hi bowen
 
-import { useCreateQuota, useQuotaById, useUpdateQuota } from "../../../contexts/hooks/data-fetching/useQuotas";
-import { useProvidersSummary } from "../../../contexts/hooks/data-fetching/useProviders";
-import { useLocations } from "../../../contexts/hooks/data-fetching/useLocations";
+import { useCreateQuota, useQuotaById, useUpdateQuota } from "@/contexts/hooks/data-fetching/useQuotas";
+import { useProvidersSummary } from "@/contexts/hooks/data-fetching/useProviders";
+import { useLocations } from "@/contexts/hooks/data-fetching/useLocations";
 
 const MAX_INPUT_NUMBER = 99;
 

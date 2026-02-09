@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
-import { api } from '../../../../server/api.js'
+import { api } from '@server/src/api.js'
 
 export function useDirectoryCategories() {
   return useQuery({

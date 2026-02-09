@@ -7,8 +7,8 @@ import ProviderTable from "@/components/provider-directory/ProviderTable";
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 import CategoryDrawer from "@/components/provider-directory/CategoryDrawer";
 import { useRoleContext } from "@/contexts/hooks/useRoleContext";
-import { useProviders } from "../../../contexts/hooks/data-fetching/useProviders";
-import { useDirectoryCategories } from "../../../contexts/hooks/data-fetching/useDirectoryCategories";
+import { useProviders } from "@/contexts/hooks/data-fetching/useProviders";
+import { useDirectoryCategories } from "@/contexts/hooks/data-fetching/useDirectoryCategories";
 
 export const ProviderDirectoryPage = () => {
   const { role, loading } = useRoleContext();

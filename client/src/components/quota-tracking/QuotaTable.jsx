@@ -27,7 +27,7 @@ import ProgressBar from "@/components/quota-tracking/ProgressBar";
 import QuotaDrawer from "@/components/quota-tracking/QuotaDrawer";
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 
-import { useUpdateQuota } from "../../../contexts/hooks/data-fetching/useQuotas";
+import { useUpdateQuota } from "@/contexts/hooks/data-fetching/useQuotas";
 
 const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
   const [editingQuotaId, setEditingQuotaId] = useState(null);

@@ -19,7 +19,7 @@ import {
 
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 import { useRoleContext } from "@/contexts/hooks/useRoleContext";
-import { useCreateCategory } from "../../../contexts/hooks/data-fetching/useDirectoryCategories";
+import { useCreateCategory } from "@/contexts/hooks/data-fetching/useDirectoryCategories";
 
 const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
   const [name, setName] = useState("");

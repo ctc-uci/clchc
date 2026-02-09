@@ -7,7 +7,7 @@ import { ArrowDown, ArrowUp } from "lucide-react";
 import {
   useQuotaById,
   useUpdateQuota,
-} from "../../../contexts/hooks/data-fetching/useQuotas";
+} from "@/contexts/hooks/data-fetching/useQuotas"
 import { useBackendContext } from "../../contexts/hooks/useBackendContext";
 
 export default function ProgressBar({ quotaID }) {

@@ -17,7 +17,7 @@ import { CustomCard } from "@/components/common/CustomCard";
 import { Navbar } from "@/components/layout/Navbar";
 import { BackendContext } from "@/contexts/BackendContext";
 import debounce from "lodash.debounce";
-import { useUsers, useUsersStats, useDeleteUser } from "../../../contexts/hooks/data-fetching/useUsers";
+import { useUsers, useUsersStats, useDeleteUser } from "@/contexts/hooks/data-fetching/useUsers";
 import UserTable from "./UserTable";
 import {UserPendingStatusList} from "./UserPendingStatusList";
 

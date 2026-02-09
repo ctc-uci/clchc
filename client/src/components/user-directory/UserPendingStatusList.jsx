@@ -16,7 +16,7 @@ import {
   useDeleteUser,
   useUpdateUser,
   useUsers,
-} from "../../../contexts/hooks/data-fetching/useUsers";
+} from "@/contexts/hooks/data-fetching/useUsers";
 
 export const UserPendingStatusList = () => {
   // const [pendingUsers, setPendingUsers] = useState([]);
