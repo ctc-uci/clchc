@@ -12,6 +12,7 @@ import { PERSONAL_INFO, Settings } from "@/components/user-settings/Settings";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { BackendProvider } from "@/contexts/BackendContext";
 import { RoleProvider } from "@/contexts/RoleContext";
+import  Layout from "@/components/layout/layout"; 
 import { CookiesProvider } from "react-cookie";
 import {
   Navigate,
@@ -31,22 +32,32 @@ const App = () => {
           <RoleProvider>
             <Router>
               <Routes>
-                <Route
+                <Route element={<Layout/>}>
+                  <Route
                   path="/user-directory"
                   element={<UserDirectory />}
-                />
-                <Route
+                  />
+                  <Route
                   path="/settings"
                   element={
                     <ProtectedRoute
                       element={<Settings view={PERSONAL_INFO} />}
                     />
                   }
-                />
-                <Route
+                  />
+                  <Route
                   path="/quota-tracking"
                   element={<QuotaTracking />}
-                />
+                  />
+                  <Route
+                  path="/provider-directory"
+                  element={<ProviderDirectoryPage />}
+                  />
+                  <Route
+                  path="/version-log"
+                  element={<VersionLogPage />}
+                  />
+                </Route>
                 <Route
                   path="/login"
                   element={<Login />}
@@ -66,14 +77,6 @@ const App = () => {
                 <Route
                   path="/dashboard"
                   element={<ProtectedRoute element={<Dashboard />} />}
-                />
-                <Route
-                  path="/provider-directory"
-                  element={<ProviderDirectoryPage />}
-                />
-                <Route
-                  path="/version-log"
-                  element={<VersionLogPage />}
                 />
                 <Route
                   path="/admin"

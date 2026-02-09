@@ -14,15 +14,13 @@ export const Navbar = () => {
     py: 1,
     borderRadius: "md",
     fontSize: { base: "8px", sm: "14px" },
-    _hover: { textDecoration: "underline", textUnderlineOffset: "3px" },
+    _hover: { textUnderlineOffset: "3px", fontWeight: "550" },
   };
 
   const activeStyle = ({ isActive }) =>
     isActive
       ? {
-          textDecoration: "underline",
-          textUnderlineOffset: "3px",
-          fontWeight: "600",
+          fontWeight: "1000"
         }
       : undefined;
 
