@@ -21,8 +21,8 @@ import {
   Routes,
 } from "react-router-dom";
 
-import { PendingApprovalPage } from "./components/login/PendingApprovalPage";
-import { VersionLogPage } from "./components/version-log/VersionLogPage";
+import { PendingApprovalPage } from "@/components/login/PendingApprovalPage";
+import { VersionLogPage } from "@/components/version-log/VersionLogPage";
 
 const queryClient = new QueryClient();
 
