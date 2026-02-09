@@ -1,37 +1,82 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-import { Box, Button, Divider, Flex, Grid, Text, useDisclosure } from "@chakra-ui/react";
+import { AddIcon, HamburgerIcon, SearchIcon } from "@chakra-ui/icons";
+import {
+  Box,
+  Button,
+  Divider,
+  Flex,
+  Heading,
+  Input,
+  InputGroup,
+  InputLeftElement,
+  Tag,
+  Text,
+  useDisclosure,
+} from "@chakra-ui/react";
 
 import { Navbar } from "@/components/layout/Navbar";
+import CategoryDrawer from "@/components/provider-directory/CategoryDrawer";
 import ProviderTable from "@/components/provider-directory/ProviderTable";
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
-import CategoryDrawer from "@/components/provider-directory/CategoryDrawer";
 import { useRoleContext } from "@/contexts/hooks/useRoleContext";
+import debounce from "lodash.debounce";
 
 export const ProviderDirectoryPage = () => {
   const [providers, setProviders] = useState(null);
   const [providerCategories, setProviderCategories] = useState(null);
+  const [providerQuery, setProviderQuery] = useState("");
   const { role, loading } = useRoleContext();
   const {
-      isOpen: isCreateDrawerOpen,
-      onOpen: onCreateDrawerOpen,
-      onClose: onCreateDrawerClose,
-    } = useDisclosure();
+    isOpen: isCreateDrawerOpen,
+    onOpen: onCreateDrawerOpen,
+    onClose: onCreateDrawerClose,
+  } = useDisclosure();
 
   const { backend } = useBackendContext();
 
-  const fetchData = async () => {
+  const fetchData = async (provider = "") => {
+    let endpoint = "/providers";
+
+    if (provider) {
+      endpoint += `?search=${provider}`;
+    }
+
     const [providerData, catData] = await Promise.all([
-      backend.get("/providers"),
+      backend.get(endpoint),
       backend.get("/directoryCategories"),
     ]);
+
     setProviders(providerData.data);
     setProviderCategories(catData.data);
   };
 
+  const debouncedFetch = useMemo(() => {
+    return debounce((provider) => {
+      fetchData(provider);
+    }, 300);
+  }, [fetchData]);
+
   useEffect(() => {
-    fetchData();
-  }, [backend]);
+    return () => {
+      debouncedFetch.cancel();
+    };
+  }, [debouncedFetch]);
+
+  useEffect(() => {
+    debouncedFetch.cancel();
+
+    if (!providerQuery) {
+      fetchData("");
+      return;
+    }
+
+    debouncedFetch(providerQuery);
+  }, [providerQuery, fetchData, debouncedFetch]);
+
+  const handleChange = (e) => {
+    setProviderQuery(e.target.value);
+  };
 
   return (
     <Box
@@ -39,69 +84,78 @@ export const ProviderDirectoryPage = () => {
       maxW="1200px"
       mx="auto"
     >
-      {/* Overview Card */}
-      <Box
-        maxWidth="1200px"
-        height="261px"
-        bg="#E2E2E2"
-        borderRadius="13px"
-        p={6}
-        mb={10}
+      <Flex
+        alignItems="center"
+        gap={3}
+        mb={5}
       >
-        {/* Header */}
-        <Box mb={4}>
-          <Text
-            fontSize="xl"
-            fontWeight="semibold"
-          >
-            Overview
-          </Text>
-          <Text
-            fontSize="lg"
-            color="gray.600"
-          >
-            Summary of provider
-          </Text>
-        </Box>
-
-        <HorizontalDivider />
-
-        {/* Stats */}
-        <Grid
-          templateColumns="repeat(4, 1fr)"
-          position="relative"
+        <Heading
+          size="2xl"
+          fontWeight="medium"
         >
-          <StatItem
-            label="New Providers"
-            value="5"
-          />
-          <StatItem
-            label="Total Providers"
-            value="500"
-          />
-          <StatItem
-            label="Providers per Location"
-            value="4"
-          />
-          <StatItem
-            label="Specialties Covered"
-            value="4"
-          />
+          Provider Directory
+        </Heading>
+        <Tag
+          bg="yellow.300"
+          color="black"
+          fontSize="lg"
+        >
+          {role}
+        </Tag>
+      </Flex>
+      <Text
+        size="lg"
+        fontWeight="normal"
+        color="#00000080"
+        mb={5}
+      >
+        {" "}
+        All current active providers in network
+      </Text>
 
-          {/* Vertical dividers */}
-          <GridDivider left="25%" />
-          <GridDivider left="50%" />
-          <GridDivider left="75%" />
-        </Grid>
-      </Box>
+      {role === "ccm" || role === "master" ? (
+        <Flex
+          justifyContent="space-between"
+          alignItems="center"
+          mb={5}
+          gap={4}
+        >
+          <InputGroup maxW="600px">
+            <InputLeftElement pointerEvents="none">
+              <SearchIcon color="gray.400" />
+            </InputLeftElement>
+            <Input
+              placeholder="Search Providers"
+              borderRadius="md"
+              onChange={handleChange}
+            />
+          </InputGroup>
 
-       {role === "ccm" || role === "master" ? (
-          <>
-            <Button onClick={()=>{onCreateDrawerOpen()}}>Add New Category</Button>
-          </>
-        ) : (
-          <></>
-        )}
+          <Flex gap={3}>
+            <Button
+              bg="black"
+              color="white"
+              _hover={{ bg: "gray.800" }}
+              rightIcon={<HamburgerIcon />}
+            >
+              Manage
+            </Button>
+            <Button
+              onClick={() => {
+                onCreateDrawerOpen();
+              }}
+              bg="black"
+              color="white"
+              _hover={{ bg: "gray.800" }}
+              rightIcon={<AddIcon />}
+            >
+              Add New
+            </Button>
+          </Flex>
+        </Flex>
+      ) : (
+        <></>
+      )}
 
       {providers && providerCategories ? (
         <Box>
@@ -113,10 +167,12 @@ export const ProviderDirectoryPage = () => {
       ) : (
         <Text>Loading</Text>
       )}
-      <CategoryDrawer isOpen={isCreateDrawerOpen}
+      <CategoryDrawer
+        isOpen={isCreateDrawerOpen}
         onOpen={onCreateDrawerOpen}
         onClose={onCreateDrawerClose}
-        onSaved={fetchData}/>
+        onSaved={fetchData}
+      />
       <Navbar />
     </Box>
   );
