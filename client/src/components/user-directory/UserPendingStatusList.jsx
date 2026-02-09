@@ -36,6 +36,7 @@ export const UserPendingStatusList = () => {
     error: errorDeleting,
   } = useDeleteUser();
 
+
   //When Approve Button is clicked, update user status to active
   const handleApprove = async (id) => {
     try {
@@ -43,8 +44,9 @@ export const UserPendingStatusList = () => {
     } catch (err) {
       console.error("Couldn't approve user", err);
     }
-  };
 
+  };
+    
   //When Deny Button is clicked, delete user from database
   const handleDeny = async (id) => {
     try {
