@@ -103,7 +103,7 @@ export default function ProviderTable({ providers, providerCategories, isLoading
   };
 
   if (isLoading) {
-    return <div> Loading providers and categories... </div>
+    return <Text> Loading providers and categories... </Text>
   }
   return (
     <TableContainer>

@@ -60,7 +60,7 @@ export const UserPendingStatusList = () => {
   };
 
   if (isLoading) {
-    return <div> Loading pending users... </div>;
+    return <Text> Loading pending users... </Text>;
   }
 
   return (

@@ -86,12 +86,9 @@ export const UserDirectory = () => {
     };
 
   if (isStatsLoading) {
-    return <div> User stats loading... </div>
+    return <Text> User stats loading... </Text>
   }
-  if (statsError) {
-  return <div>Failed to load user stats</div>;
-}
-
+  
   return (
     <Box
       p={6}

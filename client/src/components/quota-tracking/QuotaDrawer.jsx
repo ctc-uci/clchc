@@ -385,7 +385,7 @@ export default function QuotaDrawer({ quotaID = 0, isOpen: externalIsOpen, onOpe
   };
 
   if (isLoading) {
-    return <div> Loading quota </div>
+    return <Text> Loading quota </Text>
   }
 
   return (

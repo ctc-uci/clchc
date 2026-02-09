@@ -10,6 +10,7 @@ import {
   Th,
   Thead,
   Tr,
+  Text
 } from "@chakra-ui/react";
 
 export default function UserTable({ users, loading, onDelete}) {
@@ -23,7 +24,7 @@ export default function UserTable({ users, loading, onDelete}) {
   };
 
   if (loading) {
-    return <div> Loading users... </div>
+    return <Text> Loading users... </Text>
   }
   return (
     <TableContainer borderWidth="1px" borderColor="gray.200" borderRadius="lg">
