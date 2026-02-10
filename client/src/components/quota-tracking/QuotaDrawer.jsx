@@ -581,7 +581,7 @@ export default function QuotaDrawer({
 
   useEffect(() => {
     // Auto-calculate quota based on total hours and apptCalcFactor
-    if (!startTime || !endTime || apptCalcFactor === null) return;
+    if (!quotaID || !startTime || !endTime || apptCalcFactor === null) return;
 
     try {
       console.log(
@@ -613,7 +613,7 @@ export default function QuotaDrawer({
     } catch (err) {
       console.error("Error calculating quota:", err);
     }
-  }, [startTime, endTime, apptCalcFactor]);
+  }, [quotaID, startTime, endTime, apptCalcFactor]);
 
   useEffect(() => {
     // Initialize the form each time the drawer opens
