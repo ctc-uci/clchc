@@ -1,12 +1,12 @@
 import { Flex, Link } from "@chakra-ui/react";
 
 import { useAuthContext } from "@/contexts/hooks/useAuthContext";
-import { useRoleContext } from "@/contexts/hooks/useRoleContext";
+import { useUserContext } from "@/contexts/hooks/useUserContext";
 import { NavLink } from "react-router-dom";
 
 export const Navbar = () => {
   const { currentUser } = useAuthContext();
-  const { role, loading } = useRoleContext();
+  const { role, loading } = useUserContext();
 
   const baseLinkProps = {
     color: "white",
@@ -20,7 +20,7 @@ export const Navbar = () => {
   const activeStyle = ({ isActive }) =>
     isActive
       ? {
-          fontWeight: "1000"
+          fontWeight: "1000",
         }
       : undefined;
 

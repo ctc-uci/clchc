@@ -19,14 +19,14 @@ import { Navbar } from "@/components/layout/Navbar";
 import CategoryDrawer from "@/components/provider-directory/CategoryDrawer";
 import ProviderTable from "@/components/provider-directory/ProviderTable";
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
-import { useRoleContext } from "@/contexts/hooks/useRoleContext";
+import { useUserContext } from "@/contexts/hooks/useUserContext";
 import debounce from "lodash.debounce";
 
 export const ProviderDirectoryPage = () => {
   const [providers, setProviders] = useState(null);
   const [providerCategories, setProviderCategories] = useState(null);
   const [providerQuery, setProviderQuery] = useState("");
-  const { role, loading } = useRoleContext();
+  const { role, loading } = useUserContext();
   const {
     isOpen: isCreateDrawerOpen,
     onOpen: onCreateDrawerOpen,

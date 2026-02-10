@@ -1,5 +1,5 @@
 import { useAuthContext } from "@/contexts/hooks/useAuthContext";
-import { useRoleContext } from "@/contexts/hooks/useRoleContext";
+import { useUserContext } from "@/contexts/hooks/useUserContext";
 import { Navigate } from "react-router-dom";
 
 import type { User as DbUser } from "../types/user";
@@ -16,7 +16,7 @@ export const ProtectedRoute = ({
   allowedRoles = [],
 }: ProtectedRouteProps) => {
   const { currentUser } = useAuthContext();
-  const { role } = useRoleContext();
+  const { role } = useUserContext();
 
   const roles: DbUserRole[] = Array.isArray(allowedRoles)
     ? allowedRoles
