@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 
+import { LockIcon } from "@chakra-ui/icons";
 // import { Pencil } from 'lucide-react';
 
 import {
@@ -27,12 +28,11 @@ import {
   Text,
   useDisclosure,
 } from "@chakra-ui/react";
-import { LockIcon } from "@chakra-ui/icons";
 
+import { useAuthContext } from "@/contexts/hooks/useAuthContext";
 // bowen
 
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
-import { useAuthContext } from "@/contexts/hooks/useAuthContext";
 
 const MAX_INPUT_NUMBER = 99;
 
@@ -58,7 +58,10 @@ const selectStyles = {
 };
 
 const LockRightElement = () => (
-  <InputRightElement pointerEvents="none" color="gray.400">
+  <InputRightElement
+    pointerEvents="none"
+    color="gray.400"
+  >
     <LockIcon boxSize={3} />
   </InputRightElement>
 );
@@ -243,7 +246,10 @@ function QuotaProgress({ quota, setQuota, progress, setProgress, isLocked }) {
             height="92px"
             gap="40px"
           >
-            <Box position="relative" w="80px">
+            <Box
+              position="relative"
+              w="80px"
+            >
               <NumberInput
                 value={progress}
                 min={0}
@@ -290,7 +296,10 @@ function QuotaProgress({ quota, setQuota, progress, setProgress, isLocked }) {
               /
             </Text>
 
-            <Box position="relative" w="80px">
+            <Box
+              position="relative"
+              w="80px"
+            >
               <NumberInput
                 value={quota}
                 size="lg"
@@ -522,6 +531,7 @@ export default function QuotaDrawer({
   isOpen: externalIsOpen,
   onOpen: externalOnOpen,
   onClose: externalOnClose,
+  defaultDate,
 }) {
   const internalDisclosure = useDisclosure();
   const isOpen =
@@ -552,7 +562,7 @@ export default function QuotaDrawer({
         console.log("No currentUser available yet");
         return;
       }
-      
+
       try {
         console.log("Fetching user profile for:", currentUser.uid);
         const res = await backend.get(`/users/${currentUser.uid}`);
@@ -570,28 +580,40 @@ export default function QuotaDrawer({
   }, [currentUser, backend]);
 
   useEffect(() => {
-    // Auto-calculate endTime based on startTime and apptCalcFactor
-    if (!startTime || apptCalcFactor === null) return;
+    // Auto-calculate quota based on total hours and apptCalcFactor
+    if (!startTime || !endTime || apptCalcFactor === null) return;
 
     try {
-      console.log("Calculating end time with startTime:", startTime, "and apptCalcFactor:", apptCalcFactor);
-      const [hours, minutes] = startTime.split(':').map(Number);
-      if (isNaN(hours) || isNaN(minutes)) return;
+      console.log(
+        "Calculating quota with startTime:",
+        startTime,
+        "endTime:",
+        endTime,
+        "and apptCalcFactor:",
+        apptCalcFactor
+      );
+      
+      const [startHours, startMinutes] = startTime.split(":").map(Number);
+      const [endHours, endMinutes] = endTime.split(":").map(Number);
+      
+      if (isNaN(startHours) || isNaN(startMinutes) || isNaN(endHours) || isNaN(endMinutes)) return;
 
-      const startDate = new Date();
-      startDate.setHours(hours, minutes, 0, 0);
+      // Calculate total hours between start and end time
+      const startTotalMinutes = startHours * 60 + startMinutes;
+      const endTotalMinutes = endHours * 60 + endMinutes;
+      const totalHours = (endTotalMinutes - startTotalMinutes) / 60;
       
-      const hoursToAdd = apptCalcFactor;
-      startDate.setMinutes(startDate.getMinutes() + hoursToAdd * 60);
+      if (totalHours <= 0) return; // Invalid time range
+
+      // Calculate default quota: total hours * factor
+      const calculatedQuota = Math.round(totalHours * apptCalcFactor);
+      console.log("Calculated quota:", calculatedQuota);
       
-      const endHours = String(startDate.getHours()).padStart(2, '0');
-      const endMinutes = String(startDate.getMinutes()).padStart(2, '0');
-      
-      setEndTime(`${endHours}:${endMinutes}`);
+      setQuota(calculatedQuota);
     } catch (err) {
-      console.error("Error calculating end time:", err);
+      console.error("Error calculating quota:", err);
     }
-  }, [startTime, apptCalcFactor]);
+  }, [startTime, endTime, apptCalcFactor]);
 
   useEffect(() => {
     // Initialize the form each time the drawer opens
@@ -614,6 +636,7 @@ export default function QuotaDrawer({
         setNote(quotaData.notes ?? "");
         setQuota(quotaData.quota ?? 0);
         setProgress(quotaData.progress ?? 0);
+        setNote(quotaData.notes ?? "");
       } catch (err) {
         console.error("Error fetching quota details:", err);
       }
@@ -626,15 +649,13 @@ export default function QuotaDrawer({
       setLocationId("");
       setStartTime("");
       setEndTime("");
-      setDate("");
-      setType("");
+      setDate(defaultDate ? formatDateForInput(defaultDate) : "");
       setNote("");
       setQuota(0);
       setProgress(0);
       setIsLocked(false);
     }
-  }, [isOpen, quotaID, backend]);
-
+  }, [isOpen, quotaID, backend, defaultDate]);
   const handleTestFill = () => {
     if (!isDev || isLocked) return;
     setProviderId(1);

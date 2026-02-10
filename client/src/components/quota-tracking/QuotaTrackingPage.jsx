@@ -19,6 +19,7 @@ import { CustomCard } from "@/components/common/CustomCard";
 import Navbar from "@/components/layout/Navbar";
 import QuotaDrawer from "@/components/quota-tracking/QuotaDrawer";
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
+import { useRoleContext } from "@/contexts/hooks/useRoleContext";
 import debounce from "lodash.debounce";
 
 import QuotaTable from "./QuotaTable";
@@ -28,10 +29,13 @@ export const QuotaTracking = () => {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [providerQuery, setProviderQuery] = useState("");
+  const { role } = useRoleContext();
 
   // get current date and reformat
   const today = new Date();
-  const [selectedDate, setSelectedDate] = useState(today.toLocaleDateString("en-CA"));
+  const [selectedDate, setSelectedDate] = useState(
+    today.toLocaleDateString("en-CA")
+  );
 
   const {
     isOpen: isCreateDrawerOpen,
@@ -45,14 +49,14 @@ export const QuotaTracking = () => {
 
       let endpoint = `/quota/details`;
       const params = [];
-      
+
       if (provider) params.push(`provider=${provider}`);
       if (date) params.push(`date=${date}`);
 
       if (params.length) {
         endpoint += `?${params.join("&")}`;
       }
-      
+
       try {
         const response = await backend.get(endpoint);
         setRows(response.data);
@@ -89,7 +93,6 @@ export const QuotaTracking = () => {
     debouncedFetch(providerQuery, selectedDate);
   }, [providerQuery, selectedDate, fetchQuotas, debouncedFetch]);
 
-
   const handleChange = (e) => {
     setProviderQuery(e.target.value);
   };
@@ -118,7 +121,7 @@ export const QuotaTracking = () => {
               py={0.5}
               fontSize="xs"
             >
-              Master
+              {role ?? "Viewer"}
             </Badge>
           </Flex>
           <Text
@@ -140,9 +143,8 @@ export const QuotaTracking = () => {
               type="date"
               value={selectedDate}
               onChange={(e) => {
-                setSelectedDate(e.target.value)
-                }
-              }
+                setSelectedDate(e.target.value);
+              }}
             />
           </InputGroup>
         </Box>
@@ -227,6 +229,7 @@ export const QuotaTracking = () => {
         isOpen={isCreateDrawerOpen}
         onOpen={onCreateDrawerOpen}
         onClose={onCreateDrawerClose}
+        defaultDate={selectedDate}
       />
 
       <Navbar />
