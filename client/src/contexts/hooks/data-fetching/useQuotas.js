@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { api } from '@server/src/api.js'
+import { api } from '@/api.js'
 
 export const useQuotas = ({ date, provider } = {}) => {
   return useQuery({
