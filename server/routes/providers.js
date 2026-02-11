@@ -27,7 +27,30 @@ providersRouter.post("/", async (req, res) => {
 
 providersRouter.get("/", async (req, res) => {
   try {
-    const result = await db.any(`SELECT * FROM providers`);
+    const { search } = req.query;
+
+    let whereClause = "";
+    const values = [];
+    const conditions = [];
+
+    if (search) {
+      conditions.push(`data->>'Name' ILIKE $${values.length + 1}`);
+      values.push(`%${search}%`);
+    }
+
+    if (conditions.length > 0) {
+      whereClause = "WHERE " + conditions.join(" AND ");
+    }
+
+    const result = await db.any(
+      `
+      SELECT * FROM providers
+      ${whereClause}
+      ORDER BY id ASC
+      `,
+      values
+    );
+
     res.status(200).json(keysToCamel(result));
   } catch (err) {
     console.error(err);

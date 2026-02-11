@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { AddIcon, SearchIcon } from "@chakra-ui/icons";
 import {
@@ -20,7 +20,7 @@ import Navbar from "@/components/layout/Navbar";
 import QuotaDrawer from "@/components/quota-tracking/QuotaDrawer";
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 import { useRoleContext } from "@/contexts/hooks/useRoleContext";
-import debounce from "lodash.debounce";
+import { useDebounce } from "@/hooks/useDebounce";
 
 import QuotaTable from "./QuotaTable";
 
@@ -69,18 +69,7 @@ export const QuotaTracking = () => {
     [backend]
   );
 
-  const debouncedFetch = useMemo(() => {
-    return debounce((provider, date) => {
-      fetchQuotas(provider, date);
-    }, 300);
-  }, [fetchQuotas]);
-
-  // Handle cleanup
-  useEffect(() => {
-    return () => {
-      debouncedFetch.cancel();
-    };
-  }, [debouncedFetch]);
+  const debouncedFetch = useDebounce(fetchQuotas);
 
   useEffect(() => {
     debouncedFetch.cancel();

@@ -1,7 +1,7 @@
 import { Admin } from "@/components/admin/Admin";
 import { CatchAll } from "@/components/CatchAll";
 import { Dashboard } from "@/components/dashboard/Dashboard";
-import { Login } from "./components/login/Login";
+import { Login } from "@/components/login/Login";
 import { Playground } from "@/components/Playground";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { ProviderDirectoryPage } from "@/components/provider-directory/ProviderDirectoryPage";
@@ -12,6 +12,7 @@ import { PERSONAL_INFO, Settings } from "@/components/user-settings/Settings";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { BackendProvider } from "@/contexts/BackendContext";
 import { RoleProvider } from "@/contexts/RoleContext";
+import  Layout from "@/components/layout/layout"; 
 import { CookiesProvider } from "react-cookie";
 import {
   Navigate,
@@ -31,11 +32,12 @@ const App = () => {
           <RoleProvider>
             <Router>
               <Routes>
-                <Route
+                <Route element={<Layout/>}>
+                  <Route
                   path="/user-directory"
                   element={<UserDirectory />}
-                />
-                <Route
+                  />
+                  <Route
                   path="/settings"
                   element={
                     <ProtectedRoute
@@ -46,7 +48,16 @@ const App = () => {
                 <Route
                   path="/quota-tracking"
                   element={<QuotaTracking />}
-                />
+                  />
+                  <Route
+                  path="/provider-directory"
+                  element={<ProviderDirectoryPage />}
+                  />
+                  <Route
+                  path="/version-log"
+                  element={<VersionLogPage />}
+                  />
+                </Route>
                 <Route
                   path="/login"
                   element={<Login />}

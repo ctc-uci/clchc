@@ -31,7 +31,7 @@ export const UserDirectory = () => {
     const fetchUserInfo = async () => {
       try {
         const [usersRes, statsRes] = await Promise.all([
-          backend.get("/users-js"),
+          backend.get("/users"),
           backend.get("/users/stats"),
         ]);
 
@@ -51,7 +51,7 @@ export const UserDirectory = () => {
   // table delete
   const handleDelete = async (id) => {
     try {
-      await backend.delete(`/users-js/${id}`);
+      await backend.delete(`/users/${id}`);
       setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
     } catch (err) {
       console.error(
