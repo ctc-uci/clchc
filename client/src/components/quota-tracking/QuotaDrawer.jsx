@@ -581,7 +581,7 @@ export default function QuotaDrawer({
 
   useEffect(() => {
     // Auto-calculate quota based on total hours and apptCalcFactor
-    if (!quotaID || !startTime || !endTime || apptCalcFactor === null) return;
+    if (quotaID || !startTime || !endTime || apptCalcFactor === null) return;
 
     try {
       console.log(
@@ -592,23 +592,29 @@ export default function QuotaDrawer({
         "and apptCalcFactor:",
         apptCalcFactor
       );
-      
+
       const [startHours, startMinutes] = startTime.split(":").map(Number);
       const [endHours, endMinutes] = endTime.split(":").map(Number);
-      
-      if (isNaN(startHours) || isNaN(startMinutes) || isNaN(endHours) || isNaN(endMinutes)) return;
+
+      if (
+        isNaN(startHours) ||
+        isNaN(startMinutes) ||
+        isNaN(endHours) ||
+        isNaN(endMinutes)
+      )
+        return;
 
       // Calculate total hours between start and end time
       const startTotalMinutes = startHours * 60 + startMinutes;
       const endTotalMinutes = endHours * 60 + endMinutes;
       const totalHours = (endTotalMinutes - startTotalMinutes) / 60;
-      
+
       if (totalHours <= 0) return; // Invalid time range
 
       // Calculate default quota: total hours * factor
       const calculatedQuota = Math.round(totalHours * apptCalcFactor);
       console.log("Calculated quota:", calculatedQuota);
-      
+
       setQuota(calculatedQuota);
     } catch (err) {
       console.error("Error calculating quota:", err);
