@@ -565,7 +565,7 @@ export default function QuotaDrawer({
 
       try {
         console.log("Fetching user profile for:", currentUser.uid);
-        const res = await backend.get(`/users/${currentUser.uid}`);
+        const res = await backend.get(`/users/firebase/${currentUser.uid}`);
         const userData = res.data[0];
         console.log("User data:", userData);
         const factor = userData?.apptCalcFactor ?? null;
