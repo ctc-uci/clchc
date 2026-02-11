@@ -44,8 +44,8 @@ const App = () => {
                       element={<Settings view={PERSONAL_INFO} />}
                     />
                   }
-                  />
-                  <Route
+                />
+                <Route
                   path="/quota-tracking"
                   element={<QuotaTracking />}
                   />
@@ -67,6 +67,10 @@ const App = () => {
                   element={<PendingApprovalPage />}
                 />
                 <Route
+                  path="/pending-approval"
+                  element={<PendingApprovalPage />}
+                />
+                <Route
                   path="/signup"
                   element={<Signup />}
                 />
@@ -77,6 +81,14 @@ const App = () => {
                 <Route
                   path="/dashboard"
                   element={<ProtectedRoute element={<Dashboard />} />}
+                />
+                <Route
+                  path="/provider-directory"
+                  element={<ProviderDirectoryPage />}
+                />
+                <Route
+                  path="/version-log"
+                  element={<VersionLogPage />}
                 />
                 <Route
                   path="/admin"

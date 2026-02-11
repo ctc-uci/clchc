@@ -12,7 +12,6 @@
     "lint": "eslint",
     "format": "npx prettier --write .",
     "preview": "vite preview",
-    "postinstall": "patch-package",
     "test": "vitest --run",
     "test:watch": "vitest"
   },

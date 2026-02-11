@@ -27,9 +27,12 @@ import ProgressBar from "@/components/quota-tracking/ProgressBar";
 import QuotaDrawer from "@/components/quota-tracking/QuotaDrawer";
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 
+const SELECTED_BG = "#7fb3ec";
+
 const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
   const { backend } = useBackendContext();
   const [editingQuotaId, setEditingQuotaId] = useState(null);
+  const [selectedRowId, setSelectedRowId] = useState(null);
   const {
     isOpen: isDrawerOpen,
     onOpen: onDrawerOpen,
@@ -59,7 +62,10 @@ const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
     return (
       <Popover trigger="click">
         <PopoverTrigger>
-          <Box maxWidth="100px">
+          <Box
+            maxWidth="100px"
+            onClick={(e) => e.stopPropagation()}
+          >
             <Text
               isTruncated
               textDecoration="underline"
@@ -99,7 +105,11 @@ const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
   }
 
   return (
-    <TableContainer borderWidth="1px" borderColor="gray.200" borderRadius="lg">
+    <TableContainer
+      borderWidth="1px"
+      borderColor="gray.200"
+      borderRadius="lg"
+    >
       <Table variant="simple">
         <Thead bg="gray.50">
           <Tr>
@@ -108,13 +118,30 @@ const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
             <Th>Type</Th>
             <Th>Progress</Th>
             <Th>Notes</Th>
-            <Th></Th>
           </Tr>
         </Thead>
 
         <Tbody>
           {rows.map((row) => (
-            <Tr key={row.id}>
+            <Tr
+              key={row.id}
+              bg={selectedRowId === row.id ? SELECTED_BG : "transparent"}
+              onClick={() => {
+                if (selectedRowId === row.id) {
+                  // Second click - open drawer
+                  setEditingQuotaId(row.id);
+                  onDrawerOpen();
+                } else {
+                  // First click - highlight
+                  setSelectedRowId(row.id);
+                }
+              }}
+              cursor="pointer"
+              transition="background-color 0.2s"
+              _hover={{
+                bg: selectedRowId === row.id ? SELECTED_BG : "gray.50",
+              }}
+            >
               {/* Provider */}
               <Td>
                 <Box>
@@ -152,7 +179,9 @@ const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
 
               {/* Progress */}
               <Td>
-                <ProgressBar quotaID={row.id} />
+                <Box onClick={(e) => e.stopPropagation()}>
+                  <ProgressBar quotaID={row.id} />
+                </Box>
               </Td>
 
               {/* Notes */}
@@ -162,20 +191,6 @@ const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
                   initialNote={row.notes}
                   onSave={onSave}
                 ></EditableNote>
-              </Td>
-
-              {/* Edit */}
-              <Td textAlign="right">
-                <IconButton
-                  aria-label="Edit quota"
-                  icon={<EditIcon />}
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => {
-                    setEditingQuotaId(row.id);
-                    onDrawerOpen();
-                  }}
-                />
               </Td>
             </Tr>
           ))}
@@ -187,6 +202,7 @@ const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
         onOpen={onDrawerOpen}
         onClose={() => {
           setEditingQuotaId(null);
+          setSelectedRowId(null);
           onDrawerClose();
           if (onRowsUpdate) {
             // Trigger parent to refetch by passing a non-function value
