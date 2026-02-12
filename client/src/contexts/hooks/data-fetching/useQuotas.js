@@ -1,7 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { api } from '@/api.js'
+import { useApi } from '@/api.js'
 
 export const useQuotas = ({ date, provider } = {}) => {
+  const { quotas } = useApi()
+
   return useQuery({
     queryKey: ["quotas", { date, provider }],
     queryFn: async () => {
@@ -11,7 +13,7 @@ export const useQuotas = ({ date, provider } = {}) => {
       if (date) params.append("date", date);
       if (provider) params.append("provider", provider);
 
-      return api.quotas.getAll({ params });
+      return quotas.getAll({ params });
     },
     staleTime: 60 * 1000, // 1 min
     refetchInterval: 60 * 1000, // 1 min
@@ -19,10 +21,12 @@ export const useQuotas = ({ date, provider } = {}) => {
 };
 
 export const useQuotaById = (id, enabled = true) => {
+  const { quotas } = useApi()
+
   return useQuery({
     queryKey: ["quota", id],
     queryFn: async () => {
-      const res = await api.quotas.getById(id)
+      const res = await quotas.getById(id)
       const quota = Array.isArray(res) ? res[0] : res;
       console.log("Fetching quota by id (react-query)", id, quota);
       return quota;
@@ -34,10 +38,11 @@ export const useQuotaById = (id, enabled = true) => {
 
 export const useUpdateQuota = () => {
   const queryClient = useQueryClient();
+  const { quotas } = useApi()
 
   return useMutation({
     mutationFn: ({ id, data }) => {
-      return api.quotas.update(id, data)
+      return quotas.update(id, data)
     },
     onSuccess: () => {
       // Refetch after mutation to update frontend data
@@ -49,9 +54,10 @@ export const useUpdateQuota = () => {
 
 export const useCreateQuota = () => {
   const queryClient = useQueryClient();
+  const { quotas } = useApi()
   
   return useMutation({
-    mutationFn: (newQuota) => api.quotas.create(newQuota),
+    mutationFn: (newQuota) => quotas.create(newQuota),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["quotas"] });
       queryClient.invalidateQueries({ queryKey: ["quota"], exact: false });

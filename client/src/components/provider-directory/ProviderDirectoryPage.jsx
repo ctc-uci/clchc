@@ -25,8 +25,8 @@ import { useDirectoryCategories } from "@/contexts/hooks/data-fetching/useDirect
 import debounce from "lodash.debounce";
 
 export const ProviderDirectoryPage = () => {
-  const [providers, setProviders] = useState(null);
-  const [providerCategories, setProviderCategories] = useState(null);
+  // const [providers, setProviders] = useState(null);
+  // const [providerCategories, setProviderCategories] = useState(null);
   const [providerQuery, setProviderQuery] = useState("");
   const { role, loading } = useRoleContext();
   const {
@@ -44,10 +44,6 @@ export const ProviderDirectoryPage = () => {
     isLoading: loadingCategories,
     error: errorCategories,
   } = useDirectoryCategories();
-    isOpen: isCreateDrawerOpen,
-    onOpen: onCreateDrawerOpen,
-    onClose: onCreateDrawerClose,
-  } = useDisclosure();
 
   const { backend } = useBackendContext();
 

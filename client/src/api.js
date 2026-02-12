@@ -1,143 +1,76 @@
-const API_BASE = "http://localhost:3001"; // in production, will need to supply an alternate API_BASE for our backend
+import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 
-export const api = {
-  providers: {
-    getAll: async () => {
-      const res = await fetch(`${API_BASE}/providers`);
-      if (!res.ok) {
-        throw new Error(`Failed to fetch providers: ${res.status}`);
-      }
-      return res.json();
-    },
-    getSummary: async () => {
-        const res = await fetch(`${API_BASE}/providers/summary`);
-        if (!res.ok) {
-            throw new Error(`Failed to fetch providers: ${res.status}`);
-        }
-        return res.json();
-    }
-  },
-  directoryCategories: {
-    getAll: async () => {
-      const res = await fetch(`${API_BASE}/directoryCategories`);
-      if (!res.ok) {
-        throw new Error(`Failed to get directory categories: ${res.status}`);
-      }
-      return res.json();
-    },
-    create: async (data) => {
-      const res = await fetch(`${API_BASE}/directoryCategories`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-        credentials: "include",
-      });
-      if (!res.ok) {
-        throw new Error(`Failed to create category: ${res.status}`);
-      }
-      return res.json();
-    },
-  },
-  tags: {
-    getAll: async () => {
-      const res = await fetch(`${API_BASE}/tags`);
-      if (!res.ok) {
-        throw new Error(`Failed to get tags: ${res.status}`);
-      }
-      return res.json();
-    },
-  },
-  quotas: {
-    getAll: async ({ params }) => {
-      let url = `${API_BASE}/quota/details`;
-      if (params instanceof URLSearchParams) {
-        url += `?${params.toString()}`;
-      }
+export const useApi = () => {
+  const { backend } = useBackendContext();
 
-      const res = await fetch(url);
-      if (!res.ok) {
-        throw new Error(`Failed to getch quotas: ${res.status}`);
-      }
-      return res.json();
+  return {
+    providers: {
+      getAll: async () => {
+        const res = await backend.get("/providers");
+        return res.data;
+      },
+      getSummary: async () => {
+        const res = await backend.get("/providers/summary");
+        return res.data;
+      },
     },
-    getById: async (id) => {
-      const res = await fetch(`${API_BASE}/quota/${id}`);
-      if (!res.ok) {
-        throw new Error(`Failed to fetch quota ${id}: ${res.status}`);
-      }
-      return res.json();
+    directoryCategories: {
+      getAll: async () => {
+        const res = await backend.get("/directoryCategories");
+        return res.data;
+      },
+      create: async (data) => {
+        const res = await backend.post("/directoryCategories", data);
+        return res.data;
+      },
     },
-    update: async (id, data) => {
-      const res = await fetch(`${API_BASE}/quota/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!res.ok) {
-        throw new Error(`Failed to update quota ${id}: ${res.status}`);
-      }
-      return res.json();
+    tags: {
+      getAll: async () => {
+        const res = await backend.get("/tags");
+        return res.data;
+      },
     },
-    create: async (data) => {
-      const res = await fetch(`${API_BASE}/quota`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!res.ok) {
-        throw new Error(`Failed to create quota: ${res.status}`);
-      }
-      return res.json();
+    quotas: {
+      getAll: async ({ params }) => {
+        const res = await backend.get("/quota/details", { params });
+        return res.data;
+      },
+      getById: async (id) => {
+        const res = await backend.get(`/quota/${id}`);
+        return res.data;
+      },
+      update: async (id, data) => {
+        const res = await backend.put(`/quota/${id}`, data);
+        return res.data;
+      },
+      create: async (data) => {
+        const res = await backend.post("/quota", data);
+        return res.data;
+      },
     },
-  },
-  users: {
-    getAll: async ({ params }) => {
-        let url = `${API_BASE}/users`;
-      if (params instanceof URLSearchParams) {
-        url += `?${params.toString()}`;
-      }
-      const res = await fetch(url);
-      if (!res.ok) {
-        throw new Error(`Failed to get users: ${res.status}`);
-      }
-      return res.json();
+    users: {
+      getAll: async ({ params }) => {
+        const res = await backend.get("/users", { params });
+        return res.data;
+      },
+      getAllStats: async () => {
+        const res = await backend.get("/users/stats");
+        return res.data;
+      },
+      delete: async (id) => {
+        const res = await backend.delete(`/users/${id}`);
+        return res.data;
+      },
+      update: async (id, data) => {
+        const res = await backend.put(`/users/${id}`, data);
+        return res.data;
+      },
     },
-    getAllStats: async () => {
-      const res = await fetch(`${API_BASE}/users/stats`);
-      if (!res.ok) {
-        throw new Error(`Failed to get user stats: ${res.status}`);
-      }
-      return res.json();
+    locations: {
+      getAll: async () => {
+        const res = await backend.get("/location");
+        return res.data;
+      },
     },
-    delete: async (id) => {
-      const res = await fetch(`${API_BASE}/users/${id}`, {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-      });
-      if (!res.ok) {
-        throw new Error(`Failed to delete user ${id}: ${res.status}`);
-      }
-      return res.json();
-    },
-    update: async (id, data) => {
-      const res = await fetch(`${API_BASE}/users/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!res.ok) {
-        throw new Error(`Failed to update quota ${id}: ${res.status}`);
-      }
-      return res.json();
-    },
-  },
-  locations: {
-    getAll: async () => {
-      const res = await fetch(`${API_BASE}/location`);
-      if (!res.ok) {
-        throw new Error(`Failed to get locations: ${res.status}`);
-      }
-      return res.json();
-    },
-  }
+  };
 };

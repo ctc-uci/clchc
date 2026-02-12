@@ -1,7 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { api } from '@/api.js'
+import { useApi } from '@/api.js'
 
 export const useUsers = ({ user, status } = {}) => {
+  const { users } = useApi()
+
   return useQuery({
     queryKey: ['users', { user, status }],
     queryFn: async () => {
@@ -11,7 +13,7 @@ export const useUsers = ({ user, status } = {}) => {
       if (user) params.append("user", user);
       if (status) params.append("status", status)
 
-      return api.users.getAll({ params });
+      return users.getAll({ params });
     },
     staleTime: 60 * 1000, // 1 min
     refetchInterval: 60 * 1000, // 1 min
@@ -19,12 +21,14 @@ export const useUsers = ({ user, status } = {}) => {
 }
 
 export function useUsersStats() {
+  const { users } = useApi()
+
   return useQuery({
     queryKey: ['usersStats'],
     queryFn: async () => {
       console.log("Fetching users stats (react-query)");
 
-      return api.users.getAllStats();
+      return users.getAllStats();
     },
     staleTime: 60 * 1000, // 1 min
     refetchInterval: 60 * 1000, // 1 min
@@ -32,11 +36,12 @@ export function useUsersStats() {
 }
 
 export const useUpdateUser = () => {
+  const { users } = useApi()
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: ({ id, data }) => {
-      return api.users.update(id, data)
+      return users.update(id, data)
     },
     onSuccess: () => {
       // Refetch after mutation to update frontend data

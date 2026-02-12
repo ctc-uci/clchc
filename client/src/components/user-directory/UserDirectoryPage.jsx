@@ -20,18 +20,21 @@ import debounce from "lodash.debounce";
 import { useUsers, useUsersStats, useDeleteUser } from "@/contexts/hooks/data-fetching/useUsers";
 import UserTable from "./UserTable";
 import {UserPendingStatusList} from "./UserPendingStatusList";
+import { useDebounce } from "@/hooks/useDebounce";
 
 export const UserDirectory = () => {
   const { backend } = useContext(BackendContext);
   const [searchQuery, setSearchQuery] = useState("");
-  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
-  const [ userId, setUserId ] = useState(null)
+  const debouncedSearchQuery = useDebounce(
+    (value) => setSearchQuery(value),
+    300
+  );
   const {
       data: users,
       isLoading,
       error,
       refetch,
-  } = useUsers({ user: debouncedSearchQuery, status: "approved" });
+  } = useUsers({ user: searchQuery, status: "approved" });
   const {
     data: userStats = [],
     isStatsLoading,
@@ -57,33 +60,9 @@ export const UserDirectory = () => {
     }
   };
 
-  const debouncedFetch = useMemo(() => {
-      return debounce(() => {
-        refetch();
-      }, 300);
-    }, [refetch]);
-  
-    useEffect(() => {
-      const handler = setTimeout(() => {
-        setDebouncedSearchQuery(searchQuery);
-      }, 300);
-  
-      return () => clearTimeout(handler);
-    }, [searchQuery]);
-  
-    useEffect(() => {
-      if (!searchQuery) return; // no fetch if search is empty
-  
-      debouncedFetch();
-  
-      return () => {
-        debouncedFetch.cancel();
-      };
-    }, [searchQuery, debouncedFetch]);
-  
-    const handleChange = (e) => {
-      setSearchQuery(e.target.value);
-    };
+  const handleChange = (e) => {
+    debouncedSearchQuery(e.target.value);
+  };
 
   if (isStatsLoading) {
     return <Text> User stats loading... </Text>
@@ -188,7 +167,7 @@ export const UserDirectory = () => {
         <Input
           placeholder="Search by name or email..."
           borderRadius="md"
-          value={searchQuery}
+          // value={searchQuery}
           onChange={handleChange}
         />
       </InputGroup>
