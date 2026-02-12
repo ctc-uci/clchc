@@ -1,28 +1,39 @@
-import { Flex, Link, Box } from "@chakra-ui/react";
+import { Box, Flex, Link } from "@chakra-ui/react";
 
 import { useAuthContext } from "@/contexts/hooks/useAuthContext";
 import { useRoleContext } from "@/contexts/hooks/useRoleContext";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
+
+const useIsActive = (pathname) => {
+  const location = useLocation();
+  return location.pathname === pathname;
+};
 
 export const Navbar = () => {
   const { currentUser } = useAuthContext();
   const { role, loading } = useRoleContext();
+  const isQuotaActive = useIsActive("/quota-tracking");
+  const isProviderActive = useIsActive("/provider-directory");
+  const isUserActive = useIsActive("/user-directory");
+  const isVersionActive = useIsActive("/version-log");
+  const isSettingsActive = useIsActive("/settings");
 
-  const baseLinkProps = {
+  const getLinkProps = (isActive) => ({
     color: "white",
     px: 2,
     py: 1,
     borderRadius: "md",
     fontSize: { base: "8px", sm: "14px" },
-    _hover: { textUnderlineOffset: "3px", fontWeight: "550" },
-  };
-
-  const activeStyle = ({ isActive }) =>
-    isActive
-      ? {
-        fontWeight: "1000"
-      }
-      : undefined;
+    fontWeight: isActive ? "700" : "400",
+    textDecoration: "none",
+    _hover: {
+      textShadow: "0 0 0.5px white, 0 0 0.5px white",
+      textDecoration: "none",
+    },
+    _active: {
+      fontWeight: "400",
+    },
+  });
 
   return (
     <>
@@ -37,15 +48,13 @@ export const Navbar = () => {
         bgGradient="linear(to-t, white, transparent)"
       />
       <Flex
-        // Positioning
         position="fixed"
-        bottom="5vh" // Replaces marginTp: stays near bottom regardless of screen height
-        left="50%" // Moves to center
-        transform="translateX(-50%)" // Perfectly centers the bar
-        // Styling
+        bottom="5vh"
+        left="50%"
+        transform="translateX(-50%)"
         bg="black"
-        w={{ base: "90%", md: "56%" }} // Wider on mobile (90%), thinner on desktop (56%)
-        h="60px" // Fixed height is usually safer for navbars than %
+        w={{ base: "90%", md: "56%" }}
+        h="60px"
         borderRadius="16px"
         align="center"
         justify="space-evenly"
@@ -60,8 +69,7 @@ export const Navbar = () => {
           <Link
             as={NavLink}
             to="/quota-tracking"
-            style={activeStyle}
-            {...baseLinkProps}
+            {...getLinkProps(isQuotaActive)}
           >
             Quota Tracking
           </Link>
@@ -69,8 +77,7 @@ export const Navbar = () => {
           <Link
             as={NavLink}
             to="/provider-directory"
-            style={activeStyle}
-            {...baseLinkProps}
+            {...getLinkProps(isProviderActive)}
           >
             Provider Directory
           </Link>
@@ -80,16 +87,14 @@ export const Navbar = () => {
               <Link
                 as={NavLink}
                 to="/user-directory"
-                style={activeStyle}
-                {...baseLinkProps}
+                {...getLinkProps(isUserActive)}
               >
                 User Directory
               </Link>
               <Link
                 as={NavLink}
                 to="/version-log"
-                style={activeStyle}
-                {...baseLinkProps}
+                {...getLinkProps(isVersionActive)}
               >
                 Version Log
               </Link>
@@ -101,15 +106,13 @@ export const Navbar = () => {
           <Link
             as={NavLink}
             to="/settings"
-            style={activeStyle}
-            {...baseLinkProps}
+            {...getLinkProps(isSettingsActive)}
           >
             Settings
           </Link>
         </Flex>
       </Flex>
     </>
-
   );
 };
 
