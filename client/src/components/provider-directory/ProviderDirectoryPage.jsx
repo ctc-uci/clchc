@@ -22,12 +22,16 @@ import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 import { useRoleContext } from "@/contexts/hooks/useRoleContext";
 import { useProviders } from "@/contexts/hooks/data-fetching/useProviders";
 import { useDirectoryCategories } from "@/contexts/hooks/data-fetching/useDirectoryCategories";
-import debounce from "lodash.debounce";
+import { useDebounce } from "@/hooks/useDebounce";
 
 export const ProviderDirectoryPage = () => {
   // const [providers, setProviders] = useState(null);
   // const [providerCategories, setProviderCategories] = useState(null);
   const [providerQuery, setProviderQuery] = useState("");
+  const debouncedProviderQuery = useDebounce(
+  (value) => setProviderQuery(value),
+  300
+);
   const { role, loading } = useRoleContext();
   const {
       isOpen: isCreateDrawerOpen,
@@ -38,56 +42,37 @@ export const ProviderDirectoryPage = () => {
     data: providers = [],
     isLoading,
     error,
-  } = useProviders();
+    refetch: refetchProviders
+  } = useProviders({
+    query: providerQuery
+  });
   const {
     data: providerCategories = [],
     isLoading: loadingCategories,
     error: errorCategories,
+    refetch: refetchCategories
   } = useDirectoryCategories();
 
   const { backend } = useBackendContext();
 
-  const fetchData = async (provider = "") => {
-    let endpoint = "/providers";
+  // const fetchData = async (provider = "") => {
+  //   let endpoint = "/providers";
 
-    if (provider) {
-      endpoint += `?search=${provider}`;
-    }
+  //   if (provider) {
+  //     endpoint += `?search=${provider}`;
+  //   }
 
-    const [providerData, catData] = await Promise.all([
-      backend.get(endpoint),
-      backend.get("/directoryCategories"),
-    ]);
+  //   const [providerData, catData] = await Promise.all([
+  //     backend.get(endpoint),
+  //     backend.get("/directoryCategories"),
+  //   ]);
 
-    setProviders(providerData.data);
-    setProviderCategories(catData.data);
-  };
-
-  const debouncedFetch = useMemo(() => {
-    return debounce((provider) => {
-      fetchData(provider);
-    }, 300);
-  }, [fetchData]);
-
-  useEffect(() => {
-    return () => {
-      debouncedFetch.cancel();
-    };
-  }, [debouncedFetch]);
-
-  useEffect(() => {
-    debouncedFetch.cancel();
-
-    if (!providerQuery) {
-      fetchData("");
-      return;
-    }
-
-    debouncedFetch(providerQuery);
-  }, [providerQuery, fetchData, debouncedFetch]);
+  //   setProviders(providerData.data);
+  //   setProviderCategories(catData.data);
+  // };
 
   const handleChange = (e) => {
-    setProviderQuery(e.target.value);
+    debouncedProviderQuery(e.target.value);
   };
 
   return (
@@ -184,7 +169,7 @@ export const ProviderDirectoryPage = () => {
         isOpen={isCreateDrawerOpen}
         onOpen={onCreateDrawerOpen}
         onClose={onCreateDrawerClose}
-        onSaved={fetchData}
+        onSaved={refetchCategories}
       />
       <Navbar />
     </Box>

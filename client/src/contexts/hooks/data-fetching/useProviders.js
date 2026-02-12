@@ -1,15 +1,18 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useApi } from '@/api.js'
 
-export function useProviders() {
+export function useProviders({ query } = {}) {
   const { providers } = useApi()
 
   return useQuery({
-    queryKey: ['providers'],
+    queryKey: ['providers', query],
     queryFn: async () => {
-      console.log("Fetching providers (react-query)");
+      console.log("Fetching providers (react-query)", query);
 
-      return providers.getAll();
+      const params = new URLSearchParams();
+      if (query) params.append("search", query);
+
+      return providers.getAll({ params });
     },
     staleTime: 60 * 1000, 
     refetchInterval: 60 * 1000, // 1 min

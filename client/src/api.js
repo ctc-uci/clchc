@@ -5,8 +5,8 @@ export const useApi = () => {
 
   return {
     providers: {
-      getAll: async () => {
-        const res = await backend.get("/providers");
+      getAll: async ({ params }) => {
+        const res = await backend.get("/providers", { params });
         return res.data;
       },
       getSummary: async () => {
