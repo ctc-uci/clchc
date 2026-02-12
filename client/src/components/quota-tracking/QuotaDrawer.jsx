@@ -35,6 +35,7 @@ import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 import { useCreateQuota, useQuotaById, useUpdateQuota } from "@/contexts/hooks/data-fetching/useQuotas";
 import { useProvidersSummary } from "@/contexts/hooks/data-fetching/useProviders";
 import { useLocations } from "@/contexts/hooks/data-fetching/useLocations";
+import { useUserByFirebaseUid } from "@/contexts/hooks/data-fetching/useUsers";
 
 const MAX_INPUT_NUMBER = 99;
 
@@ -582,7 +583,7 @@ export default function QuotaDrawer({
     } = useUpdateQuota();
 
   const [providerId, setProviderId] = useState("");
-  const [apptCalcFactor, setApptCalcFactor] = useState(null);
+  // const [apptCalcFactor, setApptCalcFactor] = useState(null);
   const [locationId, setLocationId] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
@@ -595,32 +596,41 @@ export default function QuotaDrawer({
   // const [lockEdit, setLockEdit] = useState(false);
   const isDev = import.meta.env?.DEV;
 
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      if (!currentUser?.uid) {
-        console.log("No currentUser available yet");
-        return;
-      }
+  const {
+    data: userData,
+    isLoading: loadingCurrentUser,
+    error: errorCurrentUser
+  } = useUserByFirebaseUid(currentUser.uid)
+  // console.log(userData)
+  const apptCalcFactor = userData?.[0]?.apptCalcFactor ?? null;
+  // console.log(apptCalcFactor)
 
-      try {
-        // console.log("Fetching user profile for:", currentUser.uid);
-        const res = await backend.get(`/users/firebase/${currentUser.uid}`);
-        const userData = res.data[0];
-        // console.log("User data:", userData);
-        const factor = userData?.apptCalcFactor ?? null;
-        // console.log("apptCalcFactor:", factor);
-        setApptCalcFactor(factor);
-      } catch (err) {
-        console.error("Error fetching user profile:", err);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchUserProfile = async () => {
+  //     if (!currentUser?.uid) {
+  //       console.log("No currentUser available yet");
+  //       return;
+  //     }
 
-    fetchUserProfile();
-  }, [currentUser, backend]);
+  //     try {
+  //       // console.log("Fetching user profile for:", currentUser.uid);
+  //       const res = await backend.get(`/users/firebase/${currentUser.uid}`);
+  //       const userData = res.data[0];
+  //       // console.log("User data:", userData);
+  //       const factor = userData?.apptCalcFactor ?? null;
+  //       // console.log("apptCalcFactor:", factor);
+  //       setApptCalcFactor(factor);
+  //     } catch (err) {
+  //       console.error("Error fetching user profile:", err);
+  //     }
+  //   };
+
+  //   fetchUserProfile();
+  // }, [currentUser, backend]);
 
   useEffect(() => {
     // Auto-calculate quota based on total hours and apptCalcFactor
-    if (quotaID || !startTime || !endTime || apptCalcFactor === null) return;
+    if (!startTime || !endTime || !apptCalcFactor) return;
 
     try {
       console.log(
@@ -715,11 +725,6 @@ export default function QuotaDrawer({
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (isLocked) {
-      handleClose();
-      return;
-    }
-
     const formData = {
       providerId,
       locationId,
@@ -733,16 +738,21 @@ export default function QuotaDrawer({
       notes: note,
     };
 
+    if (!isLocked) {
+      setIsLocked(true);
+      return;
+    }
+
     try {
       if (quotaID) {
-        console.log("Updating quota with ID:", quotaID, "Data:", formData);
-        await backend.put(`/quota/${quotaID}`, formData);
-        setIsLocked(true);
+        // console.log("Updating quota with ID:", quotaID, "Data:", formData);
+        // await backend.put(`/quota/${quotaID}`, formData);
+        await updateQuota({id: quotaID, data: formData})
       } else {
-        await backend.post("/quota", formData);
-        setIsLocked(true);
+        // await backend.post("/quota", formData);
+        await createQuota(formData)
       }
-
+      handleClose()
       // TODO: Should we redirect to the new quota page?
     } catch (err) {
       console.error("Error creating a new quota:", err);

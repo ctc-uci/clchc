@@ -57,6 +57,10 @@ export const useApi = () => {
         const res = await backend.get("/users/stats");
         return res.data;
       },
+      getByFirebaseUid: async(uid) => {
+        const res = await backend.get(`/users/firebase/${uid}`);
+        return res.data;
+      },
       delete: async (id) => {
         const res = await backend.delete(`/users/${id}`);
         return res.data;
@@ -77,6 +81,6 @@ export const useApi = () => {
         const res = await backend.get("/versionLog/details", { params });
         return res.data;
       }
-    }
+    },
   };
 };

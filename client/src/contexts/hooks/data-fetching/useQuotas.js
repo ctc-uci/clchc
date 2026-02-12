@@ -28,7 +28,7 @@ export const useQuotaById = (id, enabled = true) => {
     queryFn: async () => {
       const res = await quotas.getById(id)
       const quota = Array.isArray(res) ? res[0] : res;
-      console.log("Fetching quota by id (react-query)", id, quota);
+      // console.log("Fetching quota by id (react-query)", id, quota);
       return quota;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes

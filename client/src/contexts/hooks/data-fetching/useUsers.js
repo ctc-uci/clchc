@@ -20,6 +20,20 @@ export const useUsers = ({ user, status } = {}) => {
   });
 }
 
+export const useUserByFirebaseUid = (uid) => {
+  const { users } = useApi()
+
+  return useQuery({
+    queryKey: ["user", uid],
+    queryFn: async () => {
+      console.log("Fetching user by firebase uid (react-query)", uid);
+      return users.getByFirebaseUid(uid);
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchInterval: 60 * 1000
+  });
+};
+
 export function useUsersStats() {
   const { users } = useApi()
 
