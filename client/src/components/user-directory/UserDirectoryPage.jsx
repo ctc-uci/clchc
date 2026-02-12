@@ -26,7 +26,7 @@ export const UserDirectory = () => {
   const [users, setUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [userStats, setUserStats] = useState({});
-  const [selectedRole, setSelectedRole] = useState("All Roles");
+  const [selectedRole, setSelectedRole] = useState("all");
 
   useEffect(() => {
     // Fetches users and user stats in parallel
@@ -68,7 +68,14 @@ export const UserDirectory = () => {
     const lowerQuery = searchQuery.toLowerCase();
     const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
     const email = user.email.toLowerCase();
-    return fullName.includes(lowerQuery) || email.includes(lowerQuery);
+
+    const matchesSearch =
+      fullName.includes(lowerQuery) || email.includes(lowerQuery);
+
+    const matchesRole =
+      selectedRole === "all" || user.role === selectedRole;
+
+    return matchesSearch && matchesRole;
   });
 
   return (
@@ -177,7 +184,7 @@ export const UserDirectory = () => {
           />
         </InputGroup>
 
-        <UserRoleFilter 
+        <UserRoleFilter
           selectedRole={selectedRole}
           onChange={setSelectedRole}
         />
