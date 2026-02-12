@@ -72,5 +72,11 @@ export const useApi = () => {
         return res.data;
       },
     },
+    versionLogs: {
+      getAll: async ({ params }) => {
+        const res = await backend.get("/versionLog/details", { params });
+        return res.data;
+      }
+    }
   };
 };

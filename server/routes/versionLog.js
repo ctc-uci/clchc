@@ -43,7 +43,22 @@ versionLogRouter.get("/details", async (req, res) => {
   const { q } = req.query;
 
   try {
-    const versionLogs = await db.query(
+    // Prepare dynamic conditions
+    const conditions = [];
+    const values = [];
+
+    if (q) {
+      values.push(`%${q}%`);
+      conditions.push(`
+        "users".first_name ILIKE $${values.length} OR
+        "users".last_name ILIKE $${values.length} OR
+        providers.data->>'Name' ILIKE $${values.length}
+      `);
+    }
+
+    const whereClause = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
+
+    const results = await db.query(
       `
       SELECT
         version_log.id AS id,
@@ -57,24 +72,13 @@ versionLogRouter.get("/details", async (req, res) => {
       JOIN quota ON version_log.quota_id = quota.id
       JOIN "users" ON version_log.user_id = "users".id
       JOIN providers ON quota.provider_id = providers.id
-      WHERE (
-        $1::text IS NULL
-        OR "users".first_name ILIKE '%' || $1 || '%'
-        OR "users".last_name ILIKE '%' || $1 || '%'
-        OR providers.data->>'Name' ILIKE '%' || $1 || '%'
-      )
+      ${whereClause}
       ORDER BY version_log.id ASC
       `,
-      [q ?? null]
+      values
     );
 
-    if (!versionLogs) {
-      return res
-        .status(404)
-        .json({ error: `Version log details with id ${id} not found.` });
-    }
-
-    res.status(200).json(keysToCamel(versionLogs));
+    res.status(200).json(keysToCamel(results));
   } catch (err) {
     res.status(400).send(err.message);
   }
