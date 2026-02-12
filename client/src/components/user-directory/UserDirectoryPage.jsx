@@ -23,7 +23,7 @@ import {UserPendingStatusList} from "./UserPendingStatusList";
 import { useDebounce } from "@/hooks/useDebounce";
 
 export const UserDirectory = () => {
-  const { backend } = useContext(BackendContext);
+  // const { backend } = useContext(BackendContext);
   const [searchQuery, setSearchQuery] = useState("");
   const debouncedSearchQuery = useDebounce(
     (value) => setSearchQuery(value),

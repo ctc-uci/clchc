@@ -569,7 +569,7 @@ export default function QuotaDrawer({
   const onOpen = externalOnOpen || internalDisclosure.onOpen;
   const onClose = externalOnClose || internalDisclosure.onClose;
   const btnRef = React.useRef();
-  const { backend } = useBackendContext();
+  // const { backend } = useBackendContext();
   const { currentUser } = useAuthContext();
   const [quota, setQuota] = useState(0);
   const {
@@ -715,7 +715,7 @@ export default function QuotaDrawer({
       setProgress(0);
       setIsLocked(false);
     }
-  }, [isOpen, quotaID, backend, defaultDate]);
+  }, [isOpen, quotaID, defaultDate]);
   const handleTestFill = () => {
     if (!isDev || isLocked) return;
     setProviderId(1);

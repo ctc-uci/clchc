@@ -26,7 +26,7 @@ import { useQuotas } from "@/contexts/hooks/data-fetching/useQuotas";
 import QuotaTable from "./QuotaTable";
 
 export const QuotaTracking = () => {
-  const { backend } = useBackendContext()
+  // const { backend } = useBackendContext()
   const [rows, setRows] = useState([]);
   const [providerQuery, setProviderQuery] = useState("");
   // const [debouncedProviderQuery, setDebouncedProviderQuery] = useState("");
