@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 
-import { InfoOutlineIcon, SearchIcon } from "@chakra-ui/icons";
+import { SearchIcon } from "@chakra-ui/icons";
 import {
   Badge,
   Box,
@@ -27,6 +27,11 @@ export const UserDirectory = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [userStats, setUserStats] = useState({});
   const [selectedRole, setSelectedRole] = useState("all");
+
+  // Keep filter in state so changing role doesn't refresh the page (client-side only)
+  const handleRoleChange = (value) => {
+    setSelectedRole(Array.isArray(value) ? value[0] ?? "all" : value ?? "all");
+  };
 
   useEffect(() => {
     // Fetches users and user stats in parallel
@@ -186,7 +191,7 @@ export const UserDirectory = () => {
 
         <UserRoleFilter
           selectedRole={selectedRole}
-          onChange={setSelectedRole}
+          onChange={handleRoleChange}
         />
       </Flex>
 

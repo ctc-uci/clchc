@@ -25,6 +25,7 @@ export default function UserRoleFilter({ selectedRole, onChange }) {
     <Menu closeOnSelect={false}>
       <MenuButton
         as={Button}
+        type="button"
         colorScheme="blackAlpha"
         leftIcon={<FiFilter />}
         rightIcon={<ChevronDownIcon />}
