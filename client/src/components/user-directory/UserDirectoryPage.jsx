@@ -26,6 +26,7 @@ export const UserDirectory = () => {
   const [users, setUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [userStats, setUserStats] = useState({});
+  const [selectedRole, setSelectedRole] = useState("All Roles");
 
   useEffect(() => {
     // Fetches users and user stats in parallel
@@ -169,14 +170,17 @@ export const UserDirectory = () => {
             <SearchIcon color="gray.400" />
           </InputLeftElement>
           <Input
-            placeholder="Search by name or email..."
+            placeholder="Search Providers"
             borderRadius="md"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </InputGroup>
 
-        <UserRoleFilter />
+        <UserRoleFilter 
+          selectedRole={selectedRole}
+          onChange={setSelectedRole}
+        />
       </Flex>
 
       <UserTable

@@ -13,7 +13,7 @@ import {
 
 import { FiFilter } from "react-icons/fi";
 
-export default function UserRoleFilter({ selectedRoles, onChange }) {
+export default function UserRoleFilter({ selectedRole, onChange }) {
   const roles = [
     "All Roles",
     "Call Center Manager",
@@ -33,8 +33,8 @@ export default function UserRoleFilter({ selectedRoles, onChange }) {
       </MenuButton>
       <MenuList>
         <MenuOptionGroup
-          type="checkbox"
-          value={selectedRoles}
+          type="radio"
+          value={selectedRole}
           onChange={onChange}
         >
           {roles.map((role) => (
@@ -42,7 +42,7 @@ export default function UserRoleFilter({ selectedRoles, onChange }) {
               key={role}
               value={role}
             >
-              {role.charAt(0).toUpperCase() + role.slice(1)}
+              {role}
             </MenuItemOption>
           ))}
         </MenuOptionGroup>
