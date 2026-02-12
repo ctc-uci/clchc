@@ -131,7 +131,7 @@ export const Login = () => {
         sx={{ width: 500, marginX: "auto" }}
       >
         <Image
-          src="/clchc-logo.web"
+          src="/clchc-logo.webp"
           alt="Celebrating Life Community Health Center"
           maxW="600px"
           mb={16}
