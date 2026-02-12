@@ -17,8 +17,9 @@ import { CustomCard } from "@/components/common/CustomCard";
 import { Navbar } from "@/components/layout/Navbar";
 import { BackendContext } from "@/contexts/BackendContext";
 
+import { UserPendingStatusList } from "./UserPendingStatusList";
+import UserRoleFilter from "./UserRoleFilter";
 import UserTable from "./UserTable";
-import {UserPendingStatusList} from "./UserPendingStatusList";
 
 export const UserDirectory = () => {
   const { backend } = useContext(BackendContext);
@@ -118,7 +119,7 @@ export const UserDirectory = () => {
           </InputGroup>
         </Box>
       </Flex>
-      <Box mb={8}>      
+      <Box mb={8}>
         <UserPendingStatusList />
       </Box>
 
@@ -158,20 +159,25 @@ export const UserDirectory = () => {
         </HStack>
       </Box>
 
-      <InputGroup
-        maxW="400px"
+      <Flex
+        gap={4}
+        align="center"
         pb={6}
       >
-        <InputLeftElement pointerEvents="none">
-          <SearchIcon color="gray.400" />
-        </InputLeftElement>
-        <Input
-          placeholder="Search by name or email..."
-          borderRadius="md"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-      </InputGroup>
+        <InputGroup flex={1}>
+          <InputLeftElement pointerEvents="none">
+            <SearchIcon color="gray.400" />
+          </InputLeftElement>
+          <Input
+            placeholder="Search by name or email..."
+            borderRadius="md"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </InputGroup>
+
+        <UserRoleFilter />
+      </Flex>
 
       <UserTable
         users={filteredUsers}
