@@ -3,32 +3,37 @@ import React from "react";
 import {
   Table,
   TableContainer,
+  Tag,
   Tbody,
   Td,
+  Text,
   Th,
   Thead,
   Tr,
   Wrap,
   WrapItem,
-  Tag,
-  Text
 } from "@chakra-ui/react";
 
 export default function ProviderTable({ providers, providerCategories, isLoading }) {
   // sort categories by columnOrder
-  
-  const sortedCategories = [...providerCategories].sort((a, b) => a.columnOrder - b.columnOrder);
+
+  const sortedCategories = [...providerCategories].sort(
+    (a, b) => a.columnOrder - b.columnOrder
+  );
   /**
    * Making table header by mapping categories from providerCategories
    * @returns <Thead> with each category as a cell in the header row.
    */
   const Header = () => {
     const columns = sortedCategories.map((cat) => (
-      <Th key={cat.name}>{cat.name}</Th>
+      <Th key={cat.name} fontSize="sm" fontWeight="bold" color="#2D3748">{cat.name}</Th>
     ));
 
     return (
-      <Thead>
+      <Thead
+        bg="#00000014"
+        h="60px"
+      >
         <Tr>{columns}</Tr>
       </Thead>
     );
@@ -46,11 +51,14 @@ export default function ProviderTable({ providers, providerCategories, isLoading
 
     // Treat undefined/null/"" as missing
     const isMissing =
-      raw === undefined || raw === null || (typeof raw === "string" && raw.trim() === "");
+      raw === undefined ||
+      raw === null ||
+      (typeof raw === "string" && raw.trim() === "");
 
     if (isMissing) {
       // Defaults per inputType
-      if (cat.inputType === "tag") return <Text color="gray.400">NO TAGS SELECTED</Text>;
+      if (cat.inputType === "tag")
+        return <Text color="gray.400">NO TAGS SELECTED</Text>;
       return <Text color="gray.400"></Text>; // default for "text" (and any other types)
     }
 
@@ -82,10 +90,23 @@ export default function ProviderTable({ providers, providerCategories, isLoading
   const ProviderRow = ({ provider }) => {
     const getCells = () =>
       sortedCategories.map((cat) => (
-        <Td key={cat.name}>{renderCellValue(provider, cat)}</Td>
+        <Td
+          key={cat.name}
+          borderRight="1px solid"
+          borderColor="gray.200"
+        >
+          {renderCellValue(provider, cat)}
+        </Td>
       ));
 
-    return <Tr>{getCells()}</Tr>;
+    return (
+      <Tr
+        borderBottom="1px solid"
+        borderColor="gray.200"
+      >
+        {getCells()}
+      </Tr>
+    );
   };
 
   /**
@@ -106,7 +127,11 @@ export default function ProviderTable({ providers, providerCategories, isLoading
     return <Text> Loading providers and categories... </Text>
   }
   return (
-    <TableContainer>
+    <TableContainer
+      border="1px solid"
+      borderColor="gray.200"
+      borderRadius="lg"
+    >
       <Table>
         {/**Subcomps to simplify structure */}
         <Header />

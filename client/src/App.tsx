@@ -13,6 +13,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { BackendProvider } from "@/contexts/BackendContext";
 import { RoleProvider } from "@/contexts/RoleContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import  Layout from "@/components/layout/layout"; 
 import { CookiesProvider } from "react-cookie";
 import {
   Navigate,
@@ -35,11 +36,12 @@ const App = () => {
             <RoleProvider>
               <Router>
                 <Routes>
-                  <Route
+                <Route element={<Layout/>}>
+                    <Route
                     path="/user-directory"
                     element={<UserDirectory />}
-                  />
-                  <Route
+                    />
+                    <Route
                     path="/settings"
                     element={
                       <ProtectedRoute
@@ -50,11 +52,24 @@ const App = () => {
                   <Route
                     path="/quota-tracking"
                     element={<QuotaTracking />}
+                    />
+                  <Route
+                  path="/provider-directory"
+                  element={<ProviderDirectoryPage />}
                   />
+                  <Route
+                  path="/version-log"
+                  element={<VersionLogPage />}
+                  />
+                </Route>
                   <Route
                     path="/login"
                     element={<Login />}
                   />
+                <Route
+                  path="/pending-approval"
+                  element={<PendingApprovalPage />}
+                />
                   <Route
                     path="/pending-approval"
                     element={<PendingApprovalPage />}

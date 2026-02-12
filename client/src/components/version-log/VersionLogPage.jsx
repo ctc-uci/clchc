@@ -13,18 +13,16 @@ import {
   Text,
 } from "@chakra-ui/react";
 
+import Navbar from "@/components/layout/Navbar";
+import VersionLogTable from "@/components/version-log/VersionLogTable";
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
-import debounce from "lodash.debounce";
-
-import Navbar from "../layout/Navbar";
-import VersionLogTable from "./VersionLogTable";
+import { useDebounce } from "@/hooks/useDebounce";
 
 export const VersionLogPage = () => {
   const [logs, setLogs] = useState([]);
   const { backend } = useBackendContext();
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
-  // reference QuotaTrackingPage
 
   const fetchVersionLogs = useCallback(
     async (searchQuery) => {
@@ -52,18 +50,7 @@ export const VersionLogPage = () => {
     fetchVersionLogs();
   }, [fetchVersionLogs]);
 
-  const debouncedFetch = useMemo(() => {
-    return debounce((q) => {
-      fetchVersionLogs(q);
-    }, 300);
-  }, [fetchVersionLogs]);
-
-  // Handle cleanup
-  useEffect(() => {
-    return () => {
-      debouncedFetch.cancel();
-    };
-  }, [debouncedFetch]);
+  const debouncedFetch = useDebounce(fetchVersionLogs);
 
   useEffect(() => {
     debouncedFetch.cancel();

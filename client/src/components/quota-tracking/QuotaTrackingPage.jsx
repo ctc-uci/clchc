@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { AddIcon, SearchIcon } from "@chakra-ui/icons";
 import {
@@ -19,15 +19,22 @@ import { CustomCard } from "@/components/common/CustomCard";
 import Navbar from "@/components/layout/Navbar";
 import QuotaDrawer from "@/components/quota-tracking/QuotaDrawer";
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
-import debounce from "lodash.debounce";
+import { useRoleContext } from "@/contexts/hooks/useRoleContext";
+import { useDebounce } from "@/hooks/useDebounce";
 
 import { useQuotas } from "@/contexts/hooks/data-fetching/useQuotas";
 import QuotaTable from "./QuotaTable";
 
 export const QuotaTracking = () => {
+  const { backend } = useBackendContext()
   const [rows, setRows] = useState([]);
   const [providerQuery, setProviderQuery] = useState("");
-  const [debouncedProviderQuery, setDebouncedProviderQuery] = useState("");
+  // const [debouncedProviderQuery, setDebouncedProviderQuery] = useState("");
+  const debouncedProviderQuery = useDebounce(
+  (value) => setProviderQuery(value),
+  300
+);
+  const { role } = useRoleContext();
 
   // get current date and reformat
   const today = new Date();
@@ -42,7 +49,7 @@ export const QuotaTracking = () => {
     refetch,
   } = useQuotas({
     date: selectedDate,
-    provider: debouncedProviderQuery,
+    provider: providerQuery,
   });
 
   const {
@@ -51,32 +58,8 @@ export const QuotaTracking = () => {
     onClose: onCreateDrawerClose,
   } = useDisclosure();
 
-  const debouncedFetch = useMemo(() => {
-    return debounce(() => {
-      refetch();
-    }, 300);
-  }, [refetch]);
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedProviderQuery(providerQuery);
-    }, 300);
-
-    return () => clearTimeout(handler);
-  }, [providerQuery]);
-
-  useEffect(() => {
-    if (!providerQuery) return; // no fetch if search is empty
-
-    debouncedFetch();
-
-    return () => {
-      debouncedFetch.cancel();
-    };
-  }, [providerQuery, selectedDate, debouncedFetch]);
-
   const handleChange = (e) => {
-    setProviderQuery(e.target.value);
+    debouncedProviderQuery(e.target.value);
   };
 
   return (
@@ -103,7 +86,7 @@ export const QuotaTracking = () => {
               py={0.5}
               fontSize="xs"
             >
-              Master
+              {role ?? "Viewer"}
             </Badge>
           </Flex>
           <Text
@@ -201,7 +184,7 @@ export const QuotaTracking = () => {
           if (typeof updater === "function") {
             setRows(updater);
           } else {
-            refetch;
+            refetch();
           }
         }}
       />
@@ -211,6 +194,7 @@ export const QuotaTracking = () => {
         isOpen={isCreateDrawerOpen}
         onOpen={onCreateDrawerOpen}
         onClose={onCreateDrawerClose}
+        defaultDate={selectedDate}
       />
 
       <Navbar />

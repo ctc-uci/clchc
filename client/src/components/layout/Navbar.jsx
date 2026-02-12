@@ -1,4 +1,4 @@
-import { Flex, Link } from "@chakra-ui/react";
+import { Flex, Link, Box } from "@chakra-ui/react";
 
 import { useAuthContext } from "@/contexts/hooks/useAuthContext";
 import { useRoleContext } from "@/contexts/hooks/useRoleContext";
@@ -14,90 +14,102 @@ export const Navbar = () => {
     py: 1,
     borderRadius: "md",
     fontSize: { base: "8px", sm: "14px" },
-    _hover: { textDecoration: "underline", textUnderlineOffset: "3px" },
+    _hover: { textUnderlineOffset: "3px", fontWeight: "550" },
   };
 
   const activeStyle = ({ isActive }) =>
     isActive
       ? {
-          textDecoration: "underline",
-          textUnderlineOffset: "3px",
-          fontWeight: "600",
-        }
+        fontWeight: "1000"
+      }
       : undefined;
 
   return (
-    <Flex
-      // Positioning
-      position="fixed"
-      bottom="5vh" // Replaces marginTop: stays near bottom regardless of screen height
-      left="50%" // Moves to center
-      transform="translateX(-50%)" // Perfectly centers the bar
-      // Styling
-      bg="black"
-      w={{ base: "90%", md: "56%" }} // Wider on mobile (90%), thinner on desktop (56%)
-      h="60px" // Fixed height is usually safer for navbars than %
-      borderRadius="16px"
-      align="center"
-      justify="space-evenly"
-      px={4}
-    >
+    <>
+      <Box
+        position="fixed"
+        bottom="0"
+        left="0"
+        right="0"
+        h="200px"
+        zIndex={9}
+        pointerEvents="none"
+        bgGradient="linear(to-t, white, transparent)"
+      />
       <Flex
-        gap="3"
-        width="100%"
+        // Positioning
+        position="fixed"
+        bottom="5vh" // Replaces marginTp: stays near bottom regardless of screen height
+        left="50%" // Moves to center
+        transform="translateX(-50%)" // Perfectly centers the bar
+        // Styling
+        bg="black"
+        w={{ base: "90%", md: "56%" }} // Wider on mobile (90%), thinner on desktop (56%)
+        h="60px" // Fixed height is usually safer for navbars than %
+        borderRadius="16px"
+        align="center"
         justify="space-evenly"
+        px={4}
+        zIndex={10}
       >
-        <Link
-          as={NavLink}
-          to="/quota-tracking"
-          style={activeStyle}
-          {...baseLinkProps}
+        <Flex
+          gap="3"
+          width="100%"
+          justify="space-evenly"
         >
-          Quota Tracking
-        </Link>
+          <Link
+            as={NavLink}
+            to="/quota-tracking"
+            style={activeStyle}
+            {...baseLinkProps}
+          >
+            Quota Tracking
+          </Link>
 
-        <Link
-          as={NavLink}
-          to="/provider-directory"
-          style={activeStyle}
-          {...baseLinkProps}
-        >
-          Provider Directory
-        </Link>
+          <Link
+            as={NavLink}
+            to="/provider-directory"
+            style={activeStyle}
+            {...baseLinkProps}
+          >
+            Provider Directory
+          </Link>
 
-        {role === "master" || role === "ccm" ? (
-          <>
-            <Link
-              as={NavLink}
-              to="/user-directory"
-              style={activeStyle}
-              {...baseLinkProps}
-            >
-              User Directory
-            </Link>
-            <Link
-              as={NavLink}
-              to="/version-log"
-              style={activeStyle}
-              {...baseLinkProps}
-            >
-              Version Log
-            </Link>
-          </>
-        ) : (
-          <></>
-        )}
+          {role === "master" || role === "ccm" ? (
+            <>
+              <Link
+                as={NavLink}
+                to="/user-directory"
+                style={activeStyle}
+                {...baseLinkProps}
+              >
+                User Directory
+              </Link>
+              <Link
+                as={NavLink}
+                to="/version-log"
+                style={activeStyle}
+                {...baseLinkProps}
+              >
+                Version Log
+              </Link>
+            </>
+          ) : (
+            <></>
+          )}
 
-        <Link
-          as={NavLink}
-          to="/settings"
-          style={activeStyle}
-          {...baseLinkProps}
-        >
-          Settings
-        </Link>
+          <Link
+            as={NavLink}
+            to="/settings"
+            style={activeStyle}
+            {...baseLinkProps}
+          >
+            Settings
+          </Link>
+        </Flex>
       </Flex>
-    </Flex>
+    </>
+
   );
 };
 
