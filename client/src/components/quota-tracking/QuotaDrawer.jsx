@@ -29,13 +29,16 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 
+import { useLocations } from "@/contexts/hooks/data-fetching/useLocations";
+import { useProvidersSummary } from "@/contexts/hooks/data-fetching/useProviders";
+import {
+  useCreateQuota,
+  useQuotaById,
+  useUpdateQuota,
+} from "@/contexts/hooks/data-fetching/useQuotas";
+import { useUserByFirebaseUid } from "@/contexts/hooks/data-fetching/useUsers";
 import { useAuthContext } from "@/contexts/hooks/useAuthContext";
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
-
-import { useCreateQuota, useQuotaById, useUpdateQuota } from "@/contexts/hooks/data-fetching/useQuotas";
-import { useProvidersSummary } from "@/contexts/hooks/data-fetching/useProviders";
-import { useLocations } from "@/contexts/hooks/data-fetching/useLocations";
-import { useUserByFirebaseUid } from "@/contexts/hooks/data-fetching/useUsers";
 
 const MAX_INPUT_NUMBER = 99;
 
@@ -116,12 +119,11 @@ function ProviderDropdown({ providerId, setProviderId, isLocked }) {
   );
 
   const {
-      data: providers = [],
-      isLoading: loadingSummary,
-      error: summaryError,
-      refetch,
-    } = useProvidersSummary();
-  
+    data: providers = [],
+    isLoading: loadingSummary,
+    error: summaryError,
+    refetch,
+  } = useProvidersSummary();
 
   // useEffect(() => {
   //   const fetchProviders = async () => {
@@ -135,7 +137,7 @@ function ProviderDropdown({ providerId, setProviderId, isLocked }) {
   //   fetchProviders();
   // }, [backend]);
   if (loadingSummary) {
-    return <Text>Loading provider summary...</Text>
+    return <Text>Loading provider summary...</Text>;
   }
 
   return (
@@ -174,11 +176,11 @@ function LocationDropdown({ locationId, setLocationId, isLocked }) {
   // const [locations, setLocations] = useState(null);
   // const { backend } = useBackendContext();
   const {
-      data: locations = [],
-      isLoading: loadingLocations,
-      error: locationsError,
-      refetch,
-    } = useLocations();
+    data: locations = [],
+    isLoading: loadingLocations,
+    error: locationsError,
+    refetch,
+  } = useLocations();
 
   // useEffect(() => {
   //   const fetchLocations = async () => {
@@ -193,7 +195,7 @@ function LocationDropdown({ locationId, setLocationId, isLocked }) {
   // }, [backend]);
 
   if (loadingLocations) {
-    return <Text>Loading locations...</Text>
+    return <Text>Loading locations...</Text>;
   }
 
   return (
@@ -569,18 +571,23 @@ export default function QuotaDrawer({
   const btnRef = React.useRef();
   const { backend } = useBackendContext();
   const { currentUser } = useAuthContext();
-  const [quota, setQuota] = useState(0)
-  const { data: quotaData, isLoading, error, refetch } = useQuotaById(quotaID, isOpen && !!quotaID);
+  const [quota, setQuota] = useState(0);
   const {
-      mutate: createQuota,
-      isLoading: isCreating,
-      error: createError,
-    } = useCreateQuota();
+    data: quotaData,
+    isLoading,
+    error,
+    refetch,
+  } = useQuotaById(quotaID, isOpen && !!quotaID);
   const {
-      mutate: updateQuota,
-      isLoading: isUpdating,
-      error: updateError,
-    } = useUpdateQuota();
+    mutate: createQuota,
+    isLoading: isCreating,
+    error: createError,
+  } = useCreateQuota();
+  const {
+    mutate: updateQuota,
+    isLoading: isUpdating,
+    error: updateError,
+  } = useUpdateQuota();
 
   const [providerId, setProviderId] = useState("");
   // const [apptCalcFactor, setApptCalcFactor] = useState(null);
@@ -599,8 +606,8 @@ export default function QuotaDrawer({
   const {
     data: userData,
     isLoading: loadingCurrentUser,
-    error: errorCurrentUser
-  } = useUserByFirebaseUid(currentUser.uid)
+    error: errorCurrentUser,
+  } = useUserByFirebaseUid(currentUser.uid);
   // console.log(userData)
   const apptCalcFactor = userData?.[0]?.apptCalcFactor ?? null;
   // console.log(apptCalcFactor)
@@ -747,12 +754,12 @@ export default function QuotaDrawer({
       if (quotaID) {
         // console.log("Updating quota with ID:", quotaID, "Data:", formData);
         // await backend.put(`/quota/${quotaID}`, formData);
-        await updateQuota({id: quotaID, data: formData})
+        await updateQuota({ id: quotaID, data: formData });
       } else {
         // await backend.post("/quota", formData);
-        await createQuota(formData)
+        await createQuota(formData);
       }
-      handleClose()
+      handleClose();
       // TODO: Should we redirect to the new quota page?
     } catch (err) {
       console.error("Error creating a new quota:", err);
@@ -774,7 +781,7 @@ export default function QuotaDrawer({
   };
 
   if (isLoading) {
-    return <Text> Loading quota </Text>
+    return <Text> Loading quota </Text>;
   }
 
   return (

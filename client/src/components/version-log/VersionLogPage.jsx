@@ -15,9 +15,9 @@ import {
 
 import Navbar from "@/components/layout/Navbar";
 import VersionLogTable from "@/components/version-log/VersionLogTable";
+import { useVersionLogs } from "@/contexts/hooks/data-fetching/useVersionLogs";
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 import { useDebounce } from "@/hooks/useDebounce";
-import { useVersionLogs } from "@/contexts/hooks/data-fetching/useVersionLogs";
 
 export const VersionLogPage = () => {
   // const [logs, setLogs] = useState([]);
@@ -33,9 +33,9 @@ export const VersionLogPage = () => {
     data: logs = [],
     isLoading,
     error,
-    refetch
+    refetch,
   } = useVersionLogs({
-    q: searchQuery
+    q: searchQuery,
   });
 
   // const fetchVersionLogs = useCallback(
