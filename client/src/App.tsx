@@ -1,6 +1,7 @@
 import { Admin } from "@/components/admin/Admin";
 import { CatchAll } from "@/components/CatchAll";
 import { Dashboard } from "@/components/dashboard/Dashboard";
+import Layout from "@/components/layout/layout";
 import { Login } from "@/components/login/Login";
 import { Playground } from "@/components/Playground";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
@@ -11,8 +12,7 @@ import { UserDirectory } from "@/components/user-directory/UserDirectoryPage";
 import { PERSONAL_INFO, Settings } from "@/components/user-settings/Settings";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { BackendProvider } from "@/contexts/BackendContext";
-import { RoleProvider } from "@/contexts/RoleContext";
-import  Layout from "@/components/layout/layout"; 
+import { UserProvider } from "@/contexts/UserContext";
 import { CookiesProvider } from "react-cookie";
 import {
   Navigate,
@@ -29,33 +29,33 @@ const App = () => {
     <CookiesProvider>
       <BackendProvider>
         <AuthProvider>
-          <RoleProvider>
+          <UserProvider>
             <Router>
               <Routes>
-                <Route element={<Layout/>}>
+                <Route element={<Layout />}>
                   <Route
-                  path="/user-directory"
-                  element={<UserDirectory />}
+                    path="/user-directory"
+                    element={<UserDirectory />}
                   />
                   <Route
-                  path="/settings"
-                  element={
-                    <ProtectedRoute
-                      element={<Settings view={PERSONAL_INFO} />}
-                    />
-                  }
-                />
-                <Route
-                  path="/quota-tracking"
-                  element={<QuotaTracking />}
+                    path="/settings"
+                    element={
+                      <ProtectedRoute
+                        element={<Settings view={PERSONAL_INFO} />}
+                      />
+                    }
                   />
                   <Route
-                  path="/provider-directory"
-                  element={<ProviderDirectoryPage />}
+                    path="/quota-tracking"
+                    element={<QuotaTracking />}
                   />
                   <Route
-                  path="/version-log"
-                  element={<VersionLogPage />}
+                    path="/provider-directory"
+                    element={<ProviderDirectoryPage />}
+                  />
+                  <Route
+                    path="/version-log"
+                    element={<VersionLogPage />}
                   />
                 </Route>
                 <Route
@@ -114,7 +114,7 @@ const App = () => {
                 />
               </Routes>
             </Router>
-          </RoleProvider>
+          </UserProvider>
         </AuthProvider>
       </BackendProvider>
     </CookiesProvider>

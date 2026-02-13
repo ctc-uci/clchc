@@ -1,7 +1,7 @@
 import { Box, Flex, Link } from "@chakra-ui/react";
 
 import { useAuthContext } from "@/contexts/hooks/useAuthContext";
-import { useRoleContext } from "@/contexts/hooks/useRoleContext";
+import { useUserContext } from "@/contexts/hooks/useUserContext";
 import { NavLink, useLocation } from "react-router-dom";
 
 const useIsActive = (pathname) => {
@@ -11,7 +11,7 @@ const useIsActive = (pathname) => {
 
 export const Navbar = () => {
   const { currentUser } = useAuthContext();
-  const { role, loading } = useRoleContext();
+  const { role, loading } = useUserContext();
   const isQuotaActive = useIsActive("/quota-tracking");
   const isProviderActive = useIsActive("/provider-directory");
   const isUserActive = useIsActive("/user-directory");
