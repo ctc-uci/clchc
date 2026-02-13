@@ -127,7 +127,6 @@ export const UserDirectory = () => {
             <Input
               textAlign="center"
               type="date"
-              onChange={(e) => console.log("date input:", e.target.value)}
             />
           </InputGroup>
         </Box>

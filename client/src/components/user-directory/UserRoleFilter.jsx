@@ -22,7 +22,7 @@ export default function UserRoleFilter({ selectedRole, onChange }) {
   ];
 
   return (
-    <Menu closeOnSelect={false}>
+    <Menu>
       <MenuButton
         as={Button}
         type="button"
