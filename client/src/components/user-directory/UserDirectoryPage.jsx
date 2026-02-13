@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 
 import { InfoOutlineIcon, SearchIcon } from "@chakra-ui/icons";
 import {
@@ -17,8 +17,8 @@ import { CustomCard } from "@/components/common/CustomCard";
 import { Navbar } from "@/components/layout/Navbar";
 import { BackendContext } from "@/contexts/BackendContext";
 
+import { UserPendingStatusList } from "./UserPendingStatusList";
 import UserTable from "./UserTable";
-import {UserPendingStatusList} from "./UserPendingStatusList";
 
 export const UserDirectory = () => {
   const { backend } = useContext(BackendContext);
@@ -26,27 +26,27 @@ export const UserDirectory = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [userStats, setUserStats] = useState({});
 
+  const fetchUserInfo = useCallback(async () => {
+    try {
+      const [usersRes, statsRes] = await Promise.all([
+        backend.get("/users"),
+        backend.get("/users/stats"),
+      ]);
+
+      setUsers(usersRes.data);
+      setUserStats(statsRes.data);
+    } catch (err) {
+      console.error(
+        "couldn't fetch user info in components/UserDirectoryPage.jsx",
+        err
+      );
+    }
+  }, [backend]);
+
   useEffect(() => {
     // Fetches users and user stats in parallel
-    const fetchUserInfo = async () => {
-      try {
-        const [usersRes, statsRes] = await Promise.all([
-          backend.get("/users"),
-          backend.get("/users/stats"),
-        ]);
-
-        setUsers(usersRes.data);
-        setUserStats(statsRes.data);
-      } catch (err) {
-        console.error(
-          "couldn't fetch user info in components/UserDirectoryPage.jsx",
-          err
-        );
-      }
-    };
-
     fetchUserInfo();
-  }, [backend]);
+  }, [fetchUserInfo]);
 
   // table delete
   const handleDelete = async (id) => {
@@ -118,7 +118,7 @@ export const UserDirectory = () => {
           </InputGroup>
         </Box>
       </Flex>
-      <Box mb={8}>      
+      <Box mb={8}>
         <UserPendingStatusList />
       </Box>
 
@@ -176,6 +176,7 @@ export const UserDirectory = () => {
       <UserTable
         users={filteredUsers}
         onDelete={handleDelete}
+        onUpdated={fetchUserInfo}
       />
       <Navbar />
     </Box>
