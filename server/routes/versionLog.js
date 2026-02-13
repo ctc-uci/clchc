@@ -6,19 +6,19 @@ export const versionLogRouter = Router();
 
 versionLogRouter.post("/", async (req, res) => {
   try {
-    const { userId, quotaId, action } = req.body;
+    const { userId, quotaId, action, delta } = req.body;
 
-    if (!userId || !quotaId || !action) {
+    if (!userId || !quotaId || !action || !delta) {
       return res.status(404).json({
         error:
-          "Parameters not sufficient; userId, quotaId, and action are required.",
+          "Parameters not sufficient; userId, quotaId, action, and delta are required.",
       });
     }
 
     const result = await db.query(
-      `INSERT INTO version_log (user_id, quota_id, action)
-       VALUES ($1, $2, $3) RETURNING *`,
-      [userId, quotaId, action]
+      `INSERT INTO version_log (user_id, quota_id, action, delta)
+       VALUES ($1, $2, $3, $4) RETURNING *`,
+      [userId, quotaId, action, delta]
     );
 
     res.status(201).json(keysToCamel(result));
