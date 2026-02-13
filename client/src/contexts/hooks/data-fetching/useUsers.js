@@ -70,7 +70,7 @@ export const useDeleteUser = () => {
   return useMutation({
     mutationFn: (id) => {
       console.log("Deleting user ", id)
-      return api.users.delete(id)
+      return users.delete(id)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"], exact: false });
