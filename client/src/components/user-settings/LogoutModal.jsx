@@ -14,11 +14,11 @@ import {
   Text,
 } from "@chakra-ui/react";
 
-import { useRoleContext } from "@/contexts/hooks/useRoleContext";
 import { useAuthContext } from "@/contexts/hooks/useAuthContext";
+import { useUserContext } from "@/contexts/hooks/useUserContext";
 
 export default function LogoutModal({ isOpen, onClose }) {
-  const { role } = useRoleContext();
+  const { role } = useUserContext();
   const { logout } = useAuthContext();
   const [userInfo] = useState();
   const handleLogout = () => logout();
