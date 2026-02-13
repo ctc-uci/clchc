@@ -48,6 +48,7 @@ versionLogRouter.get("/details", async (req, res) => {
       SELECT
         version_log.id AS id,
         version_log.*,
+        version_log.delta,
         quota.date,
         quota.end_time AS time,
         "users".first_name,
@@ -63,7 +64,7 @@ versionLogRouter.get("/details", async (req, res) => {
         OR "users".last_name ILIKE '%' || $1 || '%'
         OR providers.data->>'Name' ILIKE '%' || $1 || '%'
       )
-      ORDER BY version_log.id ASC
+      ORDER BY version_log.id DESC
       `,
       [q ?? null]
     );
