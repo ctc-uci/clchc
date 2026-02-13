@@ -19,7 +19,7 @@ import { CustomCard } from "@/components/common/CustomCard";
 import Navbar from "@/components/layout/Navbar";
 import QuotaDrawer from "@/components/quota-tracking/QuotaDrawer";
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
-import { useRoleContext } from "@/contexts/hooks/useRoleContext";
+import { useUserContext } from "@/contexts/hooks/useUserContext";
 import { useDebounce } from "@/hooks/useDebounce";
 
 import { useQuotas } from "@/contexts/hooks/data-fetching/useQuotas";
@@ -34,7 +34,7 @@ export const QuotaTracking = () => {
   (value) => setProviderQuery(value),
   300
 );
-  const { role } = useRoleContext();
+  const { role } = useUserContext();
 
   // get current date and reformat
   const today = new Date();

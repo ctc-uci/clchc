@@ -13,7 +13,8 @@
     "format": "npx prettier --write .",
     "preview": "vite preview",
     "test": "vitest --run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@chakra-ui/react": "^2.8.2",

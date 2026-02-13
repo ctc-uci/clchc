@@ -10,15 +10,15 @@ import {
   DrawerHeader,
   DrawerOverlay,
   FormControl,
-  Input,
   FormLabel,
+  Input,
   Radio,
   RadioGroup,
   Stack,
 } from "@chakra-ui/react";
 
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
-import { useRoleContext } from "@/contexts/hooks/useRoleContext";
+import { useUserContext } from "@/contexts/hooks/useUserContext";
 import { useCreateCategory } from "@/contexts/hooks/data-fetching/useDirectoryCategories";
 
 const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
@@ -27,7 +27,7 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
   const [isRequired, setIsRequired] = useState(false);
   const [columnOrder, setColumnOrder] = useState(0);
   const { backend } = useBackendContext();
-  const { role, loading } = useRoleContext();
+  const { role, loading } = useUserContext();
   const {
     mutate: createCategory,
     isLoading: isCreating,
@@ -54,7 +54,11 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
       setColumnOrder(0);
     } catch (err) {
       // console.error("Failed to create category", err);
-      console.error("Failed to create category", err?.response?.status, err?.response?.data || err.message);
+      console.error(
+        "Failed to create category",
+        err?.response?.status,
+        err?.response?.data || err.message
+      );
     }
   };
 
@@ -71,8 +75,7 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
           <DrawerHeader>Provider Drawer</DrawerHeader>
           <DrawerBody>
             <Stack gap={4}>
-
-               <FormControl isRequired>
+              <FormControl isRequired>
                 <FormLabel>Category Name</FormLabel>
                 <Input
                   type="text"

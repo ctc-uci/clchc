@@ -19,7 +19,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import CategoryDrawer from "@/components/provider-directory/CategoryDrawer";
 import ProviderTable from "@/components/provider-directory/ProviderTable";
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
-import { useRoleContext } from "@/contexts/hooks/useRoleContext";
+import { useUserContext } from "@/contexts/hooks/useUserContext";
 import { useProviders } from "@/contexts/hooks/data-fetching/useProviders";
 import { useDirectoryCategories } from "@/contexts/hooks/data-fetching/useDirectoryCategories";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -32,7 +32,7 @@ export const ProviderDirectoryPage = () => {
   (value) => setProviderQuery(value),
   300
 );
-  const { role, loading } = useRoleContext();
+  const { role, loading } = useUserContext();
   const {
       isOpen: isCreateDrawerOpen,
       onOpen: onCreateDrawerOpen,
