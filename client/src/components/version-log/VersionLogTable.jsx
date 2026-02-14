@@ -92,7 +92,7 @@ const VersionLogTable = ({ loading, logs }) => {
                           as="span"
                           color="green.500"
                         >
-                          {entry.delta}
+                          +{entry.delta}
                         </Text>
                       </>
                     )}
