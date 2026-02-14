@@ -12,27 +12,30 @@ import {
 
 import { useAuthContext } from "@/contexts/hooks/useAuthContext";
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
+import { useUserContext } from "@/contexts/hooks/useUserContext";
 
 export default function PersonalInfo() {
   const { backend } = useBackendContext();
   const { currentUser } = useAuthContext();
+  const { dbUser, refetch } = useUserContext();
 
-  const [userInfo, setUserInfo] = useState(null);
+  const [userInfo, setUserInfo] = useState({
+    firstName: dbUser?.firstName ?? "",
+    lastName: dbUser?.lastName ?? "",
+    email: dbUser?.email ?? "",
+  });
 
   useEffect(() => {
-    if (!currentUser?.uid) return;
+    if (dbUser) {
+      setUserInfo({
+        firstName: dbUser.firstName ?? "",
+        lastName: dbUser.lastName ?? "",
+        email: dbUser.email ?? "",
+      });
+    }
+  }, [dbUser]);
 
-    (async () => {
-      try {
-        const { data } = await backend.get(`/users/firebase/${currentUser.uid}`);
-        setUserInfo(data?.[0] ?? null);
-      } catch (e) {
-        console.error("Failed to fetch user info:", e);
-      }
-    })();
-  }, [backend, currentUser?.uid]);
-
-  if (!userInfo) return null;
+  if (!dbUser) return null;
 
   const updateUserProp = (key, value) => {
     setUserInfo((prev) => ({ ...prev, [key]: value }));
@@ -45,6 +48,7 @@ export default function PersonalInfo() {
         lastName: userInfo.lastName,
         email: userInfo.email,
       });
+      await refetch();
       alert("Changes saved successfully.");
     } catch (e) {
       console.error("Failed to update user:", e);

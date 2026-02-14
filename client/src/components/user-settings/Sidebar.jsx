@@ -10,17 +10,17 @@ import {
 } from "@chakra-ui/react";
 
 import { useAuthContext } from "@/contexts/hooks/useAuthContext";
-import { useRoleContext } from "@/contexts/hooks/useRoleContext";
+import { useUserContext } from "@/contexts/hooks/useUserContext";
+import { Delete } from "lucide-react";
 
 import LogoutModal from "./LogoutModal.jsx";
 import { CALCULATION_FACTOR, DELETE_ACCOUNT, PERSONAL_INFO } from "./Settings";
-import { Delete } from "lucide-react";
 
 export default function Sidebar({ currentView, setCurrentView }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { currentUser } = useAuthContext(); // deconstructing context to get user info
-  const { role } = useRoleContext();
-  
+  const { role } = useUserContext();
+
   const User = () => (
     <VStack align="center">
       <Avatar size="2xl" />
@@ -31,7 +31,9 @@ export default function Sidebar({ currentView, setCurrentView }) {
 
   const PersonalButton = () => (
     <Button
-      backgroundColor={currentView === PERSONAL_INFO && !isOpen ? "#bbb" : undefined}
+      backgroundColor={
+        currentView === PERSONAL_INFO && !isOpen ? "#bbb" : undefined
+      }
       onClick={() => setCurrentView(PERSONAL_INFO)}
     >
       Personal Information
@@ -41,7 +43,9 @@ export default function Sidebar({ currentView, setCurrentView }) {
   const FactorButton = () => {
     return role === "ccm" || role === "master" ? (
       <Button
-        backgroundColor={currentView === CALCULATION_FACTOR && !isOpen ? "#bbb" : undefined}
+        backgroundColor={
+          currentView === CALCULATION_FACTOR && !isOpen ? "#bbb" : undefined
+        }
         onClick={() => setCurrentView(CALCULATION_FACTOR)}
       >
         Calculation Factor
@@ -50,21 +54,24 @@ export default function Sidebar({ currentView, setCurrentView }) {
   };
 
   const LogoutButton = () => (
-    <Button onClick={onOpen}
+    <Button
+      onClick={onOpen}
       backgroundColor={isOpen ? "#bbb" : undefined}
     >
       Log Out
     </Button>
-  )
+  );
 
   const DeleteButton = () => (
     <Button
-      backgroundColor={currentView === DELETE_ACCOUNT && !isOpen ? "#bbb" : undefined}
+      backgroundColor={
+        currentView === DELETE_ACCOUNT && !isOpen ? "#bbb" : undefined
+      }
       onClick={() => setCurrentView(DELETE_ACCOUNT)}
     >
       Delete Account
     </Button>
-  )
+  );
 
   const NavButtons = () => (
     <VStack
