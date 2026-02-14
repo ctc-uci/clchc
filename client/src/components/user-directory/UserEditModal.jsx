@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   Avatar,
@@ -22,7 +22,14 @@ import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 
 export default function UserEditModal({ isOpen, onClose, user, onUpdated }) {
   const { backend } = useBackendContext();
-  const [selectedRole, setSelectedRole] = useState(user.role);
+  const [selectedRole, setSelectedRole] = useState(user?.role ?? "viewer");
+
+  useEffect(() => {
+    setSelectedRole(user?.role ?? "viewer");
+  }, [user]);
+
+  if (!user) return null;
+
   const currentFirebaseUid = user.firebaseUid;
   const username = user.firstName + " " + user.lastName;
   const roleColors = {
@@ -33,6 +40,11 @@ export default function UserEditModal({ isOpen, onClose, user, onUpdated }) {
   };
 
   const onApprove = async () => {
+    if (!currentFirebaseUid) {
+      console.error("Approval failed: missing firebaseUid");
+      return;
+    }
+
     try {
       await backend.put("/users/update/set-role/", {
         role: selectedRole,
@@ -145,7 +157,7 @@ export default function UserEditModal({ isOpen, onClose, user, onUpdated }) {
           <Select
             borderRadius="14px"
             bg="#F9FAFB"
-            defaultValue={selectedRole}
+            value={selectedRole}
             _focus={{ borderColor: "gray.300" }}
             onChange={(e) => setSelectedRole(e.target.value)}
             size="lg"
