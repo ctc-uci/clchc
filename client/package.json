@@ -13,8 +13,7 @@
     "format": "npx prettier --write .",
     "preview": "vite preview",
     "test": "vitest --run",
-    "test:watch": "vitest",
-    "postinstall": "patch-package"
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@chakra-ui/react": "^2.8.2",
@@ -26,8 +25,6 @@
     "framer-motion": "^11.3.27",
     "lodash.debounce": "^4.0.8",
     "lucide-react": "^0.562.0",
-    "patch-package": "^8.0.0",
-    "postinstall-postinstall": "^2.1.0",
     "react": "^18.3.1",
     "react-cookie": "^7.2.0",
     "react-dom": "^18.3.1",
