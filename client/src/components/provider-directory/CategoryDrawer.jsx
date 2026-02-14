@@ -19,46 +19,126 @@ import {
 
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 import { useUserContext } from "@/contexts/hooks/useUserContext";
+import { closestCenter, DndContext } from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
   const [name, setName] = useState("");
   const [inputType, setInputType] = useState("");
   const [isRequired, setIsRequired] = useState(false);
   const [columnOrder, setColumnOrder] = useState(0);
+  const [categories, setCategories] = useState([]);
   const { backend } = useBackendContext();
   const { role, loading } = useUserContext();
 
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const fetchCategories = async () => {
+      try {
+        const res = await backend.get("/directoryCategories");
+        // IMPORTANT: match your backend field name exactly
+        const sorted = [...res.data].sort(
+          (a, b) => a.columnOrder - b.columnOrder
+        );
+
+        setCategories(sorted);
+      } catch (err) {
+        console.error("Failed to fetch categories", err);
+      }
+    };
+
+    fetchCategories();
+  }, [isOpen, backend]);
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+
+    if (!over || active.id === over.id) return;
+
+    setCategories((items) => {
+      const oldIndex = items.findIndex((i) => i.id === active.id);
+      const newIndex = items.findIndex((i) => i.id === over.id);
+
+      const reordered = arrayMove(items, oldIndex, newIndex);
+
+      return reordered.map((item, index) => ({
+        ...item,
+        columnOrder: index,
+      }));
+    });
+  };
+
   const handleSubmit = async () => {
     try {
-      const dateCreated = new Date().toISOString();
-      const adjustedColumnOrder = columnOrder - 1;
-      const res = await backend.post("/directoryCategories", {
-        name,
-        inputType,
-        isRequired,
-        dateCreated,
-        columnOrder: adjustedColumnOrder,
-      });
-      console.log("Create response:", res?.data);
+      await Promise.all(
+        categories.map((cat, index) =>
+          backend.put(`/directoryCategories/${cat.id}`, {
+            columnOrder: index,
+          })
+        )
+      );
+
+      if (name.trim()) {
+        const dateCreated = new Date().toISOString();
+
+        await backend.post("/directoryCategories", {
+          name,
+          inputType,
+          isRequired,
+          dateCreated,
+          columnOrder: categories.length,
+        });
+      }
 
       onClose();
       setName("");
       setInputType("");
       setIsRequired(false);
       setColumnOrder(0);
+
       if (typeof onSaved === "function") {
-        onSaved(res?.data);
+        onSaved();
       }
     } catch (err) {
-      // console.error("Failed to create category", err);
       console.error(
-        "Failed to create category",
+        "Failed to save changes",
         err?.response?.status,
         err?.response?.data || err.message
       );
     }
   };
 
+  function SortableCategory({ category }) {
+    const { attributes, listeners, setNodeRef, transform, transition } =
+      useSortable({ id: category.id });
+
+    const style = {
+      transform: CSS.Transform.toString(transform),
+      transition,
+      padding: "8px",
+      borderRadius: "6px",
+      marginBottom: "4px",
+      background: "#f3f3f3",
+      cursor: "grab",
+    };
+
+    return (
+      <div
+        ref={setNodeRef}
+        style={style}
+        {...attributes}
+        {...listeners}
+      >
+        {category.name}
+      </div>
+    );
+  }
   return (
     <>
       <Drawer
@@ -71,6 +151,22 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
           <DrawerCloseButton />
           <DrawerHeader>Provider Drawer</DrawerHeader>
           <DrawerBody>
+            <DndContext
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={categories.map((cat) => cat.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                {categories.map((cat) => (
+                  <SortableCategory
+                    key={cat.id}
+                    category={cat}
+                  />
+                ))}
+              </SortableContext>
+            </DndContext>
             <Stack gap={4}>
               <FormControl isRequired>
                 <FormLabel>Category Name</FormLabel>
