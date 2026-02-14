@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 
 import { SearchIcon } from "@chakra-ui/icons";
 import {
@@ -33,27 +33,27 @@ export const UserDirectory = () => {
     setSelectedRole(Array.isArray(value) ? value[0] ?? "all" : value ?? "all");
   };
 
+  const fetchUserInfo = useCallback(async () => {
+    try {
+      const [usersRes, statsRes] = await Promise.all([
+        backend.get("/users"),
+        backend.get("/users/stats"),
+      ]);
+
+      setUsers(usersRes.data);
+      setUserStats(statsRes.data);
+    } catch (err) {
+      console.error(
+        "couldn't fetch user info in components/UserDirectoryPage.jsx",
+        err
+      );
+    }
+  }, [backend]);
+
   useEffect(() => {
     // Fetches users and user stats in parallel
-    const fetchUserInfo = async () => {
-      try {
-        const [usersRes, statsRes] = await Promise.all([
-          backend.get("/users"),
-          backend.get("/users/stats"),
-        ]);
-
-        setUsers(usersRes.data);
-        setUserStats(statsRes.data);
-      } catch (err) {
-        console.error(
-          "couldn't fetch user info in components/UserDirectoryPage.jsx",
-          err
-        );
-      }
-    };
-
     fetchUserInfo();
-  }, [backend]);
+  }, [fetchUserInfo]);
 
   // table delete
   const handleDelete = async (id) => {
@@ -197,6 +197,7 @@ export const UserDirectory = () => {
       <UserTable
         users={filteredUsers}
         onDelete={handleDelete}
+        onUpdated={fetchUserInfo}
       />
       <Navbar />
     </Box>
