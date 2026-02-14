@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 
 import {
   Button,
@@ -15,6 +15,14 @@ import {
   Radio,
   RadioGroup,
   Stack,
+  useToast,
+  AlertDialog,
+  AlertDialogOverlay,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogBody,
+  AlertDialogFooter,
+  useDisclosure,
 } from "@chakra-ui/react";
 
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
@@ -36,6 +44,11 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
   const [showForm, setShowForm] = useState(false);
   const { backend } = useBackendContext();
   const { role, loading } = useUserContext();
+  const toast = useToast();
+  const formStackRef = useRef(null);
+  const { isOpen: isDiscardAlertOpen, onOpen: onDiscardAlertOpen, onClose: onDiscardAlertClose } = useDisclosure();
+  const cancelRef = useRef();
+  const pendingCloseRef = useRef(false);
   
 
 
@@ -58,6 +71,30 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
 
     fetchCategories();
   }, [isOpen, backend]);
+
+  // after clicking add new category, it scrolls to show the new stack form shown
+  useEffect(() => {
+    if (showForm && formStackRef.current) {
+      formStackRef.current.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  }, [showForm]);
+
+  // alert pop ups for discarding unsaved changes
+  const handleDrawerClose = () => {
+    const hasTempCategories = categories.some((cat) => String(cat.id).startsWith("temp-"));
+    if (hasTempCategories) {
+      pendingCloseRef.current = true;
+      onDiscardAlertOpen();
+    } else {
+      onClose();
+    }
+  };
+
+  const handleConfirmDiscard = () => {
+    onDiscardAlertClose();
+    onClose();
+  };
+
   const handleDragEnd = (event) => {
     const { active, over } = event;
 
@@ -130,15 +167,39 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
       setIsRequired(false);
       setShowForm(false);
 
+      // feedback for successfully saving categories
+      toast({
+        title: "Success",
+        description: "Categories saved successfully!",
+        status: "success",
+        position: "bottom-right",
+        duration: 5000,
+        isClosable: true,
+      });
+
       if (typeof onSaved === "function") {
         onSaved();
       }
     } catch (err) {
+      // feedback for error + deleting the bad category 
+      setCategories((prevCategories) =>
+        prevCategories.filter((cat) => !String(cat.id).startsWith("temp-"))
+      );
+
+      const errorMessage = err?.response?.data || err.message || "Failed to save changes";
       console.error(
         "Failed to save changes",
         err?.response?.status,
-        err?.response?.data || err.message
+        errorMessage
       );
+      toast({
+        title: "Error",
+        description: errorMessage,
+        status: "error",
+        position: "bottom-right",
+        duration: 5000,
+        isClosable: true,
+      });
     }
   };
 
@@ -172,7 +233,7 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
       <Drawer
         isOpen={isOpen}
         placement="left"
-        onClose={onClose}
+        onClose={handleDrawerClose}
       >
         <DrawerOverlay />
         <DrawerContent>
@@ -199,7 +260,7 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
             <Button onClick={() => setShowForm(!showForm)}>Add Category</Button>
 
             {showForm && (
-              <Stack gap={4} mt={4} p={4} borderWidth={1} borderRadius={6}>
+              <Stack gap={4} mt={4} p={4} borderWidth={1} borderRadius={6} ref={formStackRef}>
                 <FormControl isRequired>
                   <FormLabel>Category Name</FormLabel>
                   <Input
@@ -248,7 +309,7 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
             <Button
               variant="outline"
               mr={3}
-              onClick={onClose}
+              onClick={handleDrawerClose}
             >
               Cancel
             </Button>
@@ -261,6 +322,31 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
           </DrawerFooter>
         </DrawerContent>
       </Drawer>
+
+      <AlertDialog
+        isOpen={isDiscardAlertOpen}
+        leastDestructiveRef={cancelRef}
+        onClose={onDiscardAlertClose}
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              Discard Changes
+            </AlertDialogHeader>
+            <AlertDialogBody>
+              You have unsaved categories. Are you sure you want to discard these changes?
+            </AlertDialogBody>
+            <AlertDialogFooter>
+              <Button ref={cancelRef} onClick={onDiscardAlertClose}>
+                Keep Changes
+              </Button>
+              <Button colorScheme="red" onClick={handleConfirmDiscard} ml={3}>
+                Discard
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
     </>
   );
 };
