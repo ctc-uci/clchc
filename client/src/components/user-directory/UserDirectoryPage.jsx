@@ -1,6 +1,6 @@
 import { useCallback, useContext, useEffect, useState } from "react";
 
-import { InfoOutlineIcon, SearchIcon } from "@chakra-ui/icons";
+import { SearchIcon } from "@chakra-ui/icons";
 import {
   Badge,
   Box,
@@ -18,6 +18,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { BackendContext } from "@/contexts/BackendContext";
 
 import { UserPendingStatusList } from "./UserPendingStatusList";
+import UserRoleFilter from "./UserRoleFilter";
 import UserTable from "./UserTable";
 
 export const UserDirectory = () => {
@@ -25,6 +26,12 @@ export const UserDirectory = () => {
   const [users, setUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [userStats, setUserStats] = useState({});
+  const [selectedRole, setSelectedRole] = useState("all");
+
+  // Keep filter in state so changing role doesn't refresh the page (client-side only)
+  const handleRoleChange = (value) => {
+    setSelectedRole(Array.isArray(value) ? value[0] ?? "all" : value ?? "all");
+  };
 
   const fetchUserInfo = useCallback(async () => {
     try {
@@ -66,7 +73,14 @@ export const UserDirectory = () => {
     const lowerQuery = searchQuery.toLowerCase();
     const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
     const email = user.email.toLowerCase();
-    return fullName.includes(lowerQuery) || email.includes(lowerQuery);
+
+    const matchesSearch =
+      fullName.includes(lowerQuery) || email.includes(lowerQuery);
+
+    const matchesRole =
+      selectedRole === "all" || user.role === selectedRole;
+
+    return matchesSearch && matchesRole;
   });
 
   return (
@@ -113,7 +127,6 @@ export const UserDirectory = () => {
             <Input
               textAlign="center"
               type="date"
-              onChange={(e) => console.log("date input:", e.target.value)}
             />
           </InputGroup>
         </Box>
@@ -158,20 +171,28 @@ export const UserDirectory = () => {
         </HStack>
       </Box>
 
-      <InputGroup
-        maxW="400px"
+      <Flex
+        gap={4}
+        align="center"
         pb={6}
       >
-        <InputLeftElement pointerEvents="none">
-          <SearchIcon color="gray.400" />
-        </InputLeftElement>
-        <Input
-          placeholder="Search by name or email..."
-          borderRadius="md"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+        <InputGroup flex={1}>
+          <InputLeftElement pointerEvents="none">
+            <SearchIcon color="gray.400" />
+          </InputLeftElement>
+          <Input
+            placeholder="Search Providers"
+            borderRadius="md"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </InputGroup>
+
+        <UserRoleFilter
+          selectedRole={selectedRole}
+          onChange={handleRoleChange}
         />
-      </InputGroup>
+      </Flex>
 
       <UserTable
         users={filteredUsers}
