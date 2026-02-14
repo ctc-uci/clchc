@@ -149,7 +149,7 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
         <DrawerOverlay />
         <DrawerContent>
           <DrawerCloseButton />
-          <DrawerHeader>Provider Drawer</DrawerHeader>
+          <DrawerHeader>Manage Categories</DrawerHeader>
           <DrawerBody>
             <DndContext
               collisionDetection={closestCenter}
