@@ -32,10 +32,12 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
   const [name, setName] = useState("");
   const [inputType, setInputType] = useState("");
   const [isRequired, setIsRequired] = useState(false);
-  const [columnOrder, setColumnOrder] = useState(0);
   const [categories, setCategories] = useState([]);
+  const [showForm, setShowForm] = useState(false);
   const { backend } = useBackendContext();
   const { role, loading } = useUserContext();
+  
+
 
   useEffect(() => {
     if (!isOpen) return;
@@ -74,33 +76,59 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
     });
   };
 
+  const handleAddCategory = () => {
+    if (!name.trim() || !inputType) {
+      return;
+    }
+
+    const newCategory = {
+      id: `temp-${Date.now()}`,
+      name,
+      inputType,
+      isRequired,
+      columnOrder: categories.length,
+      dateCreated: new Date().toISOString(),
+    };
+
+    setCategories([...categories, newCategory]);
+    setName("");
+    setInputType("");
+    setIsRequired(false);
+    setShowForm(false);
+  };
+
   const handleSubmit = async () => {
     try {
+      // Separate existing and new categories
+      const existingCategories = categories.filter((cat) => !String(cat.id).startsWith("temp-"));
+      const newCategories = categories.filter((cat) => String(cat.id).startsWith("temp-"));
+
+      // Update existing categories with new column order
       await Promise.all(
-        categories.map((cat, index) =>
+        existingCategories.map((cat, index) =>
           backend.put(`/directoryCategories/${cat.id}`, {
             columnOrder: index,
           })
         )
       );
 
-      if (name.trim()) {
-        const dateCreated = new Date().toISOString();
-
-        await backend.post("/directoryCategories", {
-          name,
-          inputType,
-          isRequired,
-          dateCreated,
-          columnOrder: categories.length,
-        });
-      }
+      // Post new categories
+      await Promise.all(
+        newCategories.map((cat, index) =>
+          backend.post("/directoryCategories", {
+            name: cat.name,
+            inputType: cat.inputType,
+            isRequired: cat.isRequired,
+            columnOrder: existingCategories.length + index,
+          })
+        )
+      );
 
       onClose();
       setName("");
       setInputType("");
       setIsRequired(false);
-      setColumnOrder(0);
+      setShowForm(false);
 
       if (typeof onSaved === "function") {
         onSaved();
@@ -167,46 +195,53 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
                 ))}
               </SortableContext>
             </DndContext>
-            <Stack gap={4}>
-              <FormControl isRequired>
-                <FormLabel>Category Name</FormLabel>
-                <Input
-                  type="text"
-                  onChange={(e) => setName(e.target.value)}
-                />
-              </FormControl>
-              <FormControl isRequired>
-                <FormLabel>Input Type</FormLabel>
-                <RadioGroup
-                  onChange={setInputType}
-                  value={inputType}
-                >
-                  <Stack direction="row">
-                    <Radio value="text">Text</Radio>
-                    <Radio value="tag">Tag</Radio>
-                  </Stack>
-                </RadioGroup>
-              </FormControl>
 
-              <label>
-                {" "}
-                Optional?
-                <input
-                  type="checkbox"
-                  style={{ marginLeft: "8px" }}
-                  checked={isRequired}
-                  onChange={(e) => setIsRequired(e.target.checked)}
-                />
-              </label>
+            <Button onClick={() => setShowForm(!showForm)}>Add Category</Button>
 
-              <FormControl isRequired>
-                <FormLabel>Column Order</FormLabel>
-                <Input
-                  type="text"
-                  onChange={(e) => setColumnOrder(Number(e.target.value))}
-                />
-              </FormControl>
-            </Stack>
+            {showForm && (
+              <Stack gap={4} mt={4} p={4} borderWidth={1} borderRadius={6}>
+                <FormControl isRequired>
+                  <FormLabel>Category Name</FormLabel>
+                  <Input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                </FormControl>
+                <FormControl isRequired>
+                  <FormLabel>Input Type</FormLabel>
+                  <RadioGroup
+                    onChange={setInputType}
+                    value={inputType}
+                  >
+                    <Stack direction="row">
+                      <Radio value="text">Text</Radio>
+                      <Radio value="tag">Tag</Radio>
+                    </Stack>
+                  </RadioGroup>
+                </FormControl>
+
+                <label>
+                  {" "}
+                  Optional?
+                  <input
+                    type="checkbox"
+                    style={{ marginLeft: "8px" }}
+                    checked={isRequired}
+                    onChange={(e) => setIsRequired(e.target.checked)}
+                  />
+                </label>
+
+                <Stack direction="row" justify="flex-end">
+                  <Button variant="outline" onClick={() => setShowForm(false)}>
+                    Cancel
+                  </Button>
+                  <Button colorScheme="blue" onClick={handleAddCategory}>
+                    Add
+                  </Button>
+                </Stack>
+              </Stack>
+            )}
           </DrawerBody>
 
           <DrawerFooter>
