@@ -42,7 +42,7 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
         inputType,
         isRequired,
         // dateCreated,
-        columnOrder: columnOrder
+        columnOrder: columnOrder - 1
       }
       console.log(formData)
       await createCategory(formData);

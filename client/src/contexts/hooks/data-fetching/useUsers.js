@@ -66,6 +66,7 @@ export const useUpdateUser = () => {
 
 export const useDeleteUser = () => {
   const queryClient = useQueryClient();
+  const { users } = useApi()
 
   return useMutation({
     mutationFn: (id) => {
