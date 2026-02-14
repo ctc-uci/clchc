@@ -133,23 +133,15 @@ export const ProviderDirectoryPage = () => {
 
           <Flex gap={3}>
             <Button
-              bg="black"
-              color="white"
-              _hover={{ bg: "gray.800" }}
-              rightIcon={<HamburgerIcon />}
-            >
-              Manage
-            </Button>
-            <Button
               onClick={() => {
                 onCreateDrawerOpen();
               }}
               bg="black"
               color="white"
               _hover={{ bg: "gray.800" }}
-              rightIcon={<AddIcon />}
+              rightIcon={<HamburgerIcon />}
             >
-              Add New
+              Manage
             </Button>
           </Flex>
         </Flex>
