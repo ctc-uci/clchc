@@ -16,7 +16,6 @@ import {
   Input,
   Select,
   Text,
-  Textarea,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 
@@ -27,7 +26,8 @@ const ConfirmationBanner = ({ mode }) => {
   const messages = {
     create:
       "Please confirm you would like to create a new provider with the following information",
-    edit: "Please confirm you would like to save the changes to the provider with the following information",
+    edit: 
+      "Please confirm you would like to save the changes to the provider with the following information",
     delete:
       "Please confirm you would like to delete the provider with the following information",
   };
@@ -57,171 +57,133 @@ const ConfirmationBanner = ({ mode }) => {
     </Alert>
   );
 };
-
+//We're not using these functions right now, but they could be helpful for formatting specific fields in the future
 // Maps a display label to the actual DB category name (case-insensitive match)
-const findCategoryName = (categories, label) => {
-  const lower = label.toLowerCase();
-  const match = categories.find((c) => c.name.toLowerCase() === lower);
-  return match ? match.name : label;
-};
+// const findCategoryName = (categories, label) => {
+//   const lower = label.toLowerCase();
+//   const match = categories.find((c) => c.name.toLowerCase() === lower);
+//   return match ? match.name : label;
+// };
 
-// Format phone: (XXX) XXX - XXXX
-const formatPhone = (value) => {
-  const digits = value.replace(/\D/g, "").slice(0, 10);
-  if (digits.length === 0) return "";
-  if (digits.length <= 3) return `(${digits}`;
-  if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
-  return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)} - ${digits.slice(6)}`;
-};
+// // Format phone: (XXX) XXX - XXXX
+// const formatPhone = (value) => {
+//   const digits = value.replace(/\D/g, "").slice(0, 10);
+//   if (digits.length === 0) return "";
+//   if (digits.length <= 3) return `(${digits}`;
+//   if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+//   return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)} - ${digits.slice(6)}`;
+// };
 
-// Format license/NPI: XXX XXXXX XXXXXXXXXX (3 + 5 + rest, alphanumeric)
-const formatLicenseNpi = (value) => {
-  const clean = value.replace(/[^a-zA-Z0-9]/g, "");
-  if (clean.length <= 3) return clean;
-  if (clean.length <= 8) return `${clean.slice(0, 3)} ${clean.slice(3)}`;
-  return `${clean.slice(0, 3)} ${clean.slice(3, 8)} ${clean.slice(8)}`;
-};
+// // Format license/NPI: XXX XXXXX XXXXXXXXXX (3 + 5 + rest, alphanumeric)
+// const formatLicenseNpi = (value) => {
+//   const clean = value.replace(/[^a-zA-Z0-9]/g, "");
+//   if (clean.length <= 3) return clean;
+//   if (clean.length <= 8) return `${clean.slice(0, 3)} ${clean.slice(3)}`;
+//   return `${clean.slice(0, 3)} ${clean.slice(3, 8)} ${clean.slice(8)}`;
+// };
 
 // --- Provider Form Fields (hardcoded 2-column layout matching MidFi) ---
 // `catNames` maps display labels to actual DB category names
-const ProviderFormFields = ({ formValues, onChange, readOnly, catNames }) => {
-  const fieldProps = (displayLabel) => {
-    const key = catNames[displayLabel] || displayLabel;
-    return {
-      value: formValues[key] || "",
-      onChange: (e) => onChange(key, e.target.value),
-      isReadOnly: readOnly,
-      bg: readOnly ? "gray.50" : "white",
-    };
-  };
+const ProviderFormFields = ({ categories, tags, formValues, onChange, readOnly, errors}) => {
+  // const fieldProps = (displayLabel) => {
+  //   const key = catNames[displayLabel] || displayLabel;
+  //   return {
+  //     value: formValues[key] || "",
+  //     onChange: (e) => onChange(key, e.target.value),
+  //     isReadOnly: readOnly,
+  //     bg: readOnly ? "gray.50" : "white",
+  //   };
+  // };
 
-  const formattedFieldProps = (displayLabel, formatter) => {
-    const key = catNames[displayLabel] || displayLabel;
-    return {
-      value: formValues[key] || "",
-      onChange: (e) => onChange(key, formatter(e.target.value)),
-      isReadOnly: readOnly,
-      bg: readOnly ? "gray.50" : "white",
-    };
-  };
+  // const formattedFieldProps = (displayLabel, formatter) => {
+  //   const key = catNames[displayLabel] || displayLabel;
+  //   return {
+  //     value: formValues[key] || "",
+  //     onChange: (e) => onChange(key, formatter(e.target.value)),
+  //     isReadOnly: readOnly,
+  //     bg: readOnly ? "gray.50" : "white",
+  //   };
+  // };
 
-  const selectProps = (displayLabel) => {
-    const key = catNames[displayLabel] || displayLabel;
-    return {
-      value: formValues[key] || "",
-      onChange: (e) => onChange(key, e.target.value),
-      isDisabled: readOnly,
-      bg: readOnly ? "gray.50" : "white",
-    };
-  };
+  // const selectProps = (displayLabel) => {
+  //   const key = catNames[displayLabel] || displayLabel;
+  //   return {
+  //     value: formValues[key] || "",
+  //     onChange: (e) => onChange(key, e.target.value),
+  //     isDisabled: readOnly,
+  //     bg: readOnly ? "gray.50" : "white",
+  //   };
+  // };
 
-  return (
-    <>
-      {/* Row 1: Provider Name + NPI/License */}
-      <Flex gap={4} mb={4}>
-        <FormControl flex={1}>
-          <FormLabel fontWeight={600}>Provider Name</FormLabel>
-          <Flex gap={2}>
-            <Input placeholder="John Smith" {...fieldProps("Name")} flex={1} />
-            <Input placeholder="PA" {...fieldProps("Credential")} w="60px" />
-          </Flex>
-        </FormControl>
-        <FormControl flex={1}>
-          <FormLabel fontWeight={600}>License / NPI</FormLabel>
-          <Input
-            placeholder="XXX XXXXX XXXXXXXXX"
-            {...formattedFieldProps("NPI/License", formatLicenseNpi)}
-          />
-        </FormControl>
+return (
+    <Flex direction="column" gap={6}>
+      <Flex wrap="wrap" gap={6}>
+        {console.log(categories)}
+        {categories.map((cat) => {
+
+          return (
+            <Box key={cat.id} flex="1 1 48%">
+              <FormControl
+                key={cat.id}
+                mb={4}
+                isRequired={cat.is_required}
+                isInvalid={!!errors[cat.id]}
+              >
+                <FormLabel fontWeight={600}>
+                  {cat.name}
+                </FormLabel>
+
+                {cat.inputType === "text" && (
+                  <Input
+                    value={formValues[cat.id] || ""}
+                    onChange={(e) => onChange(cat.id, e.target.value)}
+                    isReadOnly={readOnly}
+                    bg={readOnly ? "gray.50" : "white"}
+                  />
+                )}
+
+                {cat.inputType === "tag" && (
+                  <Select
+                    placeholder="Select"
+                    value={formValues[cat.id] || ""}
+                    onChange={(e) => onChange(cat.id, e.target.value)}
+                    isDisabled={readOnly}
+                    bg={readOnly ? "gray.50" : "white"}
+                  >
+                    {tags
+                      .filter((tag) => tag.categoryId === cat.id)
+                      .map((tag) => (
+                        <option key={tag.id} value={tag.tagValue}>
+                          {tag.tagValue}
+                        </option>
+                      ))}
+                  </Select>
+                )}
+
+
+                {errors[cat.id] && (
+                  <Text color="red.500" fontSize="sm" mt={1}>
+                    {errors[cat.id]}
+                  </Text>
+                )}
+              </FormControl>
+            </Box>
+          );
+        })}
       </Flex>
-
-      {/* Row 2: Phone Number + DEA */}
-      <Flex gap={4} mb={4}>
-        <FormControl flex={1}>
-          <FormLabel fontWeight={600}>Phone Number</FormLabel>
-          <Input
-            placeholder="(000) 000 - 0000"
-            {...formattedFieldProps("Phone Number", formatPhone)}
-          />
-        </FormControl>
-        <FormControl flex={1}>
-          <FormLabel fontWeight={600}>DEA</FormLabel>
-          <Input placeholder="XX000000000" {...fieldProps("DEA")} />
-        </FormControl>
-      </Flex>
-
-      {/* Row 3: Patients + MAT Program */}
-      <Flex gap={4} mb={4}>
-        <FormControl flex={1}>
-          <FormLabel fontWeight={600}>Patients</FormLabel>
-          <Select placeholder="Select" {...selectProps("Patients")}>
-            <option value="No">No</option>
-            <option value="5+ Children">5+ Children</option>
-            <option value="21+ Adults">21+ Adults</option>
-            <option value="18+ Adults">18+ Adults</option>
-          </Select>
-        </FormControl>
-        <FormControl flex={1}>
-          <FormLabel fontWeight={600}>MAT Program</FormLabel>
-          <Select placeholder="Select" {...selectProps("MAT Program")}>
-            <option value="Yes">Yes</option>
-            <option value="No">No</option>
-          </Select>
-        </FormControl>
-      </Flex>
-
-      {/* Row 4: Languages (full width) */}
-      <FormControl mb={4}>
-        <FormLabel fontWeight={600}>Languages</FormLabel>
-        <Select placeholder="Select" {...selectProps("Languages")}>
-          <option value="English">English</option>
-          <option value="Spanish">Spanish</option>
-          <option value="Korean">Korean</option>
-          <option value="Vietnamese">Vietnamese</option>
-          <option value="Mandarin">Mandarin</option>
-          <option value="Tagalog">Tagalog</option>
-        </Select>
-      </FormControl>
-
-      {/* Row 5: Long Term Notes (full width) */}
-      <FormControl mb={4}>
-        <FormLabel fontWeight={600}>Long Term Notes</FormLabel>
-        <Textarea
-          placeholder="Type long term note here..."
-          value={formValues[catNames["Long Term Notes"] || "Long Term Notes"] || ""}
-          onChange={(e) =>
-            onChange(catNames["Long Term Notes"] || "Long Term Notes", e.target.value)
-          }
-          isReadOnly={readOnly}
-          bg={readOnly ? "gray.50" : "white"}
-          resize="vertical"
-          minH="120px"
-        />
-      </FormControl>
-    </>
+    </Flex>
   );
 };
 
-// Display labels we use in the form — matched case-insensitively to DB categories
-const FORM_LABELS = [
-  "Name",
-  "Credential",
-  "NPI/License",
-  "Phone Number",
-  "DEA",
-  "Patients",
-  "MAT Program",
-  "Languages",
-  "Long Term Notes",
-];
-
 // --- Main ProviderDrawer ---
 const ProviderDrawer = ({ mode, provider, isOpen, onClose, onSaved }) => {
+  const [categories, setCategories] = useState([]);
+  const [tags, setTags] = useState([]);
   const { backend } = useBackendContext();
   const [activeMode, setActiveMode] = useState(mode);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [formValues, setFormValues] = useState({});
-  const [catNames, setCatNames] = useState({});
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     if (!isOpen) return;
@@ -230,27 +192,30 @@ const ProviderDrawer = ({ mode, provider, isOpen, onClose, onSaved }) => {
 
     const init = async () => {
       try {
-        const res = await backend.get("/directoryCategories");
-        const categories = res.data;
+        const [catRes, tagRes] = await Promise.all([
+          backend.get("/directoryCategories"),
+          backend.get("/tags"),
+        ]);
 
-        // Build mapping: display label -> actual DB category name
-        const mapping = {};
-        FORM_LABELS.forEach((label) => {
-          mapping[label] = findCategoryName(categories, label);
-        });
-        setCatNames(mapping);
+        setCategories(catRes.data);
+        setTags(tagRes.data);
 
-        // Pre-fill form for edit/delete
         if ((mode === "edit" || mode === "delete") && provider) {
-          setFormValues({
-            ...provider.data,
-            [mapping["Long Term Notes"]]: provider.data?.[mapping["Long Term Notes"]] || provider.note || "",
+          const converted = {};
+
+          catRes.data.forEach((cat) => {
+            const existingValue = provider.data?.[cat.name];
+
+            if (existingValue !== undefined) {
+              converted[cat.id] = existingValue;
+            }
           });
-        } else {
-          setFormValues({});
+
+          setFormValues(converted);
         }
+
       } catch (err) {
-        console.error("Error fetching categories", err);
+        console.error("Error fetching drawer data", err);
       }
     };
 
@@ -258,18 +223,36 @@ const ProviderDrawer = ({ mode, provider, isOpen, onClose, onSaved }) => {
     setShowConfirmation(false);
   }, [isOpen, backend, mode, provider]);
 
-  const handleChange = (field, value) => {
-    setFormValues((prev) => ({ ...prev, [field]: value }));
+
+  const handleChange = (categoryId, value) => {
+    setFormValues((prev) => ({
+      ...prev,
+      [categoryId]: value,
+    }));
   };
 
   const buildPayload = () => {
-    const noteKey = catNames["Long Term Notes"] || "Long Term Notes";
-    const note = formValues[noteKey] || "";
-    return { data: { ...formValues }, note };
+    const dataPayload = {};
+
+    categories.forEach((cat) => {
+      if (formValues[cat.id] !== undefined) {
+        dataPayload[cat.name] = formValues[cat.id];
+      }
+    });
+
+    return {
+      data: dataPayload,
+      note: formValues.note || "",
+    };
   };
+
 
   const handleSubmit = async () => {
     if (!showConfirmation) {
+      const isValid = validateForm();
+
+      if (!isValid) return;
+
       setShowConfirmation(true);
       return;
     }
@@ -297,16 +280,25 @@ const ProviderDrawer = ({ mode, provider, isOpen, onClose, onSaved }) => {
     onClose();
   };
 
-  const titles = {
-    create: "Create Provider",
-    edit: "Edit Provider",
-    delete: "Delete Provider",
-  };
+  const validateForm = () => {
+  const newErrors = {};
 
-  const submitLabels = {
-    create: "Create",
-    edit: "Save Changes",
-    delete: "Confirm",
+  categories.forEach((cat) => {
+    if (cat.is_required) {
+      const value = formValues[cat.id];
+
+      const isEmpty =
+        value === undefined ||
+        value === "" ||
+        (Array.isArray(value) && value.length === 0);
+
+      if (isEmpty) {
+        newErrors[cat.id] = `${cat.name} is required`;
+      }
+    }
+  });
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const isReadOnly = showConfirmation || activeMode === "delete";
@@ -319,18 +311,25 @@ const ProviderDrawer = ({ mode, provider, isOpen, onClose, onSaved }) => {
         <DrawerHeader fontWeight="bold" fontSize="xl">
           {showConfirmation && activeMode === "edit"
             ? "Confirm Changes"
-            : titles[activeMode]}
+            : activeMode === "create"
+            ? "Create Provider"
+            : activeMode === "edit"
+            ? "Edit Provider"
+            : "Delete Provider"}
         </DrawerHeader>
 
         <DrawerBody>
           {showConfirmation && <ConfirmationBanner mode={activeMode} />}
 
           <ProviderFormFields
+            categories={categories}
+            tags={tags}
             formValues={formValues}
             onChange={handleChange}
             readOnly={isReadOnly}
-            catNames={catNames}
+            errors={errors}
           />
+
         </DrawerBody>
 
         <DrawerFooter justifyContent="space-between">
@@ -347,13 +346,14 @@ const ProviderDrawer = ({ mode, provider, isOpen, onClose, onSaved }) => {
               >
                 Delete Provider
               </Button>
+
               <Button
                 bg="black"
                 color="white"
                 _hover={{ bg: "gray.800" }}
                 onClick={handleSubmit}
               >
-                {submitLabels[activeMode]}
+                Save Changes
               </Button>
             </>
           ) : (
@@ -361,17 +361,21 @@ const ProviderDrawer = ({ mode, provider, isOpen, onClose, onSaved }) => {
               <Button variant="outline" onClick={handleClose}>
                 Cancel
               </Button>
+
               <Button
                 bg={activeMode === "delete" ? "red.600" : "black"}
                 color="white"
-                _hover={{ bg: activeMode === "delete" ? "red.700" : "gray.800" }}
+                _hover={{
+                  bg: activeMode === "delete" ? "red.700" : "gray.800",
+                }}
                 onClick={handleSubmit}
               >
-                {showConfirmation ? "Confirm" : submitLabels[activeMode]}
+                {showConfirmation ? "Confirm" : activeMode === "create" ? "Create" : "Confirm"}
               </Button>
             </>
           )}
         </DrawerFooter>
+
       </DrawerContent>
     </Drawer>
   );
