@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 
+import { DeleteIcon, HamburgerIcon } from "@chakra-ui/icons";
 import {
+  Box,
   Button,
   Drawer,
   DrawerBody,
@@ -9,8 +11,10 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerOverlay,
+  Flex,
   FormControl,
   FormLabel,
+  IconButton,
   Input,
   Radio,
   RadioGroup,
@@ -28,6 +32,10 @@ import {
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 import { useUserContext } from "@/contexts/hooks/useUserContext";
 import { closestCenter, DndContext } from "@dnd-kit/core";
+import {
+  restrictToParentElement,
+  restrictToVerticalAxis,
+} from "@dnd-kit/modifiers";
 import {
   arrayMove,
   SortableContext,
@@ -210,22 +218,48 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
     const style = {
       transform: CSS.Transform.toString(transform),
       transition,
-      padding: "8px",
-      borderRadius: "6px",
-      marginBottom: "4px",
-      background: "#f3f3f3",
-      cursor: "grab",
     };
 
     return (
-      <div
+      <Flex
         ref={setNodeRef}
         style={style}
-        {...attributes}
-        {...listeners}
+        align="center"
+        justify="space-between"
+        borderRadius="md"
+        bg="gray.100"
+        mb={3}
       >
-        {category.name}
-      </div>
+        {/* Drag Handle ONLY */}
+        <Flex
+          align="center"
+          bg="gray.200"
+          px={4}
+          py={3}
+          {...attributes}
+          {...listeners}
+          cursor="grab"
+          _active={{ cursor: "grabbing" }}
+        >
+          <HamburgerIcon />
+        </Flex>
+
+        {/* Category Name */}
+        <Box
+          flex="1"
+          px={4}
+        >
+          {category.name}
+        </Box>
+
+        {/* Trash Button (future functionality) */}
+        <IconButton
+          icon={<DeleteIcon />}
+          aria-label="Delete category"
+          variant="ghost"
+          mr={2}
+        />
+      </Flex>
     );
   }
   return (
@@ -243,6 +277,7 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
             <DndContext
               collisionDetection={closestCenter}
               onDragEnd={handleDragEnd}
+              modifiers={[restrictToVerticalAxis, restrictToParentElement]}
             >
               <SortableContext
                 items={categories.map((cat) => cat.id)}
