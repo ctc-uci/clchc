@@ -6,19 +6,19 @@ export const versionLogRouter = Router();
 
 versionLogRouter.post("/", async (req, res) => {
   try {
-    const { userId, quotaId, action, delta } = req.body;
+    const { userId, quotaId, action } = req.body;
 
-    if (!userId || !quotaId || !action || !delta) {
+    if (!userId || !quotaId || !action) {
       return res.status(404).json({
         error:
-          "Parameters not sufficient; userId, quotaId, action, and delta are required.",
+          "Parameters not sufficient; userId, quotaId, and action are required.",
       });
     }
 
     const result = await db.query(
-      `INSERT INTO version_log (user_id, quota_id, action, delta)
-       VALUES ($1, $2, $3, $4) RETURNING *`,
-      [userId, quotaId, action, delta]
+      `INSERT INTO version_log (user_id, quota_id, action)
+       VALUES ($1, $2, $3) RETURNING *`,
+      [userId, quotaId, action]
     );
 
     res.status(201).json(keysToCamel(result));
@@ -48,7 +48,6 @@ versionLogRouter.get("/details", async (req, res) => {
       SELECT
         version_log.id AS id,
         version_log.*,
-        version_log.delta,
         quota.date,
         quota.end_time AS time,
         "users".first_name,
@@ -64,7 +63,7 @@ versionLogRouter.get("/details", async (req, res) => {
         OR "users".last_name ILIKE '%' || $1 || '%'
         OR providers.data->>'Name' ILIKE '%' || $1 || '%'
       )
-      ORDER BY version_log.id DESC
+      ORDER BY version_log.id ASC
       `,
       [q ?? null]
     );

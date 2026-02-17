@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { LockIcon } from "@chakra-ui/icons";
 // import { Pencil } from 'lucide-react';
@@ -553,7 +553,6 @@ export default function QuotaDrawer({
   const [quota, setQuota] = useState(0);
   const [progress, setProgress] = useState(0);
   const [isLocked, setIsLocked] = useState(false);
-  const [originalProgress, setOriginalProgress] = useState(0);
   // const [lockEdit, setLockEdit] = useState(false);
   const isDev = import.meta.env?.DEV;
 
@@ -644,7 +643,6 @@ export default function QuotaDrawer({
         setQuota(quotaData.quota ?? 0);
         setProgress(quotaData.progress ?? 0);
         setNote(quotaData.notes ?? "");
-        setOriginalProgress(quotaData.progress ?? 0);
       } catch (err) {
         console.error("Error fetching quota details:", err);
       }
@@ -661,7 +659,6 @@ export default function QuotaDrawer({
       setNote("");
       setQuota(0);
       setProgress(0);
-      setOriginalProgress(0);
       setIsLocked(false);
     }
   }, [isOpen, quotaID, backend, defaultDate]);
@@ -681,30 +678,11 @@ export default function QuotaDrawer({
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-   
-
     if (isLocked) {
       handleClose();
       return;
     }
-    if (progress != originalProgress) {
-      /* If the new progress is not the same as the original, 
-       use a POST endpoint to the /VersionLog route */
-      try {
-        const res = await backend.get(`/users/firebase/${currentUser.uid}`);
-        const userData = res.data[0];
-        const userID = userData.id;
-        await backend.post("/versionLog", {
-          userId: userID ?? null,
-          quotaId: quotaID ?? null,
-          action:
-            progress > originalProgress ? "increment" : "decrement",
-          delta: progress - originalProgress,
-        });
-      } catch (err) {
-        console.error("Error logging quota change to version log:", err);
-      }
-    }
+
     const formData = {
       providerId,
       locationId,
