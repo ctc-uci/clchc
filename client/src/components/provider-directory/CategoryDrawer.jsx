@@ -170,12 +170,12 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
 
       // Post new categories
       await Promise.all(
-        newCategories.map((cat, index) =>
+        newCategories.map((cat) =>
           backend.post("/directoryCategories", {
             name: cat.name,
             inputType: cat.inputType,
             isRequired: cat.isRequired,
-            columnOrder: existingCategories.length + index,
+            columnOrder: cat.columnOrder,
           })
         )
       );
