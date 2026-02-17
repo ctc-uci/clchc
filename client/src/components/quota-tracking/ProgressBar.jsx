@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 
 import { Button, Flex, Icon, Progress, Text } from "@chakra-ui/react";
 
+import { useAuthContext } from "@/contexts/hooks/useAuthContext";
 import { ArrowDown, ArrowUp } from "lucide-react";
 
 import { useBackendContext } from "../../contexts/hooks/useBackendContext";
@@ -12,7 +13,8 @@ export default function ProgressBar({ quotaID }) {
   const quotaRef = useRef(null);
   const [quota, setQuota] = useState(null);
   const [currentProgress, setCurrentProgress] = useState(0);
-
+  const { currentUser } = useAuthContext();
+  const [originalProgress, setOriginalProgress] = useState(null);
   //populate quota on mount
   useEffect(() => {
     (async () => {
@@ -25,6 +27,7 @@ export default function ProgressBar({ quotaID }) {
         quotaRef.current = q;
         setQuota(q);
         setCurrentProgress(q.progress ?? 0);
+        setOriginalProgress(q.progress ?? 0);
       } catch (err) {
         console.error("Error fetching quota:", err);
       }
@@ -45,6 +48,21 @@ export default function ProgressBar({ quotaID }) {
       quotaRef.current = { ...quotaRef.current, progress: next };
     } catch (err) {
       console.error("Error updating progress:", err);
+    }
+    try {
+      const res = await backend.get(`/users/firebase/${currentUser.uid}`);
+      const userData = res.data[0];
+      const userID = userData.id;
+      await backend.post("/versionLog", {
+        userId: userID ?? null,
+        quotaId: quotaID ?? null,
+        action:
+          next > originalProgress ? "increment" : "decrement",
+        delta: next - originalProgress,
+      });
+      setOriginalProgress(next);
+    } catch (err) {
+      console.error("Error logging quota change to version log:", err);
     }
   };
 
