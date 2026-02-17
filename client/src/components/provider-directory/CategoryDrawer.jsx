@@ -44,6 +44,58 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
+function SortableCategory({ category }) {
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id: category.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <Flex
+      ref={setNodeRef}
+      style={style}
+      align="center"
+      justify="space-between"
+      borderRadius="md"
+      bg="gray.100"
+      mb={3}
+    >
+      {/* Drag Handle ONLY */}
+      <Flex
+        align="center"
+        bg="gray.200"
+        px={4}
+        py={3}
+        {...attributes}
+        {...listeners}
+        cursor="grab"
+        _active={{ cursor: "grabbing" }}
+      >
+        <HamburgerIcon />
+      </Flex>
+
+      {/* Category Name */}
+      <Box
+        flex="1"
+        px={4}
+      >
+        {category.name}
+      </Box>
+
+      {/* Trash Button (future functionality) */}
+      <IconButton
+        icon={<DeleteIcon />}
+        aria-label="Delete category"
+        variant="ghost"
+        mr={2}
+      />
+    </Flex>
+  );
+}
+
 const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
   const [name, setName] = useState("");
   const [inputType, setInputType] = useState("");
@@ -223,57 +275,6 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
     }
   };
 
-  function SortableCategory({ category }) {
-    const { attributes, listeners, setNodeRef, transform, transition } =
-      useSortable({ id: category.id });
-
-    const style = {
-      transform: CSS.Transform.toString(transform),
-      transition,
-    };
-
-    return (
-      <Flex
-        ref={setNodeRef}
-        style={style}
-        align="center"
-        justify="space-between"
-        borderRadius="md"
-        bg="gray.100"
-        mb={3}
-      >
-        {/* Drag Handle ONLY */}
-        <Flex
-          align="center"
-          bg="gray.200"
-          px={4}
-          py={3}
-          {...attributes}
-          {...listeners}
-          cursor="grab"
-          _active={{ cursor: "grabbing" }}
-        >
-          <HamburgerIcon />
-        </Flex>
-
-        {/* Category Name */}
-        <Box
-          flex="1"
-          px={4}
-        >
-          {category.name}
-        </Box>
-
-        {/* Trash Button (future functionality) */}
-        <IconButton
-          icon={<DeleteIcon />}
-          aria-label="Delete category"
-          variant="ghost"
-          mr={2}
-        />
-      </Flex>
-    );
-  }
   return (
     <>
       <Drawer
