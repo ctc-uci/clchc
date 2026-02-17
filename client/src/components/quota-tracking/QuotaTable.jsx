@@ -25,7 +25,6 @@ import {
 
 import ProgressBar from "@/components/quota-tracking/ProgressBar";
 import QuotaDrawer from "@/components/quota-tracking/QuotaDrawer";
-import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 import { useUpdateQuota } from "@/contexts/hooks/data-fetching/useQuotas";
 
 const SELECTED_BG = "#7fb3ec";
