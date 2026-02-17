@@ -14,7 +14,13 @@ import {
   WrapItem,
 } from "@chakra-ui/react";
 
-export default function ProviderTable({ providers, providerCategories, isLoading }) {
+export default function ProviderTable({
+  providers,
+  providerCategories,
+  selectedProviderId,
+  onProviderSelect,
+  onProviderDoubleClick,
+}) {
   // sort categories by columnOrder
 
   const sortedCategories = [...providerCategories].sort(
@@ -59,7 +65,7 @@ export default function ProviderTable({ providers, providerCategories, isLoading
       // Defaults per inputType
       if (cat.inputType === "tag")
         return <Text color="gray.400">NO TAGS SELECTED</Text>;
-      return <Text color="gray.400"></Text>; // default for "text" (and any other types)
+      return <Text color="gray.400"></Text>;
     }
 
     // Format per inputType
@@ -88,8 +94,10 @@ export default function ProviderTable({ providers, providerCategories, isLoading
   };
 
   const ProviderRow = ({ provider }) => {
+    const isSelected = selectedProviderId === provider.id;
+
     const getCells = () =>
-      sortedCategories.map((cat) => (
+      providerCategories.map((cat) => (
         <Td
           key={cat.name}
           borderRight="1px solid"
@@ -103,6 +111,11 @@ export default function ProviderTable({ providers, providerCategories, isLoading
       <Tr
         borderBottom="1px solid"
         borderColor="gray.200"
+        cursor={onProviderSelect ? "pointer" : "default"}
+        bg={isSelected ? "blue.50" : "transparent"}
+        _hover={onProviderSelect ? { bg: isSelected ? "blue.100" : "gray.50" } : {}}
+        onClick={() => onProviderSelect?.(provider)}
+        onDoubleClick={() => onProviderDoubleClick?.(provider)}
       >
         {getCells()}
       </Tr>
@@ -123,9 +136,6 @@ export default function ProviderTable({ providers, providerCategories, isLoading
     return <Tbody>{rows}</Tbody>;
   };
 
-  if (isLoading) {
-    return <Text> Loading providers and categories... </Text>
-  }
   return (
     <TableContainer
       border="1px solid"
