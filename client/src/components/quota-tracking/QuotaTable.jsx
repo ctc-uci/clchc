@@ -26,11 +26,11 @@ import {
 import ProgressBar from "@/components/quota-tracking/ProgressBar";
 import QuotaDrawer from "@/components/quota-tracking/QuotaDrawer";
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
+import { useUpdateQuota } from "@/contexts/hooks/data-fetching/useQuotas";
 
 const SELECTED_BG = "#7fb3ec";
 
 const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
-  const { backend } = useBackendContext();
   const [editingQuotaId, setEditingQuotaId] = useState(null);
   const [selectedRowId, setSelectedRowId] = useState(null);
   const {
@@ -39,11 +39,17 @@ const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
     onClose: onDrawerClose,
   } = useDisclosure();
 
+  const {
+    mutate: updateQuota,
+    isLoading: isUpdating,
+    error: updateError,
+  } = useUpdateQuota();
+
   const onSave = async (id, newNote) => {
     const sanitizedNote = newNote.trim();
 
     try {
-      await backend.put(`/quota/${id}`, { notes: sanitizedNote });
+      updateQuota({ id, data: { notes: sanitizedNote } });
       if (onRowsUpdate) {
         onRowsUpdate((prevRows) =>
           prevRows.map((row) =>

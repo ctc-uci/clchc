@@ -61,13 +61,40 @@ usersRouter.post("/", async (req, res) => {
 // Get all users w/ optional status filter
 usersRouter.get("/", async (req, res) => {
   try {
-    const { status } = req.query;
+    const { status, user } = req.query;
+
+    const conditions = [];
+    const values = [];
+
+    // Filter by status if provided
+    if (status) {
+      values.push(String(status));
+      conditions.push(`status::text = $${values.length}`);
+    }
+
+    // Filter by user search if provided
+    if (user) {
+      values.push(`%${user}%`);
+      conditions.push(`
+        (
+          first_name ILIKE $${values.length} 
+          OR last_name ILIKE $${values.length} 
+          OR email ILIKE $${values.length}
+        )
+      `);
+    }
+
+    // Build the WHERE clause dynamically
+    const whereClause = conditions.length > 0 ? "WHERE " + conditions.join(" AND ") : "";
 
     const result = await db.query(
-      status
-        ? "SELECT * FROM users WHERE status::text = $1"
-        : "SELECT * FROM users",
-      status ? [String(status)] : []
+      `
+        SELECT *
+        FROM users
+        ${whereClause}
+        ORDER BY id ASC
+      `,
+      values
     );
 
     return res.status(200).json(keysToCamel(result));

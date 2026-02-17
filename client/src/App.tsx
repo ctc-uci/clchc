@@ -3,6 +3,7 @@ import { CatchAll } from "@/components/CatchAll";
 import { Dashboard } from "@/components/dashboard/Dashboard";
 import Layout from "@/components/layout/layout";
 import { Login } from "@/components/login/Login";
+import { PendingApprovalPage } from "@/components/login/PendingApprovalPage";
 import { Playground } from "@/components/Playground";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { ProviderDirectoryPage } from "@/components/provider-directory/ProviderDirectoryPage";
@@ -10,9 +11,11 @@ import { QuotaTracking } from "@/components/quota-tracking/QuotaTrackingPage";
 import { Signup } from "@/components/signup/Signup";
 import { UserDirectory } from "@/components/user-directory/UserDirectoryPage";
 import { PERSONAL_INFO, Settings } from "@/components/user-settings/Settings";
+import { VersionLogPage } from "@/components/version-log/VersionLogPage";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { BackendProvider } from "@/contexts/BackendContext";
 import { UserProvider } from "@/contexts/UserContext";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { CookiesProvider } from "react-cookie";
 import {
   Navigate,
@@ -21,41 +24,41 @@ import {
   Routes,
 } from "react-router-dom";
 
-import { PendingApprovalPage } from "./components/login/PendingApprovalPage";
-import { VersionLogPage } from "./components/version-log/VersionLogPage";
+const queryClient = new QueryClient();
 
 const App = () => {
   return (
+    <QueryClientProvider client={queryClient}>
     <CookiesProvider>
       <BackendProvider>
         <AuthProvider>
           <UserProvider>
             <Router>
               <Routes>
-                <Route element={<Layout />}>
+                <Route element={<Layout/>}>
                   <Route
-                    path="/user-directory"
-                    element={<UserDirectory />}
+                  path="/user-directory"
+                  element={<UserDirectory />}
                   />
                   <Route
-                    path="/settings"
-                    element={
-                      <ProtectedRoute
-                        element={<Settings view={PERSONAL_INFO} />}
-                      />
-                    }
+                  path="/settings"
+                  element={
+                    <ProtectedRoute
+                      element={<Settings view={PERSONAL_INFO} />}
+                    />
+                  }
+                />
+                <Route
+                  path="/quota-tracking"
+                  element={<QuotaTracking />}
                   />
                   <Route
-                    path="/quota-tracking"
-                    element={<QuotaTracking />}
+                  path="/provider-directory"
+                  element={<ProviderDirectoryPage />}
                   />
                   <Route
-                    path="/provider-directory"
-                    element={<ProviderDirectoryPage />}
-                  />
-                  <Route
-                    path="/version-log"
-                    element={<VersionLogPage />}
+                  path="/version-log"
+                  element={<VersionLogPage />}
                   />
                 </Route>
                 <Route
@@ -118,6 +121,7 @@ const App = () => {
         </AuthProvider>
       </BackendProvider>
     </CookiesProvider>
+    </QueryClientProvider>
   );
 };
 

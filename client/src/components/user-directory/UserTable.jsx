@@ -12,12 +12,13 @@ import {
   Th,
   Thead,
   Tr,
+  Text,
   useDisclosure,
 } from "@chakra-ui/react";
 
 import UserEditModal from "./UserEditModal";
 
-export default function UserTable({ users, onDelete, onUpdated }) {
+export default function UserTable({ users = [], loading = false, onDelete, onUpdated }) {
   // console.log(users)
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedUser, setSelectedUser] = useState(null);
@@ -35,6 +36,9 @@ export default function UserTable({ users, onDelete, onUpdated }) {
     viewer: "yellow",
   };
 
+  if (loading) {
+    return <Text> Loading users... </Text>
+  }
   return (
     <>
       <TableContainer

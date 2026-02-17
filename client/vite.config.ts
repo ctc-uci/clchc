@@ -13,6 +13,7 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: {
         '@': path.resolve(__dirname, 'src'),
+        '@server': path.resolve(__dirname, '../server'),
       },
     },
 
@@ -22,6 +23,9 @@ export default defineConfig(({ mode }) => {
      * @see {@link client/docs/signInWithRedirect.md} for more detailed documentation.
      */
     server: {
+      fs: {
+        allow: [path.resolve(__dirname, '..')],
+      },
       proxy: {
         "/__/auth": {
           target: `https://${process.env.VITE_FIREBASE_AUTHDOMAIN}`,

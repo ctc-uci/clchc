@@ -22,13 +22,18 @@ import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 import { useUserContext } from "@/contexts/hooks/useUserContext";
 import { useDebounce } from "@/hooks/useDebounce";
 
+import { useQuotas } from "@/contexts/hooks/data-fetching/useQuotas";
 import QuotaTable from "./QuotaTable";
 
 export const QuotaTracking = () => {
-  const { backend } = useBackendContext();
+  // const { backend } = useBackendContext()
   const [rows, setRows] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [providerQuery, setProviderQuery] = useState("");
+  // const [debouncedProviderQuery, setDebouncedProviderQuery] = useState("");
+  const debouncedProviderQuery = useDebounce(
+  (value) => setProviderQuery(value),
+  300
+);
   const { role } = useUserContext();
 
   // get current date and reformat
@@ -38,52 +43,23 @@ export const QuotaTracking = () => {
   );
 
   const {
+    data: quotas = [],
+    isLoading,
+    error,
+    refetch,
+  } = useQuotas({
+    date: selectedDate,
+    provider: providerQuery,
+  });
+
+  const {
     isOpen: isCreateDrawerOpen,
     onOpen: onCreateDrawerOpen,
     onClose: onCreateDrawerClose,
   } = useDisclosure();
 
-  const fetchQuotas = useCallback(
-    async (provider, date) => {
-      setLoading(true);
-
-      let endpoint = `/quota/details`;
-      const params = [];
-
-      if (provider) params.push(`provider=${provider}`);
-      if (date) params.push(`date=${date}`);
-
-      if (params.length) {
-        endpoint += `?${params.join("&")}`;
-      }
-
-      try {
-        const response = await backend.get(endpoint);
-        setRows(response.data);
-      } catch (err) {
-        console.error("Failed to fetch quotas", err);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [backend]
-  );
-
-  const debouncedFetch = useDebounce(fetchQuotas);
-
-  useEffect(() => {
-    debouncedFetch.cancel();
-
-    if (!providerQuery) {
-      fetchQuotas("", selectedDate);
-      return;
-    }
-
-    debouncedFetch(providerQuery, selectedDate);
-  }, [providerQuery, selectedDate, fetchQuotas, debouncedFetch]);
-
   const handleChange = (e) => {
-    setProviderQuery(e.target.value);
+    debouncedProviderQuery(e.target.value);
   };
 
   return (
@@ -202,13 +178,13 @@ export const QuotaTracking = () => {
       </InputGroup>
 
       <QuotaTable
-        rows={rows}
-        loading={loading}
+        rows={quotas}
+        loading={isLoading}
         onRowsUpdate={(updater) => {
           if (typeof updater === "function") {
             setRows(updater);
           } else {
-            fetchQuotas(providerQuery, selectedDate);
+            refetch();
           }
         }}
       />

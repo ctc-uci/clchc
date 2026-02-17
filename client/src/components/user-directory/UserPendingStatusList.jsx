@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { BackendContext } from "@/contexts/BackendContext";
 
 import { WarningIcon } from "@chakra-ui/icons";
 import {
@@ -12,50 +12,45 @@ import {
   VStack,
 } from "@chakra-ui/react";
 
-import { BackendContext } from "@/contexts/BackendContext";
+import {
+  useDeleteUser,
+  useUpdateUser,
+  useUsers,
+} from "@/contexts/hooks/data-fetching/useUsers";
 
 export const UserPendingStatusList = () => {
-  const { backend } = useContext(BackendContext);
-  const [pendingUsers, setPendingUsers] = useState([]);
+  // const [pendingUsers, setPendingUsers] = useState([]);
+  const {
+    data: pendingUsers,
+    isLoading,
+    error,
+  } = useUsers({ status: "pending" });
+  const {
+    mutate: updateUser,
+    isLoading: isUpdating,
+    error: errorUpdating,
+  } = useUpdateUser();
+  const {
+    mutate: deleteUser,
+    isLoading: isDeleting,
+    error: errorDeleting,
+  } = useDeleteUser();
 
-  //Fetch users and check for pending status
-  useEffect(() => {
-    const checkPendingStatus = async () => {
-      try {
-        // Fetch all users that have pending status
-        const response = await backend.get("/users", {
-          params: { status: "pending" },
-        });
-        setPendingUsers(response.data);
-      } catch (err) {
-        console.error(
-          "couldn't fetch pending status in components/UserPendingStatus.jsx",
-          err
-        );
-      }
-    };
-
-    checkPendingStatus();
-  }, [backend]);
 
   //When Approve Button is clicked, update user status to active
   const handleApprove = async (id) => {
     try {
-      await backend.put(`/users/${id}`, {
-        status: "approved",
-      });
-
-      setPendingUsers((prev) => prev.filter((user) => user.id !== id));
+      await updateUser({ id: id, data: { status: "approved" } });
     } catch (err) {
       console.error("Couldn't approve user", err);
     }
-  };
 
+  };
+    
   //When Deny Button is clicked, delete user from database
   const handleDeny = async (id) => {
     try {
-      await backend.delete(`/users/${id}`);
-      setPendingUsers((prev) => prev.filter((user) => user.id !== id));
+      await deleteUser(id);
     } catch (err) {
       console.error(
         "couldn't deny user in components/UserPendingStatus.jsx",
@@ -63,6 +58,10 @@ export const UserPendingStatusList = () => {
       );
     }
   };
+
+  if (isLoading) {
+    return <Text> Loading pending users... </Text>;
+  }
 
   return (
     <Box
