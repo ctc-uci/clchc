@@ -1,7 +1,13 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import { DeleteIcon, HamburgerIcon } from "@chakra-ui/icons";
 import {
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogOverlay,
   Box,
   Button,
   Drawer,
@@ -19,14 +25,8 @@ import {
   Radio,
   RadioGroup,
   Stack,
-  useToast,
-  AlertDialog,
-  AlertDialogOverlay,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogBody,
-  AlertDialogFooter,
   useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
 
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
@@ -54,11 +54,13 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
   const { role, loading } = useUserContext();
   const toast = useToast();
   const formStackRef = useRef(null);
-  const { isOpen: isDiscardAlertOpen, onOpen: onDiscardAlertOpen, onClose: onDiscardAlertClose } = useDisclosure();
+  const {
+    isOpen: isDiscardAlertOpen,
+    onOpen: onDiscardAlertOpen,
+    onClose: onDiscardAlertClose,
+  } = useDisclosure();
   const cancelRef = useRef();
   const pendingCloseRef = useRef(false);
-  
-
 
   useEffect(() => {
     if (!isOpen) return;
@@ -83,13 +85,18 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
   // after clicking add new category, it scrolls to show the new stack form shown
   useEffect(() => {
     if (showForm && formStackRef.current) {
-      formStackRef.current.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      formStackRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+      });
     }
   }, [showForm]);
 
   // alert pop ups for discarding unsaved changes
   const handleDrawerClose = () => {
-    const hasTempCategories = categories.some((cat) => String(cat.id).startsWith("temp-"));
+    const hasTempCategories = categories.some((cat) =>
+      String(cat.id).startsWith("temp-")
+    );
     if (hasTempCategories) {
       pendingCloseRef.current = true;
       onDiscardAlertOpen();
@@ -145,8 +152,12 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
   const handleSubmit = async () => {
     try {
       // Separate existing and new categories
-      const existingCategories = categories.filter((cat) => !String(cat.id).startsWith("temp-"));
-      const newCategories = categories.filter((cat) => String(cat.id).startsWith("temp-"));
+      const existingCategories = categories.filter(
+        (cat) => !String(cat.id).startsWith("temp-")
+      );
+      const newCategories = categories.filter((cat) =>
+        String(cat.id).startsWith("temp-")
+      );
 
       // Update existing categories with new column order
       await Promise.all(
@@ -189,12 +200,13 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
         onSaved();
       }
     } catch (err) {
-      // feedback for error + deleting the bad category 
+      // feedback for error + deleting the bad category
       setCategories((prevCategories) =>
         prevCategories.filter((cat) => !String(cat.id).startsWith("temp-"))
       );
 
-      const errorMessage = err?.response?.data || err.message || "Failed to save changes";
+      const errorMessage =
+        err?.response?.data || err.message || "Failed to save changes";
       console.error(
         "Failed to save changes",
         err?.response?.status,
@@ -295,7 +307,14 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
             <Button onClick={() => setShowForm(!showForm)}>Add Category</Button>
 
             {showForm && (
-              <Stack gap={4} mt={4} p={4} borderWidth={1} borderRadius={6} ref={formStackRef}>
+              <Stack
+                gap={4}
+                mt={4}
+                p={4}
+                borderWidth={1}
+                borderRadius={6}
+                ref={formStackRef}
+              >
                 <FormControl isRequired>
                   <FormLabel>Category Name</FormLabel>
                   <Input
@@ -328,11 +347,20 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
                   />
                 </label>
 
-                <Stack direction="row" justify="flex-end">
-                  <Button variant="outline" onClick={() => setShowForm(false)}>
+                <Stack
+                  direction="row"
+                  justify="flex-end"
+                >
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowForm(false)}
+                  >
                     Cancel
                   </Button>
-                  <Button colorScheme="blue" onClick={handleAddCategory}>
+                  <Button
+                    colorScheme="blue"
+                    onClick={handleAddCategory}
+                  >
                     Add
                   </Button>
                 </Stack>
@@ -365,17 +393,28 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
       >
         <AlertDialogOverlay>
           <AlertDialogContent>
-            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+            <AlertDialogHeader
+              fontSize="lg"
+              fontWeight="bold"
+            >
               Discard Changes
             </AlertDialogHeader>
             <AlertDialogBody>
-              You have unsaved categories. Are you sure you want to discard these changes?
+              You have unsaved categories. Are you sure you want to discard
+              these changes?
             </AlertDialogBody>
             <AlertDialogFooter>
-              <Button ref={cancelRef} onClick={onDiscardAlertClose}>
+              <Button
+                ref={cancelRef}
+                onClick={onDiscardAlertClose}
+              >
                 Keep Changes
               </Button>
-              <Button colorScheme="red" onClick={handleConfirmDiscard} ml={3}>
+              <Button
+                colorScheme="red"
+                onClick={handleConfirmDiscard}
+                ml={3}
+              >
                 Discard
               </Button>
             </AlertDialogFooter>
