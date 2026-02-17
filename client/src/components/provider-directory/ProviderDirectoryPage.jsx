@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { AddIcon, HamburgerIcon, SearchIcon } from "@chakra-ui/icons";
+import { AddIcon, ChevronDownIcon, SearchIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
@@ -10,6 +10,10 @@ import {
   Input,
   InputGroup,
   InputLeftElement,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
   Tag,
   Text,
   useDisclosure,
@@ -17,6 +21,7 @@ import {
 
 import { Navbar } from "@/components/layout/Navbar";
 import CategoryDrawer from "@/components/provider-directory/CategoryDrawer";
+import ProviderDrawer from "@/components/provider-directory/ProviderDrawer";
 import ProviderTable from "@/components/provider-directory/ProviderTable";
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 import { useUserContext } from "@/contexts/hooks/useUserContext";
@@ -26,16 +31,28 @@ export const ProviderDirectoryPage = () => {
   const [providers, setProviders] = useState(null);
   const [providerCategories, setProviderCategories] = useState(null);
   const [providerQuery, setProviderQuery] = useState("");
+  
   const { role, loading } = useUserContext();
+  
   const {
-    isOpen: isCreateDrawerOpen,
-    onOpen: onCreateDrawerOpen,
-    onClose: onCreateDrawerClose,
+    isOpen: isCategoryDrawerOpen,
+    onOpen: onCategoryDrawerOpen,
+    onClose: onCategoryDrawerClose,
   } = useDisclosure();
+
+  const {
+    isOpen: isProviderDrawerOpen,
+    onOpen: onProviderDrawerOpen,
+    onClose: onProviderDrawerClose,
+  } = useDisclosure();
+
+  const [drawerMode, setDrawerMode] = useState("create");
+  const [selectedProvider, setSelectedProvider] = useState(null);
+  const [highlightedProviderId, setHighlightedProviderId] = useState(null);
 
   const { backend } = useBackendContext();
 
-  const fetchData = async (provider = "") => {
+  const fetchData = useCallback(async (provider = "") => {
     let endpoint = "/providers";
 
     if (provider) {
@@ -49,7 +66,7 @@ export const ProviderDirectoryPage = () => {
 
     setProviders(providerData.data);
     setProviderCategories(catData.data);
-  };
+  }, [backend]);
 
   const debouncedFetch = useMemo(() => {
     return debounce((provider) => {
@@ -76,6 +93,22 @@ export const ProviderDirectoryPage = () => {
 
   const handleChange = (e) => {
     setProviderQuery(e.target.value);
+  };
+
+  const openCreateDrawer = () => {
+    setDrawerMode("create");
+    setSelectedProvider(null);
+    onProviderDrawerOpen();
+  };
+
+  const openEditDrawer = (provider) => {
+    setDrawerMode("edit");
+    setSelectedProvider(provider);
+    onProviderDrawerOpen();
+  };
+
+  const handleDrawerSaved = () => {
+    fetchData(providerQuery);
   };
 
   return (
@@ -132,6 +165,23 @@ export const ProviderDirectoryPage = () => {
           </InputGroup>
 
           <Flex gap={3}>
+            <Menu>
+              <MenuButton
+                as={Button}
+                bg="black"
+                color="white"
+                _hover={{ bg: "gray.800" }}
+                _active={{ bg: "gray.800" }}
+                rightIcon={<ChevronDownIcon />}
+              >
+                Edit
+              </MenuButton>
+              <MenuList>
+                <MenuItem isDisabled>Tags</MenuItem>
+                <MenuItem isDisabled>Categories</MenuItem>
+                <MenuItem onClick={openCreateDrawer}>Providers</MenuItem>
+              </MenuList>
+            </Menu>
             <Button
               onClick={() => {
                 onCreateDrawerOpen();
@@ -154,17 +204,36 @@ export const ProviderDirectoryPage = () => {
           <ProviderTable
             providers={providers}
             providerCategories={providerCategories}
+            selectedProviderId={highlightedProviderId}
+            onProviderSelect={
+              role === "ccm" || role === "master"
+                ? (provider) => setHighlightedProviderId(provider.id)
+                : undefined
+            }
+            onProviderDoubleClick={
+              role === "ccm" || role === "master" ? openEditDrawer : undefined
+            }
           />
         </Box>
       ) : (
         <Text>Loading</Text>
       )}
+
       <CategoryDrawer
-        isOpen={isCreateDrawerOpen}
-        onOpen={onCreateDrawerOpen}
-        onClose={onCreateDrawerClose}
+        isOpen={isCategoryDrawerOpen}
+        onOpen={onCategoryDrawerOpen}
+        onClose={onCategoryDrawerClose}
         onSaved={fetchData}
       />
+
+      <ProviderDrawer
+        mode={drawerMode}
+        provider={selectedProvider}
+        isOpen={isProviderDrawerOpen}
+        onClose={onProviderDrawerClose}
+        onSaved={handleDrawerSaved}
+      />
+
       <Navbar />
     </Box>
   );
