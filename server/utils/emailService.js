@@ -13,6 +13,8 @@ export async function notifyCcmNewUserRequest(name, email) {
   // Sanitize
   const sanitizedName = escapeHtml(name);
   const sanitizedEmail = escapeHtml(email);
+  // change this when deployed
+  const approvalUrl = `http://localhost:3000/user-directory`;
 
   const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -28,6 +30,7 @@ export async function notifyCcmNewUserRequest(name, email) {
         <p>Please approve this user:</p>
         <p><strong>Name:</strong> ${sanitizedName}</p>
         <p><strong>Email:</strong> ${sanitizedEmail}</p>
+        <p>Approve them <a href="${approvalUrl}">here</a></p>
       </div>
     `;
 

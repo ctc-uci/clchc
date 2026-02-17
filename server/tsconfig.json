@@ -29,6 +29,7 @@
       "@/common/*": ["common/*"],
       "@/config/*": ["config/*"],
       "@/routes/*": ["routes/*"],
+      "@/utils/*": ["utils/*"],
       "@/*": ["src/*"]
     }
   }
