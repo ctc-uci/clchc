@@ -9,7 +9,7 @@ export default tseslint.config(
     ignores: ["dist"],
     languageOptions: {
       ecmaVersion: 2020,
-      globals: globals.browser,
+      globals: globals.node,
       parserOptions: {
         projectService: true,
         tsconfigRootDir: import.meta.dirname,
