@@ -14,13 +14,7 @@ import {
   WrapItem,
 } from "@chakra-ui/react";
 
-export default function ProviderTable({
-  providers,
-  providerCategories,
-  selectedProviderId,
-  onProviderSelect,
-  onProviderDoubleClick,
-}) {
+export default function ProviderTable({ providers, providerCategories }) {
   // sort categories by columnOrder
 
   const sortedCategories = [...providerCategories].sort(
@@ -55,38 +49,6 @@ export default function ProviderTable({
   const renderCellValue = (provider, cat) => {
     const raw = provider?.data?.[cat.name];
 
-    // Special rendering for Name column: show phone + DEA below
-    const catLower = cat.name.toLowerCase();
-    if (catLower === "name") {
-      const name = raw || "";
-      // Find phone/DEA keys case-insensitively
-      const dataKeys = Object.keys(provider?.data || {});
-      const phoneKey = dataKeys.find((k) => k.toLowerCase() === "phone number");
-      const deaKey = dataKeys.find((k) => k.toLowerCase() === "dea");
-      const phone = phoneKey ? provider.data[phoneKey] : "";
-      const dea = deaKey ? provider.data[deaKey] : "";
-
-      if (!name && !phone && !dea) {
-        return <Text color="gray.400"></Text>;
-      }
-
-      return (
-        <>
-          <Text fontWeight="medium">{name}</Text>
-          {phone && (
-            <Text fontSize="sm" color="gray.500">
-              {phone}
-            </Text>
-          )}
-          {dea && (
-            <Text fontSize="sm" color="gray.500">
-              DEA: {dea}
-            </Text>
-          )}
-        </>
-      );
-    }
-
     // Treat undefined/null/"" as missing
     const isMissing =
       raw === undefined ||
@@ -97,7 +59,7 @@ export default function ProviderTable({
       // Defaults per inputType
       if (cat.inputType === "tag")
         return <Text color="gray.400">NO TAGS SELECTED</Text>;
-      return <Text color="gray.400"></Text>;
+      return <Text color="gray.400"></Text>; // default for "text" (and any other types)
     }
 
     // Format per inputType
@@ -126,8 +88,6 @@ export default function ProviderTable({
   };
 
   const ProviderRow = ({ provider }) => {
-    const isSelected = selectedProviderId === provider.id;
-
     const getCells = () =>
       providerCategories.map((cat) => (
         <Td
@@ -143,11 +103,6 @@ export default function ProviderTable({
       <Tr
         borderBottom="1px solid"
         borderColor="gray.200"
-        cursor={onProviderSelect ? "pointer" : "default"}
-        bg={isSelected ? "blue.50" : "transparent"}
-        _hover={onProviderSelect ? { bg: isSelected ? "blue.100" : "gray.50" } : {}}
-        onClick={() => onProviderSelect?.(provider)}
-        onDoubleClick={() => onProviderDoubleClick?.(provider)}
       >
         {getCells()}
       </Tr>
