@@ -16,18 +16,18 @@ import {
   VStack,
 } from "@chakra-ui/react";
 
-import { Link } from "react-router-dom";
-
 import { useAuthContext } from "@/contexts/hooks/useAuthContext";
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
-import { useRoleContext } from "@/contexts/hooks/useRoleContext";
+import { useUserContext } from "@/contexts/hooks/useUserContext";
 import { User } from "@/types/user";
+import { Link } from "react-router-dom";
+
 import { RoleSelect } from "./RoleSelect";
 
 export const Dashboard = () => {
   const { logout, currentUser } = useAuthContext();
   const { backend } = useBackendContext();
-  const { role } = useRoleContext();
+  const { role } = useUserContext();
 
   const [users, setUsers] = useState<User[] | undefined>();
 
