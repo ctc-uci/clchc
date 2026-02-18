@@ -1,9 +1,8 @@
-import nodemailer from "nodemailer";
-import escapeHtml from "escape-html";
 import { db } from "@/db/db-pgp";
+import escapeHtml from "escape-html";
+import nodemailer from "nodemailer";
 
 export async function notifyCcmNewUserRequest(name, email) {
-  
   // Validate email/password, early return if not configured.
   if (!process.env.EMAIL_USER || !process.env.EMAIL_APP_PASSWORD) {
     console.warn("Email service not configured.");
@@ -35,7 +34,9 @@ export async function notifyCcmNewUserRequest(name, email) {
     `;
 
     // Query for CCM's email address
-    const rows = await db.query(`SELECT email FROM users WHERE role = 'ccm'`);
+    const rows = await db.query(`SELECT email FROM users WHERE email = $1`, [
+      sanitizedEmail,
+    ]);
     // Validate email
     if (!rows || !rows.length) throw new Error("Cannot find ccm.");
     const ccmEmail = rows[0].email;
