@@ -4,6 +4,7 @@
 
 ## Packages installed by NPM. https://docs.npmjs.com/about-packages-and-modules
 node_modules/
+package-lock.json
 
 ## Vitest coverage output. https://vitest.dev/guide/coverage.html
 coverage/
