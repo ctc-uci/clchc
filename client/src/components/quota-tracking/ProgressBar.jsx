@@ -2,49 +2,75 @@ import React, { useEffect, useRef, useState } from "react";
 
 import { Button, Flex, Icon, Progress, Text } from "@chakra-ui/react";
 
+import { BackendContext } from "@/contexts/BackendContext";
+import {
+  useQuotaById,
+  useUpdateQuota,
+} from "@/contexts/hooks/data-fetching/useQuotas";
+import {
+  useCreateLog,
+} from "@/contexts/hooks/data-fetching/useVersionLogs";
+import { useUserContext } from "@/contexts/hooks/useUserContext";
 import { ArrowDown, ArrowUp } from "lucide-react";
 
 import { useBackendContext } from "../../contexts/hooks/useBackendContext";
 
 export default function ProgressBar({ quotaID }) {
+  const quotaRef = useRef(null);
+  // const [quota, setQuota] = useState(null);
+  const {
+    mutate: updateQuota,
+    isLoading: isUpdating,
+    error: updateError,
+  } = useUpdateQuota();
+  const {
+    mutate: createLog,
+    isLoading: isCreatingLog,
+    error: createLogError,
+  } = useCreateLog();
+  const { data: quota, isLoading, error, refetch } = useQuotaById(quotaID);
+  const maxProgress = quota?.quota ?? 0;
+  const current = quota?.progress ?? 0;
+  const [currentProgress, setCurrentProgress] = useState(current);
+  const [originalProgress, setOriginalProgress] = useState(null);
+  const { dbUser } = useUserContext();
   const { backend } = useBackendContext();
 
-  const quotaRef = useRef(null);
-  const [quota, setQuota] = useState(null);
-  const [currentProgress, setCurrentProgress] = useState(0);
-
-  //populate quota on mount
   useEffect(() => {
-    (async () => {
-      try {
-        const { data } = await backend.get(`/quota/${quotaID}`);
-        const q = data?.[0];
-
-        if (!q) return;
-
-        quotaRef.current = q;
-        setQuota(q);
-        setCurrentProgress(q.progress ?? 0);
-      } catch (err) {
-        console.error("Error fetching quota:", err);
-      }
-    })();
-  }, [backend, quotaID]);
-
-  const maxProgress = quota?.quota ?? 0;
+    if (quota) {
+      quotaRef.current = quota;
+      setCurrentProgress(quota.progress ?? 0);
+      setOriginalProgress(quota.progress ?? 0);
+    }
+  }, [quota]);
 
   //update progress in DB
   const updateProgress = async (next) => {
-    if (!quotaRef.current) return;
-    try {
-      await backend.put(`/quota/${quotaID}`, {
-        ...quotaRef.current,
-        progress: next,
-      });
+    const currentQuota = quota ?? quotaRef.current;
+    if (!currentQuota) return;
 
-      quotaRef.current = { ...quotaRef.current, progress: next };
+    try {
+      await updateQuota({ id: quotaID, data: { progress: next } });
     } catch (err) {
       console.error("Error updating progress:", err);
+    }
+
+    try {
+      await createLog({
+        userId: dbUser?.id,
+        quotaId: quotaID,
+        action: next > originalProgress ? "increment" : "decrement",
+        delta: next - originalProgress,
+      });
+      // await backend.post("/versionLog", {
+      //   userId: dbUser?.id,
+      //   quotaId: quotaID,
+      //   action: next > originalProgress ? "increment" : "decrement",
+      //   delta: next - originalProgress,
+      // });
+      setOriginalProgress(next);
+    } catch (err) {
+      console.error("Error logging quota change to version log:", err);
     }
   };
 
@@ -65,6 +91,8 @@ export default function ProgressBar({ quotaID }) {
     await updateProgress(next);
   };
 
+  if (isLoading) return <Text>Loading quota...</Text>;
+  if (error) return <Text>Error loading quota: {error.message}</Text>;
   return (
     <Flex
       alignItems="center"
