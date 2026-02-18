@@ -1,5 +1,5 @@
-import { useState, useMemo } from "react";
-
+import { useState, useMemo, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { AddIcon, SearchIcon } from "@chakra-ui/icons";
 import {
   Badge,
@@ -14,17 +14,18 @@ import {
   Text,
   useDisclosure,
 } from "@chakra-ui/react";
-
 import { CustomCard } from "@/components/common/CustomCard";
 import Navbar from "@/components/layout/Navbar";
 import QuotaDrawer from "@/components/quota-tracking/QuotaDrawer";
 import { useUserContext } from "@/contexts/hooks/useUserContext";
 import { useDebounce } from "@/hooks/useDebounce";
-
 import { useQuotas } from "@/contexts/hooks/data-fetching/useQuotas";
 import QuotaTable from "./QuotaTable";
 
 export const QuotaTracking = () => {
+  const navigate = useNavigate();
+  const { dateParam } = useParams();
+
   const [rows, setRows] = useState([]);
   const [providerQuery, setProviderQuery] = useState("");
   // const [debouncedProviderQuery, setDebouncedProviderQuery] = useState("");
@@ -35,10 +36,21 @@ export const QuotaTracking = () => {
   const { role } = useUserContext();
 
   // get current date and reformat
-  const today = new Date();
+  const today = new Date().toLocaleDateString("en-CA");
   const [selectedDate, setSelectedDate] = useState(
-    today.toLocaleDateString("en-CA")
+    dateParam || sessionStorage.getItem("quotaDate") || today
   );
+
+  useEffect(() => {
+    if (dateParam && dateParam !== selectedDate) {
+      setSelectedDate(dateParam);
+      sessionStorage.setItem("quotaDate", dateParam);
+    }
+  }, [dateParam]);
+
+  useEffect(() => {
+    sessionStorage.setItem("quotaDate", selectedDate);
+  }, [selectedDate]);
 
   const {
     data: quotas = [],
@@ -98,6 +110,12 @@ export const QuotaTracking = () => {
     debouncedProviderQuery(e.target.value);
   };
 
+  const handleDateChange = (e) => {
+    const newDate = e.target.value;
+    setSelectedDate(newDate);
+    navigate(`/quota-tracking/${newDate}`);
+  };
+
   return (
     <Box
       p={6}
@@ -143,9 +161,7 @@ export const QuotaTracking = () => {
               textAlign="center"
               type="date"
               value={selectedDate}
-              onChange={(e) => {
-                setSelectedDate(e.target.value);
-              }}
+              onChange={handleDateChange}
             />
           </InputGroup>
         </Box>
