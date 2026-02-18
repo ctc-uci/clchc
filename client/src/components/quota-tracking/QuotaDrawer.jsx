@@ -112,7 +112,6 @@ function formatTimeForInput(value) {
 
 function ProviderDropdown({ providerId, setProviderId, isLocked }) {
   // const [providers, setProviders] = useState(null);
-  const { backend } = useBackendContext();
   const today = new Date();
   const [selectedDate, setSelectedDate] = useState(
     today.toLocaleDateString("en-CA")
@@ -174,7 +173,7 @@ function ProviderDropdown({ providerId, setProviderId, isLocked }) {
 
 function LocationDropdown({ locationId, setLocationId, isLocked }) {
   // const [locations, setLocations] = useState(null);
-  // const { backend } = useBackendContext();
+  const { backend } = useBackendContext();
   const {
     data: locations = [],
     isLoading: loadingLocations,
@@ -569,7 +568,7 @@ export default function QuotaDrawer({
   const onOpen = externalOnOpen || internalDisclosure.onOpen;
   const onClose = externalOnClose || internalDisclosure.onClose;
   const btnRef = React.useRef();
-  // const { backend } = useBackendContext();
+  const { backend } = useBackendContext();
   const { currentUser } = useAuthContext();
   const [quota, setQuota] = useState(0);
   const {
@@ -755,22 +754,17 @@ export default function QuotaDrawer({
 
     try {
       if (quotaID) {
-        // console.log("Updating quota with ID:", quotaID, "Data:", formData);
-        // await backend.put(`/quota/${quotaID}`, formData);
         await updateQuota({ id: quotaID, data: formData });
       } else {
-        // await backend.post("/quota", formData);
         await createQuota(formData);
       }
-      handleClose();
-      // TODO: Should we redirect to the new quota page?
-      if (progress !== originalProgress) {
+      if (progress !== originalProgress && quotaID) {
         /* If the new progress is not the same as the original, 
        use a POST endpoint to the /VersionLog route */
         try {
           await backend.post("/versionLog", {
-            userId: userData.id ?? null,
-            quotaId: quotaID ?? null,
+            userId: userData?.[0]?.id ?? null,
+            quotaId: quotaID,
             action: progress > originalProgress ? "increment" : "decrement",
             delta: progress - originalProgress,
           });
@@ -778,6 +772,7 @@ export default function QuotaDrawer({
           console.error("Error logging quota change to version log:", err);
         }
       }
+      handleClose();
     } catch (err) {
       console.error("Error creating a new quota:", err);
     }
