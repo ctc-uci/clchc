@@ -13,3 +13,6 @@ CREATE TABLE IF NOT EXISTS version_log (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (quota_id) REFERENCES quota(id) ON DELETE CASCADE
 );
+
+ALTER TABLE version_log
+ADD COLUMN delta INT;
