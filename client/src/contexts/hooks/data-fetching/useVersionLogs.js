@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useApi } from '@/api.js'
 
 export const useVersionLogs = ({ q } = {}) => {
@@ -7,7 +7,7 @@ export const useVersionLogs = ({ q } = {}) => {
     return useQuery({
         queryKey: ['logs', q],
         queryFn: async () => {
-            console.log("Fetching logs (react-query)", q)
+            // console.log("Fetching logs (react-query)", q)
 
             const params = new URLSearchParams();
             if (q) params.append("q", q);
@@ -17,4 +17,19 @@ export const useVersionLogs = ({ q } = {}) => {
         staleTime: 60 * 1000,
         refetchInterval: 60 * 1000,
     });
+}
+
+export const useCreateLog = () => {
+  const { versionLogs } = useApi();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data) => {
+    //   console.log("Creating log (react-query)", data);
+      return versionLogs.create(data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['logs'], { exact: false });
+    },
+  })
 }

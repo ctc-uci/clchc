@@ -7,7 +7,7 @@ export const useUsers = ({ user, status } = {}) => {
   return useQuery({
     queryKey: ['users', { user, status }],
     queryFn: async () => {
-      console.log("Fetching users (react-query)", user, status );
+      // console.log("Fetching users (react-query)", user, status );
 
       const params = new URLSearchParams();
       if (user) params.append("user", user);
@@ -26,7 +26,7 @@ export const useUserByFirebaseUid = (uid) => {
   return useQuery({
     queryKey: ["user", uid],
     queryFn: async () => {
-      console.log("Fetching user by firebase uid (react-query)", uid);
+      // console.log("Fetching user by firebase uid (react-query)", uid);
       return users.getByFirebaseUid(uid);
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -40,7 +40,7 @@ export function useUsersStats() {
   return useQuery({
     queryKey: ['usersStats'],
     queryFn: async () => {
-      console.log("Fetching users stats (react-query)");
+      // console.log("Fetching users stats (react-query)");
 
       return users.getAllStats();
     },
@@ -70,7 +70,7 @@ export const useDeleteUser = () => {
 
   return useMutation({
     mutationFn: (id) => {
-      console.log("Deleting user ", id)
+      // console.log("Deleting user ", id)
       return users.delete(id)
     },
     onSuccess: () => {

@@ -36,6 +36,9 @@ import {
   useQuotaById,
   useUpdateQuota,
 } from "@/contexts/hooks/data-fetching/useQuotas";
+import {
+  useCreateLog
+} from "@/contexts/hooks/data-fetching/useVersionLogs";
 import { useUserByFirebaseUid } from "@/contexts/hooks/data-fetching/useUsers";
 import { useAuthContext } from "@/contexts/hooks/useAuthContext";
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
@@ -124,17 +127,6 @@ function ProviderDropdown({ providerId, setProviderId, isLocked }) {
     refetch,
   } = useProvidersSummary();
 
-  // useEffect(() => {
-  //   const fetchProviders = async () => {
-  //     try {
-  //       const res = await backend.get("/providers/summary");
-  //       setProviders(res.data);
-  //     } catch (err) {
-  //       console.error("Error fetching providers:", err);
-  //     }
-  //   };
-  //   fetchProviders();
-  // }, [backend]);
   if (loadingSummary) {
     return <Text>Loading provider summary...</Text>;
   }
@@ -172,26 +164,12 @@ function ProviderDropdown({ providerId, setProviderId, isLocked }) {
 }
 
 function LocationDropdown({ locationId, setLocationId, isLocked }) {
-  // const [locations, setLocations] = useState(null);
-  const { backend } = useBackendContext();
   const {
     data: locations = [],
     isLoading: loadingLocations,
     error: locationsError,
     refetch,
   } = useLocations();
-
-  // useEffect(() => {
-  //   const fetchLocations = async () => {
-  //     try {
-  //       const res = await backend.get("/location");
-  //       setLocations(res.data);
-  //     } catch (err) {
-  //       console.log("Error fetching locations:", err);
-  //     }
-  //   };
-  //   fetchLocations();
-  // }, [backend]);
 
   if (loadingLocations) {
     return <Text>Loading locations...</Text>;
@@ -568,7 +546,6 @@ export default function QuotaDrawer({
   const onOpen = externalOnOpen || internalDisclosure.onOpen;
   const onClose = externalOnClose || internalDisclosure.onClose;
   const btnRef = React.useRef();
-  const { backend } = useBackendContext();
   const { currentUser } = useAuthContext();
   const [quota, setQuota] = useState(0);
   const {
@@ -608,32 +585,12 @@ export default function QuotaDrawer({
     isLoading: loadingCurrentUser,
     error: errorCurrentUser,
   } = useUserByFirebaseUid(currentUser.uid);
-  // console.log(userData)
+  const {
+    mutate: createLog,
+    isLoading: isCreatingLog,
+    error: createLogError,
+  } = useCreateLog();
   const apptCalcFactor = userData?.[0]?.apptCalcFactor ?? null;
-  // console.log(apptCalcFactor)
-
-  // useEffect(() => {
-  //   const fetchUserProfile = async () => {
-  //     if (!currentUser?.uid) {
-  //       console.log("No currentUser available yet");
-  //       return;
-  //     }
-
-  //     try {
-  //       // console.log("Fetching user profile for:", currentUser.uid);
-  //       const res = await backend.get(`/users/firebase/${currentUser.uid}`);
-  //       const userData = res.data[0];
-  //       // console.log("User data:", userData);
-  //       const factor = userData?.apptCalcFactor ?? null;
-  //       // console.log("apptCalcFactor:", factor);
-  //       setApptCalcFactor(factor);
-  //     } catch (err) {
-  //       console.error("Error fetching user profile:", err);
-  //     }
-  //   };
-
-  //   fetchUserProfile();
-  // }, [currentUser, backend]);
 
   useEffect(() => {
     // Auto-calculate quota based on total hours and apptCalcFactor
@@ -762,12 +719,12 @@ export default function QuotaDrawer({
         /* If the new progress is not the same as the original, 
        use a POST endpoint to the /VersionLog route */
         try {
-          await backend.post("/versionLog", {
+          await createLog({
             userId: userData?.[0]?.id ?? null,
             quotaId: quotaID,
             action: progress > originalProgress ? "increment" : "decrement",
             delta: progress - originalProgress,
-          });
+          })
         } catch (err) {
           console.error("Error logging quota change to version log:", err);
         }

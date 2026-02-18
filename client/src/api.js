@@ -80,6 +80,10 @@ export const useApi = () => {
       getAll: async ({ params }) => {
         const res = await backend.get("/versionLog/details", { params });
         return res.data;
+      },
+      create: async (data) => {
+        const res = await backend.post("/versionLog", data);;
+        return res.data;
       }
     },
   };

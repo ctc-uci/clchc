@@ -7,6 +7,9 @@ import {
   useQuotaById,
   useUpdateQuota,
 } from "@/contexts/hooks/data-fetching/useQuotas";
+import {
+  useCreateLog,
+} from "@/contexts/hooks/data-fetching/useVersionLogs";
 import { useUserContext } from "@/contexts/hooks/useUserContext";
 import { ArrowDown, ArrowUp } from "lucide-react";
 
@@ -20,6 +23,11 @@ export default function ProgressBar({ quotaID }) {
     isLoading: isUpdating,
     error: updateError,
   } = useUpdateQuota();
+  const {
+    mutate: createLog,
+    isLoading: isCreatingLog,
+    error: createLogError,
+  } = useCreateLog();
   const { data: quota, isLoading, error, refetch } = useQuotaById(quotaID);
   const maxProgress = quota?.quota ?? 0;
   const current = quota?.progress ?? 0;
@@ -48,12 +56,18 @@ export default function ProgressBar({ quotaID }) {
     }
 
     try {
-      await backend.post("/versionLog", {
+      await createLog({
         userId: dbUser?.id,
         quotaId: quotaID,
         action: next > originalProgress ? "increment" : "decrement",
         delta: next - originalProgress,
       });
+      // await backend.post("/versionLog", {
+      //   userId: dbUser?.id,
+      //   quotaId: quotaID,
+      //   action: next > originalProgress ? "increment" : "decrement",
+      //   delta: next - originalProgress,
+      // });
       setOriginalProgress(next);
     } catch (err) {
       console.error("Error logging quota change to version log:", err);
