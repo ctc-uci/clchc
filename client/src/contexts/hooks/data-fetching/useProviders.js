@@ -7,7 +7,7 @@ export function useProviders({ query } = {}) {
   return useQuery({
     queryKey: ['providers', query],
     queryFn: async () => {
-      console.log("Fetching providers (react-query)", query);
+      // console.log("Fetching providers (react-query)", query);
 
       const params = new URLSearchParams();
       if (query) params.append("search", query);
@@ -25,7 +25,7 @@ export function useProvidersSummary() {
   return useQuery({
     queryKey: ["providersSummary"],
     queryFn: async () => {
-      console.log("Fetching provider summary (react-query)");
+      // console.log("Fetching provider summary (react-query)");
 
       return providers.getSummary();
     },

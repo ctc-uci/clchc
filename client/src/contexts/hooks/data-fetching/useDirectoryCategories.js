@@ -7,7 +7,7 @@ export function useDirectoryCategories() {
   return useQuery({
     queryKey: ['directoryCategories'],
     queryFn: async () => {
-      console.log("Fetching categories (react-query)");
+      // console.log("Fetching categories (react-query)");
 
       return directoryCategories.getAll();
     },

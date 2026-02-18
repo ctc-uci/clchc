@@ -38,27 +38,6 @@ export const VersionLogPage = () => {
     q: searchQuery,
   });
 
-  // const fetchVersionLogs = useCallback(
-  //   async (searchQuery) => {
-  //     setLoading(true); // Only display loading text on initial load
-  //     const params = new URLSearchParams();
-
-  //     if (searchQuery) {
-  //       params.set("q", searchQuery);
-  //     }
-
-  //     const endpoint = `/versionLog/details${params.toString() ? `?${params}` : ""}`;
-  //     try {
-  //       const response = await backend.get(endpoint);
-  //       setLogs(response.data);
-  //     } catch (err) {
-  //       console.log("Failed to fetch version logs", err);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   },
-  //   [backend]
-  // );
 
   // handleChange
   const handleChange = (e) => {

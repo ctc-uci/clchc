@@ -7,7 +7,7 @@ export const useQuotas = ({ date, provider } = {}) => {
   return useQuery({
     queryKey: ["quotas", { date, provider }],
     queryFn: async () => {
-      console.log("Fetching quotas (react-query)", { date, provider });
+      // console.log("Fetching quotas (react-query)", { date, provider });
 
       const params = new URLSearchParams();
       if (date) params.append("date", date);

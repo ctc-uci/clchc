@@ -7,7 +7,7 @@ export const useVersionLogs = ({ q } = {}) => {
     return useQuery({
         queryKey: ['logs', q],
         queryFn: async () => {
-            console.log("Fetching logs (react-query)", q)
+            // console.log("Fetching logs (react-query)", q)
 
             const params = new URLSearchParams();
             if (q) params.append("q", q);
@@ -25,7 +25,7 @@ export const useCreateLog = () => {
 
   return useMutation({
     mutationFn: async (data) => {
-      console.log("Creating log (react-query)", data);
+    //   console.log("Creating log (react-query)", data);
       return versionLogs.create(data);
     },
     onSuccess: () => {

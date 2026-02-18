@@ -7,7 +7,7 @@ export function useLocations() {
   return useQuery({
     queryKey: ['locations'],
     queryFn: async () => {
-      console.log("Fetching locations (react-query)");
+      // console.log("Fetching locations (react-query)");
 
       return locations.getAll();
     },
