@@ -26,7 +26,7 @@ const transport = {
     pass,
   },
   from: user,
-  secure: true,
+  secure: process.env.NODE_ENV !== "development",
 };
 
 const transporter = nodemailer.createTransport(transport);

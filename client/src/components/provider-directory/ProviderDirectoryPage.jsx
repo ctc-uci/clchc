@@ -1,37 +1,89 @@
-import { useEffect, useState } from "react";
-
-import { Box, Button, Divider, Flex, Grid, Text, useDisclosure } from "@chakra-ui/react";
-
+import { useState } from "react";
+import { HamburgerIcon, SearchIcon } from "@chakra-ui/icons";
+import {
+  Box,
+  Button,
+  Flex,
+  Heading,
+  Input,
+  InputGroup,
+  InputLeftElement,
+  Tag,
+  Text,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  useDisclosure,
+} from "@chakra-ui/react";
 import { Navbar } from "@/components/layout/Navbar";
-import ProviderTable from "@/components/provider-directory/ProviderTable";
-import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 import CategoryDrawer from "@/components/provider-directory/CategoryDrawer";
-import { useRoleContext } from "@/contexts/hooks/useRoleContext";
+import ProviderDrawer from "@/components/provider-directory/ProviderDrawer";
+import ProviderTable from "@/components/provider-directory/ProviderTable";
+import { useUserContext } from "@/contexts/hooks/useUserContext";
+import { useProviders } from "@/contexts/hooks/data-fetching/useProviders";
+import { useDirectoryCategories } from "@/contexts/hooks/data-fetching/useDirectoryCategories";
+import { useDebounce } from "@/hooks/useDebounce";
 
 export const ProviderDirectoryPage = () => {
-  const [providers, setProviders] = useState(null);
-  const [providerCategories, setProviderCategories] = useState(null);
-  const { role, loading } = useRoleContext();
+  const [providerQuery, setProviderQuery] = useState("");
+  const [drawerMode, setDrawerMode] = useState("create");
+  const [selectedProvider, setSelectedProvider] = useState(null);
+  const [highlightedProviderId, setHighlightedProviderId] = useState(null);
+
+  const debouncedProviderQuery = useDebounce(
+  (value) => setProviderQuery(value),
+  300
+);
+  const { role } = useUserContext();
+
   const {
-      isOpen: isCreateDrawerOpen,
-      onOpen: onCreateDrawerOpen,
-      onClose: onCreateDrawerClose,
-    } = useDisclosure();
+    isOpen: isCategoryDrawerOpen,
+    onOpen: onCategoryDrawerOpen,
+    onClose: onCategoryDrawerClose,
+  } = useDisclosure();
 
-  const { backend } = useBackendContext();
+  const {
+    isOpen: isProviderDrawerOpen,
+    onOpen: onProviderDrawerOpen,
+    onClose: onProviderDrawerClose,
+  } = useDisclosure();
 
-  const fetchData = async () => {
-    const [providerData, catData] = await Promise.all([
-      backend.get("/providers"),
-      backend.get("/directoryCategories"),
-    ]);
-    setProviders(providerData.data);
-    setProviderCategories(catData.data);
+  const {
+    data: providers = [],
+    isLoading,
+    error,
+    refetch: refetchProviders
+  } = useProviders({
+    query: providerQuery
+  });
+
+  const {
+    data: providerCategories = [],
+    isLoading: loadingCategories,
+    error: errorCategories,
+    refetch: refetchCategories
+  } = useDirectoryCategories();
+
+  const handleChange = (e) => {
+    debouncedProviderQuery(e.target.value);
   };
 
-  useEffect(() => {
-    fetchData();
-  }, [backend]);
+  const openCreateProviderDrawer = () => {
+    setDrawerMode("create");
+    setSelectedProvider(null);
+    onProviderDrawerOpen();
+  };
+
+  const openEditProviderDrawer = (provider) => {
+    setDrawerMode("edit");
+    setSelectedProvider(provider);
+    onProviderDrawerOpen();
+  };
+
+  const handleDrawerSaved = () => {
+    refetchProviders();
+  };
 
   return (
     <Box
@@ -39,124 +91,150 @@ export const ProviderDirectoryPage = () => {
       maxW="1200px"
       mx="auto"
     >
-      {/* Overview Card */}
-      <Box
-        maxWidth="1200px"
-        height="261px"
-        bg="#E2E2E2"
-        borderRadius="13px"
-        p={6}
-        mb={10}
+      <Flex
+        alignItems="center"
+        gap={3}
+        mb={5}
       >
-        {/* Header */}
-        <Box mb={4}>
-          <Text
-            fontSize="xl"
-            fontWeight="semibold"
-          >
-            Overview
-          </Text>
-          <Text
-            fontSize="lg"
-            color="gray.600"
-          >
-            Summary of provider
-          </Text>
-        </Box>
-
-        <HorizontalDivider />
-
-        {/* Stats */}
-        <Grid
-          templateColumns="repeat(4, 1fr)"
-          position="relative"
+        <Heading
+          size="2xl"
+          fontWeight="medium"
         >
-          <StatItem
-            label="New Providers"
-            value="5"
-          />
-          <StatItem
-            label="Total Providers"
-            value="500"
-          />
-          <StatItem
-            label="Providers per Location"
-            value="4"
-          />
-          <StatItem
-            label="Specialties Covered"
-            value="4"
-          />
+          Provider Directory
+        </Heading>
+        <Tag
+          bg="yellow.300"
+          color="black"
+          fontSize="lg"
+        >
+          {role}
+        </Tag>
+      </Flex>
+      <Text
+        size="lg"
+        fontWeight="normal"
+        color="#00000080"
+        mb={5}
+      >
+        {" "}
+        All current active providers in network
+      </Text>
 
-          {/* Vertical dividers */}
-          <GridDivider left="25%" />
-          <GridDivider left="50%" />
-          <GridDivider left="75%" />
-        </Grid>
-      </Box>
+      {role === "ccm" || role === "master" ? (
+        <Flex
+          justifyContent="space-between"
+          alignItems="center"
+          mb={5}
+          gap={4}
+        >
+          <InputGroup maxW="600px">
+            <InputLeftElement pointerEvents="none">
+              <SearchIcon color="gray.400" />
+            </InputLeftElement>
+            <Input
+              placeholder="Search Providers"
+              borderRadius="md"
+              onChange={handleChange}
+            />
+          </InputGroup>
 
-       {role === "ccm" || role === "master" ? (
-          <>
-            <Button onClick={()=>{onCreateDrawerOpen()}}>Add New Category</Button>
-          </>
-        ) : (
-          <></>
-        )}
+          <Flex gap={3}>
+            <Menu>
+              <MenuButton
+                as={Button}
+                bg="black"
+                color="white"
+                _hover={{ bg: "gray.800" }}
+                _active={{ bg: "gray.800" }}
+                rightIcon={<HamburgerIcon />}
+              >
+                Manage
+              </MenuButton>
+              <MenuList>
+                <MenuItem isDisabled>Tags</MenuItem>
+                <MenuItem onClick={onCategoryDrawerOpen}>Categories</MenuItem>
+                <MenuItem onClick={openCreateProviderDrawer}>Providers</MenuItem>
+              </MenuList>
+            </Menu>
+          </Flex>
+        </Flex>
+      ) : (
+        <></>
+      )}
 
       {providers && providerCategories ? (
         <Box>
           <ProviderTable
             providers={providers}
             providerCategories={providerCategories}
+            selectedProviderId={highlightedProviderId}
+            onProviderSelect={
+              role === "ccm" || role === "master"
+                ? (provider) => setHighlightedProviderId(provider.id)
+                : undefined
+            }
+            onProviderDoubleClick={
+              role === "ccm" || role === "master" ? openEditProviderDrawer : undefined
+            }
+            loading={isLoading || loadingCategories}
           />
         </Box>
       ) : (
         <Text>Loading</Text>
       )}
-      <CategoryDrawer isOpen={isCreateDrawerOpen}
-        onOpen={onCreateDrawerOpen}
-        onClose={onCreateDrawerClose}
-        onSaved={fetchData}/>
+      <CategoryDrawer
+        isOpen={isCategoryDrawerOpen}
+        onOpen={onCategoryDrawerOpen}
+        onClose={onCategoryDrawerClose}
+        onSaved={refetchCategories}
+      />
+      <ProviderDrawer
+        mode={drawerMode}
+        provider={selectedProvider}
+        isOpen={isProviderDrawerOpen}
+        onClose={onProviderDrawerClose}
+        onSaved={handleDrawerSaved}
+      />
       <Navbar />
     </Box>
   );
 };
 
 /* Reusable Stat Item */
-const StatItem = ({ label, value }) => (
-  <Box textAlign="left">
-    <Text
-      fontSize="lg"
-      color="gray.700"
-      mb={1}
-    >
-      {label}
-    </Text>
-    <Text
-      fontSize="3xl"
-      fontWeight="bold"
-    >
-      {value}
-    </Text>
-  </Box>
-);
+// const StatItem = ({ label, value }) => (
+//   <Box textAlign="left">
+//     <Text
+//       fontSize="lg"
+//       color="gray.700"
+//       mb={1}
+//     >
+//       {label}
+//     </Text>
+//     <Text
+//       fontSize="3xl"
+//       fontWeight="bold"
+//     >
+//       {value}
+//     </Text>
+//   </Box>
+// );
 
-/* Horizontal Divider */
-const HorizontalDivider = () => (
-  <Divider
-    borderColor="black.400"
-    length="1,906px"
-  />
-);
+// /* Horizontal Divider */
+// const HorizontalDivider = () => (
+//   <Divider
+//     borderColor="black.400"
+//     length="1,906px"
+//   />
+// );
 
-/* Grid Divider */
-const GridDivider = ({ left }) => (
-  <Box
-    position="absolute"
-    top={0}
-    bottom={0}
-    left={`calc(${left} - 20px)`}
-    width="1px"
-    bg="gray.400"
-  />
-);
+// /* Grid Divider */
+// const GridDivider = ({ left }) => (
+//   <Box
+//     position="absolute"
+//     top={0}
+//     bottom={0}
+//     left={`calc(${left} - 20px)`}
+//     width="1px"
+//     bg="gray.400"
+//   />
+// );

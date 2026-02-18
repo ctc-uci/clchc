@@ -107,7 +107,7 @@ export const Login = () => {
   // useEffect(() => {
   //   handleRedirectResult(backend, navigate, toast);
   // }, [backend, handleRedirectResult, navigate, toast]);
-  
+
   const [checkingRedirect, setCheckingRedirect] = useState(true);
 
   useEffect(() => {
@@ -131,7 +131,7 @@ export const Login = () => {
         sx={{ width: 500, marginX: "auto" }}
       >
         <Image
-          src="/clchc-logo.svg"
+          src="/clchc-logo.webp"
           alt="Celebrating Life Community Health Center"
           maxW="600px"
           mb={16}

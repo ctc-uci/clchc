@@ -3,32 +3,43 @@ import React from "react";
 import {
   Table,
   TableContainer,
+  Tag,
   Tbody,
   Td,
+  Text,
   Th,
   Thead,
   Tr,
   Wrap,
   WrapItem,
-  Tag,
-  Text
 } from "@chakra-ui/react";
 
-export default function ProviderTable({ providers, providerCategories }) {
+export default function ProviderTable({
+  providers,
+  providerCategories,
+  selectedProviderId,
+  onProviderSelect,
+  onProviderDoubleClick,
+}) {
   // sort categories by columnOrder
-  
-  const sortedCategories = [...providerCategories].sort((a, b) => a.columnOrder - b.columnOrder);
+
+  const sortedCategories = [...providerCategories].sort(
+    (a, b) => a.columnOrder - b.columnOrder
+  );
   /**
    * Making table header by mapping categories from providerCategories
    * @returns <Thead> with each category as a cell in the header row.
    */
   const Header = () => {
     const columns = sortedCategories.map((cat) => (
-      <Th key={cat.name}>{cat.name}</Th>
+      <Th key={cat.name} fontSize="sm" fontWeight="bold" color="#2D3748">{cat.name}</Th>
     ));
 
     return (
-      <Thead>
+      <Thead
+        bg="#00000014"
+        h="60px"
+      >
         <Tr>{columns}</Tr>
       </Thead>
     );
@@ -46,12 +57,15 @@ export default function ProviderTable({ providers, providerCategories }) {
 
     // Treat undefined/null/"" as missing
     const isMissing =
-      raw === undefined || raw === null || (typeof raw === "string" && raw.trim() === "");
+      raw === undefined ||
+      raw === null ||
+      (typeof raw === "string" && raw.trim() === "");
 
     if (isMissing) {
       // Defaults per inputType
-      if (cat.inputType === "tag") return <Text color="gray.400">NO TAGS SELECTED</Text>;
-      return <Text color="gray.400"></Text>; // default for "text" (and any other types)
+      if (cat.inputType === "tag")
+        return <Text color="gray.400">NO TAGS SELECTED</Text>;
+      return <Text color="gray.400"></Text>;
     }
 
     // Format per inputType
@@ -80,12 +94,32 @@ export default function ProviderTable({ providers, providerCategories }) {
   };
 
   const ProviderRow = ({ provider }) => {
+    const isSelected = selectedProviderId === provider.id;
+
     const getCells = () =>
       providerCategories.map((cat) => (
-        <Td key={cat.name}>{renderCellValue(provider, cat)}</Td>
+        <Td
+          key={cat.name}
+          borderRight="1px solid"
+          borderColor="gray.200"
+        >
+          {renderCellValue(provider, cat)}
+        </Td>
       ));
 
-    return <Tr>{getCells()}</Tr>;
+    return (
+      <Tr
+        borderBottom="1px solid"
+        borderColor="gray.200"
+        cursor={onProviderSelect ? "pointer" : "default"}
+        bg={isSelected ? "blue.50" : "transparent"}
+        _hover={onProviderSelect ? { bg: isSelected ? "blue.100" : "gray.50" } : {}}
+        onClick={() => onProviderSelect?.(provider)}
+        onDoubleClick={() => onProviderDoubleClick?.(provider)}
+      >
+        {getCells()}
+      </Tr>
+    );
   };
 
   /**
@@ -103,7 +137,11 @@ export default function ProviderTable({ providers, providerCategories }) {
   };
 
   return (
-    <TableContainer>
+    <TableContainer
+      border="1px solid"
+      borderColor="gray.200"
+      borderRadius="lg"
+    >
       <Table>
         {/**Subcomps to simplify structure */}
         <Header />

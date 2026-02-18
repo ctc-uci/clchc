@@ -35,6 +35,6 @@ export const db = pgp({
   database,
   port: Number(port),
   ssl: {
-    rejectUnauthorized: false,
+    rejectUnauthorized: process.env.NODE_ENV === "production",
   },
 });

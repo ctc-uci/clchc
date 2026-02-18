@@ -87,8 +87,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const handleRedirectResult = async (
     backend: AxiosInstance,
     navigate: NavigateFunction,
-    toast: CreateToastFnReturn,
-    refetch: () => Promise<void>
+    toast: CreateToastFnReturn
   ) => {
     try {
       const result = await getRedirectResult(auth);

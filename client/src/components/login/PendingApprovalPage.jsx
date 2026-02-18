@@ -1,50 +1,19 @@
-import {
-  Box,
-  Button,
-  Heading,
-  Image,
-  Text,
-  VStack,
-} from "@chakra-ui/react";
-
 import { useEffect } from "react";
+
+import { Box, Button, Heading, Image, Text, VStack } from "@chakra-ui/react";
+
+import { useUserContext } from "@/contexts/hooks/useUserContext";
 import { useNavigate } from "react-router-dom";
-import { useAuthContext } from "@/contexts/hooks/useAuthContext";
-import { useBackendContext } from "@/contexts/hooks/useBackendContext";
-
-
 
 export const PendingApprovalPage = () => {
   const navigate = useNavigate();
-  const { currentUser } = useAuthContext(); // firebase user
-  const { backend } = useBackendContext();
-
-  // const [checking, setChecking] = useState(true);
+  const { status } = useUserContext();
 
   useEffect(() => {
-    const checkApproval = async () => {
-      if (!currentUser) {
-        // setChecking(false);
-        return;
-      }
-
-      try {
-        const res = await backend.get(`/users/firebase/${currentUser.uid}`);
-        const users = res.data[0];
-
-        if (users?.status === "approved") {
-          navigate("/quota-tracking", { replace: true });
-        }
-      } catch (err) {
-        console.error("Approval check failed", err);
-      } finally {
-        // setChecking(false);
-      }
-    };
-
-    checkApproval();
-  }, []);
-
+    if (status === "approved") {
+      navigate("/quota-tracking", { replace: true });
+    }
+  }, [status, navigate]);
 
   return (
     <Box

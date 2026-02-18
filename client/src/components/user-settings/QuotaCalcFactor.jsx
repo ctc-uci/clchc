@@ -13,34 +13,25 @@ import {
 
 import { useAuthContext } from "@/contexts/hooks/useAuthContext";
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
+import { useUserContext } from "@/contexts/hooks/useUserContext";
 
 export default function QuotaCalcFactor() {
   const { backend } = useBackendContext();
   const { currentUser } = useAuthContext();
+  const { dbUser, refetch } = useUserContext();
 
-  const [userInfo, setUserInfo] = useState(null);
   const [factor, setFactor] = useState(0);
 
   useEffect(() => {
-    if (!currentUser?.uid) return;
-
-    (async () => {
-      try {
-        const { data } = await backend.get(`/users/firebase/${currentUser.uid}`);
-        const user = data?.[0] ?? null;
-        setUserInfo(user);
-        setFactor(user?.apptCalcFactor ?? 0);
-      } catch (e) {
-        console.error("Failed to fetch user info:", e);
-      }
-    })();
-  }, [backend, currentUser?.uid]);
+    setFactor(dbUser?.apptCalcFactor ?? 0);
+  }, [dbUser]);
 
   const updateQuota = async (newQuota) => {
     if (!currentUser?.uid) return;
     await backend.put(`/users/firebase/${currentUser.uid}`, {
       apptCalcFactor: newQuota,
     });
+    await refetch();
   };
 
   const handleClick = async () => {

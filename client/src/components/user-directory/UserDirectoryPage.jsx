@@ -1,6 +1,6 @@
-import { useContext, useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 
-import { InfoOutlineIcon, SearchIcon } from "@chakra-ui/icons";
+import { SearchIcon } from "@chakra-ui/icons";
 import {
   Badge,
   Box,
@@ -15,59 +15,84 @@ import {
 
 import { CustomCard } from "@/components/common/CustomCard";
 import { Navbar } from "@/components/layout/Navbar";
-import { BackendContext } from "@/contexts/BackendContext";
+import {
+  useDeleteUser,
+  useUsers,
+  useUsersStats,
+} from "@/contexts/hooks/data-fetching/useUsers";
+import { useDebounce } from "@/hooks/useDebounce";
 
+import { UserPendingStatusList } from "./UserPendingStatusList";
+import UserRoleFilter from "./UserRoleFilter";
 import UserTable from "./UserTable";
-import {UserPendingStatusList} from "./UserPendingStatusList";
 
 export const UserDirectory = () => {
-  const { backend } = useContext(BackendContext);
-  const [users, setUsers] = useState([]);
+  // Keep what's typed immediately (so the input feels responsive)
+  const [searchInput, setSearchInput] = useState("");
+  // This is what we actually query/filter with (debounced updates)
   const [searchQuery, setSearchQuery] = useState("");
-  const [userStats, setUserStats] = useState({});
 
-  useEffect(() => {
-    // Fetches users and user stats in parallel
-    const fetchUserInfo = async () => {
-      try {
-        const [usersRes, statsRes] = await Promise.all([
-          backend.get("/users"),
-          backend.get("/users/stats"),
-        ]);
+  const [selectedRole, setSelectedRole] = useState("all");
 
-        setUsers(usersRes.data);
-        setUserStats(statsRes.data);
-      } catch (err) {
-        console.error(
-          "couldn't fetch user info in components/UserDirectoryPage.jsx",
-          err
-        );
-      }
-    };
+  const debouncedSetSearchQuery = useDebounce((value) => {
+    setSearchQuery(value);
+  }, 300);
 
-    fetchUserInfo();
-  }, [backend]);
-
-  // table delete
-  const handleDelete = async (id) => {
-    try {
-      await backend.delete(`/users/${id}`);
-      setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
-    } catch (err) {
-      console.error(
-        "couldn't delete user in components/UserDirectoryPage.jsx",
-        err
-      );
-    }
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchInput(value);
+    debouncedSetSearchQuery(value);
   };
 
-  // filter data via search bar changes
-  const filteredUsers = users.filter((user) => {
-    const lowerQuery = searchQuery.toLowerCase();
-    const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
-    const email = user.email.toLowerCase();
-    return fullName.includes(lowerQuery) || email.includes(lowerQuery);
-  });
+  const handleRoleChange = (value) => {
+    setSelectedRole(
+      Array.isArray(value) ? (value[0] ?? "all") : (value ?? "all")
+    );
+  };
+
+  const {
+    data: users = [],
+    isLoading,
+    error,
+    refetch,
+  } = useUsers({ user: searchQuery, status: "approved" });
+
+  const {
+    data: userStats = {},
+    isLoading: isStatsLoading,
+    error: statsError,
+  } = useUsersStats();
+
+  const { mutate: deleteUser } = useDeleteUser();
+
+  const handleDelete = (userId) => {
+    deleteUser(userId);
+  };
+
+  // Client-side role filter + (extra) client-side search filter for safety
+  // (even if backend already searches, this keeps UI consistent)
+  const filteredUsers = useMemo(() => {
+    const lowerQuery = (searchQuery || "").toLowerCase();
+
+    return users.filter((user) => {
+      const fullName =
+        `${user.firstName || ""} ${user.lastName || ""}`.toLowerCase();
+      const email = (user.email || "").toLowerCase();
+
+      const matchesSearch =
+        !lowerQuery ||
+        fullName.includes(lowerQuery) ||
+        email.includes(lowerQuery);
+
+      const matchesRole = selectedRole === "all" || user.role === selectedRole;
+
+      return matchesSearch && matchesRole;
+    });
+  }, [users, searchQuery, selectedRole]);
+
+  if (isStatsLoading) {
+    return <Text>User stats loading...</Text>;
+  }
 
   return (
     <Box
@@ -113,12 +138,12 @@ export const UserDirectory = () => {
             <Input
               textAlign="center"
               type="date"
-              onChange={(e) => console.log("date input:", e.target.value)}
             />
           </InputGroup>
         </Box>
       </Flex>
-      <Box mb={8}>      
+
+      <Box mb={8}>
         <UserPendingStatusList />
       </Box>
 
@@ -158,25 +183,36 @@ export const UserDirectory = () => {
         </HStack>
       </Box>
 
-      <InputGroup
-        maxW="400px"
+      <Flex
+        gap={4}
+        align="center"
         pb={6}
       >
-        <InputLeftElement pointerEvents="none">
-          <SearchIcon color="gray.400" />
-        </InputLeftElement>
-        <Input
-          placeholder="Search by name or email..."
-          borderRadius="md"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+        <InputGroup flex={1}>
+          <InputLeftElement pointerEvents="none">
+            <SearchIcon color="gray.400" />
+          </InputLeftElement>
+          <Input
+            placeholder="Search by name or email..."
+            borderRadius="md"
+            value={searchInput}
+            onChange={handleSearchChange}
+          />
+        </InputGroup>
+
+        <UserRoleFilter
+          selectedRole={selectedRole}
+          onChange={handleRoleChange}
         />
-      </InputGroup>
+      </Flex>
 
       <UserTable
         users={filteredUsers}
+        loading={isLoading}
         onDelete={handleDelete}
+        onUpdated={refetch}
       />
+
       <Navbar />
     </Box>
   );
