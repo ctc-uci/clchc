@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import { LockIcon } from "@chakra-ui/icons";
 // import { Pencil } from 'lucide-react';
@@ -112,7 +112,6 @@ function formatTimeForInput(value) {
 
 function ProviderDropdown({ providerId, setProviderId, isLocked }) {
   // const [providers, setProviders] = useState(null);
-  // const { backend } = useBackendContext();
   const today = new Date();
   const [selectedDate, setSelectedDate] = useState(
     today.toLocaleDateString("en-CA")
@@ -174,7 +173,7 @@ function ProviderDropdown({ providerId, setProviderId, isLocked }) {
 
 function LocationDropdown({ locationId, setLocationId, isLocked }) {
   // const [locations, setLocations] = useState(null);
-  // const { backend } = useBackendContext();
+  const { backend } = useBackendContext();
   const {
     data: locations = [],
     isLoading: loadingLocations,
@@ -569,7 +568,7 @@ export default function QuotaDrawer({
   const onOpen = externalOnOpen || internalDisclosure.onOpen;
   const onClose = externalOnClose || internalDisclosure.onClose;
   const btnRef = React.useRef();
-  // const { backend } = useBackendContext();
+  const { backend } = useBackendContext();
   const { currentUser } = useAuthContext();
   const [quota, setQuota] = useState(0);
   const {
@@ -600,6 +599,7 @@ export default function QuotaDrawer({
   // const [quota, setQuota] = useState(0);
   const [progress, setProgress] = useState(0);
   const [isLocked, setIsLocked] = useState(false);
+  const [originalProgress, setOriginalProgress] = useState(0);
   // const [lockEdit, setLockEdit] = useState(false);
   const isDev = import.meta.env?.DEV;
 
@@ -694,6 +694,7 @@ export default function QuotaDrawer({
         setDate(quotaData.date ? formatDateForInput(quotaData.date) : "");
         setType(quotaData.appointmentType ?? "");
         setNote(quotaData.notes ?? "");
+        setOriginalProgress(quotaData.progress ?? 0);
         setQuota(quotaData.quota ?? 0);
         setProgress(quotaData.progress ?? 0);
         setNote(quotaData.notes ?? "");
@@ -713,6 +714,7 @@ export default function QuotaDrawer({
       setNote("");
       setQuota(0);
       setProgress(0);
+      setOriginalProgress(0);
       setIsLocked(false);
     }
   }, [isOpen, quotaID, defaultDate]);
@@ -752,15 +754,25 @@ export default function QuotaDrawer({
 
     try {
       if (quotaID) {
-        // console.log("Updating quota with ID:", quotaID, "Data:", formData);
-        // await backend.put(`/quota/${quotaID}`, formData);
         await updateQuota({ id: quotaID, data: formData });
       } else {
-        // await backend.post("/quota", formData);
         await createQuota(formData);
       }
+      if (progress !== originalProgress && quotaID) {
+        /* If the new progress is not the same as the original, 
+       use a POST endpoint to the /VersionLog route */
+        try {
+          await backend.post("/versionLog", {
+            userId: userData?.[0]?.id ?? null,
+            quotaId: quotaID,
+            action: progress > originalProgress ? "increment" : "decrement",
+            delta: progress - originalProgress,
+          });
+        } catch (err) {
+          console.error("Error logging quota change to version log:", err);
+        }
+      }
       handleClose();
-      // TODO: Should we redirect to the new quota page?
     } catch (err) {
       console.error("Error creating a new quota:", err);
     }

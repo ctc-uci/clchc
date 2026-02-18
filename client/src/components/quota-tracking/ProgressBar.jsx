@@ -2,12 +2,14 @@ import React, { useEffect, useRef, useState } from "react";
 
 import { Button, Flex, Icon, Progress, Text } from "@chakra-ui/react";
 
-import { ArrowDown, ArrowUp } from "lucide-react";
-
+import { BackendContext } from "@/contexts/BackendContext";
 import {
   useQuotaById,
   useUpdateQuota,
-} from "@/contexts/hooks/data-fetching/useQuotas"
+} from "@/contexts/hooks/data-fetching/useQuotas";
+import { useUserContext } from "@/contexts/hooks/useUserContext";
+import { ArrowDown, ArrowUp } from "lucide-react";
+
 import { useBackendContext } from "../../contexts/hooks/useBackendContext";
 
 export default function ProgressBar({ quotaID }) {
@@ -22,11 +24,15 @@ export default function ProgressBar({ quotaID }) {
   const maxProgress = quota?.quota ?? 0;
   const current = quota?.progress ?? 0;
   const [currentProgress, setCurrentProgress] = useState(current);
+  const [originalProgress, setOriginalProgress] = useState(null);
+  const { dbUser } = useUserContext();
+  const { backend } = useBackendContext();
 
   useEffect(() => {
     if (quota) {
       quotaRef.current = quota;
       setCurrentProgress(quota.progress ?? 0);
+      setOriginalProgress(quota.progress ?? 0);
     }
   }, [quota]);
 
@@ -39,6 +45,18 @@ export default function ProgressBar({ quotaID }) {
       await updateQuota({ id: quotaID, data: { progress: next } });
     } catch (err) {
       console.error("Error updating progress:", err);
+    }
+
+    try {
+      await backend.post("/versionLog", {
+        userId: dbUser?.id,
+        quotaId: quotaID,
+        action: next > originalProgress ? "increment" : "decrement",
+        delta: next - originalProgress,
+      });
+      setOriginalProgress(next);
+    } catch (err) {
+      console.error("Error logging quota change to version log:", err);
     }
   };
 
