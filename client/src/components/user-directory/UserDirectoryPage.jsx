@@ -115,8 +115,8 @@ export const UserDirectory = () => {
             <Badge
               bg="#FFD768"
               borderRadius="md"
-              px={7}
-              py={1}
+              px={6}
+              py={0.5}
               ml={2}
               fontSize="sm"
               fontWeight="normal"
@@ -132,19 +132,6 @@ export const UserDirectory = () => {
           >
             Manage user accounts and permissions
           </Text>
-        </Box>
-
-        <Box
-          flex="1"
-          display="flex"
-          justifyContent="flex-end"
-        >
-          <InputGroup w="19ch">
-            <Input
-              textAlign="center"
-              type="date"
-            />
-          </InputGroup>
         </Box>
       </Flex>
 
