@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 
 import { Button, Flex, Icon, Progress, Text } from "@chakra-ui/react";
 
-import { BackendContext } from "@/contexts/BackendContext";
 import {
   useQuotaById,
   useUpdateQuota,
@@ -13,28 +12,21 @@ import {
 import { useUserContext } from "@/contexts/hooks/useUserContext";
 import { ArrowDown, ArrowUp } from "lucide-react";
 
-import { useBackendContext } from "../../contexts/hooks/useBackendContext";
-
 export default function ProgressBar({ quotaID }) {
   const quotaRef = useRef(null);
   // const [quota, setQuota] = useState(null);
   const {
     mutate: updateQuota,
-    isLoading: isUpdating,
-    error: updateError,
   } = useUpdateQuota();
   const {
     mutate: createLog,
-    isLoading: isCreatingLog,
-    error: createLogError,
   } = useCreateLog();
-  const { data: quota, isLoading, error, refetch } = useQuotaById(quotaID);
+  const { data: quota, isLoading, error } = useQuotaById(quotaID);
   const maxProgress = quota?.quota ?? 0;
   const current = quota?.progress ?? 0;
   const [currentProgress, setCurrentProgress] = useState(current);
   const [originalProgress, setOriginalProgress] = useState(null);
   const { dbUser } = useUserContext();
-  const { backend } = useBackendContext();
 
   useEffect(() => {
     if (quota) {

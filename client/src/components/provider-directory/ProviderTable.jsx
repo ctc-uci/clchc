@@ -1,5 +1,3 @@
-import React from "react";
-
 import {
   Table,
   TableContainer,
@@ -12,7 +10,43 @@ import {
   Tr,
   Wrap,
   WrapItem,
+  Skeleton,
 } from "@chakra-ui/react";
+
+const SkeletonHeader = () => {
+  return (
+    <Thead>
+      <Tr>
+        {Array.from({ length: 4 }, (_, i) => (
+        <Th key={i}
+          fontSize="sm"
+          fontWeight="bold"
+          color="#2D3748"
+          p={0}>
+            <Skeleton h="60px" w="100%"/>
+            </Th>
+      ))}
+      </Tr>
+    </Thead>
+  )
+}
+
+const SkeletonBody = () => {
+  return (
+    <Tbody>
+        {Array.from({ length: 5 }, (_, i) => (
+       <Tr key={i}
+       borderBottom="1px solid"
+        borderColor="gray.200">
+        <Td><Skeleton height="40px" /></Td>
+        <Td><Skeleton height="40px" /></Td>
+        <Td><Skeleton height="40px" /></Td>
+        <Td><Skeleton height="40px" /></Td>
+       </Tr>
+      ))}
+      </Tbody>
+  )
+}
 
 export default function ProviderTable({
   providers,
@@ -20,6 +54,7 @@ export default function ProviderTable({
   selectedProviderId,
   onProviderSelect,
   onProviderDoubleClick,
+  loading
 }) {
   // sort categories by columnOrder
 
@@ -144,8 +179,7 @@ export default function ProviderTable({
     >
       <Table>
         {/**Subcomps to simplify structure */}
-        <Header />
-        <Body />
+        {loading ? <><SkeletonHeader /><SkeletonBody /></> : <><Header /><Body /></>}
       </Table>
     </TableContainer>
   );

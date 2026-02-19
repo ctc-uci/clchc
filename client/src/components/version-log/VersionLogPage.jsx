@@ -1,5 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-
+import { useState } from "react";
 import { SearchIcon } from "@chakra-ui/icons";
 import {
   Badge,
@@ -16,7 +15,6 @@ import {
 import Navbar from "@/components/layout/Navbar";
 import VersionLogTable from "@/components/version-log/VersionLogTable";
 import { useVersionLogs } from "@/contexts/hooks/data-fetching/useVersionLogs";
-import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 import { useDebounce } from "@/hooks/useDebounce";
 
 export const VersionLogPage = () => {
@@ -32,8 +30,6 @@ export const VersionLogPage = () => {
   const {
     data: logs = [],
     isLoading,
-    error,
-    refetch,
   } = useVersionLogs({
     q: searchQuery,
   });

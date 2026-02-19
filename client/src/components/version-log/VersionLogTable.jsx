@@ -10,7 +10,25 @@ import {
   Thead,
   Tr,
   VStack,
+  Skeleton
 } from "@chakra-ui/react";
+
+const SkeletonRows = () => {
+  return (
+<>
+        {Array.from({ length: 5 }, (_, i) => (
+       <Tr key={i}>
+        <Td><Skeleton height="30px" /></Td>
+        <Td><Skeleton height="30px" /></Td>
+        <Td><Skeleton height="30px" /></Td>
+        <Td><Skeleton height="30px" /></Td>
+        <Td><Skeleton height="30px" /></Td>
+        <Td><Skeleton height="30px" /></Td>
+       </Tr>
+      ))}
+      </>
+  )
+}
 
 const VersionLogTable = ({ loading, logs }) => {
   return (
@@ -38,7 +56,7 @@ const VersionLogTable = ({ loading, logs }) => {
           </Thead>
 
           <Tbody>
-            {logs.length === 0 && (
+            {!loading && logs.length === 0 && (
               <Tr>
                 <Td colSpan={6}>
                   <Text
@@ -46,13 +64,13 @@ const VersionLogTable = ({ loading, logs }) => {
                     py={6}
                     color="gray.500"
                   >
-                    {loading ? "Loading..." : "No version history available"}
+                    No version history available
                   </Text>
                 </Td>
               </Tr>
             )}
 
-            {logs.map((entry) => {
+            {loading ? <SkeletonRows /> : logs.map((entry) => {
               const log_d = new Date(entry.timestamp);
 
               const log_date = log_d.toLocaleDateString("en-US", {

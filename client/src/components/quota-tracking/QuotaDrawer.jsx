@@ -123,8 +123,6 @@ function ProviderDropdown({ providerId, setProviderId, isLocked }) {
   const {
     data: providers = [],
     isLoading: loadingSummary,
-    error: summaryError,
-    refetch,
   } = useProvidersSummary();
 
   if (loadingSummary) {
@@ -167,8 +165,6 @@ function LocationDropdown({ locationId, setLocationId, isLocked }) {
   const {
     data: locations = [],
     isLoading: loadingLocations,
-    error: locationsError,
-    refetch,
   } = useLocations();
 
   if (loadingLocations) {
@@ -551,18 +547,12 @@ export default function QuotaDrawer({
   const {
     data: quotaData,
     isLoading,
-    error,
-    refetch,
   } = useQuotaById(quotaID, isOpen && !!quotaID);
   const {
     mutate: createQuota,
-    isLoading: isCreating,
-    error: createError,
   } = useCreateQuota();
   const {
     mutate: updateQuota,
-    isLoading: isUpdating,
-    error: updateError,
   } = useUpdateQuota();
 
   const [providerId, setProviderId] = useState("");
@@ -583,12 +573,9 @@ export default function QuotaDrawer({
   const {
     data: userData,
     isLoading: loadingCurrentUser,
-    error: errorCurrentUser,
   } = useUserByFirebaseUid(currentUser.uid);
   const {
     mutate: createLog,
-    isLoading: isCreatingLog,
-    error: createLogError,
   } = useCreateLog();
   const apptCalcFactor = userData?.[0]?.apptCalcFactor ?? null;
 

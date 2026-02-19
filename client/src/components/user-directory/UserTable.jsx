@@ -12,11 +12,26 @@ import {
   Th,
   Thead,
   Tr,
-  Text,
   useDisclosure,
+  Skeleton
 } from "@chakra-ui/react";
 
 import UserEditModal from "./UserEditModal";
+
+const SkeletonRows = () => {
+  return (
+<>
+        {Array.from({ length: 5 }, (_, i) => (
+       <Tr key={i}>
+        <Td><Skeleton height="30px" /></Td>
+        <Td><Skeleton height="30px" /></Td>
+        <Td><Skeleton height="30px" /></Td>
+        <Td><Skeleton height="30px" /></Td>
+       </Tr>
+      ))}
+      </>
+  )
+}
 
 export default function UserTable({ users = [], loading = false, onDelete, onUpdated }) {
   // console.log(users)
@@ -36,9 +51,7 @@ export default function UserTable({ users = [], loading = false, onDelete, onUpd
     viewer: "yellow",
   };
 
-  if (loading) {
-    return <Text> Loading users... </Text>
-  }
+  
   return (
     <>
       <TableContainer
@@ -49,14 +62,15 @@ export default function UserTable({ users = [], loading = false, onDelete, onUpd
         <Table>
           <Thead bg="gray.50">
             <Tr>
-              <Th>User</Th>
-              <Th>Email</Th>
-              <Th>Role</Th>
-              <Th>Actions</Th>
+              <Th width="25%">User</Th>
+              <Th width="25%">Email</Th>
+              <Th width="25%">Role</Th>
+              <Th width="25%">Actions</Th>
             </Tr>
           </Thead>
           <Tbody>
-            {users.map((user) => (
+            {loading ? <SkeletonRows /> :
+            users.map((user) => (
               <Tr key={user.id}>
                 <Td>
                   {user.firstName} {user.lastName}

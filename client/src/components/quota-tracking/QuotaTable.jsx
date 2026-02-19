@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { CheckIcon, EditIcon } from "@chakra-ui/icons";
+import { CheckIcon } from "@chakra-ui/icons";
 import {
   Badge,
   Box,
@@ -21,14 +21,30 @@ import {
   Thead,
   Tr,
   useDisclosure,
+  Skeleton,
 } from "@chakra-ui/react";
 
 import ProgressBar from "@/components/quota-tracking/ProgressBar";
 import QuotaDrawer from "@/components/quota-tracking/QuotaDrawer";
-import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 import { useUpdateQuota } from "@/contexts/hooks/data-fetching/useQuotas";
 
 const SELECTED_BG = "#7fb3ec";
+
+const SkeletonRows = () => {
+  return (
+<>
+              {Array.from({ length: 5 }, (_, i) => (
+       <Tr key={i}>
+        <Td><Skeleton height="30px" /></Td>
+        <Td><Skeleton height="30px" /></Td>
+        <Td><Skeleton height="30px" /></Td>
+        <Td><Skeleton height="30px" /></Td>
+        <Td><Skeleton height="30px" /></Td>
+       </Tr>
+      ))}
+      </>
+  )
+}
 
 const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
   const [editingQuotaId, setEditingQuotaId] = useState(null);
@@ -41,8 +57,6 @@ const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
 
   const {
     mutate: updateQuota,
-    isLoading: isUpdating,
-    error: updateError,
   } = useUpdateQuota();
 
   const onSave = async (id, newNote) => {
@@ -50,13 +64,6 @@ const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
 
     try {
       updateQuota({ id, data: { notes: sanitizedNote } });
-      if (onRowsUpdate) {
-        onRowsUpdate((prevRows) =>
-          prevRows.map((row) =>
-            row.id === id ? { ...row, notes: sanitizedNote } : row
-          )
-        );
-      }
     } catch (err) {
       console.error("Could not update note", err);
     }
@@ -106,29 +113,28 @@ const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
     );
   };
 
-  if (loading) {
-    return <Text>Loading...</Text>;
-  }
-
   return (
     <TableContainer
       borderWidth="1px"
       borderColor="gray.200"
       borderRadius="lg"
     >
-      <Table variant="simple">
+      <Table variant="simple" sx={{ tableLayout: "fixed" }}>
         <Thead bg="gray.50">
           <Tr>
-            <Th>Providers</Th>
-            <Th>Location</Th>
-            <Th>Type</Th>
-            <Th>Progress</Th>
-            <Th>Notes</Th>
+            <Th width="20%">Providers</Th>
+            <Th width="20%">Location</Th>
+            <Th width="20%">Type</Th>
+            <Th width="20%">Progress</Th>
+            <Th width="20%">Notes</Th>
           </Tr>
         </Thead>
 
+        {/* {loading ? <Skeleton /> : <Component />} */}
+
         <Tbody>
-          {rows.map((row) => (
+          {loading ? <SkeletonRows /> :
+          rows.map((row) => (
             <Tr
               key={row.id}
               bg={selectedRowId === row.id ? SELECTED_BG : "transparent"}

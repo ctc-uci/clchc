@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 
 import { AddIcon, SearchIcon } from "@chakra-ui/icons";
 import {
@@ -18,7 +18,6 @@ import {
 import { CustomCard } from "@/components/common/CustomCard";
 import Navbar from "@/components/layout/Navbar";
 import QuotaDrawer from "@/components/quota-tracking/QuotaDrawer";
-import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 import { useUserContext } from "@/contexts/hooks/useUserContext";
 import { useDebounce } from "@/hooks/useDebounce";
 
@@ -27,7 +26,6 @@ import QuotaTable from "./QuotaTable";
 
 export const QuotaTracking = () => {
   // const { backend } = useBackendContext()
-  const [rows, setRows] = useState([]);
   const [providerQuery, setProviderQuery] = useState("");
   // const [debouncedProviderQuery, setDebouncedProviderQuery] = useState("");
   const debouncedProviderQuery = useDebounce(
@@ -45,8 +43,6 @@ export const QuotaTracking = () => {
   const {
     data: quotas = [],
     isLoading,
-    error,
-    refetch,
   } = useQuotas({
     date: selectedDate,
     provider: providerQuery,
@@ -180,13 +176,6 @@ export const QuotaTracking = () => {
       <QuotaTable
         rows={quotas}
         loading={isLoading}
-        onRowsUpdate={(updater) => {
-          if (typeof updater === "function") {
-            setRows(updater);
-          } else {
-            refetch();
-          }
-        }}
       />
 
       <QuotaDrawer

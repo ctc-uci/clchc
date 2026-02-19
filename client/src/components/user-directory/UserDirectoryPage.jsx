@@ -11,6 +11,7 @@ import {
   InputGroup,
   InputLeftElement,
   Text,
+  Skeleton
 } from "@chakra-ui/react";
 
 import { CustomCard } from "@/components/common/CustomCard";
@@ -53,14 +54,12 @@ export const UserDirectory = () => {
   const {
     data: users = [],
     isLoading,
-    error,
     refetch,
   } = useUsers({ user: searchQuery, status: "approved" });
 
   const {
     data: userStats = {},
     isLoading: isStatsLoading,
-    error: statsError,
   } = useUsersStats();
 
   const { mutate: deleteUser } = useDeleteUser();
@@ -90,9 +89,9 @@ export const UserDirectory = () => {
     });
   }, [users, searchQuery, selectedRole]);
 
-  if (isStatsLoading) {
-    return <Text>User stats loading...</Text>;
-  }
+  // if (isStatsLoading) {
+  //   return <Text>User stats loading...</Text>;
+  // }
 
   return (
     <Box
@@ -170,7 +169,7 @@ export const UserDirectory = () => {
             height="12rem"
             width="14rem"
           />
-          {userStats.byRole &&
+          {isStatsLoading ? <Skeleton /> : userStats.byRole &&
             userStats.byRole.map((userStat) => (
               <CustomCard
                 key={userStat.role}
