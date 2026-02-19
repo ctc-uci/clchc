@@ -92,6 +92,7 @@ export default function ProgressBar({ quota }) {
         value={currentProgress}
         max={maxProgress}
         flex="1"
+        width="141px"
         height="12px"
         borderRadius="4px"
         background="rgba(0, 0, 0, 0.06)"
