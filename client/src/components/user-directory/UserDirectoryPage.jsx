@@ -127,6 +127,7 @@ export const UserDirectory = () => {
           </Flex>
           <Text
             color="#00000080"
+            fontSize="md"
             fontWeight="normal"
             mt={1}
           >
@@ -135,6 +136,25 @@ export const UserDirectory = () => {
         </Box>
       </Flex>
 
+      <Flex
+        align="center"
+        gap={1}
+        mb={2}
+      >
+        <Box
+          w="8px"
+          h="8px"
+          bg="red.500"
+          borderRadius="full"
+        />
+        <Heading
+          color="#00000080"
+          fontSize="xs"
+          fontWeight="semibold"
+        >
+          PENDING REQUESTS
+        </Heading>
+      </Flex>
       <Box mb={8}>
         <UserPendingStatusList />
       </Box>
@@ -150,11 +170,7 @@ export const UserDirectory = () => {
           </InputLeftElement>
           <Input
             placeholder="Search Providers"
-<<<<<<< HEAD
             borderRadius="2xl"
-=======
-            borderRadius="md"
->>>>>>> 683ce5f (feat: user table striped to match mid-fi)
             value={searchInput}
             onChange={handleSearchChange}
             fontWeight="normal"

@@ -26,7 +26,9 @@ export default function UserRoleFilter({ selectedRole, onChange }) {
       <MenuButton
         as={Button}
         type="button"
-        colorScheme="blackAlpha"
+        bg="blackAlpha.400"
+        color="white"
+        _hover={{ bg: "blackAlpha.500" }}
         leftIcon={<FiFilter />}
         rightIcon={<ChevronDownIcon />}
       >
