@@ -1,9 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
 
-import { Button, Flex, Icon, Progress, Text, Box, Skeleton } from "@chakra-ui/react";
+import {
+  Button,
+  Flex,
+  Icon,
+  Progress,
+  Text,
+} from "@chakra-ui/react";
 
 import {
-  useQuotaById,
   useUpdateQuota,
 } from "@/contexts/hooks/data-fetching/useQuotas";
 import { useCreateLog } from "@/contexts/hooks/data-fetching/useVersionLogs";
@@ -71,66 +76,80 @@ export default function ProgressBar({ quota }) {
   };
 
   return (
-  <Flex justifyContent="space-between" alignItems="center" width="100%">
-    <Flex alignItems="center" gap="6px" flex="1" maxWidth="calc(100% - 39px)">
-      <Button
-        onClick={handleDecrease}
-        isDisabled={currentProgress <= 0}
-        minW="24px"
-        height="33px"
-        padding="0"
-        borderRadius="4px"
-        bg="black"
-        flexShrink={0}
-      >
-        <Icon color="white" boxSize={4}>
-          <ArrowDown />
-        </Icon>
-      </Button>
-
-      <Progress
-        value={currentProgress}
-        max={maxProgress}
-        flex="1"
-        width="141px"
-        height="12px"
-        borderRadius="4px"
-        background="rgba(0, 0, 0, 0.06)"
-        marginx="6px"
-        sx={{
-          "& > div": {
-            backgroundColor: "#38A169",
-          },
-        }}
-      />
-
-      <Button
-        onClick={handleIncrease}
-        isDisabled={currentProgress >= maxProgress}
-        minW="24px"
-        height="33px"
-        padding="0"
-        borderRadius="4px"
-        bg="black"
-        flexShrink={0}
-      >
-        <Icon color="white" boxSize={4}>
-          <ArrowUp />
-        </Icon>
-      </Button>
-    </Flex>
-    <Text
-      color="black"
-      fontSize="16px"
-      fontWeight="600"
-      lineHeight="24px"
-      flexShrink={0}
-      marginLeft="6px"
-      minWidth="40px"
+    <Flex
+      justifyContent="space-between"
+      alignItems="center"
+      width="100%"
     >
-      {currentProgress}/{maxProgress}
-    </Text>
-  </Flex>
+      <Flex
+        alignItems="center"
+        gap="6px"
+        flex="1"
+        maxWidth="calc(100% - 39px)"
+      >
+        <Button
+          onClick={handleDecrease}
+          isDisabled={currentProgress <= 0}
+          minW="24px"
+          height="33px"
+          padding="0"
+          borderRadius="4px"
+          bg="black"
+          flexShrink={0}
+        >
+          <Icon
+            color="white"
+            boxSize={4}
+          >
+            <ArrowDown />
+          </Icon>
+        </Button>
 
+        <Progress
+          value={currentProgress}
+          max={maxProgress}
+          flex="1"
+          width="141px"
+          height="12px"
+          borderRadius="4px"
+          background="rgba(0, 0, 0, 0.06)"
+          marginx="6px"
+          sx={{
+            "& > div": {
+              backgroundColor: "#38A169",
+            },
+          }}
+        />
+
+        <Button
+          onClick={handleIncrease}
+          isDisabled={currentProgress >= maxProgress}
+          minW="24px"
+          height="33px"
+          padding="0"
+          borderRadius="4px"
+          bg="black"
+          flexShrink={0}
+        >
+          <Icon
+            color="white"
+            boxSize={4}
+          >
+            <ArrowUp />
+          </Icon>
+        </Button>
+      </Flex>
+      <Text
+        color="black"
+        fontSize="16px"
+        fontWeight="600"
+        lineHeight="24px"
+        flexShrink={0}
+        marginLeft="6px"
+        minWidth="40px"
+      >
+        {currentProgress}/{maxProgress}
+      </Text>
+    </Flex>
   );
 }

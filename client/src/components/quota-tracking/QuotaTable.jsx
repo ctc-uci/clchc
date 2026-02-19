@@ -36,22 +36,51 @@ const SkeletonRows = () => {
       {Array.from({ length: 5 }, (_, i) => (
         <Tr key={i}>
           <Td>
-            <Box display="flex" flexDirection="column" gap="2px">
-              <Skeleton height="15px" width="80%"/>
-              <Skeleton height="10px" width="60%"/>
+            <Box
+              display="flex"
+              flexDirection="column"
+              gap="2px"
+            >
+              <Skeleton
+                height="15px"
+                width="80%"
+              />
+              <Skeleton
+                height="10px"
+                width="60%"
+              />
             </Box>
           </Td>
           <Td>
-            <Skeleton height="30px" width="80%"/>
+            <Skeleton
+              height="30px"
+              width="80%"
+            />
           </Td>
           <Td>
-            <Skeleton height="30px" width="60%"/>
+            <Skeleton
+              height="30px"
+              width="60%"
+            />
           </Td>
           <Td>
-            <Box display="flex" flexDirection="row" gap="2px">
-            <Skeleton height="30px" width="19%"/>
-            <Skeleton height="30px" width="60%"/>
-            <Skeleton height="30px" width="19%"/>
+            <Box
+              display="flex"
+              flexDirection="row"
+              gap="2px"
+            >
+              <Skeleton
+                height="30px"
+                width="19%"
+              />
+              <Skeleton
+                height="30px"
+                width="60%"
+              />
+              <Skeleton
+                height="30px"
+                width="19%"
+              />
             </Box>
           </Td>
           <Td>
@@ -210,7 +239,10 @@ const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
                 </Td>
 
                 {/* Progress */}
-                <Td px={2} py={34.5}>
+                <Td
+                  px={2}
+                  py={34.5}
+                >
                   <Box onClick={(e) => e.stopPropagation()}>
                     <ProgressBar quota={row} />
                   </Box>
