@@ -57,11 +57,11 @@ export const UserDirectory = () => {
     refetch,
   } = useUsers({ user: searchQuery, status: "approved" });
 
-  const {
-    data: userStats = {},
-    isLoading: isStatsLoading,
-    error: statsError,
-  } = useUsersStats();
+  // const {
+  //   data: userStats = {},
+  //   isLoading: isStatsLoading,
+  //   error: statsError,
+  // } = useUsersStats();
 
   const { mutate: deleteUser } = useDeleteUser();
 
@@ -90,10 +90,6 @@ export const UserDirectory = () => {
     });
   }, [users, searchQuery, selectedRole]);
 
-  if (isStatsLoading) {
-    return <Text>User stats loading...</Text>;
-  }
-
   return (
     <Box
       p={6}
@@ -105,24 +101,33 @@ export const UserDirectory = () => {
         align="flex-start"
         mb={6}
       >
-        <Box>
+        <Box mt={5}>
           <Flex
             align="flex-end"
             gap={2}
           >
-            <Heading size="lg">User Directory</Heading>
+            <Heading
+              fontSize="4xl"
+              fontWeight="medium"
+            >
+              User Directory
+            </Heading>
             <Badge
-              colorScheme="yellow"
-              borderRadius="full"
-              px={2}
-              py={0.5}
-              fontSize="xs"
+              bg="#FFD768"
+              borderRadius="md"
+              px={7}
+              py={1}
+              ml={2}
+              fontSize="sm"
+              fontWeight="normal"
+              textTransform="none"
             >
               Master
             </Badge>
           </Flex>
           <Text
-            color="gray.500"
+            color="#00000080"
+            fontWeight="normal"
             mt={1}
           >
             Manage user accounts and permissions
@@ -147,42 +152,6 @@ export const UserDirectory = () => {
         <UserPendingStatusList />
       </Box>
 
-      <Heading
-        size="sm"
-        mb={0}
-        color="gray.600"
-      >
-        User Statistics
-      </Heading>
-
-      <Box
-        overflowX="auto"
-        py={4}
-        mb={6}
-      >
-        <HStack
-          spacing={4}
-          minW="min-content"
-        >
-          <CustomCard
-            title="Total Users"
-            body={userStats.total}
-            height="12rem"
-            width="14rem"
-          />
-          {userStats.byRole &&
-            userStats.byRole.map((userStat) => (
-              <CustomCard
-                key={userStat.role}
-                title={userStat.role}
-                body={userStat.count}
-                height="12rem"
-                width="14rem"
-              />
-            ))}
-        </HStack>
-      </Box>
-
       <Flex
         gap={4}
         align="center"
@@ -193,10 +162,13 @@ export const UserDirectory = () => {
             <SearchIcon color="gray.400" />
           </InputLeftElement>
           <Input
-            placeholder="Search by name or email..."
-            borderRadius="md"
+            placeholder="Search Providers"
+            borderRadius="2xl"
             value={searchInput}
             onChange={handleSearchChange}
+            fontWeight="normal"
+            fontSize="sm"
+            py={5}
           />
         </InputGroup>
 
