@@ -10,7 +10,7 @@ import {
   Thead,
   Tr,
   VStack,
-  Skeleton
+  Skeleton,
 } from "@chakra-ui/react";
 
 const SkeletonRows = () => {
@@ -18,12 +18,21 @@ const SkeletonRows = () => {
 <>
         {Array.from({ length: 5 }, (_, i) => (
        <Tr key={i}>
-        <Td><Skeleton height="30px" /></Td>
-        <Td><Skeleton height="30px" /></Td>
-        <Td><Skeleton height="30px" /></Td>
-        <Td><Skeleton height="30px" /></Td>
-        <Td><Skeleton height="30px" /></Td>
-        <Td><Skeleton height="30px" /></Td>
+        <Td><Skeleton height="30px" width="90%"/></Td>
+        <Td>
+          <Box display="flex" flexDirection="row" gap="3px">
+          <Skeleton height="30px" width="40%"/>
+          <Skeleton height="30px" width="25%"/></Box>
+          </Td>
+        <Td><Skeleton height="30px" width="60%"/></Td>
+        <Td><Skeleton height="30px" width="30%"/></Td>
+        <Td>
+        <Box display="flex" flexDirection="column" gap="2px">
+              <Skeleton height="15px" width="80%"/>
+              <Skeleton height="10px" width="60%"/>
+        </Box>
+        </Td>
+        <Td><Skeleton height="30px" width="70%"/></Td>
        </Tr>
       ))}
       </>
@@ -31,6 +40,7 @@ const SkeletonRows = () => {
 }
 
 const VersionLogTable = ({ loading, logs }) => {
+  const TESTLOADING = true;
   return (
     <VStack
       spacing={3}
@@ -43,15 +53,15 @@ const VersionLogTable = ({ loading, logs }) => {
         overflow="hidden"
         bg="white"
       >
-        <Table size="sm">
+        <Table size="sm" sx={{ tableLayout: "fixed" }}>
           <Thead bg="gray.50">
             <Tr>
-              <Th>Editor</Th>
-              <Th>Action</Th>
-              <Th>Date</Th>
-              <Th>Time</Th>
-              <Th>Provider</Th>
-              <Th>Quota Created</Th>
+              <Th width="20%">Editor</Th>
+              <Th width="15%">Action</Th>
+              <Th width="15%">Date</Th>
+              <Th width="15%">Time</Th>
+              <Th width="17.5%">Provider</Th>
+              <Th width="17.5%">Quota Created</Th>
             </Tr>
           </Thead>
 
@@ -70,7 +80,7 @@ const VersionLogTable = ({ loading, logs }) => {
               </Tr>
             )}
 
-            {loading ? <SkeletonRows /> : logs.map((entry) => {
+            {TESTLOADING ? <SkeletonRows /> : logs.map((entry) => {
               const log_d = new Date(entry.timestamp);
 
               const log_date = log_d.toLocaleDateString("en-US", {

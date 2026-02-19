@@ -8,12 +8,8 @@ import {
   HStack,
   Skeleton,
   SkeletonCircle,
-  Table,
-  Td,
   Text,
-  Tr,
   VStack,
-  Tbody
 } from "@chakra-ui/react";
 
 import {
@@ -25,61 +21,49 @@ import {
 const SkeletonRows = () => {
   return (
     <>
-      <Table>
-        <Tbody>
-        {Array.from({ length: 1 }, (_, i) => (
-       <Tr key={i} bg="white" spacing={3}>
-          <Td>
-            <HStack spacing={3}>
-              <SkeletonCircle size="10" />
-              <Box flex="1">
-                <Skeleton
-                  height="14px"
-                  width="120px"
-                  mb="2"
-                />
-                <Skeleton
-                  height="12px"
-                  width="80px"
-                />
-              </Box>
-            </HStack>
-          </Td>
-          <Td>
-            <Skeleton
-              height="14px"
-              width="200px"
-            />
-          </Td>
+      {Array.from({ length: 2 }, (_, i) => (
+        <Flex
+          key={i}
+          bg="white"
+          p={4}
+          borderRadius="md"
+          align="center"
+          justify="space-between"
+          boxShadow="sm"
+        >
+          {/* Placeholder Icon */}
+          <Skeleton
+            height="24px"
+            width="24px"
+            borderRadius="full"
+          />
 
-          <Td>
-            <Skeleton
-              height="20px"
-              width="90px"
-              borderRadius="md"
-            />
-          </Td>
-          <Td>
-            <HStack spacing={2}>
-              <Skeleton
-                height="32px"
-                width="32px"
-                borderRadius="md"
-              />
-              <Skeleton
-                height="32px"
-                width="32px"
-                borderRadius="md"
-              />
-            </HStack>
-          </Td>
-        </Tr>
-      ))}  
-      </Tbody>
-      </Table>
+          {/* Left - Avatar & Info */}
+          <HStack spacing={3} minW="260px">
+            <SkeletonCircle size="10" />
+            <Box>
+              <Skeleton height="14px" width="120px" mb="2" />
+              <Skeleton height="12px" width="180px" />
+            </Box>
+          </HStack>
+
+          {/* Date */}
+          <Skeleton height="14px" width="80px" />
+
+          {/* Role */}
+          <Skeleton height="14px" width="60px" />
+
+          {/* Actions */}
+          <HStack spacing={2}>
+            <Skeleton height="32px" width="80px" borderRadius="md" />
+            <Skeleton height="32px" width="80px" borderRadius="md" />
+          </HStack>
+        </Flex>
+      ))}
     </>
   );
 };
+
 
 export const UserPendingStatusList = () => {
   // const [pendingUsers, setPendingUsers] = useState([]);
@@ -115,10 +99,6 @@ export const UserPendingStatusList = () => {
     }
   };
 
-  // if (isLoading) {
-  //   return <Text> Loading pending users... </Text>;
-  // }
-
   return (
     <Box
       bg="#FFF8E6"
@@ -142,7 +122,7 @@ export const UserPendingStatusList = () => {
           borderRadius="full"
           px={2}
         >
-          {isLoading ? <Skeleton width="5px" /> : pendingUsers.length}
+          {isLoading ? <Skeleton height="20px" width="20px" /> : pendingUsers.length}
         </Badge>
       </Flex>
 

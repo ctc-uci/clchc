@@ -13,6 +13,7 @@ export function useDirectoryCategories() {
     },
     staleTime: 60 * 1000, 
     refetchInterval: 60 * 1000, // 1 min
+    suspense: false,
   });
 }
 

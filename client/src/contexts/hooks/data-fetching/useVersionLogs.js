@@ -16,6 +16,7 @@ export const useVersionLogs = ({ q } = {}) => {
         },
         staleTime: 60 * 1000,
         refetchInterval: 60 * 1000,
+        suspense: false,
     });
 }
 
