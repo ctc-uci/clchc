@@ -210,9 +210,9 @@ const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
                 </Td>
 
                 {/* Progress */}
-                <Td>
+                <Td px={2} py={34.5}>
                   <Box onClick={(e) => e.stopPropagation()}>
-                    <ProgressBar quotaID={row.id} />
+                    <ProgressBar quota={row} />
                   </Box>
                 </Td>
 

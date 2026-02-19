@@ -1,27 +1,20 @@
 import React, { useEffect, useRef, useState } from "react";
 
-import { Button, Flex, Icon, Progress, Text } from "@chakra-ui/react";
+import { Button, Flex, Icon, Progress, Text, Box, Skeleton } from "@chakra-ui/react";
 
 import {
   useQuotaById,
   useUpdateQuota,
 } from "@/contexts/hooks/data-fetching/useQuotas";
-import {
-  useCreateLog,
-} from "@/contexts/hooks/data-fetching/useVersionLogs";
+import { useCreateLog } from "@/contexts/hooks/data-fetching/useVersionLogs";
 import { useUserContext } from "@/contexts/hooks/useUserContext";
 import { ArrowDown, ArrowUp } from "lucide-react";
 
-export default function ProgressBar({ quotaID }) {
+export default function ProgressBar({ quota }) {
   const quotaRef = useRef(null);
   // const [quota, setQuota] = useState(null);
-  const {
-    mutate: updateQuota,
-  } = useUpdateQuota();
-  const {
-    mutate: createLog,
-  } = useCreateLog();
-  const { data: quota, isLoading, error } = useQuotaById(quotaID);
+  const { mutate: updateQuota } = useUpdateQuota();
+  const { mutate: createLog } = useCreateLog();
   const maxProgress = quota?.quota ?? 0;
   const current = quota?.progress ?? 0;
   const [currentProgress, setCurrentProgress] = useState(current);
@@ -42,7 +35,7 @@ export default function ProgressBar({ quotaID }) {
     if (!currentQuota) return;
 
     try {
-      await updateQuota({ id: quotaID, data: { progress: next } });
+      await updateQuota({ id: quota.id, data: { progress: next } });
     } catch (err) {
       console.error("Error updating progress:", err);
     }
@@ -50,16 +43,10 @@ export default function ProgressBar({ quotaID }) {
     try {
       await createLog({
         userId: dbUser?.id,
-        quotaId: quotaID,
+        quotaId: quota.id,
         action: next > originalProgress ? "increment" : "decrement",
         delta: next - originalProgress,
       });
-      // await backend.post("/versionLog", {
-      //   userId: dbUser?.id,
-      //   quotaId: quotaID,
-      //   action: next > originalProgress ? "increment" : "decrement",
-      //   delta: next - originalProgress,
-      // });
       setOriginalProgress(next);
     } catch (err) {
       console.error("Error logging quota change to version log:", err);
@@ -83,59 +70,66 @@ export default function ProgressBar({ quotaID }) {
     await updateProgress(next);
   };
 
-  if (isLoading) return <Text>Loading quota...</Text>;
-  if (error) return <Text>Error loading quota: {error.message}</Text>;
   return (
-    <Flex
-      alignItems="center"
-      gap="5px"
-      padding={1}
-    >
+  <Flex justifyContent="space-between" alignItems="center" width="100%">
+    <Flex alignItems="center" gap="6px" flex="1" maxWidth="calc(100% - 39px)">
       <Button
         onClick={handleDecrease}
         isDisabled={currentProgress <= 0}
-        width="20px"
-        minW={0}
-        px={0}
-        height="24px"
-        border="1px black solid"
-        background="white"
-        borderRadius="5px"
-        fontSize="100%"
+        minW="24px"
+        height="33px"
+        padding="0"
+        borderRadius="4px"
+        bg="black"
+        flexShrink={0}
       >
-        <Icon>
+        <Icon color="white" boxSize={4}>
           <ArrowDown />
         </Icon>
       </Button>
+
       <Progress
         value={currentProgress}
         max={maxProgress}
-        colorScheme="gray"
-        width="172px"
-        borderRadius={6}
-        border="1px lightgray solid"
-        background="gray.50"
+        flex="1"
+        height="12px"
+        borderRadius="4px"
+        background="rgba(0, 0, 0, 0.06)"
+        marginx="6px"
+        sx={{
+          "& > div": {
+            backgroundColor: "#38A169",
+          },
+        }}
       />
+
       <Button
         onClick={handleIncrease}
         isDisabled={currentProgress >= maxProgress}
-        width="20px"
-        minW={0}
-        px={0}
-        height="24px"
-        border="1px black solid"
-        background="black"
-        textColor="white"
-        _hover={{ background: "gray" }}
-        fontSize="100%"
+        minW="24px"
+        height="33px"
+        padding="0"
+        borderRadius="4px"
+        bg="black"
+        flexShrink={0}
       >
-        <Icon>
+        <Icon color="white" boxSize={4}>
           <ArrowUp />
         </Icon>
       </Button>
-      <Text>
-        {currentProgress}/{maxProgress}
-      </Text>
     </Flex>
+    <Text
+      color="black"
+      fontSize="16px"
+      fontWeight="600"
+      lineHeight="24px"
+      flexShrink={0}
+      marginLeft="6px"
+      minWidth="40px"
+    >
+      {currentProgress}/{maxProgress}
+    </Text>
+  </Flex>
+
   );
 }

@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import { SearchIcon } from "@chakra-ui/icons";
 import {
   Badge,
@@ -27,13 +28,9 @@ export const VersionLogPage = () => {
   );
   // const [loading, setLoading] = useState(true);
 
-  const {
-    data: logs = [],
-    isLoading,
-  } = useVersionLogs({
+  const { data: logs = [], isLoading } = useVersionLogs({
     q: searchQuery,
   });
-
 
   // handleChange
   const handleChange = (e) => {
