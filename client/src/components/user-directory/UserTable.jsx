@@ -9,17 +9,21 @@ import {
   TableContainer,
   Tbody,
   Td,
+  Text,
   Th,
   Thead,
   Tr,
-  Text,
   useDisclosure,
 } from "@chakra-ui/react";
 
 import UserEditModal from "./UserEditModal";
 
-export default function UserTable({ users = [], loading = false, onDelete, onUpdated }) {
-  // console.log(users)
+export default function UserTable({
+  users = [],
+  loading = false,
+  onDelete,
+  onUpdated,
+}) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedUser, setSelectedUser] = useState(null);
 
@@ -37,7 +41,7 @@ export default function UserTable({ users = [], loading = false, onDelete, onUpd
   };
 
   if (loading) {
-    return <Text> Loading users... </Text>
+    return <Text> Loading users... </Text>;
   }
   return (
     <>
@@ -46,12 +50,33 @@ export default function UserTable({ users = [], loading = false, onDelete, onUpd
         borderColor="gray.200"
         borderRadius="lg"
       >
-        <Table>
+        <Table
+          variant="striped"
+          colorScheme="gray"
+          sx={{
+            "th, td": { borderRight: "1px solid", borderColor: "gray.200" },
+          }}
+        >
           <Thead bg="gray.50">
             <Tr>
-              <Th>User</Th>
-              <Th>Email</Th>
-              <Th>Role</Th>
+              <Th
+                borderRight="1px solid"
+                borderColor="gray.200"
+              >
+                User
+              </Th>
+              <Th
+                borderRight="1px solid"
+                borderColor="gray.200"
+              >
+                Email
+              </Th>
+              <Th
+                borderRight="1px solid"
+                borderColor="gray.200"
+              >
+                Role
+              </Th>
               <Th>Actions</Th>
             </Tr>
           </Thead>

@@ -150,7 +150,11 @@ export const UserDirectory = () => {
           </InputLeftElement>
           <Input
             placeholder="Search Providers"
+<<<<<<< HEAD
             borderRadius="2xl"
+=======
+            borderRadius="md"
+>>>>>>> 683ce5f (feat: user table striped to match mid-fi)
             value={searchInput}
             onChange={handleSearchChange}
             fontWeight="normal"
