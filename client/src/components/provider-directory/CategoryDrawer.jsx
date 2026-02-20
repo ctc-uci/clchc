@@ -31,7 +31,6 @@ import {
 
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 import { useUserContext } from "@/contexts/hooks/useUserContext";
-// import { useCreateCategory } from "@/contexts/hooks/data-fetching/useDirectoryCategories";
 import { closestCenter, DndContext } from "@dnd-kit/core";
 import {
   restrictToParentElement,
@@ -105,9 +104,6 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
   const [showForm, setShowForm] = useState(false);
   const { backend } = useBackendContext();
   const { role, loading } = useUserContext();
-  // const {
-  //   mutate: createCategory,
-  // } = useCreateCategory();
   const toast = useToast();
   const formStackRef = useRef(null);
   const {

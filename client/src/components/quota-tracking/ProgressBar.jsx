@@ -17,7 +17,6 @@ import { ArrowDown, ArrowUp } from "lucide-react";
 
 export default function ProgressBar({ quota }) {
   const quotaRef = useRef(null);
-  // const [quota, setQuota] = useState(null);
   const { mutate: updateQuota } = useUpdateQuota();
   const { mutate: createLog } = useCreateLog();
   const maxProgress = quota?.quota ?? 0;
