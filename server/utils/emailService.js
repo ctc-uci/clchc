@@ -34,9 +34,7 @@ export async function notifyCcmNewUserRequest(name, email) {
     `;
 
     // Query for CCM's email address
-    const rows = await db.query(`SELECT email FROM users WHERE email = $1`, [
-      sanitizedEmail,
-    ]);
+    const rows = await db.query(`SELECT email FROM users WHERE role = 'ccm'`);
     // Validate email
     if (!rows || !rows.length) throw new Error("Cannot find ccm.");
     const ccmEmail = rows[0].email;
