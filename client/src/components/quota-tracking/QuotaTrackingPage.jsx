@@ -20,6 +20,7 @@ import QuotaDrawer from "@/components/quota-tracking/QuotaDrawer";
 import { useUserContext } from "@/contexts/hooks/useUserContext";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useQuotas } from "@/contexts/hooks/data-fetching/useQuotas";
+import CalendarCard from "./CalendarCard";
 import QuotaTable from "./QuotaTable";
 
 export const QuotaTracking = () => {
@@ -110,8 +111,7 @@ export const QuotaTracking = () => {
     debouncedProviderQuery(e.target.value);
   };
 
-  const handleDateChange = (e) => {
-    const newDate = e.target.value;
+  const handleDateChange = (newDate) => {
     setSelectedDate(newDate);
     navigate(`/quota-tracking/${newDate}`);
   };
@@ -156,14 +156,10 @@ export const QuotaTracking = () => {
           display="flex"
           justifyContent="flex-end"
         >
-          <InputGroup w="19ch">
-            <Input
-              textAlign="center"
-              type="date"
-              value={selectedDate}
-              onChange={handleDateChange}
-            />
-          </InputGroup>
+          <CalendarCard
+            value={selectedDate}
+            onChange={handleDateChange}
+          />
         </Box>
 
         <Button
