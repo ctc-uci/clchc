@@ -10,8 +10,8 @@ import {
   Input,
   InputGroup,
   InputLeftElement,
+  Skeleton,
   Text,
-  Skeleton
 } from "@chakra-ui/react";
 
 import { CustomCard } from "@/components/common/CustomCard";
@@ -26,6 +26,18 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { UserPendingStatusList } from "./UserPendingStatusList";
 import UserRoleFilter from "./UserRoleFilter";
 import UserTable from "./UserTable";
+
+const UserStatsSkeleton = () => {
+  return Array.from({ length: 4 }, (_, i) => (
+    <CustomCard
+      key={i}
+      title={<Skeleton height="30px" />}
+      body={<Skeleton boxSize="45px" />}
+      height="12rem"
+      width="14rem"
+    />
+  ));
+};
 
 export const UserDirectory = () => {
   // Keep what's typed immediately (so the input feels responsive)
@@ -57,10 +69,7 @@ export const UserDirectory = () => {
     refetch,
   } = useUsers({ user: searchQuery, status: "approved" });
 
-  const {
-    data: userStats = {},
-    isLoading: isStatsLoading,
-  } = useUsersStats();
+  const { data: userStats = {}, isLoading: isStatsLoading } = useUsersStats();
 
   const { mutate: deleteUser } = useDeleteUser();
 
@@ -88,10 +97,6 @@ export const UserDirectory = () => {
       return matchesSearch && matchesRole;
     });
   }, [users, searchQuery, selectedRole]);
-
-  // if (isStatsLoading) {
-  //   return <Text>User stats loading...</Text>;
-  // }
 
   return (
     <Box
@@ -163,22 +168,28 @@ export const UserDirectory = () => {
           spacing={4}
           minW="min-content"
         >
-          <CustomCard
-            title="Total Users"
-            body={userStats.total}
-            height="12rem"
-            width="14rem"
-          />
-          {isStatsLoading ? <Skeleton /> : userStats.byRole &&
-            userStats.byRole.map((userStat) => (
+          {isStatsLoading ? (
+            <UserStatsSkeleton />
+          ) : (
+            <>
               <CustomCard
-                key={userStat.role}
-                title={userStat.role}
-                body={userStat.count}
+                title="Total Users"
+                body={userStats.total}
                 height="12rem"
                 width="14rem"
               />
-            ))}
+              {userStats.byRole &&
+                userStats.byRole.map((userStat) => (
+                  <CustomCard
+                    key={userStat.role}
+                    title={userStat.role}
+                    body={userStat.count}
+                    height="12rem"
+                    width="14rem"
+                  />
+                ))}
+            </>
+          )}
         </HStack>
       </Box>
 

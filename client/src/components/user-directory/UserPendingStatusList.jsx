@@ -18,65 +18,74 @@ import {
   useUsers,
 } from "@/contexts/hooks/data-fetching/useUsers";
 
-const SkeletonRows = () => {
+const RequestSkeleton = () => {
   return (
-    <>
-      {Array.from({ length: 2 }, (_, i) => (
-        <Flex
-          key={i}
-          bg="white"
-          p={4}
-          borderRadius="md"
-          align="center"
-          justify="space-between"
-          boxShadow="sm"
-        >
-          {/* Placeholder Icon */}
+    <Flex
+      bg="white"
+      p={4}
+      borderRadius="md"
+      align="center"
+      justify="space-between"
+      boxShadow="sm"
+    >
+      {/* Placeholder Icon */}
+      <Skeleton
+        boxSize="24px"
+        borderRadius="full"
+      />
+
+      {/* Left - Avatar & Info */}
+      <HStack
+        spacing={3}
+        minW="260px"
+      >
+        <SkeletonCircle size="10" />
+        <VStack alignItems="start">
           <Skeleton
-            height="24px"
-            width="24px"
-            borderRadius="full"
+            height="14px"
+            width="120px"
           />
+          <Skeleton
+            height="12px"
+            width="180px"
+          />
+        </VStack>
+      </HStack>
 
-          {/* Left - Avatar & Info */}
-          <HStack spacing={3} minW="260px">
-            <SkeletonCircle size="10" />
-            <Box>
-              <Skeleton height="14px" width="120px" mb="2" />
-              <Skeleton height="12px" width="180px" />
-            </Box>
-          </HStack>
+      {/* Date */}
+      <Skeleton
+        height="14px"
+        width="80px"
+      />
 
-          {/* Date */}
-          <Skeleton height="14px" width="80px" />
+      {/* Role */}
+      <Skeleton
+        height="14px"
+        width="60px"
+      />
 
-          {/* Role */}
-          <Skeleton height="14px" width="60px" />
-
-          {/* Actions */}
-          <HStack spacing={2}>
-            <Skeleton height="32px" width="80px" borderRadius="md" />
-            <Skeleton height="32px" width="80px" borderRadius="md" />
-          </HStack>
-        </Flex>
-      ))}
-    </>
+      {/* Actions */}
+      <HStack spacing={2}>
+        <Skeleton
+          height="32px"
+          width="80px"
+          borderRadius="md"
+        />
+        <Skeleton
+          height="32px"
+          width="80px"
+          borderRadius="md"
+        />
+      </HStack>
+    </Flex>
   );
 };
 
-
 export const UserPendingStatusList = () => {
   // const [pendingUsers, setPendingUsers] = useState([]);
-  const {
-    data: pendingUsers,
-    isLoading,
-  } = useUsers({ status: "pending" });
-  const {
-    mutate: updateUser,
-  } = useUpdateUser();
-  const {
-    mutate: deleteUser,
-  } = useDeleteUser();
+  const { data: pendingUsers, isLoading } = useUsers({ status: "pending" });
+  const { mutate: updateUser } = useUpdateUser();
+  const { mutate: deleteUser } = useDeleteUser();
 
   //When Approve Button is clicked, update user status to active
   const handleApprove = async (id) => {
@@ -109,21 +118,22 @@ export const UserPendingStatusList = () => {
     >
       <Flex
         align="center"
-        mb={4}
+        gap={2}
       >
-        <WarningIcon
-          color="orange.400"
-          mr={2}
-        />
+        <WarningIcon color="orange.400" />
         <Text fontWeight="semibold">Pending Requests</Text>
-        <Badge
-          ml={2}
-          colorScheme="red"
-          borderRadius="full"
-          px={2}
-        >
-          {isLoading ? <Skeleton height="20px" width="20px" /> : pendingUsers.length}
-        </Badge>
+
+        {isLoading ? (
+          <Skeleton boxSize="20px" />
+        ) : (
+          <Badge
+            colorScheme="red"
+            borderRadius="full"
+            px={2}
+          >
+            {pendingUsers.length}
+          </Badge>
+        )}
       </Flex>
 
       <VStack
@@ -131,7 +141,7 @@ export const UserPendingStatusList = () => {
         align="stretch"
       >
         {isLoading ? (
-          <SkeletonRows />
+          <RequestSkeleton />
         ) : (
           pendingUsers.map((req) => (
             <Flex

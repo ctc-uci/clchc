@@ -20,15 +20,9 @@ const SkeletonHeader = () => {
         {Array.from({ length: 4 }, (_, i) => (
           <Th
             key={i}
-            fontSize="sm"
-            fontWeight="bold"
-            color="#2D3748"
             p={0}
           >
-            <Skeleton
-              h="60px"
-              w="100%"
-            />
+            <Skeleton height="60px" />
           </Th>
         ))}
       </Tr>

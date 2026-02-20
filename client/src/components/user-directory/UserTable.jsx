@@ -25,33 +25,18 @@ const SkeletonRows = () => {
       {Array.from({ length: 5 }, (_, i) => (
         <Tr key={i}>
           <Td>
-            <Skeleton
-              height="30px"
-              width="60%"
-            />
+            <Skeleton height="30px" />
           </Td>
           <Td>
-            <Skeleton
-              height="30px"
-              width="80%"
-            />
+            <Skeleton height="30px" />
           </Td>
           <Td>
-            <Skeleton
-              height="30px"
-              width="30%"
-            />
+            <Skeleton height="30px" />
           </Td>
           <Td>
             <HStack>
-              <Skeleton
-                height="30px"
-                width="30px"
-              />
-              <Skeleton
-                height="30px"
-                width="30px"
-              />
+              <Skeleton boxSize="30px" />
+              <Skeleton boxSize="30px" />
             </HStack>
           </Td>
         </Tr>

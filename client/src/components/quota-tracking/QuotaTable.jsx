@@ -41,27 +41,18 @@ const SkeletonRows = () => {
               flexDirection="column"
               gap="2px"
             >
-              <Skeleton
-                height="15px"
-                width="80%"
-              />
+              <Skeleton height="15px" />
               <Skeleton
                 height="10px"
-                width="60%"
+                width="80%"
               />
             </Box>
           </Td>
           <Td>
-            <Skeleton
-              height="30px"
-              width="80%"
-            />
+            <Skeleton height="30px" />
           </Td>
           <Td>
-            <Skeleton
-              height="30px"
-              width="60%"
-            />
+            <Skeleton height="30px" />
           </Td>
           <Td>
             <Box
@@ -71,7 +62,7 @@ const SkeletonRows = () => {
             >
               <Skeleton
                 height="30px"
-                width="19%"
+                width="20%"
               />
               <Skeleton
                 height="30px"
@@ -79,7 +70,7 @@ const SkeletonRows = () => {
               />
               <Skeleton
                 height="30px"
-                width="19%"
+                width="20%"
               />
             </Box>
           </Td>
