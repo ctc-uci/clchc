@@ -2,7 +2,7 @@ import { keysToCamel } from "@/common/utils";
 import { admin } from "@/config/firebase";
 import { db } from "@/db/db-pgp"; // TODO: replace this db with
 import { verifyRole } from "@/middleware";
-import { notifyCcmNewUserRequest } from "@/utils/emailService";
+import { notifyCcmNewUserRequest, notifyApprovedNewUser } from "@/utils/emailService";
 import { Router } from "express";
 
 export const usersRouter = Router();
@@ -294,6 +294,11 @@ usersRouter.put(
 
       if (!result || result.length === 0) {
         return res.status(404).json({ error: "User not found." });
+      }
+      
+      // If user is newly approved, notify them by email.
+      if(status === "approved"){
+        await notifyApprovedNewUser(`${result.firstName} ${result.lastName}`, result.email);
       }
 
       return res.status(200).json(keysToCamel(result[0]));
