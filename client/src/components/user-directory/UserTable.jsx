@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { EditIcon, Icon } from "@chakra-ui/icons";
+import { Icon } from "@chakra-ui/icons";
 import {
   Badge,
   IconButton,

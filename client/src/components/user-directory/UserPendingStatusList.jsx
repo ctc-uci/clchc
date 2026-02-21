@@ -1,8 +1,6 @@
 import { useState } from "react";
 
-import { WarningIcon } from "@chakra-ui/icons";
 import {
-  Badge,
   Box,
   Button,
   Flex,
@@ -12,9 +10,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 
-import { BackendContext } from "@/contexts/BackendContext";
 import {
-  useDeleteUser,
   useUpdateUser,
   useUsers,
 } from "@/contexts/hooks/data-fetching/useUsers";
@@ -117,7 +113,13 @@ export const UserPendingStatusList = () => {
                 fontSize="sm"
                 color="gray.500"
               >
-                Request Date
+                {req.userSignupDate
+                  ? new Date(req.userSignupDate).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    })
+                  : "No Date"}
               </Text>
               {/* Actions */}
               <Button

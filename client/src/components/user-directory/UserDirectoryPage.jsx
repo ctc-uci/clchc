@@ -6,19 +6,16 @@ import {
   Box,
   Flex,
   Heading,
-  HStack,
   Input,
   InputGroup,
   InputLeftElement,
   Text,
 } from "@chakra-ui/react";
 
-import { CustomCard } from "@/components/common/CustomCard";
 import { Navbar } from "@/components/layout/Navbar";
 import {
   useDeleteUser,
   useUsers,
-  useUsersStats,
 } from "@/contexts/hooks/data-fetching/useUsers";
 import { useDebounce } from "@/hooks/useDebounce";
 
