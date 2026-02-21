@@ -24,6 +24,7 @@ import {
   Progress,
   Select,
   Stack,
+  Textarea,
   Text,
   useDisclosure,
 } from "@chakra-ui/react";
@@ -82,9 +83,17 @@ const LockRightElement = (props) => (
   <InputRightElement
     pointerEvents="none"
     color="gray.400"
+    h="100%"
+    display="flex"
+    alignItems="center"
+    justifyContent="center"
     {...props}
   >
-    <LockKeyhole size={16} />
+    <Box
+      as={LockKeyhole}
+      w="clamp(12px, 40%, 16px)"
+      h="clamp(12px, 40%, 16px)"
+    />
   </InputRightElement>
 );
 
@@ -433,6 +442,22 @@ const TimeInput = ({
   setEndTime,
   isLocked,
 }) => {
+  const handleStartTimeChange = (value) => {
+    setStartTime(value);
+
+    if (endTime && value && endTime < value) {
+      setEndTime("");
+    }
+  };
+
+  const handleEndTimeChange = (value) => {
+    if (startTime && value && value < startTime) {
+      return;
+    }
+
+    setEndTime(value);
+  };
+
   return (
     <Flex
       direction="column"
@@ -510,7 +535,7 @@ const TimeInput = ({
                     },
                   }}
                   value={startTime ?? ""}
-                  onChange={(e) => setStartTime(e.target.value)}
+                  onChange={(e) => handleStartTimeChange(e.target.value)}
                 />
               </InputGroup>
               <InputGroup
@@ -535,8 +560,9 @@ const TimeInput = ({
                       display: "none",
                     },
                   }}
+                  min={startTime || undefined}
                   value={endTime ?? ""}
-                  onChange={(e) => setEndTime(e.target.value)}
+                  onChange={(e) => handleEndTimeChange(e.target.value)}
                 />
               </InputGroup>
             </>
@@ -639,19 +665,32 @@ const DailyNoteInput = ({ note, setNote, isLocked }) => {
   return (
     <FormControl isDisabled={isLocked}>
       <FormLabel>Daily Notes</FormLabel>
-      <InputGroup>
-        <Input
+      {isLocked ? (
+        <Box
+          w="100%"
+          border="1px"
+          borderColor="gray.300"
+          borderRadius="6px"
+          px={3}
+          py={2}
+          minH="70px"
+          bg="gray.50"
+          color="gray.500"
+          whiteSpace="pre-wrap"
+        >
+          {note ?? ""}
+        </Box>
+      ) : (
+        <Textarea
           placeholder="Start typing..."
           size="md"
           minH="70px"
-          type="text"
+          resize="vertical"
           {...inputStyles}
-          pr={isLocked ? "2.25rem" : undefined}
           value={note ?? ""}
           onChange={(e) => setNote(e.target.value)}
         />
-        {isLocked && <LockRightElement h="70px" />}
-      </InputGroup>
+      )}
     </FormControl>
   );
 };
@@ -814,6 +853,14 @@ export default function QuotaDrawer({
 
     e.preventDefault();
     const effectiveAction = nextAction ?? action;
+
+    if (
+      startTime &&
+      endTime &&
+      formatTimeForInput(endTime) < formatTimeForInput(startTime)
+    ) {
+      return;
+    }
 
     const formData = {
       providerId,
