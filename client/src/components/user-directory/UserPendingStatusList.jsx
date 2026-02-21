@@ -1,12 +1,14 @@
+import { useState } from "react";
+
 import { WarningIcon } from "@chakra-ui/icons";
 import {
-  Avatar,
   Badge,
   Box,
   Button,
   Flex,
   HStack,
   Text,
+  useDisclosure,
   VStack,
 } from "@chakra-ui/react";
 
@@ -16,6 +18,8 @@ import {
   useUpdateUser,
   useUsers,
 } from "@/contexts/hooks/data-fetching/useUsers";
+
+import { DenyRequestModal } from "./DenyRequestModal";
 
 export const UserPendingStatusList = () => {
   // const [pendingUsers, setPendingUsers] = useState([]);
@@ -29,11 +33,8 @@ export const UserPendingStatusList = () => {
     isLoading: isUpdating,
     error: errorUpdating,
   } = useUpdateUser();
-  const {
-    mutate: deleteUser,
-    isLoading: isDeleting,
-    error: errorDeleting,
-  } = useDeleteUser();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [selectedUser, setSelectedUser] = useState(null);
 
   //When Approve Button is clicked, update user status to active
   const handleApprove = async (id) => {
@@ -45,15 +46,14 @@ export const UserPendingStatusList = () => {
   };
 
   //When Deny Button is clicked, delete user from database
-  const handleDeny = async (id) => {
-    try {
-      await deleteUser(id);
-    } catch (err) {
-      console.error(
-        "couldn't deny user in components/UserPendingStatus.jsx",
-        err
-      );
-    }
+  const handleDeny = async (user) => {
+    setSelectedUser(user);
+    onOpen();
+  };
+
+  const handleCloseModal = () => {
+    setSelectedUser(null);
+    onClose();
   };
 
   if (isLoading) {
@@ -62,19 +62,18 @@ export const UserPendingStatusList = () => {
 
   return (
     <Box
+      bg="white"
       borderRadius="lg"
       border="0.5px solid #00000026"
+      boxShadow="sm"
+      p={4}
     >
       <VStack align="stretch">
         {pendingUsers.map((req) => (
           <Flex
             key={req.id}
-            bg="white"
-            p={4}
-            borderRadius="md"
             align="center"
             justify="space-between"
-            boxShadow="sm"
           >
             {/* Left */}
             <HStack
@@ -128,7 +127,7 @@ export const UserPendingStatusList = () => {
                 py={1}
                 px={8}
                 _hover={{ bg: "blackAlpha.500" }}
-                onClick={() => handleDeny(req.id)}
+                onClick={() => handleDeny(req)}
               >
                 Deny
               </Button>
@@ -147,6 +146,11 @@ export const UserPendingStatusList = () => {
           </Flex>
         ))}
       </VStack>
+      <DenyRequestModal
+        isOpen={isOpen}
+        onClose={onClose}
+        user={selectedUser}
+      />
     </Box>
   );
 };
