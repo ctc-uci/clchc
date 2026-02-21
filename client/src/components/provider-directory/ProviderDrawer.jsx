@@ -1,3 +1,5 @@
+import React, { useEffect, useState } from "react";
+
 import {
   Alert,
   AlertIcon,
@@ -10,24 +12,41 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerOverlay,
+  Flex,
   FormControl,
   FormLabel,
-  Flex,
   Input,
   Select,
+  Skeleton,
   Text,
 } from "@chakra-ui/react";
-import React, { useEffect, useState } from "react";
 
-import { useBackendContext } from "@/contexts/hooks/useBackendContext";
+import {
+  useCreateProvider,
+  useDeleteProvider,
+  useUpdateProvider,
+} from "@/contexts/hooks/data-fetching/useProviders";
+import { useTags } from "@/contexts/hooks/data-fetching/useTags";
 
 // --- Confirmation Banner ---
+const SkeletonBody = () => {
+  return (
+    <>
+      {Array.from({ length: 8 }, (_, i) => (
+        <Skeleton key={i}
+          height="15%"
+          margin="20px"
+        />
+      ))}
+    </>
+  );
+};
+
 const ConfirmationBanner = ({ mode }) => {
   const messages = {
     create:
       "Please confirm you would like to create a new provider with the following information",
-    edit: 
-      "Please confirm you would like to save the changes to the provider with the following information",
+    edit: "Please confirm you would like to save the changes to the provider with the following information",
     delete:
       "Please confirm you would like to delete the provider with the following information",
   };
@@ -45,13 +64,26 @@ const ConfirmationBanner = ({ mode }) => {
       p={4}
       mb={4}
     >
-      <Box display="flex" alignItems="center" mb={1}>
-        <AlertIcon color="red.500" mr={2} />
-        <Text fontWeight="bold" color="red.500">
+      <Box
+        display="flex"
+        alignItems="center"
+        mb={1}
+      >
+        <AlertIcon
+          color="red.500"
+          mr={2}
+        />
+        <Text
+          fontWeight="bold"
+          color="red.500"
+        >
           Notification
         </Text>
       </Box>
-      <Text color="red.500" fontSize="sm">
+      <Text
+        color="red.500"
+        fontSize="sm"
+      >
         {messages[mode]}
       </Text>
     </Alert>
@@ -84,7 +116,14 @@ const ConfirmationBanner = ({ mode }) => {
 
 // --- Provider Form Fields (hardcoded 2-column layout matching MidFi) ---
 // `catNames` maps display labels to actual DB category names
-const ProviderFormFields = ({ categories, tags, formValues, onChange, readOnly, errors}) => {
+const ProviderFormFields = ({
+  categories,
+  tags,
+  formValues,
+  onChange,
+  readOnly,
+  errors,
+}) => {
   // const fieldProps = (displayLabel) => {
   //   const key = catNames[displayLabel] || displayLabel;
   //   return {
@@ -115,23 +154,28 @@ const ProviderFormFields = ({ categories, tags, formValues, onChange, readOnly, 
   //   };
   // };
 
-return (
-    <Flex direction="column" gap={6}>
-      <Flex wrap="wrap" gap={6}>
-        {console.log(categories)}
+  return (
+    <Flex
+      direction="column"
+      gap={6}
+    >
+      <Flex
+        wrap="wrap"
+        gap={6}
+      >
         {categories.map((cat) => {
-
           return (
-            <Box key={cat.id} flex="1 1 48%">
+            <Box
+              key={cat.id}
+              flex="1 1 48%"
+            >
               <FormControl
                 key={cat.id}
                 mb={4}
                 isRequired={cat.is_required}
                 isInvalid={!!errors[cat.id]}
               >
-                <FormLabel fontWeight={600}>
-                  {cat.name}
-                </FormLabel>
+                <FormLabel fontWeight={600}>{cat.name}</FormLabel>
 
                 {cat.inputType === "text" && (
                   <Input
@@ -153,16 +197,22 @@ return (
                     {tags
                       .filter((tag) => tag.categoryId === cat.id)
                       .map((tag) => (
-                        <option key={tag.id} value={tag.tagValue}>
+                        <option
+                          key={tag.id}
+                          value={tag.tagValue}
+                        >
                           {tag.tagValue}
                         </option>
                       ))}
                   </Select>
                 )}
 
-
                 {errors[cat.id] && (
-                  <Text color="red.500" fontSize="sm" mt={1}>
+                  <Text
+                    color="red.500"
+                    fontSize="sm"
+                    mt={1}
+                  >
                     {errors[cat.id]}
                   </Text>
                 )}
@@ -176,14 +226,22 @@ return (
 };
 
 // --- Main ProviderDrawer ---
-const ProviderDrawer = ({ mode, provider, isOpen, onClose, onSaved }) => {
-  const [categories, setCategories] = useState([]);
-  const [tags, setTags] = useState([]);
-  const { backend } = useBackendContext();
+const ProviderDrawer = ({
+  mode,
+  provider,
+  categories,
+  isOpen,
+  onClose,
+  onSaved,
+}) => {
   const [activeMode, setActiveMode] = useState(mode);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [formValues, setFormValues] = useState({});
   const [errors, setErrors] = useState({});
+  const { data: tags = [], isLoading: loadingTags } = useTags();
+  const { mutate: createProvider } = useCreateProvider();
+  const { mutate: updateProvider } = useUpdateProvider();
+  const { mutate: deleteProvider } = useDeleteProvider();
 
   useEffect(() => {
     if (!isOpen) return;
@@ -192,18 +250,10 @@ const ProviderDrawer = ({ mode, provider, isOpen, onClose, onSaved }) => {
 
     const init = async () => {
       try {
-        const [catRes, tagRes] = await Promise.all([
-          backend.get("/directoryCategories"),
-          backend.get("/tags"),
-        ]);
-
-        setCategories(catRes.data);
-        setTags(tagRes.data);
-
         if ((mode === "edit" || mode === "delete") && provider) {
           const converted = {};
 
-          catRes.data.forEach((cat) => {
+          categories.forEach((cat) => {
             const existingValue = provider.data?.[cat.name];
 
             if (existingValue !== undefined) {
@@ -213,7 +263,6 @@ const ProviderDrawer = ({ mode, provider, isOpen, onClose, onSaved }) => {
 
           setFormValues(converted);
         }
-
       } catch (err) {
         console.error("Error fetching drawer data", err);
       }
@@ -221,8 +270,7 @@ const ProviderDrawer = ({ mode, provider, isOpen, onClose, onSaved }) => {
 
     init();
     setShowConfirmation(false);
-  }, [isOpen, backend, mode, provider]);
-
+  }, [isOpen, mode, provider, categories]);
 
   const handleChange = (categoryId, value) => {
     setFormValues((prev) => ({
@@ -246,7 +294,6 @@ const ProviderDrawer = ({ mode, provider, isOpen, onClose, onSaved }) => {
     };
   };
 
-
   const handleSubmit = async () => {
     if (!showConfirmation) {
       const isValid = validateForm();
@@ -259,11 +306,11 @@ const ProviderDrawer = ({ mode, provider, isOpen, onClose, onSaved }) => {
 
     try {
       if (activeMode === "create") {
-        await backend.post("/providers", buildPayload());
+        await createProvider(buildPayload());
       } else if (activeMode === "edit") {
-        await backend.put(`/providers/${provider.id}`, buildPayload());
+        await updateProvider({ id: provider.id, providerData: buildPayload() });
       } else if (activeMode === "delete") {
-        await backend.delete(`/providers/${provider.id}`);
+        await deleteProvider(provider.id);
       }
 
       handleClose();
@@ -281,22 +328,22 @@ const ProviderDrawer = ({ mode, provider, isOpen, onClose, onSaved }) => {
   };
 
   const validateForm = () => {
-  const newErrors = {};
+    const newErrors = {};
 
-  categories.forEach((cat) => {
-    if (cat.is_required) {
-      const value = formValues[cat.id];
+    categories.forEach((cat) => {
+      if (cat.is_required) {
+        const value = formValues[cat.id];
 
-      const isEmpty =
-        value === undefined ||
-        value === "" ||
-        (Array.isArray(value) && value.length === 0);
+        const isEmpty =
+          value === undefined ||
+          value === "" ||
+          (Array.isArray(value) && value.length === 0);
 
-      if (isEmpty) {
-        newErrors[cat.id] = `${cat.name} is required`;
+        if (isEmpty) {
+          newErrors[cat.id] = `${cat.name} is required`;
+        }
       }
-    }
-  });
+    });
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -304,78 +351,97 @@ const ProviderDrawer = ({ mode, provider, isOpen, onClose, onSaved }) => {
   const isReadOnly = showConfirmation || activeMode === "delete";
 
   return (
-    <Drawer isOpen={isOpen} placement="left" onClose={handleClose} size="md">
+    <Drawer
+      isOpen={isOpen}
+      placement="left"
+      onClose={handleClose}
+      size="md"
+    >
       <DrawerOverlay />
       <DrawerContent>
-        <DrawerCloseButton />
-        <DrawerHeader fontWeight="bold" fontSize="xl">
-          {showConfirmation && activeMode === "edit"
-            ? "Confirm Changes"
-            : activeMode === "create"
-            ? "Create Provider"
-            : activeMode === "edit"
-            ? "Edit Provider"
-            : "Delete Provider"}
-        </DrawerHeader>
+        {loadingTags ? (
+          <SkeletonBody />
+        ) : (
+          <>
+            <DrawerCloseButton />
+            <DrawerHeader
+              fontWeight="bold"
+              fontSize="xl"
+            >
+              {showConfirmation && activeMode === "edit"
+                ? "Confirm Changes"
+                : activeMode === "create"
+                  ? "Create Provider"
+                  : activeMode === "edit"
+                    ? "Edit Provider"
+                    : "Delete Provider"}
+            </DrawerHeader>
 
-        <DrawerBody>
-          {showConfirmation && <ConfirmationBanner mode={activeMode} />}
+            <DrawerBody>
+              {showConfirmation && <ConfirmationBanner mode={activeMode} />}
 
-          <ProviderFormFields
-            categories={categories}
-            tags={tags}
-            formValues={formValues}
-            onChange={handleChange}
-            readOnly={isReadOnly}
-            errors={errors}
-          />
+              <ProviderFormFields
+                categories={categories}
+                tags={tags}
+                formValues={formValues}
+                onChange={handleChange}
+                readOnly={isReadOnly}
+                errors={errors}
+              />
+            </DrawerBody>
 
-        </DrawerBody>
+            <DrawerFooter justifyContent="space-between">
+              {activeMode === "edit" && !showConfirmation ? (
+                <>
+                  <Button
+                    bg="red.600"
+                    color="white"
+                    _hover={{ bg: "red.700" }}
+                    onClick={() => {
+                      setActiveMode("delete");
+                      setShowConfirmation(true);
+                    }}
+                  >
+                    Delete Provider
+                  </Button>
 
-        <DrawerFooter justifyContent="space-between">
-          {activeMode === "edit" && !showConfirmation ? (
-            <>
-              <Button
-                bg="red.600"
-                color="white"
-                _hover={{ bg: "red.700" }}
-                onClick={() => {
-                  setActiveMode("delete");
-                  setShowConfirmation(true);
-                }}
-              >
-                Delete Provider
-              </Button>
+                  <Button
+                    bg="black"
+                    color="white"
+                    _hover={{ bg: "gray.800" }}
+                    onClick={handleSubmit}
+                  >
+                    Save Changes
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    variant="outline"
+                    onClick={handleClose}
+                  >
+                    Cancel
+                  </Button>
 
-              <Button
-                bg="black"
-                color="white"
-                _hover={{ bg: "gray.800" }}
-                onClick={handleSubmit}
-              >
-                Save Changes
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button variant="outline" onClick={handleClose}>
-                Cancel
-              </Button>
-
-              <Button
-                bg={activeMode === "delete" ? "red.600" : "black"}
-                color="white"
-                _hover={{
-                  bg: activeMode === "delete" ? "red.700" : "gray.800",
-                }}
-                onClick={handleSubmit}
-              >
-                {showConfirmation ? "Confirm" : activeMode === "create" ? "Create" : "Confirm"}
-              </Button>
-            </>
-          )}
-        </DrawerFooter>
-
+                  <Button
+                    bg={activeMode === "delete" ? "red.600" : "black"}
+                    color="white"
+                    _hover={{
+                      bg: activeMode === "delete" ? "red.700" : "gray.800",
+                    }}
+                    onClick={handleSubmit}
+                  >
+                    {showConfirmation
+                      ? "Confirm"
+                      : activeMode === "create"
+                        ? "Create"
+                        : "Confirm"}
+                  </Button>
+                </>
+              )}
+            </DrawerFooter>
+          </>
+        )}
       </DrawerContent>
     </Drawer>
   );

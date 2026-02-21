@@ -189,6 +189,7 @@ export const ProviderDirectoryPage = () => {
       <ProviderDrawer
         mode={drawerMode}
         provider={selectedProvider}
+        categories={providerCategories}
         isOpen={isProviderDrawerOpen}
         onClose={onProviderDrawerClose}
         onSaved={handleDrawerSaved}
