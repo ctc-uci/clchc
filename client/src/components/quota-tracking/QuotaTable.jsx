@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import { CheckIcon } from "@chakra-ui/icons";
 import {
@@ -28,7 +28,7 @@ import ProgressBar from "@/components/quota-tracking/ProgressBar";
 import QuotaDrawer from "@/components/quota-tracking/QuotaDrawer";
 import { useUpdateQuota } from "@/contexts/hooks/data-fetching/useQuotas";
 
-const SELECTED_BG = "#7fb3ec";
+const SELECTED_BG = "#EDF2F7";
 
 const SkeletonRows = () => {
   return (
@@ -86,6 +86,7 @@ const SkeletonRows = () => {
 const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
   const [editingQuotaId, setEditingQuotaId] = useState(null);
   const [selectedRowId, setSelectedRowId] = useState(null);
+  const tableRef = useRef(null);
   const {
     isOpen: isDrawerOpen,
     onOpen: onDrawerOpen,
@@ -93,6 +94,23 @@ const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
   } = useDisclosure();
 
   const { mutate: updateQuota } = useUpdateQuota();
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        tableRef.current && 
+        !tableRef.current.contains(event.target) && 
+        !isDrawerOpen
+      ) {
+        setSelectedRowId(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isDrawerOpen]);
 
   const onSave = async (id, newNote) => {
     const sanitizedNote = newNote.trim();
@@ -150,6 +168,7 @@ const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
 
   return (
     <TableContainer
+      ref={tableRef}
       borderWidth="1px"
       borderColor="gray.200"
       borderRadius="lg"

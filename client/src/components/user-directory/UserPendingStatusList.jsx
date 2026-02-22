@@ -1,7 +1,7 @@
 import { WarningIcon } from "@chakra-ui/icons";
+import { useState } from "react";
+
 import {
-  Avatar,
-  Badge,
   Box,
   Button,
   Flex,
@@ -9,85 +9,48 @@ import {
   Skeleton,
   SkeletonCircle,
   Text,
+  useDisclosure,
   VStack,
 } from "@chakra-ui/react";
 
 import {
-  useDeleteUser,
   useUpdateUser,
   useUsers,
 } from "@/contexts/hooks/data-fetching/useUsers";
 
+import { DenyRequestModal } from "./DenyRequestModal";
+
 const RequestSkeleton = () => {
   return (
-    <Flex
-      bg="white"
-      p={4}
-      borderRadius="md"
-      align="center"
-      justify="space-between"
-      boxShadow="sm"
-    >
-      {/* Placeholder Icon */}
-      <Skeleton
-        boxSize="24px"
-        borderRadius="full"
-      />
-
-      {/* Left - Avatar & Info */}
-      <HStack
-        spacing={3}
-        minW="260px"
-      >
-        <SkeletonCircle size="10" />
-        <VStack alignItems="start">
-          <Skeleton
-            height="14px"
-            width="120px"
-          />
-          <Skeleton
-            height="12px"
-            width="180px"
-          />
+    <Flex align="center" justify="space-between">
+      <HStack spacing={3} ml={5} minW="260px">
+        <SkeletonCircle size="14" />
+        <VStack alignItems="start" spacing={2}>
+          <Skeleton height="18px" width="160px" />
+          <Skeleton height="12px" width="220px" />
         </VStack>
       </HStack>
 
-      {/* Date */}
-      <Skeleton
-        height="14px"
-        width="80px"
-      />
-
-      {/* Role */}
-      <Skeleton
-        height="14px"
-        width="60px"
-      />
-
-      {/* Actions */}
-      <HStack spacing={2}>
-        <Skeleton
-          height="32px"
-          width="80px"
-          borderRadius="md"
-        />
-        <Skeleton
-          height="32px"
-          width="80px"
-          borderRadius="md"
-        />
+      <HStack spacing={5}>
+        <Skeleton height="14px" width="110px" />
+        <Skeleton height="32px" width="110px" borderRadius="md" />
+        <Skeleton height="32px" width="110px" borderRadius="md" />
       </HStack>
     </Flex>
   );
 };
 
 export const UserPendingStatusList = () => {
-  // const [pendingUsers, setPendingUsers] = useState([]);
-  const { data: pendingUsers, isLoading } = useUsers({ status: "pending" });
-  const { mutate: updateUser } = useUpdateUser();
-  const { mutate: deleteUser } = useDeleteUser();
+  const { data: pendingUsers = [], isLoading, error } = useUsers({
+    status: "pending",
+  });
 
-  //When Approve Button is clicked, update user status to active
+  const { mutate: updateUser } = useUpdateUser();
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [selectedUser, setSelectedUser] = useState(null);
+
+  // When Approve Button is clicked, update user status to approved
   const handleApprove = async (id) => {
     try {
       await updateUser({ id: id, data: { status: "approved" } });
@@ -96,116 +59,110 @@ export const UserPendingStatusList = () => {
     }
   };
 
-  //When Deny Button is clicked, delete user from database
-  const handleDeny = async (id) => {
-    try {
-      await deleteUser(id);
-    } catch (err) {
-      console.error(
-        "couldn't deny user in components/UserPendingStatus.jsx",
-        err
-      );
-    }
+  // When Deny Button is clicked, open modal
+  const handleDeny = (user) => {
+    setSelectedUser(user);
+    onOpen();
+  };
+
+  const handleCloseModal = () => {
+    setSelectedUser(null);
+    onClose();
   };
 
   return (
     <Box
-      bg="#FFF8E6"
+      bg="white"
       borderRadius="lg"
-      p={6}
-      border="1px solid"
-      borderColor="yellow.200"
+      border="0.5px solid #00000026"
+      boxShadow="sm"
+      p={4}
     >
-      <Flex
-        align="center"
-        gap={2}
-      >
-        <WarningIcon color="orange.400" />
-        <Text fontWeight="semibold">Pending Requests</Text>
-
+      <VStack align="stretch">
         {isLoading ? (
-          <Skeleton boxSize="20px" />
-        ) : (
-          <Badge
-            colorScheme="red"
-            borderRadius="full"
-            px={2}
-          >
-            {pendingUsers.length}
-          </Badge>
-        )}
-      </Flex>
-
-      <VStack
-        spacing={3}
-        align="stretch"
-      >
-        {isLoading ? (
-          <RequestSkeleton />
+          <>
+            <RequestSkeleton />
+            <RequestSkeleton />
+            <RequestSkeleton />
+          </>
+        ) : error ? (
+          <Text color="red.500">Failed to load pending requests.</Text>
         ) : (
           pendingUsers.map((req) => (
-            <Flex
-              key={req.id}
-              bg="white"
-              p={4}
-              borderRadius="md"
-              align="center"
-              justify="space-between"
-              boxShadow="sm"
-            >
-              {/* Placeholder Icon */}
-              <WarningIcon />
+            <Flex key={req.id} align="center" justify="space-between">
               {/* Left */}
-              <HStack
-                spacing={3}
-                minW="260px"
-              >
-                <Avatar size="sm" />
+              <HStack spacing={3} ml={5} minW="260px">
+                <Flex
+                  w="58px"
+                  h="58px"
+                  bg="#F9FAFB"
+                  borderRadius="xl"
+                  align="center"
+                  justify="center"
+                  fontWeight="normal"
+                  fontSize="xl"
+                  color="black"
+                >
+                  {`${req.firstName?.[0] ?? ""}${req.lastName?.[0] ?? ""}`}
+                </Flex>
+
                 <Box>
-                  <Text fontWeight="medium">
+                  <Text fontSize="xl" fontWeight="normal">
                     {req.firstName} {req.lastName}
                   </Text>
-                  <Text
-                    fontSize="sm"
-                    color="gray.500"
-                  >
+                  <Text fontSize="xs" fontWeight="normal" color="gray.500">
                     {req.email}
                   </Text>
                 </Box>
               </HStack>
 
-              {/* Date */}
-              <Text
-                fontSize="sm"
-                color="gray.500"
-              >
-                Request Date
-              </Text>
+              <HStack spacing={5}>
+                {/* Date */}
+                <Text fontSize="sm" color="gray.500">
+                  {req.userSignupDate
+                    ? new Date(req.userSignupDate).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      })
+                    : "No Date"}
+                </Text>
 
-              {/* Role */}
-              <Text fontSize="sm">{req.role}</Text>
-
-              {/* Actions */}
-              <HStack spacing={2}>
+                {/* Actions */}
                 <Button
                   size="sm"
-                  colorScheme="blackAlpha"
+                  bg="blackAlpha.400"
+                  color="white"
+                  py={1}
+                  px={8}
+                  _hover={{ bg: "blackAlpha.500" }}
+                  onClick={() => handleDeny(req)}
+                >
+                  Deny
+                </Button>
+
+                <Button
+                  size="sm"
+                  bg="blue.500"
+                  color="white"
+                  py={1}
+                  px={8}
+                  _hover={{ bg: "blue.600" }}
                   onClick={() => handleApprove(req.id)}
                 >
-                  ✓ Approve
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => handleDeny(req.id)}
-                >
-                  ✕ Deny
+                  Approve
                 </Button>
               </HStack>
             </Flex>
           ))
         )}
       </VStack>
+
+      <DenyRequestModal
+        isOpen={isOpen}
+        onClose={handleCloseModal}
+        user={selectedUser}
+      />
     </Box>
   );
 };
