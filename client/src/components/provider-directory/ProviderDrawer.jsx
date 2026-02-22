@@ -28,7 +28,7 @@ import {
 } from "@/contexts/hooks/data-fetching/useProviders";
 import { useTags } from "@/contexts/hooks/data-fetching/useTags";
 
-// --- Confirmation Banner ---
+
 const SkeletonBody = () => {
   return (
     <>
@@ -359,10 +359,6 @@ const ProviderDrawer = ({
     >
       <DrawerOverlay />
       <DrawerContent>
-        {loadingTags ? (
-          <SkeletonBody />
-        ) : (
-          <>
             <DrawerCloseButton />
             <DrawerHeader
               fontWeight="bold"
@@ -376,7 +372,9 @@ const ProviderDrawer = ({
                     ? "Edit Provider"
                     : "Delete Provider"}
             </DrawerHeader>
-
+            {loadingTags ? (
+          <SkeletonBody />
+        ) : ( <>
             <DrawerBody>
               {showConfirmation && <ConfirmationBanner mode={activeMode} />}
 

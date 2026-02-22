@@ -6,7 +6,6 @@ import { LockIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
-  ButtonGroup,
   Drawer,
   DrawerBody,
   DrawerCloseButton,
@@ -26,6 +25,7 @@ import {
   Select,
   Stack,
   Text,
+  Skeleton,
   useDisclosure,
 } from "@chakra-ui/react";
 
@@ -41,7 +41,6 @@ import {
 } from "@/contexts/hooks/data-fetching/useVersionLogs";
 import { useUserByFirebaseUid } from "@/contexts/hooks/data-fetching/useUsers";
 import { useAuthContext } from "@/contexts/hooks/useAuthContext";
-import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 
 const MAX_INPUT_NUMBER = 99;
 
@@ -64,6 +63,19 @@ const selectStyles = {
   borderRadius: "6px",
   _placeholder: { color: "gray.400" },
   _disabled: { bg: "gray.50", color: "gray.500", opacity: 1 },
+};
+
+const SkeletonBody = () => {
+  return (
+    <>
+      {Array.from({ length: 8 }, (_, i) => (
+        <Skeleton key={i}
+          height="15%"
+          margin="20px"
+        />
+      ))}
+    </>
+  );
 };
 
 const LockRightElement = () => (
@@ -114,19 +126,18 @@ function formatTimeForInput(value) {
 }
 
 function ProviderDropdown({ providerId, setProviderId, isLocked }) {
-  // const [providers, setProviders] = useState(null);
-  const today = new Date();
-  const [selectedDate, setSelectedDate] = useState(
-    today.toLocaleDateString("en-CA")
-  );
-
   const {
     data: providers = [],
     isLoading: loadingSummary,
   } = useProvidersSummary();
 
-  if (loadingSummary) {
-    return <Text>Loading provider summary...</Text>;
+  if (true) {
+    return (
+      <>
+    <Skeleton height="16px" mb={2} />
+    <Skeleton height="40px" />
+    </>
+    );
   }
 
   return (
@@ -167,8 +178,13 @@ function LocationDropdown({ locationId, setLocationId, isLocked }) {
     isLoading: loadingLocations,
   } = useLocations();
 
-  if (loadingLocations) {
-    return <Text>Loading locations...</Text>;
+  if (true) {
+    return (
+    <FormControl w="50%">
+      <Skeleton height="16px" mb={2} />
+      <Skeleton height="40px" borderRadius="6px" />
+    </FormControl>
+  );
   }
 
   return (
@@ -539,7 +555,7 @@ export default function QuotaDrawer({
   const internalDisclosure = useDisclosure();
   const isOpen =
     externalIsOpen !== undefined ? externalIsOpen : internalDisclosure.isOpen;
-  const onOpen = externalOnOpen || internalDisclosure.onOpen;
+  // const onOpen = externalOnOpen || internalDisclosure.onOpen;
   const onClose = externalOnClose || internalDisclosure.onClose;
   const btnRef = React.useRef();
   const { currentUser } = useAuthContext();
@@ -572,7 +588,6 @@ export default function QuotaDrawer({
 
   const {
     data: userData,
-    isLoading: loadingCurrentUser,
   } = useUserByFirebaseUid(currentUser.uid);
   const {
     mutate: createLog,
@@ -736,10 +751,6 @@ export default function QuotaDrawer({
     onClose();
   };
 
-  if (isLoading) {
-    return <Text> Loading quota </Text>;
-  }
-
   return (
     <Drawer
       isOpen={isOpen}
@@ -756,7 +767,7 @@ export default function QuotaDrawer({
         ) : (
           <DrawerHeader>Create Quota</DrawerHeader>
         )}
-
+        {isLoading ? <SkeletonBody /> :
         <form onSubmit={handleSubmit}>
           <DrawerBody pb={24}>
             <Stack gap={4}>
@@ -901,6 +912,7 @@ export default function QuotaDrawer({
             </Stack>
           </DrawerFooter>
         </form>
+            }
       </DrawerContent>
     </Drawer>
   );
