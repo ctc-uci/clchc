@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
-
+import { useState, useMemo, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { AddIcon, SearchIcon } from "@chakra-ui/icons";
 import {
   Badge,
@@ -14,19 +14,19 @@ import {
   Text,
   useDisclosure,
 } from "@chakra-ui/react";
-
 import { CustomCard } from "@/components/common/CustomCard";
 import Navbar from "@/components/layout/Navbar";
 import QuotaDrawer from "@/components/quota-tracking/QuotaDrawer";
-import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 import { useUserContext } from "@/contexts/hooks/useUserContext";
 import { useDebounce } from "@/hooks/useDebounce";
-
 import { useQuotas } from "@/contexts/hooks/data-fetching/useQuotas";
+import CalendarCard from "../common/CalendarCard";
 import QuotaTable from "./QuotaTable";
 
 export const QuotaTracking = () => {
-  // const { backend } = useBackendContext()
+  const navigate = useNavigate();
+  const { dateParam } = useParams();
+
   const [rows, setRows] = useState([]);
   const [providerQuery, setProviderQuery] = useState("");
   // const [debouncedProviderQuery, setDebouncedProviderQuery] = useState("");
@@ -37,10 +37,21 @@ export const QuotaTracking = () => {
   const { role } = useUserContext();
 
   // get current date and reformat
-  const today = new Date();
+  const today = new Date().toLocaleDateString("en-CA");
   const [selectedDate, setSelectedDate] = useState(
-    today.toLocaleDateString("en-CA")
+    dateParam || sessionStorage.getItem("quotaDate") || today
   );
+
+  useEffect(() => {
+    if (dateParam && dateParam !== selectedDate) {
+      setSelectedDate(dateParam);
+      sessionStorage.setItem("quotaDate", dateParam);
+    }
+  }, [dateParam]);
+
+  useEffect(() => {
+    sessionStorage.setItem("quotaDate", selectedDate);
+  }, [selectedDate]);
 
   const {
     data: quotas = [],
@@ -52,6 +63,44 @@ export const QuotaTracking = () => {
     provider: providerQuery,
   });
 
+  const stats = useMemo(() => {
+    // undefined quotas
+    if (!quotas || quotas.length === 0) {
+      return { totalProgress: 0, totalQuota: 0, rate: 0, activeProviders: 0, needsAttention: 0 };
+    }
+
+    let totalProgress = 0;
+    let totalQuota = 0;
+    let needsAttentionCount = 0;
+    const distinctProviders = new Set();
+    const distinctLocations = new Set();
+
+    quotas.forEach((q) => {
+      // totals
+      const p = Number(q.progress) || 0;
+      const t = Number(q.quota) || 0;
+      totalProgress += p;
+      totalQuota += t;
+
+      if (q.providerId) distinctProviders.add(q.providerId);
+      if (q.locationId) distinctLocations.add(q.locationId);
+
+      // needs attention if under 40%
+      if (t > 0 && (p / t) < 0.4) {
+        needsAttentionCount++;
+      }
+    });
+
+    return {
+      totalProgress,
+      totalQuota,
+      rate: totalQuota > 0 ? Math.round((totalProgress / totalQuota) * 100) : 0,
+      activeProviders: distinctProviders.size,
+      differentLocations: distinctLocations.size,
+      needsAttention: needsAttentionCount,
+    };
+  }, [quotas]);
+
   const {
     isOpen: isCreateDrawerOpen,
     onOpen: onCreateDrawerOpen,
@@ -60,6 +109,11 @@ export const QuotaTracking = () => {
 
   const handleChange = (e) => {
     debouncedProviderQuery(e.target.value);
+  };
+
+  const handleDateChange = (newDate) => {
+    setSelectedDate(newDate);
+    navigate(`/quota-tracking/${newDate}`);
   };
 
   return (
@@ -102,16 +156,10 @@ export const QuotaTracking = () => {
           display="flex"
           justifyContent="flex-end"
         >
-          <InputGroup w="19ch">
-            <Input
-              textAlign="center"
-              type="date"
-              value={selectedDate}
-              onChange={(e) => {
-                setSelectedDate(e.target.value);
-              }}
-            />
-          </InputGroup>
+          <CalendarCard
+            value={selectedDate}
+            onChange={handleDateChange}
+          />
         </Box>
 
         <Button
@@ -129,33 +177,33 @@ export const QuotaTracking = () => {
         py={4}
         mb={6}
       >
-        <HStack
+        <HStack 
           spacing={4}
           minW="min-content"
         >
           <CustomCard
             title="Total Progress"
-            body="5/12"
+            body={`${stats.totalProgress}/${stats.totalQuota}`} 
             height="12rem"
             width="14rem"
           />
           <CustomCard
             title="Completion Rate"
-            body="73%"
+            body={`${stats.rate}%`}
             footer="Overall Progress"
             height="12rem"
             width="14rem"
           />
           <CustomCard
             title="Active Providers"
-            body="9"
-            footer="3 Locations"
+            body={stats.activeProviders.toString()}
+            footer={`${stats.differentLocations} different locations`}
             height="12rem"
             width="14rem"
           />
           <CustomCard
             title="Needs Attention"
-            body="0"
+            body={stats.needsAttention.toString()}
             footer="Below 40% Progress"
             height="12rem"
             width="14rem"

@@ -49,7 +49,7 @@ const App = () => {
                   }
                 />
                 <Route
-                  path="/quota-tracking"
+                  path="/quota-tracking/:date?"
                   element={<QuotaTracking />}
                   />
                   <Route

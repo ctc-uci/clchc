@@ -6,12 +6,15 @@ import { NavLink, useLocation } from "react-router-dom";
 
 const useIsActive = (pathname) => {
   const location = useLocation();
-  return location.pathname === pathname;
+  return location.pathname === pathname || location.pathname.startsWith(`${pathname}/`);
 };
 
 export const Navbar = () => {
   const { currentUser } = useAuthContext();
   const { role, loading } = useUserContext();
+
+  const savedQuotaDate = sessionStorage.getItem("quotaDate") || "";
+  
   const isQuotaActive = useIsActive("/quota-tracking");
   const isProviderActive = useIsActive("/provider-directory");
   const isUserActive = useIsActive("/user-directory");
@@ -68,7 +71,7 @@ export const Navbar = () => {
         >
           <Link
             as={NavLink}
-            to="/quota-tracking"
+            to={`/quota-tracking/${savedQuotaDate}`}
             {...getLinkProps(isQuotaActive)}
           >
             Quota Tracking
