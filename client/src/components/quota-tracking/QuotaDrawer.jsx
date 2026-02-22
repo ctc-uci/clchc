@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 
-import { LockIcon } from "@chakra-ui/icons";
-// import { Pencil } from 'lucide-react';
+// import { AiOutlineExclamationCircle } from "react-icons/ai";
 
 import {
   Box,
@@ -24,6 +23,7 @@ import {
   Progress,
   Select,
   Stack,
+  Textarea,
   Text,
   Skeleton,
   useDisclosure,
@@ -33,14 +33,14 @@ import { useLocations } from "@/contexts/hooks/data-fetching/useLocations";
 import { useProvidersSummary } from "@/contexts/hooks/data-fetching/useProviders";
 import {
   useCreateQuota,
+  useDeleteQuota,
   useQuotaById,
   useUpdateQuota,
 } from "@/contexts/hooks/data-fetching/useQuotas";
-import {
-  useCreateLog
-} from "@/contexts/hooks/data-fetching/useVersionLogs";
 import { useUserByFirebaseUid } from "@/contexts/hooks/data-fetching/useUsers";
+import { useCreateLog } from "@/contexts/hooks/data-fetching/useVersionLogs";
 import { useAuthContext } from "@/contexts/hooks/useAuthContext";
+import { AlertCircle, LockKeyhole } from "lucide-react";
 
 const MAX_INPUT_NUMBER = 99;
 
@@ -78,12 +78,34 @@ const SkeletonBody = () => {
   );
 };
 
-const LockRightElement = () => (
+const actionMessage = {
+  delete: "Please confirm you would like to delete this quota.",
+  save: "Please confirm you would like to make these changes to the quota.",
+  create: "Please confirm you would like to create a new provider with the following information.",
+}
+
+const drawerTitle = {
+
+  delete: "Delete Quota",
+  edit: "Edit Quota",
+  create: "Create Quota",
+}
+
+const LockRightElement = (props) => (
   <InputRightElement
     pointerEvents="none"
     color="gray.400"
+    h="100%"
+    display="flex"
+    alignItems="center"
+    justifyContent="center"
+    {...props}
   >
-    <LockIcon boxSize={3} />
+    <Box
+      as={LockKeyhole}
+      w="clamp(12px, 40%, 16px)"
+      h="clamp(12px, 40%, 16px)"
+    />
   </InputRightElement>
 );
 
@@ -99,6 +121,13 @@ function formatDateForInput(value) {
   const mm = String(d.getMonth() + 1).padStart(2, "0");
   const dd = String(d.getDate()).padStart(2, "0");
   return `${yyyy}-${mm}-${dd}`;
+}
+
+function formatDateForDisplay(value) {
+  const normalized = formatDateForInput(value);
+  if (!normalized) return "";
+  const [yyyy, mm, dd] = normalized.split("-");
+  return `${mm}/${dd}/${yyyy}`;
 }
 
 function formatTimeForInput(value) {
@@ -125,6 +154,19 @@ function formatTimeForInput(value) {
   return `${hh}:${mm}`;
 }
 
+function formatTimeForDisplay(value) {
+  const normalized = formatTimeForInput(value);
+  if (!normalized) return "";
+
+  const [hoursString, minutes] = normalized.split(":");
+  const hours = Number(hoursString);
+  if (Number.isNaN(hours)) return normalized;
+
+  const suffix = hours >= 12 ? "PM" : "AM";
+  const displayHours = hours % 12 === 0 ? 12 : hours % 12;
+  return `${displayHours}:${minutes} ${suffix}`;
+}
+
 function ProviderDropdown({ providerId, setProviderId, isLocked }) {
   const {
     data: providers = [],
@@ -140,34 +182,56 @@ function ProviderDropdown({ providerId, setProviderId, isLocked }) {
     );
   }
 
+  const selectedProvider = providers.find(
+    (provider) => String(provider.id) === String(providerId)
+  );
+
   return (
     <FormControl
       isRequired
       isDisabled={isLocked}
     >
       <FormLabel>Provider</FormLabel>
-      <InputGroup>
-        <Select
-          {...selectStyles}
-          placeholder=" "
-          pr={isLocked ? "2.25rem" : undefined}
-          value={providerId === "" ? "" : String(providerId)}
-          onChange={(e) => {
-            setProviderId(Number(e.target.value));
-          }}
-        >
-          {providers &&
-            providers.map((provider) => (
-              <option
-                key={provider.id}
-                value={provider.id}
-              >
-                {provider.name}
-              </option>
-            ))}
-        </Select>
-        {isLocked && <LockRightElement />}
-      </InputGroup>
+      {isLocked ? (
+        <InputGroup>
+          <Box
+            w="100%"
+            border="1px"
+            borderColor="gray.300"
+            borderRadius="6px"
+            px={3}
+            py={2}
+            pr="2.25rem"
+            bg="gray.50"
+            color="gray.500"
+          >
+            {selectedProvider?.name ?? ""}
+          </Box>
+          <LockRightElement />
+        </InputGroup>
+      ) : (
+        <InputGroup>
+          <Select
+            {...selectStyles}
+            placeholder=" "
+            pr={isLocked ? "2.25rem" : undefined}
+            value={providerId === "" ? "" : String(providerId)}
+            onChange={(e) => {
+              setProviderId(Number(e.target.value));
+            }}
+          >
+            {providers &&
+              providers.map((provider) => (
+                <option
+                  key={provider.id}
+                  value={provider.id}
+                >
+                  {provider.name}
+                </option>
+              ))}
+          </Select>
+        </InputGroup>
+      )}
     </FormControl>
   );
 }
@@ -187,6 +251,10 @@ function LocationDropdown({ locationId, setLocationId, isLocked }) {
   );
   }
 
+  const selectedLocation = locations.find(
+    (location) => String(location.id) === String(locationId)
+  );
+
   return (
     <FormControl
       isRequired
@@ -194,26 +262,44 @@ function LocationDropdown({ locationId, setLocationId, isLocked }) {
       isDisabled={isLocked}
     >
       <FormLabel>Location</FormLabel>
-      <InputGroup>
-        <Select
-          {...selectStyles}
-          placeholder=" "
-          pr={isLocked ? "2.25rem" : undefined}
-          value={locationId === "" ? "" : String(locationId)}
-          onChange={(e) => setLocationId(Number(e.target.value))}
-        >
-          {locations &&
-            locations.map((location) => (
-              <option
-                key={location.id}
-                value={location.id}
-              >
-                {location.tagValue}
-              </option>
-            ))}
-        </Select>
-        {isLocked && <LockRightElement />}
-      </InputGroup>
+      {isLocked ? (
+        <InputGroup>
+          <Box
+            w="100%"
+            border="1px"
+            borderColor="gray.300"
+            borderRadius="6px"
+            px={3}
+            py={2}
+            pr="2.25rem"
+            bg="gray.50"
+            color="gray.500"
+          >
+            {selectedLocation?.tagValue ?? ""}
+          </Box>
+          <LockRightElement />
+        </InputGroup>
+      ) : (
+        <InputGroup>
+          <Select
+            {...selectStyles}
+            placeholder=" "
+            pr={isLocked ? "2.25rem" : undefined}
+            value={locationId === "" ? "" : String(locationId)}
+            onChange={(e) => setLocationId(Number(e.target.value))}
+          >
+            {locations &&
+              locations.map((location) => (
+                <option
+                  key={location.id}
+                  value={location.id}
+                >
+                  {location.tagValue}
+                </option>
+              ))}
+          </Select>
+        </InputGroup>
+      )}
     </FormControl>
   );
 }
@@ -368,6 +454,22 @@ const TimeInput = ({
   setEndTime,
   isLocked,
 }) => {
+  const handleStartTimeChange = (value) => {
+    setStartTime(value);
+
+    if (endTime && value && endTime < value) {
+      setEndTime("");
+    }
+  };
+
+  const handleEndTimeChange = (value) => {
+    if (startTime && value && value < startTime) {
+      return;
+    }
+
+    setEndTime(value);
+  };
+
   return (
     <Flex
       direction="column"
@@ -379,70 +481,110 @@ const TimeInput = ({
         isDisabled={isLocked}
       >
         <FormLabel>Hours</FormLabel>
-        <Flex>
-          <InputGroup marginRight={2}>
-            <Input
-              size="md"
-              type="text"
-              {...inputStyles}
-              pr={isLocked ? "2.25rem" : undefined}
-              value={startTime ?? ""}
-              onChange={(e) => setStartTime(e.target.value)}
-            />
-            {/* {isLocked && <LockRightElement />} */}
-          </InputGroup>
-          <InputGroup>
-            <Input
-              size="md"
-              type="text"
-              {...inputStyles}
-              pr={isLocked ? "2.25rem" : undefined}
-              value={endTime ?? ""}
-              onChange={(e) => setEndTime(e.target.value)}
-            />
-            {/* {isLocked && <LockRightElement />} */}
-          </InputGroup>
+        <Flex
+          gap={2}
+          minW={0}
+        >
+          {isLocked ? (
+            <>
+              <InputGroup
+                flex="1"
+                minW={0}
+              >
+                <Box
+                  w="100%"
+                  border="1px"
+                  borderColor="gray.300"
+                  borderRadius="6px"
+                  px={3}
+                  py={2}
+                  bg="gray.50"
+                  color="gray.500"
+                >
+                  {formatTimeForDisplay(startTime)}
+                </Box>
+              </InputGroup>
+              <InputGroup
+                flex="1"
+                minW={0}
+              >
+                <Box
+                  w="100%"
+                  border="1px"
+                  borderColor="gray.300"
+                  borderRadius="6px"
+                  px={3}
+                  py={2}
+                  bg="gray.50"
+                  color="gray.500"
+                >
+                  {formatTimeForDisplay(endTime)}
+                </Box>
+              </InputGroup>
+            </>
+          ) : (
+            <>
+              <InputGroup
+                flex="1"
+                minW={0}
+              >
+                <Input
+                  size="md"
+                  type="time"
+                  fontSize="sm"
+                  px={3}
+                  {...inputStyles}
+                  w="100%"
+                  sx={{
+                    "&::-webkit-calendar-picker-indicator": {
+                      display: "none",
+                    },
+                    "&::-webkit-clear-button": {
+                      display: "none",
+                    },
+                    "&::-webkit-inner-spin-button": {
+                      display: "none",
+                    },
+                  }}
+                  value={startTime ?? ""}
+                  onChange={(e) => handleStartTimeChange(e.target.value)}
+                />
+              </InputGroup>
+              <InputGroup
+                flex="1"
+                minW={0}
+              >
+                <Input
+                  size="md"
+                  type="time"
+                  fontSize="sm"
+                  px={3}
+                  {...inputStyles}
+                  w="100%"
+                  sx={{
+                    "&::-webkit-calendar-picker-indicator": {
+                      display: "none",
+                    },
+                    "&::-webkit-clear-button": {
+                      display: "none",
+                    },
+                    "&::-webkit-inner-spin-button": {
+                      display: "none",
+                    },
+                  }}
+                  min={startTime || undefined}
+                  value={endTime ?? ""}
+                  onChange={(e) => handleEndTimeChange(e.target.value)}
+                />
+              </InputGroup>
+            </>
+          )}
         </Flex>
       </FormControl>
     </Flex>
   );
 };
 
-// Alternative time input with AM/PM selectors (commented out for now since it adds complexity and we don't have a clear use case for it yet)
-// const TimeInput = ({ startTime, setStartTime, endTime, setEndTime }) => {
-//   return (
-//     <Flex
-//       direction="column"
-//       // paddingLeft={4}
-//       width="50%"
-//     >
-//       <FormControl isRequired>
-//         <FormLabel>Hours</FormLabel>
-//         <Flex>
-//           <InputGroup
-//             size="md"
-//             marginRight={2}
-//           >
-//             <Input
-//               type="text"
-//               value={startTime ?? ""}
-//               onChange={(e) => setStartTime(e.target.value)}
-//             />
-//             <InputRightAddon bg="white">AM</InputRightAddon>
-//           </InputGroup>
-//           <InputGroup size="md">
-//             <Input
-//               type="text"
-//               value={endTime ?? ""}
-//               onChange={(e) => setEndTime(e.target.value)}
-//             />
-//             <InputRightAddon bg="white">PM</InputRightAddon>
-//           </InputGroup>
-//         </Flex>
-//       </FormControl>
-//     </Flex>
-//   );
-// };
 const DateInput = ({ date, setDate, isLocked }) => {
   return (
     <FormControl
@@ -451,24 +593,32 @@ const DateInput = ({ date, setDate, isLocked }) => {
       isDisabled={isLocked}
     >
       <FormLabel>Date</FormLabel>
-      <Input
-        size="md"
-        type="date"
-        {...inputStyles}
-        pr={isLocked ? "2.25rem" : undefined}
-        value={date ?? ""}
-        onChange={(e) => setDate(e.target.value)}
-      />
-      {isLocked && (
-        <Box
-          position="absolute"
-          right="10px"
-          top="38px"
-          color="gray.400"
-          pointerEvents="none"
-        >
-          <LockIcon boxSize={3} />
-        </Box>
+      {isLocked ? (
+        <InputGroup>
+          <Box
+            w="100%"
+            border="1px"
+            borderColor="gray.300"
+            borderRadius="6px"
+            px={3}
+            py={2}
+            pr="2.25rem"
+            bg="gray.50"
+            color="gray.500"
+          >
+            {formatDateForDisplay(date)}
+          </Box>
+          <LockRightElement />
+        </InputGroup>
+      ) : (
+        <Input
+          size="md"
+          type="date"
+          {...inputStyles}
+          pr={isLocked ? "2.25rem" : undefined}
+          value={date ?? ""}
+          onChange={(e) => setDate(e.target.value)}
+        />
       )}
     </FormControl>
   );
@@ -476,51 +626,49 @@ const DateInput = ({ date, setDate, isLocked }) => {
 
 const TypeInput = ({ type, setType, isLocked }) => {
   return (
-    // <FormControl>
-    //   <FormLabel>Type</FormLabel>
-
-    //   <ButtonGroup isAttached>
-    //     {TYPE_OPTIONS.map(({ value, label }) => {
-    //       const selected = type === value;
-
-    //       return (
-    //         <Button
-    //           key={value}
-    //           aria-pressed={selected}
-    //           variant={selected ? "solid" : "outline"}
-    //           colorScheme={selected ? "blue" : "gray"}
-    //           onClick={() => setType(value)}
-    //         >
-    //           {label}
-    //         </Button>
-    //       );
-    //     })}
-    //   </ButtonGroup>
-    // </FormControl>
     <FormControl
       w="43%"
       isDisabled={isLocked}
     >
       <FormLabel>Type</FormLabel>
-      <InputGroup>
-        <Select
-          {...selectStyles}
-          placeholder=" "
-          pr={isLocked ? "2.25rem" : undefined}
-          value={type ?? ""}
-          onChange={(e) => setType(e.target.value)}
-        >
-          {TYPE_OPTIONS.map(({ value, label }) => (
-            <option
-              key={value}
-              value={value}
-            >
-              {label}
-            </option>
-          ))}
-        </Select>
-        {isLocked && <LockRightElement />}
-      </InputGroup>
+      {isLocked ? (
+        <InputGroup>
+          <Box
+            w="100%"
+            border="1px"
+            borderColor="gray.300"
+            borderRadius="6px"
+            px={3}
+            py={2}
+            pr="2.25rem"
+            bg="gray.50"
+            color="gray.500"
+          >
+            {type}
+          </Box>
+          <LockRightElement />
+        </InputGroup>
+      ) : (
+        <InputGroup>
+          <Select
+            {...selectStyles}
+            placeholder=" "
+            pr={isLocked ? "2.25rem" : undefined}
+            value={type ?? ""}
+            onChange={(e) => setType(e.target.value)}
+          >
+            {TYPE_OPTIONS.map(({ value, label }) => (
+              <option
+                key={value}
+                value={value}
+              >
+                {label}
+              </option>
+            ))}
+          </Select>
+          {isLocked && <LockRightElement />}
+        </InputGroup>
+      )}
     </FormControl>
   );
 };
@@ -529,18 +677,32 @@ const DailyNoteInput = ({ note, setNote, isLocked }) => {
   return (
     <FormControl isDisabled={isLocked}>
       <FormLabel>Daily Notes</FormLabel>
-      <InputGroup>
-        <Input
+      {isLocked ? (
+        <Box
+          w="100%"
+          border="1px"
+          borderColor="gray.300"
+          borderRadius="6px"
+          px={3}
+          py={2}
+          minH="70px"
+          bg="gray.50"
+          color="gray.500"
+          whiteSpace="pre-wrap"
+        >
+          {note ?? ""}
+        </Box>
+      ) : (
+        <Textarea
           placeholder="Start typing..."
           size="md"
-          type="text"
+          minH="70px"
+          resize="vertical"
           {...inputStyles}
-          pr={isLocked ? "2.25rem" : undefined}
           value={note ?? ""}
           onChange={(e) => setNote(e.target.value)}
         />
-        {isLocked && <LockRightElement />}
-      </InputGroup>
+      )}
     </FormControl>
   );
 };
@@ -570,6 +732,11 @@ export default function QuotaDrawer({
   const {
     mutate: updateQuota,
   } = useUpdateQuota();
+  const {
+    mutate: deleteQuota,
+    isLoading: isDeleting,
+    error: deleteError,
+  } = useDeleteQuota();
 
   const [providerId, setProviderId] = useState("");
   // const [apptCalcFactor, setApptCalcFactor] = useState(null);
@@ -579,12 +746,10 @@ export default function QuotaDrawer({
   const [date, setDate] = useState("");
   const [type, setType] = useState("");
   const [note, setNote] = useState("");
-  // const [quota, setQuota] = useState(0);
   const [progress, setProgress] = useState(0);
   const [isLocked, setIsLocked] = useState(false);
+  const [action, setAction] = useState("");
   const [originalProgress, setOriginalProgress] = useState(0);
-  // const [lockEdit, setLockEdit] = useState(false);
-  const isDev = import.meta.env?.DEV;
 
   const {
     data: userData,
@@ -593,21 +758,17 @@ export default function QuotaDrawer({
     mutate: createLog,
   } = useCreateLog();
   const apptCalcFactor = userData?.[0]?.apptCalcFactor ?? null;
+  const currentDrawerTitle = !quotaID
+    ? drawerTitle.create
+    : isLocked && action === "delete"
+      ? drawerTitle.delete
+      : drawerTitle.edit;
 
   useEffect(() => {
     // Auto-calculate quota based on total hours and apptCalcFactor
     if (!startTime || !endTime || !apptCalcFactor) return;
 
     try {
-      console.log(
-        "Calculating quota with startTime:",
-        startTime,
-        "endTime:",
-        endTime,
-        "and apptCalcFactor:",
-        apptCalcFactor
-      );
-
       const [startHours, startMinutes] = startTime.split(":").map(Number);
       const [endHours, endMinutes] = endTime.split(":").map(Number);
 
@@ -628,7 +789,6 @@ export default function QuotaDrawer({
 
       // Calculate default quota: total hours * factor
       const calculatedQuota = Math.round(totalHours * apptCalcFactor);
-      console.log("Calculated quota:", calculatedQuota);
 
       setQuota(calculatedQuota);
     } catch (err) {
@@ -675,23 +835,34 @@ export default function QuotaDrawer({
       setProgress(0);
       setOriginalProgress(0);
       setIsLocked(false);
+      setAction("");
     }
   }, [isOpen, quotaID, defaultDate]);
-  const handleTestFill = () => {
-    if (!isDev || isLocked) return;
-    setProviderId(1);
-    setLocationId(1);
-    setDate(formatDateForInput(new Date()));
-    setStartTime("09:00");
-    setEndTime("17:00");
-    setType("inperson");
-    setNote("Test note");
-    setQuota(5);
-    setProgress(3);
-  };
+  // const handleTestFill = () => {
+  //   if (!isDev || isLocked) return;
+  //   setProviderId(1);
+  //   setLocationId(1);
+  //   setDate(formatDateForInput(new Date()));
+  //   setStartTime("09:00");
+  //   setEndTime("17:00");
+  //   setType("inperson");
+  //   setNote("Test note");
+  //   setQuota(5);
+  //   setProgress(3);
+  // };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e, nextAction) => {
+
     e.preventDefault();
+    const effectiveAction = nextAction ?? action;
+
+    if (
+      startTime &&
+      endTime &&
+      formatTimeForInput(endTime) < formatTimeForInput(startTime)
+    ) {
+      return;
+    }
 
     const formData = {
       providerId,
@@ -708,14 +879,27 @@ export default function QuotaDrawer({
 
     if (!isLocked) {
       setIsLocked(true);
+      if(!quotaID){
+        setAction("create");
+        return;
+      }
+      setAction(effectiveAction || "save");
       return;
     }
 
     try {
-      if (quotaID) {
-        await updateQuota({ id: quotaID, data: formData });
-      } else {
+      //create
+      if (!quotaID) {
         await createQuota(formData);
+      }
+      //delete
+      else if (effectiveAction === "delete") {
+        await deleteQuota({ id: quotaID });
+        handleClose();
+      }
+      //update
+      else {
+        await updateQuota({ id: quotaID, data: formData });
       }
       if (progress !== originalProgress && quotaID) {
         /* If the new progress is not the same as the original, 
@@ -726,7 +910,7 @@ export default function QuotaDrawer({
             quotaId: quotaID,
             action: progress > originalProgress ? "increment" : "decrement",
             delta: progress - originalProgress,
-          })
+          });
         } catch (err) {
           console.error("Error logging quota change to version log:", err);
         }
@@ -748,6 +932,7 @@ export default function QuotaDrawer({
     setQuota(0);
     setProgress(0);
     setIsLocked(false);
+    setAction("");
     onClose();
   };
 
@@ -762,65 +947,46 @@ export default function QuotaDrawer({
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton />
-        {quotaID ? (
-          <DrawerHeader>Edit Quota</DrawerHeader>
-        ) : (
-          <DrawerHeader>Create Quota</DrawerHeader>
-        )}
+        <DrawerHeader>{currentDrawerTitle}</DrawerHeader>
+        
         {isLoading ? <SkeletonBody /> :
         <form onSubmit={handleSubmit}>
           <DrawerBody pb={24}>
             <Stack gap={4}>
-              {isDev && !isLocked && (
-                <Flex justify="flex-end">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleTestFill}
-                  >
-                    Fill Test Data
-                  </Button>
-                </Flex>
-              )}
               {isLocked && (
                 <Box
-                  bg="#DDDDDD"
+                  bg="#FFD2D2"
                   borderRadius="8px"
                   p={4}
-                  border="1px solid"
-                  borderColor="gray.200"
+                  border="2px solid"
+                  borderColor="#CE0000"
                 >
                   <Stack
                     direction="row"
                     align="center"
-                    spacing={3}
+                    // spacing={3}
                     mb={4}
                   >
-                    <Box
-                      w="24px"
-                      h="24px"
-                      borderRadius="full"
-                      // bg="white"
-                      border="1px solid"
-                      borderColor="black"
+                    <AlertCircle
+                      size={24}
+                      color="#CE0000"
+                    />
+                    <Text
+                      fontWeight="semibold"
+                      color="#CE0000"
                       display="flex"
                       alignItems="center"
-                      justifyContent="center"
-                      fontWeight="bold"
-                      fontSize="sm"
+                      lineHeight="1"
                     >
-                      i
-                    </Box>
-                    <Text fontWeight="semibold">Notification</Text>
+                      Notification
+                    </Text>
                   </Stack>
 
                   <Text
                     fontSize="sm"
-                    color="gray.700"
+                    color="#CE0000"
                   >
-                    Please confirm you would like to create a new provider with
-                    the following information
+                    {actionMessage[action ? action : 'create']}
                   </Text>
                 </Box>
               )}
@@ -887,28 +1053,69 @@ export default function QuotaDrawer({
               w="100%"
               gap="20px"
             >
-              <Button
-                type="button"
-                variant="outline"
-                px={10}
-                width="50%"
-                onClick={isLocked ? () => setIsLocked(false) : handleClose}
-                borderRadius="4px"
-                borderColor="#0000003D"
-              >
-                {isLocked ? "Continue Editing" : "Cancel"}
-              </Button>
+              {isLocked ? (
+                <>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    px={10}
+                    width="50%"
+                    onClick={() => {
+                      setIsLocked(false);
+                      setAction("");
+                    }}
+                    borderRadius="4px"
+                    borderColor="#0000003D"
+                  >
+                    Continue Editing
+                  </Button>
 
-              <Button
-                type="submit"
-                px={10}
-                width="50%"
-                bg="black"
-                color="white"
-                borderRadius="4px"
-              >
-                {isLocked ? "Confirm" : "Save"}
-              </Button>
+                  <Button
+                    type="submit"
+                    px={10}
+                    width="50%"
+                    bg="black"
+                    color="white"
+                    borderRadius="4px"
+                  >
+                    {action === "delete" ? "Delete" : "Confirm"}
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    px={10}
+                    width="50%"
+                    onClick={(e) => {
+                      if (!quotaID) {
+                        handleClose();
+                        return;
+                      }
+                      handleSubmit(e, "delete");
+                    }}
+                    borderRadius="4px"
+                    borderColor="#0000003D"
+                  >
+                    {!quotaID ? "Cancel" : "Delete Quota"}
+                  </Button>
+
+                  <Button
+                    // type="submit"
+                    px={10}
+                    width="50%"
+                    bg="black"
+                    color="white"
+                    borderRadius="4px"
+                    onClick={(e) => {
+                      handleSubmit(e, "save");
+                    }}
+                  >
+                    {!quotaID ? "Save" : "Save Changes"}
+                  </Button>
+                </>
+              )}
             </Stack>
           </DrawerFooter>
         </form>

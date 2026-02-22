@@ -7,7 +7,6 @@ export const useQuotas = ({ date, provider } = {}) => {
   return useQuery({
     queryKey: ["quotas", { date, provider }],
     queryFn: async () => {
-      // console.log("Fetching quotas (react-query)", { date, provider });
 
       const params = new URLSearchParams();
       if (date) params.append("date", date);
@@ -29,7 +28,6 @@ export const useQuotaById = (id, enabled = true) => {
     queryFn: async () => {
       const res = await quotas.getById(id)
       const quota = Array.isArray(res) ? res[0] : res;
-      // console.log("Fetching quota by id (react-query)", id, quota);
       return quota;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -60,6 +58,22 @@ export const useCreateQuota = () => {
   return useMutation({
     mutationFn: (newQuota) => quotas.create(newQuota),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["quotas"] });
+      queryClient.invalidateQueries({ queryKey: ["quota"], exact: false });
+    },
+  });
+};
+
+export const useDeleteQuota = () => {
+  const queryClient = useQueryClient();
+  const { quotas } = useApi()
+
+  return useMutation({
+    mutationFn: ({ id, data }) => {
+      return quotas.delete(id)
+    },
+    onSuccess: () => {
+      // Refetch after mutation to update frontend data
       queryClient.invalidateQueries({ queryKey: ["quotas"] });
       queryClient.invalidateQueries({ queryKey: ["quota"], exact: false });
     },
