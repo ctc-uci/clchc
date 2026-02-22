@@ -63,13 +63,6 @@ const SkeletonCard = () => {
           <Skeleton height="20px" />
         </Text>
       </CardBody>
-
-      <CardFooter pt={1}>
-        <Text
-          fontSize="sm"
-          color="gray.500"
-        ></Text>
-      </CardFooter>
     </Card>
   );
 };
