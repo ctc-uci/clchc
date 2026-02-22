@@ -131,7 +131,7 @@ function ProviderDropdown({ providerId, setProviderId, isLocked }) {
     isLoading: loadingSummary,
   } = useProvidersSummary();
 
-  if (true) {
+  if (loadingSummary) {
     return (
       <>
     <Skeleton height="16px" mb={2} />
@@ -178,7 +178,7 @@ function LocationDropdown({ locationId, setLocationId, isLocked }) {
     isLoading: loadingLocations,
   } = useLocations();
 
-  if (true) {
+  if (loadingLocations) {
     return (
     <FormControl w="50%">
       <Skeleton height="16px" mb={2} />
