@@ -298,7 +298,7 @@ usersRouter.put(
       
       // If user is newly approved, notify them by email.
       if(status === "approved"){
-        await notifyApprovedNewUser(`${result.firstName} ${result.lastName}`, result.email);
+        await notifyApprovedNewUser(`${result[0].first_name} ${result[0].last_name}`, result[[0]].email);
       }
 
       return res.status(200).json(keysToCamel(result[0]));
