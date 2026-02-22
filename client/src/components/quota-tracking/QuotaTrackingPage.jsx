@@ -1,38 +1,88 @@
-import { useState, useMemo, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+
 import { AddIcon, SearchIcon } from "@chakra-ui/icons";
 import {
   Badge,
   Box,
   Button,
+  Card,
+  CardBody,
+  CardFooter,
+  CardHeader,
   Flex,
   Heading,
   HStack,
   Input,
   InputGroup,
   InputLeftElement,
+  Skeleton,
   Text,
   useDisclosure,
 } from "@chakra-ui/react";
+
 import { CustomCard } from "@/components/common/CustomCard";
 import Navbar from "@/components/layout/Navbar";
 import QuotaDrawer from "@/components/quota-tracking/QuotaDrawer";
+import { useQuotas } from "@/contexts/hooks/data-fetching/useQuotas";
 import { useUserContext } from "@/contexts/hooks/useUserContext";
 import { useDebounce } from "@/hooks/useDebounce";
-import { useQuotas } from "@/contexts/hooks/data-fetching/useQuotas";
+import { useNavigate, useParams } from "react-router-dom";
+
 import CalendarCard from "../common/CalendarCard";
 import QuotaTable from "./QuotaTable";
+
+const SkeletonCard = () => {
+  return (
+    <Card
+      height="12rem"
+      width="14rem"
+      flexShrink={1}
+      borderWidth="1px"
+      borderColor="gray.200"
+      borderRadius="lg"
+      boxShadow="sm"
+      _hover={{ boxShadow: "md" }}
+      transition="box-shadow 0.2s ease"
+    >
+      <CardHeader pb={1}>
+        <Text
+          fontSize="sm"
+          color="gray.500"
+          fontWeight="medium"
+        >
+          <Skeleton height="10px" />
+        </Text>
+      </CardHeader>
+
+      <CardBody py={2}>
+        <Text
+          fontSize="3xl"
+          fontWeight="semibold"
+          color="gray.900"
+        >
+          <Skeleton height="20px" />
+        </Text>
+      </CardBody>
+
+      <CardFooter pt={1}>
+        <Text
+          fontSize="sm"
+          color="gray.500"
+        ></Text>
+      </CardFooter>
+    </Card>
+  );
+};
 
 export const QuotaTracking = () => {
   const navigate = useNavigate();
   const { dateParam } = useParams();
-  const [rows, setRows] = useState([]);
   const [providerQuery, setProviderQuery] = useState("");
   // const [debouncedProviderQuery, setDebouncedProviderQuery] = useState("");
   const debouncedProviderQuery = useDebounce(
-  (value) => setProviderQuery(value),
-  300
-);
+    (value) => setProviderQuery(value),
+    300
+  );
   const { role } = useUserContext();
 
   // get current date and reformat
@@ -52,10 +102,7 @@ export const QuotaTracking = () => {
     sessionStorage.setItem("quotaDate", selectedDate);
   }, [selectedDate]);
 
-  const {
-    data: quotas = [],
-    isLoading,
-  } = useQuotas({
+  const { data: quotas = [], isLoading } = useQuotas({
     date: selectedDate,
     provider: providerQuery,
   });
@@ -63,7 +110,13 @@ export const QuotaTracking = () => {
   const stats = useMemo(() => {
     // undefined quotas
     if (!quotas || quotas.length === 0) {
-      return { totalProgress: 0, totalQuota: 0, rate: 0, activeProviders: 0, needsAttention: 0 };
+      return {
+        totalProgress: 0,
+        totalQuota: 0,
+        rate: 0,
+        activeProviders: 0,
+        needsAttention: 0,
+      };
     }
 
     let totalProgress = 0;
@@ -83,7 +136,7 @@ export const QuotaTracking = () => {
       if (q.locationId) distinctLocations.add(q.locationId);
 
       // needs attention if under 40%
-      if (t > 0 && (p / t) < 0.4) {
+      if (t > 0 && p / t < 0.4) {
         needsAttentionCount++;
       }
     });
@@ -174,37 +227,48 @@ export const QuotaTracking = () => {
         py={4}
         mb={6}
       >
-        <HStack 
+        <HStack
           spacing={4}
           minW="min-content"
         >
-          <CustomCard
-            title="Total Progress"
-            body={`${stats.totalProgress}/${stats.totalQuota}`} 
-            height="12rem"
-            width="14rem"
-          />
-          <CustomCard
-            title="Completion Rate"
-            body={`${stats.rate}%`}
-            footer="Overall Progress"
-            height="12rem"
-            width="14rem"
-          />
-          <CustomCard
-            title="Active Providers"
-            body={stats.activeProviders.toString()}
-            footer={`${stats.differentLocations} different locations`}
-            height="12rem"
-            width="14rem"
-          />
-          <CustomCard
-            title="Needs Attention"
-            body={stats.needsAttention.toString()}
-            footer="Below 40% Progress"
-            height="12rem"
-            width="14rem"
-          />
+          {isLoading ? (
+            <>
+              <SkeletonCard />
+              <SkeletonCard />
+              <SkeletonCard />
+              <SkeletonCard />
+            </>
+          ) : (
+            <>
+              <CustomCard
+                title="Total Progress"
+                body={`${stats.totalProgress}/${stats.totalQuota}`}
+                height="12rem"
+                width="14rem"
+              />
+              <CustomCard
+                title="Completion Rate"
+                body={`${stats.rate}%`}
+                footer="Overall Progress"
+                height="12rem"
+                width="14rem"
+              />
+              <CustomCard
+                title="Active Providers"
+                body={stats.activeProviders.toString()}
+                footer={`${stats.differentLocations} different locations`}
+                height="12rem"
+                width="14rem"
+              />
+              <CustomCard
+                title="Needs Attention"
+                body={stats.needsAttention.toString()}
+                footer="Below 40% Progress"
+                height="12rem"
+                width="14rem"
+              />
+            </>
+          )}
         </HStack>
       </Box>
 
