@@ -20,7 +20,7 @@ import QuotaDrawer from "@/components/quota-tracking/QuotaDrawer";
 import { useUserContext } from "@/contexts/hooks/useUserContext";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useQuotas } from "@/contexts/hooks/data-fetching/useQuotas";
-import CalendarCard from "./CalendarCard";
+import CalendarCard from "../common/CalendarCard";
 import QuotaTable from "./QuotaTable";
 
 export const QuotaTracking = () => {
