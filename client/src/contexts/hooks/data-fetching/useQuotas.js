@@ -16,6 +16,7 @@ export const useQuotas = ({ date, provider } = {}) => {
     },
     staleTime: 60 * 1000, // 1 min
     refetchInterval: 60 * 1000, // 1 min
+    suspense: false,
   });
 };
 

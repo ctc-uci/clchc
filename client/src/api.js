@@ -13,6 +13,18 @@ export const useApi = () => {
         const res = await backend.get("/providers/summary");
         return res.data;
       },
+      create: async (data) => {
+        const res = await backend.post("/providers", data);
+        return res.data
+      },
+      update: async (id, data) => {
+        const res = await backend.put(`/providers/${id}`, data);
+        return res.data
+      },
+      delete: async (id) => {
+        const res = await backend.delete(`/providers/${id}`);
+        return res.data
+      }
     },
     directoryCategories: {
       getAll: async () => {
@@ -23,6 +35,10 @@ export const useApi = () => {
         const res = await backend.post("/directoryCategories", data);
         return res.data;
       },
+      update: async (id, data) => {
+        const res = await backend.put(`/directoryCategories/${id}`, data);
+        return res.data
+      }
     },
     tags: {
       getAll: async () => {
@@ -47,7 +63,7 @@ export const useApi = () => {
         const res = await backend.post("/quota", data);
         return res.data;
       },
-      delete: async (id, data) => {
+      delete: async (id) => {
         const res = await backend.delete(`/quota/${id}`);
         return res.data;
       }
@@ -90,5 +106,11 @@ export const useApi = () => {
         return res.data;
       }
     },
+    tags: {
+      getAll: async () => {
+        const res = await backend.get("/tags");
+        return res.data;
+      }
+    }
   };
 };

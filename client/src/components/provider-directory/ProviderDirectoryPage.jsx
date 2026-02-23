@@ -52,7 +52,6 @@ export const ProviderDirectoryPage = () => {
   const {
     data: providers = [],
     isLoading,
-    error,
     refetch: refetchProviders
   } = useProviders({
     query: providerQuery
@@ -61,7 +60,6 @@ export const ProviderDirectoryPage = () => {
   const {
     data: providerCategories = [],
     isLoading: loadingCategories,
-    error: errorCategories,
     refetch: refetchCategories
   } = useDirectoryCategories();
 
@@ -191,6 +189,7 @@ export const ProviderDirectoryPage = () => {
       <ProviderDrawer
         mode={drawerMode}
         provider={selectedProvider}
+        categories={providerCategories}
         isOpen={isProviderDrawerOpen}
         onClose={onProviderDrawerClose}
         onSaved={handleDrawerSaved}

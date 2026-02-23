@@ -16,6 +16,7 @@ export function useProviders({ query } = {}) {
     },
     staleTime: 60 * 1000, 
     refetchInterval: 60 * 1000, // 1 min
+    suspense: false,
   });
 }
 
@@ -42,6 +43,33 @@ export const useCreateProvider = () => {
     mutationFn: (newProvider) => providers.create(newProvider),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["providers"] });
+      queryClient.invalidateQueries({ queryKey: ["providerSummary"] });
+    },
+  });
+};
+
+export const useUpdateProvider = () => {
+  const queryClient = useQueryClient();
+  const { providers } = useApi()
+
+  return useMutation({
+    mutationFn: ({id, providerData}) => providers.update(id, providerData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["providers"] });
+      queryClient.invalidateQueries({ queryKey: ["providerSummary"] });
+    },
+  });
+};
+
+export const useDeleteProvider = () => {
+  const queryClient = useQueryClient();
+  const { providers } = useApi()
+
+  return useMutation ({
+    mutationFn: (id) => providers.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["providers"] });
+      queryClient.invalidateQueries({ queryKey: ["providerSummary"] });
     },
   });
 };

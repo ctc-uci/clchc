@@ -9,6 +9,7 @@ import {
   Input,
   InputGroup,
   InputLeftElement,
+  Skeleton,
   Text,
 } from "@chakra-ui/react";
 
@@ -24,11 +25,8 @@ import UserRoleFilter from "./UserRoleFilter";
 import UserTable from "./UserTable";
 
 export const UserDirectory = () => {
-  // Keep what's typed immediately (so the input feels responsive)
   const [searchInput, setSearchInput] = useState("");
-  // This is what we actually query/filter with (debounced updates)
   const [searchQuery, setSearchQuery] = useState("");
-
   const [selectedRole, setSelectedRole] = useState("all");
 
   const debouncedSetSearchQuery = useDebounce((value) => {
@@ -50,15 +48,8 @@ export const UserDirectory = () => {
   const {
     data: users = [],
     isLoading,
-    error,
     refetch,
   } = useUsers({ user: searchQuery, status: "approved" });
-
-  // const {
-  //   data: userStats = {},
-  //   isLoading: isStatsLoading,
-  //   error: statsError,
-  // } = useUsersStats();
 
   const { mutate: deleteUser } = useDeleteUser();
 
@@ -66,8 +57,6 @@ export const UserDirectory = () => {
     deleteUser(userId);
   };
 
-  // Client-side role filter + (extra) client-side search filter for safety
-  // (even if backend already searches, this keeps UI consistent)
   const filteredUsers = useMemo(() => {
     const lowerQuery = (searchQuery || "").toLowerCase();
 
@@ -155,7 +144,6 @@ export const UserDirectory = () => {
       <Box mb={8}>
         <UserPendingStatusList />
       </Box>
-
       <Flex
         gap={4}
         align="center"

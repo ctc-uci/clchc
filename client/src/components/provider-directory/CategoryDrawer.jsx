@@ -24,14 +24,17 @@ import {
   Input,
   Radio,
   RadioGroup,
+  Skeleton,
   Stack,
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
 
-import { useBackendContext } from "@/contexts/hooks/useBackendContext";
-import { useUserContext } from "@/contexts/hooks/useUserContext";
-import { useCreateCategory } from "@/contexts/hooks/data-fetching/useDirectoryCategories";
+import {
+  useCreateCategory,
+  useDirectoryCategories,
+  useUpdateCategory,
+} from "@/contexts/hooks/data-fetching/useDirectoryCategories";
 import { closestCenter, DndContext } from "@dnd-kit/core";
 import {
   restrictToParentElement,
@@ -44,6 +47,20 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+
+const SkeletonBody = () => {
+  return (
+    <>
+      {Array.from({ length: 8 }, (_, i) => (
+        <Skeleton
+          key={i}
+          height="15%"
+          margin="20px"
+        />
+      ))}
+    </>
+  );
+};
 
 function SortableCategory({ category }) {
   const { attributes, listeners, setNodeRef, transform, transition } =
@@ -103,13 +120,6 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
   const [isRequired, setIsRequired] = useState(false);
   const [categories, setCategories] = useState([]);
   const [showForm, setShowForm] = useState(false);
-  const { backend } = useBackendContext();
-  const { role, loading } = useUserContext();
-  const {
-    mutate: createCategory,
-    isLoading: isCreating,
-    error: createError,
-  } = useCreateCategory();
   const toast = useToast();
   const formStackRef = useRef(null);
   const {
@@ -119,15 +129,16 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
   } = useDisclosure();
   const cancelRef = useRef();
   const pendingCloseRef = useRef(false);
+  const { data: serverCategories = [], isLoading } = useDirectoryCategories();
+  const { mutateAsync: createCategory } = useCreateCategory();
+  const { mutateAsync: updateCategory } = useUpdateCategory();
 
   useEffect(() => {
     if (!isOpen) return;
 
     const fetchCategories = async () => {
       try {
-        const res = await backend.get("/directoryCategories");
-        // IMPORTANT: match your backend field name exactly
-        const sorted = [...res.data].sort(
+        const sorted = [...serverCategories].sort(
           (a, b) => a.columnOrder - b.columnOrder
         );
 
@@ -138,7 +149,7 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
     };
 
     fetchCategories();
-  }, [isOpen, backend]);
+  }, [isOpen, serverCategories]);
 
   // after clicking add new category, it scrolls to show the new stack form shown
   useEffect(() => {
@@ -220,16 +231,14 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
       // Update existing categories with new column order
       await Promise.all(
         existingCategories.map((cat, index) =>
-          backend.put(`/directoryCategories/${cat.id}`, {
-            columnOrder: index,
-          })
+          updateCategory({ id: cat.id, categoryData: { columnOrder: index } })
         )
       );
 
       // Post new categories
       await Promise.all(
         newCategories.map((cat) =>
-          backend.post("/directoryCategories", {
+          createCategory({
             name: cat.name,
             inputType: cat.inputType,
             isRequired: cat.isRequired,
@@ -292,104 +301,112 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
         <DrawerContent>
           <DrawerCloseButton />
           <DrawerHeader>Manage Categories</DrawerHeader>
-          <DrawerBody>
-            <DndContext
-              collisionDetection={closestCenter}
-              onDragEnd={handleDragEnd}
-              modifiers={[restrictToVerticalAxis, restrictToParentElement]}
-            >
-              <SortableContext
-                items={categories.map((cat) => cat.id)}
-                strategy={verticalListSortingStrategy}
-              >
-                {categories.map((cat) => (
-                  <SortableCategory
-                    key={cat.id}
-                    category={cat}
-                  />
-                ))}
-              </SortableContext>
-            </DndContext>
-
-            <Button onClick={() => setShowForm(!showForm)}>Add Category</Button>
-
-            {showForm && (
-              <Stack
-                gap={4}
-                mt={4}
-                p={4}
-                borderWidth={1}
-                borderRadius={6}
-                ref={formStackRef}
-              >
-                <FormControl isRequired>
-                  <FormLabel>Category Name</FormLabel>
-                  <Input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                  />
-                </FormControl>
-                <FormControl isRequired>
-                  <FormLabel>Input Type</FormLabel>
-                  <RadioGroup
-                    onChange={setInputType}
-                    value={inputType}
-                  >
-                    <Stack direction="row">
-                      <Radio value="text">Text</Radio>
-                      <Radio value="tag">Tag</Radio>
-                    </Stack>
-                  </RadioGroup>
-                </FormControl>
-
-                <label>
-                  {" "}
-                  Optional?
-                  <input
-                    type="checkbox"
-                    style={{ marginLeft: "8px" }}
-                    checked={isRequired}
-                    onChange={(e) => setIsRequired(e.target.checked)}
-                  />
-                </label>
-
-                <Stack
-                  direction="row"
-                  justify="flex-end"
+          {isLoading ? (
+            <SkeletonBody />
+          ) : (
+            <>
+              <DrawerBody>
+                <DndContext
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEnd}
+                  modifiers={[restrictToVerticalAxis, restrictToParentElement]}
                 >
-                  <Button
-                    variant="outline"
-                    onClick={() => setShowForm(false)}
+                  <SortableContext
+                    items={categories.map((cat) => cat.id)}
+                    strategy={verticalListSortingStrategy}
                   >
-                    Cancel
-                  </Button>
-                  <Button
-                    colorScheme="blue"
-                    onClick={handleAddCategory}
-                  >
-                    Add
-                  </Button>
-                </Stack>
-              </Stack>
-            )}
-          </DrawerBody>
+                    {categories.map((cat) => (
+                      <SortableCategory
+                        key={cat.id}
+                        category={cat}
+                      />
+                    ))}
+                  </SortableContext>
+                </DndContext>
 
-          <DrawerFooter>
-            <Button
-              variant="outline"
-              mr={3}
-              onClick={handleDrawerClose}
-            >
-              Cancel
-            </Button>
-            <Button
-              colorScheme="blue"
-              onClick={handleSubmit}
-            >
-              Save
-            </Button>
-          </DrawerFooter>
+                <Button onClick={() => setShowForm(!showForm)}>
+                  Add Category
+                </Button>
+
+                {showForm && (
+                  <Stack
+                    gap={4}
+                    mt={4}
+                    p={4}
+                    borderWidth={1}
+                    borderRadius={6}
+                    ref={formStackRef}
+                  >
+                    <FormControl isRequired>
+                      <FormLabel>Category Name</FormLabel>
+                      <Input
+                        type="text"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                      />
+                    </FormControl>
+                    <FormControl isRequired>
+                      <FormLabel>Input Type</FormLabel>
+                      <RadioGroup
+                        onChange={setInputType}
+                        value={inputType}
+                      >
+                        <Stack direction="row">
+                          <Radio value="text">Text</Radio>
+                          <Radio value="tag">Tag</Radio>
+                        </Stack>
+                      </RadioGroup>
+                    </FormControl>
+
+                    <label>
+                      {" "}
+                      Optional?
+                      <input
+                        type="checkbox"
+                        style={{ marginLeft: "8px" }}
+                        checked={isRequired}
+                        onChange={(e) => setIsRequired(e.target.checked)}
+                      />
+                    </label>
+
+                    <Stack
+                      direction="row"
+                      justify="flex-end"
+                    >
+                      <Button
+                        variant="outline"
+                        onClick={() => setShowForm(false)}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        colorScheme="blue"
+                        onClick={handleAddCategory}
+                      >
+                        Add
+                      </Button>
+                    </Stack>
+                  </Stack>
+                )}
+              </DrawerBody>
+
+              <DrawerFooter>
+                <Button
+                  variant="outline"
+                  mr={3}
+                  onClick={handleDrawerClose}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  colorScheme="blue"
+                  onClick={handleSubmit}
+                >
+                  Save
+                </Button>
+              </DrawerFooter>
+            </>
+          )}
         </DrawerContent>
       </Drawer>
 

@@ -5,7 +5,6 @@ import React, { useEffect, useRef, useState } from "react";
 import {
   Box,
   Button,
-  ButtonGroup,
   Drawer,
   DrawerBody,
   DrawerCloseButton,
@@ -26,6 +25,7 @@ import {
   Stack,
   Textarea,
   Text,
+  Skeleton,
   useDisclosure,
 } from "@chakra-ui/react";
 
@@ -40,7 +40,6 @@ import {
 import { useUserByFirebaseUid } from "@/contexts/hooks/data-fetching/useUsers";
 import { useCreateLog } from "@/contexts/hooks/data-fetching/useVersionLogs";
 import { useAuthContext } from "@/contexts/hooks/useAuthContext";
-import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 import { AlertCircle, LockKeyhole } from "lucide-react";
 
 const MAX_INPUT_NUMBER = 99;
@@ -64,6 +63,19 @@ const selectStyles = {
   borderRadius: "6px",
   _placeholder: { color: "gray.400" },
   _disabled: { bg: "gray.50", color: "gray.500", opacity: 1 },
+};
+
+const SkeletonBody = () => {
+  return (
+    <>
+      {Array.from({ length: 8 }, (_, i) => (
+        <Skeleton key={i}
+          height="15%"
+          margin="20px"
+        />
+      ))}
+    </>
+  );
 };
 
 const actionMessage = {
@@ -156,21 +168,18 @@ function formatTimeForDisplay(value) {
 }
 
 function ProviderDropdown({ providerId, setProviderId, isLocked }) {
-  // const [providers, setProviders] = useState(null);
-  const today = new Date();
-  const [selectedDate, setSelectedDate] = useState(
-    today.toLocaleDateString("en-CA")
-  );
-
   const {
     data: providers = [],
     isLoading: loadingSummary,
-    error: summaryError,
-    refetch,
   } = useProvidersSummary();
 
   if (loadingSummary) {
-    return <Text>Loading provider summary...</Text>;
+    return (
+      <>
+    <Skeleton height="16px" mb={2} />
+    <Skeleton height="40px" />
+    </>
+    );
   }
 
   const selectedProvider = providers.find(
@@ -231,12 +240,15 @@ function LocationDropdown({ locationId, setLocationId, isLocked }) {
   const {
     data: locations = [],
     isLoading: loadingLocations,
-    error: locationsError,
-    refetch,
   } = useLocations();
 
   if (loadingLocations) {
-    return <Text>Loading locations...</Text>;
+    return (
+    <FormControl w="50%">
+      <Skeleton height="16px" mb={2} />
+      <Skeleton height="40px" borderRadius="6px" />
+    </FormControl>
+  );
   }
 
   const selectedLocation = locations.find(
@@ -705,7 +717,7 @@ export default function QuotaDrawer({
   const internalDisclosure = useDisclosure();
   const isOpen =
     externalIsOpen !== undefined ? externalIsOpen : internalDisclosure.isOpen;
-  const onOpen = externalOnOpen || internalDisclosure.onOpen;
+  // const onOpen = externalOnOpen || internalDisclosure.onOpen;
   const onClose = externalOnClose || internalDisclosure.onClose;
   const btnRef = React.useRef();
   const { currentUser } = useAuthContext();
@@ -713,18 +725,12 @@ export default function QuotaDrawer({
   const {
     data: quotaData,
     isLoading,
-    error,
-    refetch,
   } = useQuotaById(quotaID, isOpen && !!quotaID);
   const {
     mutate: createQuota,
-    isLoading: isCreating,
-    error: createError,
   } = useCreateQuota();
   const {
     mutate: updateQuota,
-    isLoading: isUpdating,
-    error: updateError,
   } = useUpdateQuota();
   const {
     mutate: deleteQuota,
@@ -747,13 +753,9 @@ export default function QuotaDrawer({
 
   const {
     data: userData,
-    isLoading: loadingCurrentUser,
-    error: errorCurrentUser,
   } = useUserByFirebaseUid(currentUser.uid);
   const {
     mutate: createLog,
-    isLoading: isCreatingLog,
-    error: createLogError,
   } = useCreateLog();
   const apptCalcFactor = userData?.[0]?.apptCalcFactor ?? null;
   const currentDrawerTitle = !quotaID
@@ -835,19 +837,19 @@ export default function QuotaDrawer({
       setIsLocked(false);
       setAction("");
     }
-  }, [isOpen, quotaID, defaultDate]);
-  // const handleTestFill = () => {
-  //   if (!isDev || isLocked) return;
-  //   setProviderId(1);
-  //   setLocationId(1);
-  //   setDate(formatDateForInput(new Date()));
-  //   setStartTime("09:00");
-  //   setEndTime("17:00");
-  //   setType("inperson");
-  //   setNote("Test note");
-  //   setQuota(5);
-  //   setProgress(3);
-  // };
+  }, [isOpen, quotaID, defaultDate, quotaData]);
+  const handleTestFill = () => {
+    if (!isDev || isLocked) return;
+    setProviderId(1);
+    setLocationId(1);
+    setDate(formatDateForInput(new Date()));
+    setStartTime("09:00");
+    setEndTime("17:00");
+    setType("inperson");
+    setNote("Test note");
+    setQuota(5);
+    setProgress(3);
+  };
 
   const handleSubmit = async (e, nextAction) => {
 
@@ -934,10 +936,6 @@ export default function QuotaDrawer({
     onClose();
   };
 
-  if (isLoading) {
-    return <Text> Loading quota </Text>;
-  }
-
   return (
     <Drawer
       isOpen={isOpen}
@@ -950,27 +948,11 @@ export default function QuotaDrawer({
       <DrawerContent>
         <DrawerCloseButton />
         <DrawerHeader>{currentDrawerTitle}</DrawerHeader>
-        {/* {quotaID ? (
-          <DrawerHeader>Edit Quota</DrawerHeader>
-        ) : (
-          <DrawerHeader>Create Quota</DrawerHeader>
-        )} */}
-
+        
+        {isLoading ? <SkeletonBody /> :
         <form onSubmit={handleSubmit}>
           <DrawerBody pb={24}>
             <Stack gap={4}>
-              {/* {isDev && !isLocked && (
-                <Flex justify="flex-end">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleTestFill}
-                  >
-                    Fill Test Data
-                  </Button>
-                </Flex>
-              )} */}
               {isLocked && (
                 <Box
                   bg="#FFD2D2"
@@ -1137,6 +1119,7 @@ export default function QuotaDrawer({
             </Stack>
           </DrawerFooter>
         </form>
+            }
       </DrawerContent>
     </Drawer>
   );

@@ -3,13 +3,14 @@ import { useState } from "react";
 import { Icon } from "@chakra-ui/icons";
 import {
   Badge,
+  HStack,
   IconButton,
+  Skeleton,
   Stack,
   Table,
   TableContainer,
   Tbody,
   Td,
-  Text,
   Th,
   Thead,
   Tr,
@@ -17,6 +18,7 @@ import {
 } from "@chakra-ui/react";
 
 import UserEditModal from "./UserEditModal";
+
 const CustomEditIcon = (props) => (
   <Icon viewBox="0 0 24 24" fill="none" {...props}>
     <path
@@ -26,7 +28,45 @@ const CustomEditIcon = (props) => (
   </Icon>
 );
 
-export default function UserTable({ users = [], loading = false, onUpdated }) {
+const CustomDeleteIcon = (props) => (
+  <Icon viewBox="0 0 24 24" fill="none" {...props}>
+    <path
+      d="M9 3h6l1 2h5v2H3V5h5l1-2Zm1 7h2v9h-2v-9Zm4 0h2v9h-2v-9ZM7 10h2v9H7v-9Zm1-2h8l-1 13H9L8 8Z"
+      fill="currentColor"
+    />
+  </Icon>
+);
+
+const SkeletonRows = () => (
+  <>
+    {Array.from({ length: 5 }, (_, i) => (
+      <Tr key={i}>
+        <Td>
+          <Skeleton height="20px" />
+        </Td>
+        <Td>
+          <Skeleton height="20px" />
+        </Td>
+        <Td>
+          <Skeleton height="20px" />
+        </Td>
+        <Td>
+          <HStack>
+            <Skeleton boxSize="30px" borderRadius="md" />
+            <Skeleton boxSize="30px" borderRadius="md" />
+          </HStack>
+        </Td>
+      </Tr>
+    ))}
+  </>
+);
+
+export default function UserTable({
+  users = [],
+  loading = false,
+  onDelete,
+  onUpdated,
+}) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedUser, setSelectedUser] = useState(null);
 
@@ -35,7 +75,6 @@ export default function UserTable({ users = [], loading = false, onUpdated }) {
     onOpen();
   };
 
-  // different badge colors per role, can delete if dtm
   const roleColors = {
     master: "orange",
     ccm: "green",
@@ -43,9 +82,6 @@ export default function UserTable({ users = [], loading = false, onUpdated }) {
     viewer: "gray",
   };
 
-  if (loading) {
-    return <Text> Loading users... </Text>;
-  }
   return (
     <>
       <TableContainer
@@ -79,41 +115,56 @@ export default function UserTable({ users = [], loading = false, onUpdated }) {
               <Th>Actions</Th>
             </Tr>
           </Thead>
+
           <Tbody>
-            {users.map((user) => (
-              <Tr key={user.id}>
-                <Td>
-                  {user.firstName} {user.lastName}
-                </Td>
-                <Td>{user.email}</Td>
-                <Td>
-                  <Badge
-                    colorScheme={roleColors[user.role] || "gray"}
-                    borderRadius="full"
-                    px={2}
-                    py={0.5}
-                    fontSize="xs"
-                    variant="subtle"
-                  >
-                    {user.role}
-                  </Badge>
-                </Td>
-                <Td>
-                  <Stack direction="row">
-                    <IconButton
-                      aria-label="Edit"
-                      variant="ghost"
-                      borderRadius="16px"
-                      icon={<CustomEditIcon />}
-                      onClick={() => handleEditClick(user)}
-                    />
-                  </Stack>
-                </Td>
-              </Tr>
-            ))}
+            {loading ? (
+              <SkeletonRows />
+            ) : (
+              users.map((user) => (
+                <Tr key={user.id}>
+                  <Td>
+                    {user.firstName} {user.lastName}
+                  </Td>
+                  <Td>{user.email}</Td>
+                  <Td>
+                    <Badge
+                      colorScheme={roleColors[user.role] || "gray"}
+                      borderRadius="full"
+                      px={2}
+                      py={0.5}
+                      fontSize="xs"
+                      variant="subtle"
+                    >
+                      {user.role}
+                    </Badge>
+                  </Td>
+                  <Td>
+                    <Stack direction="row">
+                      <IconButton
+                        aria-label="Edit"
+                        variant="ghost"
+                        borderRadius="16px"
+                        icon={<CustomEditIcon />}
+                        onClick={() => handleEditClick(user)}
+                      />
+                      {onDelete && (
+                        <IconButton
+                          aria-label="Delete"
+                          variant="ghost"
+                          borderRadius="16px"
+                          icon={<CustomDeleteIcon />}
+                          onClick={() => onDelete(user.id)}
+                        />
+                      )}
+                    </Stack>
+                  </Td>
+                </Tr>
+              ))
+            )}
           </Tbody>
         </Table>
       </TableContainer>
+
       {selectedUser && (
         <UserEditModal
           isOpen={isOpen}

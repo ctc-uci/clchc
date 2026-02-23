@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 
-import { CheckIcon, EditIcon } from "@chakra-ui/icons";
+import { CheckIcon } from "@chakra-ui/icons";
 import {
   Badge,
   Box,
@@ -11,6 +11,7 @@ import {
   PopoverContent,
   PopoverTrigger,
   Portal,
+  Skeleton,
   Table,
   TableContainer,
   Tbody,
@@ -29,6 +30,59 @@ import { useUpdateQuota } from "@/contexts/hooks/data-fetching/useQuotas";
 
 const SELECTED_BG = "#EDF2F7";
 
+const SkeletonRows = () => {
+  return (
+    <>
+      {Array.from({ length: 5 }, (_, i) => (
+        <Tr key={i}>
+          <Td>
+            <Box
+              display="flex"
+              flexDirection="column"
+              gap="2px"
+            >
+              <Skeleton height="15px" />
+              <Skeleton
+                height="10px"
+                width="80%"
+              />
+            </Box>
+          </Td>
+          <Td>
+            <Skeleton height="30px" />
+          </Td>
+          <Td>
+            <Skeleton height="30px" />
+          </Td>
+          <Td>
+            <Box
+              display="flex"
+              flexDirection="row"
+              gap="2px"
+            >
+              <Skeleton
+                height="30px"
+                width="20%"
+              />
+              <Skeleton
+                height="30px"
+                width="60%"
+              />
+              <Skeleton
+                height="30px"
+                width="20%"
+              />
+            </Box>
+          </Td>
+          <Td>
+            <Skeleton height="30px" />
+          </Td>
+        </Tr>
+      ))}
+    </>
+  );
+};
+
 const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
   const [editingQuotaId, setEditingQuotaId] = useState(null);
   const [selectedRowId, setSelectedRowId] = useState(null);
@@ -39,11 +93,7 @@ const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
     onClose: onDrawerClose,
   } = useDisclosure();
 
-  const {
-    mutate: updateQuota,
-    isLoading: isUpdating,
-    error: updateError,
-  } = useUpdateQuota();
+  const { mutate: updateQuota } = useUpdateQuota();
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -67,13 +117,6 @@ const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
 
     try {
       updateQuota({ id, data: { notes: sanitizedNote } });
-      if (onRowsUpdate) {
-        onRowsUpdate((prevRows) =>
-          prevRows.map((row) =>
-            row.id === id ? { ...row, notes: sanitizedNote } : row
-          )
-        );
-      }
     } catch (err) {
       console.error("Could not update note", err);
     }
@@ -123,10 +166,6 @@ const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
     );
   };
 
-  if (loading) {
-    return <Text>Loading...</Text>;
-  }
-
   return (
     <TableContainer
       ref={tableRef}
@@ -134,90 +173,102 @@ const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
       borderColor="gray.200"
       borderRadius="lg"
     >
-      <Table variant="simple">
+      <Table
+        variant="simple"
+        sx={{ tableLayout: "fixed" }}
+      >
         <Thead bg="gray.50">
           <Tr>
-            <Th>Providers</Th>
-            <Th>Location</Th>
-            <Th>Type</Th>
-            <Th>Progress</Th>
-            <Th>Notes</Th>
+            <Th width="20%">Providers</Th>
+            <Th width="20%">Location</Th>
+            <Th width="20%">Type</Th>
+            <Th width="20%">Progress</Th>
+            <Th width="20%">Notes</Th>
           </Tr>
         </Thead>
 
         <Tbody>
-          {rows.map((row) => (
-            <Tr
-              key={row.id}
-              bg={selectedRowId === row.id ? SELECTED_BG : "transparent"}
-              onClick={() => {
-                if (selectedRowId === row.id) {
-                  // Second click - open drawer
-                  setEditingQuotaId(row.id);
-                  onDrawerOpen();
-                } else {
-                  // First click - highlight
-                  setSelectedRowId(row.id);
-                }
-              }}
-              cursor="pointer"
-              transition="background-color 0.2s"
-              _hover={{
-                bg: selectedRowId === row.id ? SELECTED_BG : "gray.50",
-              }}
-            >
-              {/* Provider */}
-              <Td>
-                <Box>
-                  <Text fontWeight="medium">{row.providerName}</Text>
-                  <Text
-                    fontSize="sm"
-                    color="gray.500"
+          {loading ? (
+            <SkeletonRows />
+          ) : (
+            rows.map((row) => (
+              <Tr
+                key={row.id}
+                bg={selectedRowId === row.id ? SELECTED_BG : "transparent"}
+                onClick={() => {
+                  if (selectedRowId === row.id) {
+                    // Second click - open drawer
+                    setEditingQuotaId(row.id);
+                    onDrawerOpen();
+                  } else {
+                    // First click - highlight
+                    setSelectedRowId(row.id);
+                  }
+                }}
+                cursor="pointer"
+                transition="background-color 0.2s"
+                _hover={{
+                  bg: selectedRowId === row.id ? SELECTED_BG : "gray.50",
+                }}
+              >
+                {/* Provider */}
+                <Td>
+                  <Box>
+                    <Text fontWeight="medium">{row.providerName}</Text>
+                    <Text
+                      fontSize="sm"
+                      color="gray.500"
+                    >
+                      {row.hours} hours
+                    </Text>
+                  </Box>
+                </Td>
+
+                {/* Location */}
+                <Td>
+                  <Badge
+                    px={3}
+                    py={1}
+                    borderRadius="full"
                   >
-                    {row.hours} hours
-                  </Text>
-                </Box>
-              </Td>
+                    {row.locationName}
+                  </Badge>
+                </Td>
 
-              {/* Location */}
-              <Td>
-                <Badge
-                  px={3}
-                  py={1}
-                  borderRadius="full"
+                {/* Type */}
+                <Td>
+                  <Badge
+                    px={3}
+                    py={1}
+                    borderRadius="full"
+                  >
+                    <Text textTransform="capitalize">
+                      {row.appointmentType}
+                    </Text>
+                  </Badge>
+                </Td>
+
+                {/* Progress */}
+                <Td
+                  px={2}
+                  py={34.5}
                 >
-                  {row.locationName}
-                </Badge>
-              </Td>
+                  <Box onClick={(e) => e.stopPropagation()}>
+                    <ProgressBar quota={row} />
+                  </Box>
+                </Td>
 
-              {/* Type */}
-              <Td>
-                <Badge
-                  px={3}
-                  py={1}
-                  borderRadius="full"
-                >
-                  <Text textTransform="capitalize">{row.appointmentType}</Text>
-                </Badge>
-              </Td>
-
-              {/* Progress */}
-              <Td>
-                <Box onClick={(e) => e.stopPropagation()}>
-                  <ProgressBar quotaID={row.id} />
-                </Box>
-              </Td>
-
-              {/* Notes */}
-              <Td>
-                <EditableNote
-                  quotaId={row.id}
-                  initialNote={row.notes}
-                  onSave={onSave}
-                ></EditableNote>
-              </Td>
-            </Tr>
-          ))}
+                {/* Notes */}
+                <Td>
+                  <EditableNote
+                    quotaId={row.id}
+                    initialNote={row.notes}
+                    onSave={onSave}
+                  ></EditableNote>
+                </Td>
+              </Tr>
+            ))
+          )}
         </Tbody>
       </Table>
       <QuotaDrawer
