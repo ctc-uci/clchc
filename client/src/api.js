@@ -59,6 +59,10 @@ export const useApi = () => {
         const res = await backend.post("/quota", data);
         return res.data;
       },
+      delete: async (id, data) => {
+        const res = await backend.delete(`/quota/${id}`);
+        return res.data;
+      }
     },
     users: {
       getAll: async ({ params }) => {
