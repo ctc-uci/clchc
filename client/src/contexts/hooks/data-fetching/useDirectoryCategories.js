@@ -28,3 +28,15 @@ export const useCreateCategory = () => {
     },
   });
 };
+
+export const useUpdateCategory = () => {
+  const { directoryCategories } = useApi();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({id, categoryData}) => directoryCategories.update(id, categoryData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["directoryCategories"] });
+    },
+  });
+};

@@ -35,6 +35,10 @@ export const useApi = () => {
         const res = await backend.post("/directoryCategories", data);
         return res.data;
       },
+      update: async (id, data) => {
+        const res = await backend.put(`/directoryCategories/${id}`, data);
+        return res.data
+      }
     },
     tags: {
       getAll: async () => {
@@ -59,7 +63,7 @@ export const useApi = () => {
         const res = await backend.post("/quota", data);
         return res.data;
       },
-      delete: async (id, data) => {
+      delete: async (id) => {
         const res = await backend.delete(`/quota/${id}`);
         return res.data;
       }
