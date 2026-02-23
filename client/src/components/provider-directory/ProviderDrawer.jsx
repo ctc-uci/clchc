@@ -172,7 +172,7 @@ const ProviderFormFields = ({
               <FormControl
                 key={cat.id}
                 mb={4}
-                isRequired={cat.is_required}
+                isRequired={cat.isRequired}
                 isInvalid={!!errors[cat.id]}
               >
                 <FormLabel fontWeight={600}>{cat.name}</FormLabel>
@@ -331,9 +331,8 @@ const ProviderDrawer = ({
     const newErrors = {};
 
     categories.forEach((cat) => {
-      if (cat.is_required) {
+      if (cat.isRequired) {
         const value = formValues[cat.id];
-
         const isEmpty =
           value === undefined ||
           value === "" ||
