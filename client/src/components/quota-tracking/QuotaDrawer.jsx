@@ -676,7 +676,7 @@ export default function QuotaDrawer({
       setOriginalProgress(0);
       setIsLocked(false);
     }
-  }, [isOpen, quotaID, defaultDate]);
+  }, [isOpen, quotaID, defaultDate, quotaData]);
   const handleTestFill = () => {
     if (!isDev || isLocked) return;
     setProviderId(1);
