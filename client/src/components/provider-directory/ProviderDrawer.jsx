@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 import {
   Alert,
@@ -16,7 +16,6 @@ import {
   FormControl,
   FormLabel,
   Input,
-  Select,
   Skeleton,
   Text,
 } from "@chakra-ui/react";
@@ -28,12 +27,14 @@ import {
 } from "@/contexts/hooks/data-fetching/useProviders";
 import { useTags } from "@/contexts/hooks/data-fetching/useTags";
 
+import TagSelect from "./TagSelect";
 
 const SkeletonBody = () => {
   return (
     <>
       {Array.from({ length: 8 }, (_, i) => (
-        <Skeleton key={i}
+        <Skeleton
+          key={i}
           height="15%"
           margin="20px"
         />
@@ -124,6 +125,13 @@ const ProviderFormFields = ({
   readOnly,
   errors,
 }) => {
+  const getTagsByCategory = useCallback(
+    (categoryId) => {
+      return tags.filter((tag) => tag.categoryId === categoryId);
+    },
+    [tags]
+  );
+
   // const fieldProps = (displayLabel) => {
   //   const key = catNames[displayLabel] || displayLabel;
   //   return {
@@ -187,24 +195,33 @@ const ProviderFormFields = ({
                 )}
 
                 {cat.inputType === "tag" && (
-                  <Select
-                    placeholder="Select"
-                    value={formValues[cat.id] || ""}
-                    onChange={(e) => onChange(cat.id, e.target.value)}
-                    isDisabled={readOnly}
-                    bg={readOnly ? "gray.50" : "white"}
-                  >
-                    {tags
-                      .filter((tag) => tag.categoryId === cat.id)
-                      .map((tag) => (
-                        <option
-                          key={tag.id}
-                          value={tag.tagValue}
-                        >
-                          {tag.tagValue}
-                        </option>
-                      ))}
-                  </Select>
+                  // <Select
+                  //   placeholder="Select"
+                  //   value={formValues[cat.id] || ""}
+                  //   onChange={(e) => onChange(cat.id, e.target.value)}
+                  //   isDisabled={readOnly}
+                  //   bg={readOnly ? "gray.50" : "white"}
+                  // >
+                  //   {tags
+                  //     .filter((tag) => tag.categoryId === cat.id)
+                  //     .map((tag) => (
+                  //       <option
+                  //         key={tag.id}
+                  //         value={tag.tagValue}
+                  //       >
+                  //         {tag.tagValue}
+                  //       </option>
+                  //     ))}
+                  // </Select>
+                  <TagSelect
+                    key={cat.id}
+                    tags={getTagsByCategory(cat.id)}
+                    selectedTags={formValues[cat.id] || []}
+                    onTagsChange={(value) => {
+                      onChange(cat.id, value);
+                    }}
+                    readOnly={readOnly}
+                  />
                 )}
 
                 {errors[cat.id] && (
@@ -256,7 +273,16 @@ const ProviderDrawer = ({
           categories.forEach((cat) => {
             const existingValue = provider.data?.[cat.name];
 
-            if (existingValue !== undefined) {
+            if (existingValue === undefined) {
+              return;
+            }
+
+            if (cat.inputType === "tag") {
+              const tagArr = Array.isArray(existingValue)
+                ? existingValue
+                : [existingValue];
+              converted[cat.id] = tagArr;
+            } else {
               converted[cat.id] = existingValue;
             }
           });
@@ -358,22 +384,23 @@ const ProviderDrawer = ({
     >
       <DrawerOverlay />
       <DrawerContent>
-            <DrawerCloseButton />
-            <DrawerHeader
-              fontWeight="bold"
-              fontSize="xl"
-            >
-              {showConfirmation && activeMode === "edit"
-                ? "Confirm Changes"
-                : activeMode === "create"
-                  ? "Create Provider"
-                  : activeMode === "edit"
-                    ? "Edit Provider"
-                    : "Delete Provider"}
-            </DrawerHeader>
-            {loadingTags ? (
+        <DrawerCloseButton />
+        <DrawerHeader
+          fontWeight="bold"
+          fontSize="xl"
+        >
+          {showConfirmation && activeMode === "edit"
+            ? "Confirm Changes"
+            : activeMode === "create"
+              ? "Create Provider"
+              : activeMode === "edit"
+                ? "Edit Provider"
+                : "Delete Provider"}
+        </DrawerHeader>
+        {loadingTags ? (
           <SkeletonBody />
-        ) : ( <>
+        ) : (
+          <>
             <DrawerBody>
               {showConfirmation && <ConfirmationBanner mode={activeMode} />}
 

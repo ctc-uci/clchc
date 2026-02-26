@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import { HamburgerIcon, SearchIcon } from "@chakra-ui/icons";
 import {
   Box,
@@ -8,22 +9,26 @@ import {
   Input,
   InputGroup,
   InputLeftElement,
-  Tag,
-  Text,
   Menu,
   MenuButton,
   MenuItem,
   MenuList,
+  Tag,
+  Text,
   useDisclosure,
 } from "@chakra-ui/react";
+
 import { Navbar } from "@/components/layout/Navbar";
 import CategoryDrawer from "@/components/provider-directory/CategoryDrawer";
 import ProviderDrawer from "@/components/provider-directory/ProviderDrawer";
 import ProviderTable from "@/components/provider-directory/ProviderTable";
-import { useUserContext } from "@/contexts/hooks/useUserContext";
-import { useProviders } from "@/contexts/hooks/data-fetching/useProviders";
 import { useDirectoryCategories } from "@/contexts/hooks/data-fetching/useDirectoryCategories";
+import { useProviders } from "@/contexts/hooks/data-fetching/useProviders";
+import { useTags } from "@/contexts/hooks/data-fetching/useTags";
+import { useUserContext } from "@/contexts/hooks/useUserContext";
 import { useDebounce } from "@/hooks/useDebounce";
+
+import { TagsProvider } from "./tags/TagsContext";
 
 export const ProviderDirectoryPage = () => {
   const [providerQuery, setProviderQuery] = useState("");
@@ -32,10 +37,12 @@ export const ProviderDirectoryPage = () => {
   const [highlightedProviderId, setHighlightedProviderId] = useState(null);
 
   const debouncedProviderQuery = useDebounce(
-  (value) => setProviderQuery(value),
-  300
-);
+    (value) => setProviderQuery(value),
+    300
+  );
   const { role } = useUserContext();
+
+  const { refetch: refetchTags } = useTags();
 
   const {
     isOpen: isCategoryDrawerOpen,
@@ -52,15 +59,15 @@ export const ProviderDirectoryPage = () => {
   const {
     data: providers = [],
     isLoading,
-    refetch: refetchProviders
+    refetch: refetchProviders,
   } = useProviders({
-    query: providerQuery
+    query: providerQuery,
   });
 
   const {
     data: providerCategories = [],
     isLoading: loadingCategories,
-    refetch: refetchCategories
+    refetch: refetchCategories,
   } = useDirectoryCategories();
 
   const handleChange = (e) => {
@@ -81,121 +88,128 @@ export const ProviderDirectoryPage = () => {
 
   const handleDrawerSaved = () => {
     refetchProviders();
+    refetchTags();
   };
 
   return (
-    <Box
-      p={6}
-      maxW="1200px"
-      mx="auto"
-    >
-      <Flex
-        alignItems="center"
-        gap={3}
-        mb={5}
+    <TagsProvider>
+      <Box
+        p={6}
+        maxW="1200px"
+        mx="auto"
       >
-        <Heading
-          size="2xl"
-          fontWeight="medium"
-        >
-          Provider Directory
-        </Heading>
-        <Tag
-          bg="yellow.300"
-          color="black"
-          fontSize="lg"
-        >
-          {role}
-        </Tag>
-      </Flex>
-      <Text
-        size="lg"
-        fontWeight="normal"
-        color="#00000080"
-        mb={5}
-      >
-        {" "}
-        All current active providers in network
-      </Text>
-
-      {role === "ccm" || role === "master" ? (
         <Flex
-          justifyContent="space-between"
           alignItems="center"
+          gap={3}
           mb={5}
-          gap={4}
         >
-          <InputGroup maxW="600px">
-            <InputLeftElement pointerEvents="none">
-              <SearchIcon color="gray.400" />
-            </InputLeftElement>
-            <Input
-              placeholder="Search Providers"
-              borderRadius="md"
-              onChange={handleChange}
-            />
-          </InputGroup>
-
-          <Flex gap={3}>
-            <Menu>
-              <MenuButton
-                as={Button}
-                bg="black"
-                color="white"
-                _hover={{ bg: "gray.800" }}
-                _active={{ bg: "gray.800" }}
-                rightIcon={<HamburgerIcon />}
-              >
-                Manage
-              </MenuButton>
-              <MenuList>
-                <MenuItem isDisabled>Tags</MenuItem>
-                <MenuItem onClick={onCategoryDrawerOpen}>Categories</MenuItem>
-                <MenuItem onClick={openCreateProviderDrawer}>Providers</MenuItem>
-              </MenuList>
-            </Menu>
-          </Flex>
+          <Heading
+            size="2xl"
+            fontWeight="medium"
+          >
+            Provider Directory
+          </Heading>
+          <Tag
+            bg="yellow.300"
+            color="black"
+            fontSize="lg"
+          >
+            {role}
+          </Tag>
         </Flex>
-      ) : (
-        <></>
-      )}
+        <Text
+          size="lg"
+          fontWeight="normal"
+          color="#00000080"
+          mb={5}
+        >
+          {" "}
+          All current active providers in network
+        </Text>
 
-      {providers && providerCategories ? (
-        <Box>
-          <ProviderTable
-            providers={providers}
-            providerCategories={providerCategories}
-            selectedProviderId={highlightedProviderId}
-            onProviderSelect={
-              role === "ccm" || role === "master"
-                ? (provider) => setHighlightedProviderId(provider.id)
-                : undefined
-            }
-            onProviderDoubleClick={
-              role === "ccm" || role === "master" ? openEditProviderDrawer : undefined
-            }
-            loading={isLoading || loadingCategories}
-          />
-        </Box>
-      ) : (
-        <Text>Loading</Text>
-      )}
-      <CategoryDrawer
-        isOpen={isCategoryDrawerOpen}
-        onOpen={onCategoryDrawerOpen}
-        onClose={onCategoryDrawerClose}
-        onSaved={refetchCategories}
-      />
-      <ProviderDrawer
-        mode={drawerMode}
-        provider={selectedProvider}
-        categories={providerCategories}
-        isOpen={isProviderDrawerOpen}
-        onClose={onProviderDrawerClose}
-        onSaved={handleDrawerSaved}
-      />
-      <Navbar />
-    </Box>
+        {role === "ccm" || role === "master" ? (
+          <Flex
+            justifyContent="space-between"
+            alignItems="center"
+            mb={5}
+            gap={4}
+          >
+            <InputGroup maxW="600px">
+              <InputLeftElement pointerEvents="none">
+                <SearchIcon color="gray.400" />
+              </InputLeftElement>
+              <Input
+                placeholder="Search Providers"
+                borderRadius="md"
+                onChange={handleChange}
+              />
+            </InputGroup>
+
+            <Flex gap={3}>
+              <Menu>
+                <MenuButton
+                  as={Button}
+                  bg="black"
+                  color="white"
+                  _hover={{ bg: "gray.800" }}
+                  _active={{ bg: "gray.800" }}
+                  rightIcon={<HamburgerIcon />}
+                >
+                  Manage
+                </MenuButton>
+                <MenuList>
+                  <MenuItem isDisabled>Tags</MenuItem>
+                  <MenuItem onClick={onCategoryDrawerOpen}>Categories</MenuItem>
+                  <MenuItem onClick={openCreateProviderDrawer}>
+                    Providers
+                  </MenuItem>
+                </MenuList>
+              </Menu>
+            </Flex>
+          </Flex>
+        ) : (
+          <></>
+        )}
+
+        {providers && providerCategories ? (
+          <Box>
+            <ProviderTable
+              providers={providers}
+              providerCategories={providerCategories}
+              selectedProviderId={highlightedProviderId}
+              onProviderSelect={
+                role === "ccm" || role === "master"
+                  ? (provider) => setHighlightedProviderId(provider.id)
+                  : undefined
+              }
+              onProviderDoubleClick={
+                role === "ccm" || role === "master"
+                  ? openEditProviderDrawer
+                  : undefined
+              }
+              loading={isLoading || loadingCategories}
+            />
+          </Box>
+        ) : (
+          <Text>Loading</Text>
+        )}
+        <CategoryDrawer
+          isOpen={isCategoryDrawerOpen}
+          onOpen={onCategoryDrawerOpen}
+          onClose={onCategoryDrawerClose}
+          onSaved={refetchCategories}
+        />
+        <ProviderDrawer
+          mode={drawerMode}
+          provider={selectedProvider}
+          categories={providerCategories}
+          isOpen={isProviderDrawerOpen}
+          onClose={onProviderDrawerClose}
+          onSaved={handleDrawerSaved}
+        />
+        <Navbar />
+      </Box>
+    </TagsProvider>
   );
 };
 

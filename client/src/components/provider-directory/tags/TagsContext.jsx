@@ -11,13 +11,9 @@ export const TagsProvider = ({ children }) => {
     refetch: refetchTags,
   } = useTags();
 
-  // Map of id:tagValue for all tags.
+  // Map of id:tag for all tags.
   const tagsMap = useMemo(() => {
-    const map = new Map();
-    tags.forEach((tag) => {
-      map.set(tag.id, tag);
-    });
-    return map;
+    return Object.fromEntries(tags.map((tag) => [tag.id, tag]));
   }, [tags]);
 
   const value = useMemo(() => {

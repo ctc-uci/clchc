@@ -13,6 +13,8 @@ import {
   WrapItem,
 } from "@chakra-ui/react";
 
+import { useTagsContext } from "./tags/TagsContext";
+
 const SkeletonHeader = () => {
   return (
     <Thead>
@@ -65,8 +67,9 @@ export default function ProviderTable({
   onProviderDoubleClick,
   loading,
 }) {
-  // sort categories by columnOrder
+  const { tagsMap } = useTagsContext();
 
+  // sort categories by columnOrder
   const sortedCategories = [...providerCategories].sort(
     (a, b) => a.columnOrder - b.columnOrder
   );
@@ -133,7 +136,8 @@ export default function ProviderTable({
         <Wrap>
           {tags.map((t) => (
             <WrapItem key={t}>
-              <Tag>{t}</Tag>
+              <Tag>{tagsMap[t]?.tagValue || t}</Tag>
+              {/* TODO: @xgraceyan Remove safeguard when we transition all the tags to IDs. */}
             </WrapItem>
           ))}
         </Wrap>
