@@ -5,6 +5,8 @@ import { Select, Spinner, useToast } from "@chakra-ui/react";
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 import { User } from "@/types/user";
 
+const VALID_ROLES: User["role"][] = ["master", "ccm", "ccs", "viewer"];
+
 interface RoleSelectProps {
   user: User;
   disabled?: boolean;
@@ -20,18 +22,18 @@ export const RoleSelect = ({ user, disabled = true }: RoleSelectProps) => {
   const handleChangeRole = useCallback(
     async (e: ChangeEvent<HTMLSelectElement>) => {
       const previousRole = role;
-      const updatedRole = e.currentTarget.value;
+      const updatedRole = e.currentTarget.value as User["role"];
       setLoading(true);
 
       try {
+        if (!VALID_ROLES.includes(updatedRole)) {
+          throw Error("Role is not valid");
+        }
+
         await backend.put("/users/update/set-role", {
           role: updatedRole,
           firebaseUid: user.firebaseUid,
         });
-
-        if (updatedRole !== "user" && updatedRole !== "admin") {
-          throw Error("Role is not valid");
-        }
 
         setRole(updatedRole);
 
@@ -63,8 +65,10 @@ export const RoleSelect = ({ user, disabled = true }: RoleSelectProps) => {
       disabled={loading || disabled}
       icon={loading ? <Spinner size={"xs"} /> : undefined}
     >
-      <option value="user">User</option>
-      <option value="admin">Admin</option>
+      <option value="master">Master</option>
+      <option value="ccm">CCM</option>
+      <option value="ccs">CCS</option>
+      <option value="viewer">Viewer</option>
     </Select>
   );
 };

@@ -21,7 +21,7 @@ export const ProtectedRoute = ({
   const roles: DbUserRole[] = Array.isArray(allowedRoles)
     ? allowedRoles
     : [allowedRoles];
-  const isValidRole = getIsValidRole(roles, role);
+  const isValidRole = getIsValidRole(roles, role ?? undefined);
   return currentUser && isValidRole ? (
     element
   ) : currentUser ? (

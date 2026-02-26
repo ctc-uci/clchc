@@ -13,17 +13,7 @@ import {
 import { useAuthContext } from "@/contexts/hooks/useAuthContext";
 import { useBackendContext } from "@/contexts/hooks/useBackendContext";
 import { authenticateGoogleUser } from "@/utils/auth/providers";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { z } from "zod";
-
-const signinSchema = z.object({
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters long"),
-});
-
-type SigninFormValues = z.infer<typeof signinSchema>;
 
 export const Login = () => {
   const navigate = useNavigate();
@@ -31,15 +21,6 @@ export const Login = () => {
 
   const { handleRedirectResult } = useAuthContext();
   const { backend } = useBackendContext();
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<SigninFormValues>({
-    resolver: zodResolver(signinSchema),
-    mode: "onBlur",
-  });
 
   // const toastLoginError = useCallback(
   //   (msg: string) => {
