@@ -6,6 +6,11 @@
   "repository": "git@github.com:ctc-uci/npo-template-merged.git",
   "author": "CTC <ctc@uci.edu>",
   "license": "MIT",
+  "packageManager": "yarn@1.22.22",
+  "engines": {
+    "node": ">=20.19.0",
+    "yarn": ">=1.22.0"
+  },
   "scripts": {
     "dev": "vite --port 3000 --host",
     "build": "tsc -b && vite build",
