@@ -7,6 +7,11 @@
   "repository": "git@github.com:ctc-uci/npo-template-merged.git",
   "author": "CTC <ctc@uci.edu>",
   "license": "MIT",
+  "packageManager": "yarn@1.22.22",
+  "engines": {
+    "node": ">=20.19.0",
+    "yarn": ">=1.22.0"
+  },
   "scripts": {
     "start": "tsx watch --clear-screen=false src/server.ts",
     "test": "vitest --run",
