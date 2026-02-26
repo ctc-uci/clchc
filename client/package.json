@@ -16,7 +16,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint",
     "format": "npx prettier --write .",
-    "preview": "vite preview",
+    "preview": "vite preview --host 0.0.0.0",
     "test": "vitest --run",
     "test:watch": "vitest",
     "postinstall": "patch-package"
