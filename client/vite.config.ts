@@ -22,6 +22,10 @@ export default defineConfig(({ mode }) => {
      *
      * @see {@link client/docs/signInWithRedirect.md} for more detailed documentation.
      */
+    preview: {
+      allowedHosts: ['clchc-production-a749.up.railway.app'],
+    },
+
     server: {
       fs: {
         allow: [path.resolve(__dirname, '..')],
