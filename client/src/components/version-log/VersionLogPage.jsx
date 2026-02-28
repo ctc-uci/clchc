@@ -1,5 +1,4 @@
-import { useState } from "react";
-
+import { useState, useEffect } from "react";
 import { SearchIcon } from "@chakra-ui/icons";
 import {
   Badge,
@@ -27,13 +26,29 @@ export const VersionLogPage = () => {
   const navigate = useNavigate();
   const { dateParam } = useParams();
   const [searchQuery, setSearchQuery] = useState("");
+  const today = new Date().toLocaleDateString("en-CA");
+  const [selectedDate, setSelectedDate] = useState(
+    dateParam || sessionStorage.getItem("logDate") || today
+  );
   const debouncedSearchQuery = useDebounce(
     (value) => setSearchQuery(value),
     300
   );
   // const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    if (dateParam && dateParam !== selectedDate) {
+      setSelectedDate(dateParam);
+      sessionStorage.setItem("logDate", dateParam);
+    }
+  }, [dateParam]);
+
+  useEffect(() => {
+    sessionStorage.setItem("logDate", selectedDate);
+  }, [selectedDate]);
+
   const { data: logs = [], isLoading } = useVersionLogs({
+    date: selectedDate,
     q: searchQuery,
   });
 
@@ -46,7 +61,7 @@ export const VersionLogPage = () => {
     setSelectedDate(newDate);
     navigate(`/version-log/${newDate}`);
   };
-
+  // console.log("Selected Date:", selectedDate);
   return (
     <Box
       p={6}
@@ -81,6 +96,17 @@ export const VersionLogPage = () => {
             View action history over given day
           </Text>
         </Box>
+        <Box
+          flex="1"
+          display="flex"
+          justifyContent="flex-end"
+        >
+          <CalendarCard
+            value={selectedDate}
+            onChange={handleDateChange}
+          />
+        </Box>
+
       </Flex>
 
       <Stack gap={2}>
@@ -97,9 +123,9 @@ export const VersionLogPage = () => {
         <VersionLogTable
           loading={isLoading}
           logs={logs}
+          selectedDate={selectedDate}
         />
       </Stack>
-
       <Navbar />
     </Box>
   );

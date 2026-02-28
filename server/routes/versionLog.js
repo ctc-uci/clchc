@@ -40,7 +40,7 @@ versionLogRouter.get("/", async (req, res) => {
 });
 
 versionLogRouter.get("/details", async (req, res) => {
-  const { q } = req.query;
+  const { q, date } = req.query;
 
   try {
     // Prepare dynamic conditions
@@ -53,6 +53,16 @@ versionLogRouter.get("/details", async (req, res) => {
         "users".first_name ILIKE $${values.length} OR
         "users".last_name ILIKE $${values.length} OR
         providers.data->>'Name' ILIKE $${values.length}
+      `);
+    }
+
+    if (date) {
+      values.push(date);
+      values.push(date);
+
+      conditions.push(`
+        version_log.timestamp >= $${values.length - 1}::date
+        AND version_log.timestamp < ($${values.length}::date + INTERVAL '1 day')
       `);
     }
 
