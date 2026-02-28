@@ -17,10 +17,15 @@ import Navbar from "@/components/layout/Navbar";
 import VersionLogTable from "@/components/version-log/VersionLogTable";
 import { useVersionLogs } from "@/contexts/hooks/data-fetching/useVersionLogs";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useNavigate, useParams } from "react-router-dom";
+import CalendarCard from "../common/CalendarCard";
+
 
 export const VersionLogPage = () => {
   // const [logs, setLogs] = useState([]);
   // const { backend } = useBackendContext();
+  const navigate = useNavigate();
+  const { dateParam } = useParams();
   const [searchQuery, setSearchQuery] = useState("");
   const debouncedSearchQuery = useDebounce(
     (value) => setSearchQuery(value),
@@ -35,6 +40,11 @@ export const VersionLogPage = () => {
   // handleChange
   const handleChange = (e) => {
     debouncedSearchQuery(e.target.value);
+  };
+
+  const handleDateChange = (newDate) => {
+    setSelectedDate(newDate);
+    navigate(`/version-log/${newDate}`);
   };
 
   return (
