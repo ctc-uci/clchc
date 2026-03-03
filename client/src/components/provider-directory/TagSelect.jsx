@@ -13,6 +13,7 @@ import {
   Tag,
   TagCloseButton,
   TagLabel,
+  Text,
   useToast,
   VStack,
 } from "@chakra-ui/react";
@@ -190,7 +191,7 @@ const TagSelect = ({
                   justifyContent="space-between"
                   w="100%"
                 >
-                  <span>{tag.tagValue}</span>
+                  <Text>{tag.tagValue}</Text>
                   {!readOnly && (
                     <Button
                       size="xs"
