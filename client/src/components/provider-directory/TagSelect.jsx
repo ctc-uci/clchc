@@ -98,10 +98,24 @@ const TagSelect = ({
         onTagsChange(next);
       }
       if (typeof refetchTags === "function") await refetchTags();
-      toast({ status: "success", title: "Tag deleted" });
+      toast({
+        title: "Success",
+        description: "Tag successsly deleted!",
+        status: "success",
+        position: "bottom-right",
+        duration: 5000,
+        isClosable: true,
+      });
     } catch (err) {
       console.error("Failed to delete tag", err);
-      toast({ status: "error", title: "Failed to delete tag" });
+      toast({
+        title: "Error",
+        description: err,
+        status: "error",
+        position: "bottom-right",
+        duration: 5000,
+        isClosable: true,
+      });
     } finally {
       setDeletingMap((m) => {
         const copy = { ...m };
