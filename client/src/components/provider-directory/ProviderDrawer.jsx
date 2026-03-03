@@ -215,6 +215,7 @@ const ProviderFormFields = ({
                   // </Select>
                   <TagSelect
                     key={cat.id}
+                    categoryId={cat.id}
                     tags={getTagsByCategory(cat.id)}
                     selectedTags={formValues[cat.id] || []}
                     onTagsChange={(value) => {

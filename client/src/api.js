@@ -45,6 +45,14 @@ export const useApi = () => {
         const res = await backend.get("/tags");
         return res.data;
       },
+      create: async (data) => {
+        const res = await backend.post("/tags", data);
+        return res.data;
+      },
+      delete: async (id) => {
+        const res = await backend.delete(`/tags/${id}`);
+        return res.data;
+      },
     },
     quotas: {
       getAll: async ({ params }) => {
@@ -106,11 +114,5 @@ export const useApi = () => {
         return res.data;
       }
     },
-    tags: {
-      getAll: async () => {
-        const res = await backend.get("/tags");
-        return res.data;
-      }
-    }
   };
 };
