@@ -62,7 +62,7 @@ const SkeletonBody = () => {
   );
 };
 
-function SortableCategory({ category }) {
+function SortableCategory({ category, onDelete }) {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: category.id });
 
@@ -103,12 +103,12 @@ function SortableCategory({ category }) {
         {category.name}
       </Box>
 
-      {/* Trash Button (future functionality) */}
       <IconButton
         icon={<DeleteIcon />}
         aria-label="Delete category"
         variant="ghost"
         mr={2}
+        onClick={() => onDelete(category.id)}
       />
     </Flex>
   );
@@ -290,6 +290,9 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
     }
   };
 
+  const handleMarkForDelete = (id) => {
+    setCategories((prev) => prev.filter((cat) => cat.id !== id));
+  }
   return (
     <>
       <Drawer
@@ -319,6 +322,7 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
                       <SortableCategory
                         key={cat.id}
                         category={cat}
+                        onDelete={handleMarkForDelete}
                       />
                     ))}
                   </SortableContext>
