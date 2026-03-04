@@ -88,6 +88,8 @@ export default function UserTable({
         borderWidth="1px"
         borderColor="gray.200"
         borderRadius="lg"
+        maxHeight="60vh"
+        overflowY="auto"
       >
         <Table
           colorScheme="gray"
@@ -107,7 +109,10 @@ export default function UserTable({
             },
           }}
         >
-          <Thead bg="blackAlpha.100">
+          <Thead bg="#EBEBEB"
+          position="sticky"
+          top={0}
+          zIndex={1}>
             <Tr>
               <Th>Users</Th>
               <Th>Email</Th>

@@ -88,8 +88,11 @@ export default function ProviderTable({
 
     return (
       <Thead
-        bg="#00000014"
+        bg="#EBEBEB"
         h="60px"
+        position="sticky"
+        top={0}
+        zIndex={1}
       >
         <Tr>{columns}</Tr>
       </Thead>
@@ -194,6 +197,8 @@ export default function ProviderTable({
       border="1px solid"
       borderColor="gray.200"
       borderRadius="lg"
+      maxHeight="60vh"
+      overflowY = "auto"
     >
       <Table>
         {/**Subcomps to simplify structure */}

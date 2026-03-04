@@ -4,6 +4,7 @@ import {
   Box,
   Skeleton,
   Table,
+  TableContainer,
   Tbody,
   Td,
   Text,
@@ -74,18 +75,23 @@ const VersionLogTable = ({ loading, logs }) => {
       spacing={3}
       align="stretch"
     >
-      <Box
+      <TableContainer
         border="1px solid"
         borderColor="gray.200"
         borderRadius="lg"
-        overflow="hidden"
-        bg="white"
+        maxHeight="60vh"
+        overflowY="auto"
       >
         <Table
           size="sm"
           sx={{ tableLayout: "fixed" }}
         >
-          <Thead bg="gray.50">
+          <Thead
+            bg="#EBEBEB"
+            position="sticky"
+            top={0}
+            zIndex={1}
+          >
             <Tr>
               <Th width="20%">Editor</Th>
               <Th width="15%">Action</Th>
@@ -192,7 +198,7 @@ const VersionLogTable = ({ loading, logs }) => {
             )}
           </Tbody>
         </Table>
-      </Box>
+      </TableContainer>
     </VStack>
   );
 };
