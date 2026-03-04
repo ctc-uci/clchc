@@ -2,7 +2,6 @@ import { useMemo, useState } from "react";
 
 import { SearchIcon } from "@chakra-ui/icons";
 import {
-  Badge,
   Box,
   Flex,
   Heading,
@@ -10,10 +9,10 @@ import {
   InputGroup,
   InputLeftElement,
   Skeleton,
-  Text,
 } from "@chakra-ui/react";
 
 import { Navbar } from "@/components/layout/Navbar";
+import { PageHeader } from "@/components/common/PageHeader";
 import {
   useDeleteUser,
   useUsers,
@@ -87,39 +86,11 @@ export const UserDirectory = () => {
         align="flex-start"
         mb={6}
       >
-        <Box mt={5}>
-          <Flex
-            align="flex-end"
-            gap={2}
-          >
-            <Heading
-              fontSize="4xl"
-              fontWeight="medium"
-            >
-              User Directory
-            </Heading>
-            <Badge
-              bg="#FFD768"
-              borderRadius="md"
-              px={6}
-              py={0.5}
-              ml={2}
-              fontSize="sm"
-              fontWeight="normal"
-              textTransform="none"
-            >
-              Master
-            </Badge>
-          </Flex>
-          <Text
-            color="#00000080"
-            fontSize="md"
-            fontWeight="normal"
-            mt={1}
-          >
-            Manage user accounts and permissions
-          </Text>
-        </Box>
+        <PageHeader
+          title="User Directory"
+          subheading="Manage user accounts and permissions"
+          role="Master"
+        />
       </Flex>
 
       <Flex

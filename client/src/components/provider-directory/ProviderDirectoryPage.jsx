@@ -4,12 +4,9 @@ import {
   Box,
   Button,
   Flex,
-  Heading,
   Input,
   InputGroup,
   InputLeftElement,
-  Tag,
-  Text,
   Menu,
   MenuButton,
   MenuItem,
@@ -17,6 +14,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { Navbar } from "@/components/layout/Navbar";
+import { PageHeader } from "@/components/common/PageHeader";
 import CategoryDrawer from "@/components/provider-directory/CategoryDrawer";
 import ProviderDrawer from "@/components/provider-directory/ProviderDrawer";
 import ProviderTable from "@/components/provider-directory/ProviderTable";
@@ -89,34 +87,13 @@ export const ProviderDirectoryPage = () => {
       maxW="1200px"
       mx="auto"
     >
-      <Flex
-        alignItems="center"
-        gap={3}
-        mb={5}
-      >
-        <Heading
-          size="2xl"
-          fontWeight="medium"
-        >
-          Provider Directory
-        </Heading>
-        <Tag
-          bg="yellow.300"
-          color="black"
-          fontSize="lg"
-        >
-          {role}
-        </Tag>
-      </Flex>
-      <Text
-        size="lg"
-        fontWeight="normal"
-        color="#00000080"
-        mb={5}
-      >
-        {" "}
-        All current active providers in network
-      </Text>
+      <Box mb={5}>
+        <PageHeader
+          title="Provider Directory"
+          subheading="All current active providers in network"
+          role={role}
+        />
+      </Box>
 
       {role === "ccm" || role === "master" ? (
         <Flex

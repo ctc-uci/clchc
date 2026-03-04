@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 
 import { AddIcon, SearchIcon } from "@chakra-ui/icons";
 import {
-  Badge,
   Box,
   Button,
   Card,
@@ -10,7 +9,6 @@ import {
   CardFooter,
   CardHeader,
   Flex,
-  Heading,
   HStack,
   Input,
   InputGroup,
@@ -21,6 +19,7 @@ import {
 } from "@chakra-ui/react";
 
 import { CustomCard } from "@/components/common/CustomCard";
+import { PageHeader } from "@/components/common/PageHeader";
 import Navbar from "@/components/layout/Navbar";
 import QuotaDrawer from "@/components/quota-tracking/QuotaDrawer";
 import { useQuotas } from "@/contexts/hooks/data-fetching/useQuotas";
@@ -170,29 +169,11 @@ export const QuotaTracking = () => {
         align="flex-start"
         mb={6}
       >
-        <Box>
-          <Flex
-            align="flex-end"
-            gap={2}
-          >
-            <Heading size="lg">Quota Tracking</Heading>
-            <Badge
-              colorScheme="yellow"
-              borderRadius="full"
-              px={2}
-              py={0.5}
-              fontSize="xs"
-            >
-              {role ?? "Viewer"}
-            </Badge>
-          </Flex>
-          <Text
-            color="gray.500"
-            mt={1}
-          >
-            Monitor daily appointment progress across all providers
-          </Text>
-        </Box>
+        <PageHeader
+          title="Quota Tracking"
+          subheading="Monitor daily appointment progress across all providers"
+          role={role ?? "Viewer"}
+        />
 
         <Box
           flex="1"
