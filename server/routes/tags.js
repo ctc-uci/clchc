@@ -4,6 +4,43 @@ import { Router } from "express";
 
 export const tagsRouter = Router();
 
+// strip a tag id out of every provider if tag is deleted
+async function removeTagFromProviders(tagId) {
+  const providers = await db.query("SELECT id, data FROM providers");
+  const updates = [];
+
+  const traverse = (obj) => {
+    if (Array.isArray(obj)) {
+      const filtered = obj.filter(
+        (x) => x !== tagId && x !== String(tagId) && x !== Number(tagId)
+      );
+      return filtered;
+    } else if (obj && typeof obj === "object") {
+      for (const key in obj) {
+        obj[key] = traverse(obj[key]);
+      }
+    }
+    return obj;
+  };
+
+  providers.forEach((p) => {
+    const newData = JSON.parse(JSON.stringify(p.data));
+    traverse(newData);
+    // quick comparison - if different, propagate new data (without the deleted tags)
+    if (JSON.stringify(newData) !== JSON.stringify(p.data)) {
+      updates.push(
+        db.query("UPDATE providers SET data = $1 WHERE id = $2", [
+          newData,
+          p.id,
+        ])
+      );
+    }
+  });
+
+  await Promise.all(updates);
+  return updates.length;
+}
+
 // Get all Tags
 tagsRouter.get("/", async (req, res) => {
   try {
@@ -43,6 +80,13 @@ tagsRouter.delete("/:id", async (req, res) => {
       return res.status(404).send("Tag not found");
     }
 
+    // remove tags from providers when we delete tag
+    try {
+      await removeTagFromProviders(id);
+    } catch (syncErr) {
+      console.error("failed to clean providers for deleted tag", syncErr);
+    }
+
     res.status(200).json(keysToCamel(tag));
   } catch (err) {
     res.status(400).send(err.message);
@@ -74,7 +118,15 @@ tagsRouter.put("/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const { categoryId, tagValue } = req.body;
-    
+
+    // pull existing row so we can compare changes
+    const existing = await db.oneOrNone("SELECT * FROM tags WHERE id = $1", [
+      id,
+    ]);
+    if (!existing) {
+      return res.status(404).send("Tag not found");
+    }
+
     const tag = await db.query(
       `UPDATE tags 
       SET 
@@ -87,6 +139,20 @@ tagsRouter.put("/:id", async (req, res) => {
     if (tag.length === 0) {
       return res.status(404).send("Tag not found");
     }
+
+    // purge the tag from every provider
+    const updated = tag[0];
+    if (existing.category_id !== updated.category_id) {
+      try {
+        await removeTagFromProviders(id);
+      } catch (syncErr) {
+        console.error(
+          "failed to clean providers after tag category change",
+          syncErr
+        );
+      }
+    }
+
     res.status(200).json(keysToCamel(tag));
   } catch (err) {
     res.status(400).send(err.message);

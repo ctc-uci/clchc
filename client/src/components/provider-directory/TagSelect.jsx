@@ -19,6 +19,7 @@ import {
 } from "@chakra-ui/react";
 
 import { useApi } from "@/api.js";
+import { useQueryClient } from "@tanstack/react-query";
 import { ChevronDown } from "lucide-react";
 import { useTagsContext } from "./tags/TagsContext";
 
@@ -29,6 +30,7 @@ const TagSelect = ({
   onTagsChange,
   readOnly,
 }) => {
+  const queryClient = useQueryClient();
   const { tagsMap, refetchTags } = useTagsContext();
   const { tags: tagsApi } = useApi();
   const [newTagValue, setNewTagValue] = useState("");
@@ -50,19 +52,23 @@ const TagSelect = ({
     if (readOnly || !newTagValue.trim()) return;
     setCreating(true);
     try {
-      const created = await tagsApi.create({
-        tagValue: newTagValue.trim(),
-        categoryId,
-      });
-      
-      onTagsChange(
-        Array.isArray(selectedTags)
-          ? [...selectedTags, created.id]
-          : [created.id]
-      );
+      await tagsApi.create({ tagValue: newTagValue.trim(), categoryId });
+
+      queryClient.invalidateQueries({ queryKey: ["providers"] });
+      queryClient.invalidateQueries({ queryKey: ["providersSummary"] });
+
+      if (typeof refetchTags === "function") await refetchTags();
+
+      // find newly created tag by value from the refreshed tags list
+      const newTag = tags.find((t) => t.tagValue === newTagValue.trim());
+      const newTagId = newTag?.id;
+
+      if (newTagId !== null) {
+        onTagsChange([...selectedTags, newTagId]);
+      }
+
       setNewTagValue("");
       
-      if (typeof refetchTags === "function") await refetchTags();
       // feedback for successfully (or not) creating tags
       toast({
         title: "Success",
@@ -98,6 +104,10 @@ const TagSelect = ({
         const next = selectedTags.filter((id) => id !== tagId);
         onTagsChange(next);
       }
+      
+      queryClient.invalidateQueries({ queryKey: ["providers"] });
+      queryClient.invalidateQueries({ queryKey: ["providersSummary"] });
+
       if (typeof refetchTags === "function") await refetchTags();
       toast({
         title: "Success",
@@ -180,7 +190,7 @@ const TagSelect = ({
             title="Select Tags"
             type="checkbox"
             value={selectedTags}
-            onChange={onTagsChange}
+            onChange={(values) => onTagsChange(values.filter((id) => id !== null && id !== ""))}
           >
             {tags.map((tag) => (
               <MenuItemOption

@@ -126,7 +126,7 @@ export default function ProviderTable({
     if (cat.inputType === "tag") {
       // Support either array or comma-separated string
       const tags = Array.isArray(raw)
-        ? raw
+        ? raw.filter((t) => t !== null && t !== "")
         : String(raw)
             .split(",")
             .map((t) => t.trim())

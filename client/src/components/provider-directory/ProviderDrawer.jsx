@@ -300,9 +300,15 @@ const ProviderDrawer = ({
   }, [isOpen, mode, provider, categories]);
 
   const handleChange = (categoryId, value) => {
+    const cat = categories.find((c) => c.id === categoryId);
+    const sanitized =
+      cat?.inputType === "tag" && Array.isArray(value)
+        ? value.filter((id) => id !== null && id !== "")
+        : value;
+
     setFormValues((prev) => ({
       ...prev,
-      [categoryId]: value,
+      [categoryId]: sanitized,
     }));
   };
 
