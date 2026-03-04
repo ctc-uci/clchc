@@ -40,3 +40,15 @@ export const useUpdateCategory = () => {
     },
   });
 };
+
+export const useDeleteCategory = () => {
+  const queryClient = useQueryClient();
+  const { directoryCategories } = useApi()
+
+  return useMutation ({
+    mutationFn: (id) => directoryCategories.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["directoryCategories"] });
+    },
+  });
+};

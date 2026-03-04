@@ -32,6 +32,7 @@ import {
 
 import {
   useCreateCategory,
+  useDeleteCategory,
   useDirectoryCategories,
   useUpdateCategory,
 } from "@/contexts/hooks/data-fetching/useDirectoryCategories";
@@ -132,6 +133,7 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
   const pendingCloseRef = useRef(false);
   const { data: serverCategories = [], isLoading } = useDirectoryCategories();
   const { mutateAsync: createCategory } = useCreateCategory();
+  const { mutateAsync: deleteCategory } = useDeleteCategory();
   const { mutateAsync: updateCategory } = useUpdateCategory();
 
   useEffect(() => {
@@ -221,7 +223,12 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
 
   const handleSubmit = async () => {
     try {
-      // Separate existing and new categories
+      for (const id of deletedIds) {
+        if (!String(id).startsWith("temp-")) {
+          await deleteCategory(id);
+        }
+      }
+
       const existingCategories = categories.filter(
         (cat) => !String(cat.id).startsWith("temp-")
       );
@@ -229,14 +236,12 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
         String(cat.id).startsWith("temp-")
       );
 
-      // Update existing categories with new column order
       await Promise.all(
         existingCategories.map((cat, index) =>
           updateCategory({ id: cat.id, categoryData: { columnOrder: index } })
         )
       );
 
-      // Post new categories
       await Promise.all(
         newCategories.map((cat) =>
           createCategory({
@@ -249,6 +254,7 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
       );
 
       onClose();
+      setDeletedIds([]);
       setName("");
       setInputType("");
       setIsRequired(false);

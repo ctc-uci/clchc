@@ -947,7 +947,7 @@ export default function QuotaDrawer({
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton />
-        <DrawerHeader>{currentDrawerTitle}</DrawerHeader>
+        <DrawerHeader borderBottom="1px" borderColor="#E6E6E6">{currentDrawerTitle}</DrawerHeader>
         
         {isLoading ? <SkeletonBody /> :
         <form onSubmit={handleSubmit}>
