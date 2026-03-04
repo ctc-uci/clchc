@@ -26,7 +26,6 @@ import {
 
 import ProgressBar from "@/components/quota-tracking/ProgressBar";
 import QuotaDrawer from "@/components/quota-tracking/QuotaDrawer";
-import { useUpdateQuota } from "@/contexts/hooks/data-fetching/useQuotas";
 import TextPopup from "@/components/common/TextPopup";
 
 const SELECTED_BG = "#EDF2F7";
@@ -94,8 +93,6 @@ const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
     onClose: onDrawerClose,
   } = useDisclosure();
 
-  const { mutate: updateQuota } = useUpdateQuota();
-
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -112,60 +109,6 @@ const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isDrawerOpen]);
-
-  const onSave = async (id, newNote) => {
-    const sanitizedNote = newNote.trim();
-
-    try {
-      updateQuota({ id, data: { notes: sanitizedNote } });
-    } catch (err) {
-      console.error("Could not update note", err);
-    }
-  };
-
-  // const EditableNote = ({ quotaId, initialNote, onSave }) => {
-  //   const [tempNote, setTempNote] = useState(initialNote);
-
-  //   return (
-  //     <Popover trigger="click">
-  //       <PopoverTrigger>
-  //         <Box
-  //           maxWidth="100px"
-  //           onClick={(e) => e.stopPropagation()}
-  //         >
-  //           <Text
-  //             isTruncated
-  //             textDecoration="underline"
-  //             textUnderlineOffset="3px"
-  //             color="gray.600"
-  //             noOfLines={1}
-  //           >
-  //             {initialNote}
-  //           </Text>
-  //         </Box>
-  //       </PopoverTrigger>
-  //       <Portal>
-  //         <PopoverContent bg="white">
-  //           <PopoverArrow />
-  //           <PopoverBody>
-  //             <Textarea
-  //               size="lg"
-  //               width="100%"
-  //               value={tempNote}
-  //               onChange={(e) => setTempNote(e.target.value)}
-  //             ></Textarea>
-  //             <IconButton
-  //               aria-label="Save"
-  //               borderRadius="16px"
-  //               icon={<CheckIcon />}
-  //               onClick={() => onSave(quotaId, tempNote)}
-  //             ></IconButton>
-  //           </PopoverBody>
-  //         </PopoverContent>
-  //       </Portal>
-  //     </Popover>
-  //   );
-  // };
 
   return (
     <TableContainer
