@@ -11,12 +11,13 @@ import {
   Skeleton,
 } from "@chakra-ui/react";
 
-import { Navbar } from "@/components/layout/Navbar";
 import { PageHeader } from "@/components/common/PageHeader";
+import { Navbar } from "@/components/layout/Navbar";
 import {
   useDeleteUser,
   useUsers,
 } from "@/contexts/hooks/data-fetching/useUsers";
+import { useUserContext } from "@/contexts/hooks/useUserContext";
 import { useDebounce } from "@/hooks/useDebounce";
 
 import { UserPendingStatusList } from "./UserPendingStatusList";
@@ -24,6 +25,7 @@ import UserRoleFilter from "./UserRoleFilter";
 import UserTable from "./UserTable";
 
 export const UserDirectory = () => {
+  const { role } = useUserContext();
   const [searchInput, setSearchInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRole, setSelectedRole] = useState("all");
@@ -89,7 +91,7 @@ export const UserDirectory = () => {
         <PageHeader
           title="User Directory"
           subheading="Manage user accounts and permissions"
-          role="Master"
+          role={role ?? "Viewer"}
         />
       </Flex>
 

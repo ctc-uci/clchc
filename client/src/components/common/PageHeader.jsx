@@ -3,17 +3,23 @@ import { Badge, Box, Flex, Heading, Text } from "@chakra-ui/react";
 export const PageHeader = ({ title, subheading, role }) => {
   return (
     <Box>
-      <Flex align="flex-end" gap={2}>
-        <Heading size="lg" fontWeight="semibold">
+      <Flex
+        align="flex-end"
+        gap={2}
+      >
+        <Heading
+          size="lg"
+          fontWeight="semibold"
+        >
           {title}
         </Heading>
         {role && (
           <Badge
             colorScheme="yellow"
-            borderRadius="full"
+            borderRadius="md"
             px={2}
-            py={0.5}
-            fontSize="xs"
+            py={1}
+            fontSize="sm"
             textTransform="none"
           >
             {role}
@@ -21,7 +27,10 @@ export const PageHeader = ({ title, subheading, role }) => {
         )}
       </Flex>
       {subheading && (
-        <Text color="gray.500" mt={1}>
+        <Text
+          color="gray.500"
+          mt={1}
+        >
           {subheading}
         </Text>
       )}

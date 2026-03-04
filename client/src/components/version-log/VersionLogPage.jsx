@@ -10,10 +10,11 @@ import {
   Stack,
 } from "@chakra-ui/react";
 
-import Navbar from "@/components/layout/Navbar";
 import { PageHeader } from "@/components/common/PageHeader";
+import Navbar from "@/components/layout/Navbar";
 import VersionLogTable from "@/components/version-log/VersionLogTable";
 import { useVersionLogs } from "@/contexts/hooks/data-fetching/useVersionLogs";
+import { useUserContext } from "@/contexts/hooks/useUserContext";
 import { useDebounce } from "@/hooks/useDebounce";
 
 export const VersionLogPage = () => {
@@ -24,6 +25,7 @@ export const VersionLogPage = () => {
     (value) => setSearchQuery(value),
     300
   );
+  const { role } = useUserContext();
   // const [loading, setLoading] = useState(true);
 
   const { data: logs = [], isLoading } = useVersionLogs({
@@ -49,7 +51,7 @@ export const VersionLogPage = () => {
         <PageHeader
           title="Version Log"
           subheading="View action history over given day"
-          role="Master"
+          role={role ?? "Viewer"}
         />
       </Flex>
 
