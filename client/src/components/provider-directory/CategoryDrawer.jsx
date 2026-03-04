@@ -120,6 +120,7 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
   const [isRequired, setIsRequired] = useState(false);
   const [categories, setCategories] = useState([]);
   const [showForm, setShowForm] = useState(false);
+  const [deletedIds, setDeletedIds] = useState([]);
   const toast = useToast();
   const formStackRef = useRef(null);
   const {
@@ -292,6 +293,7 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
 
   const handleMarkForDelete = (id) => {
     setCategories((prev) => prev.filter((cat) => cat.id !== id));
+    setDeletedIds((prev) => [...prev, id]);
   }
   return (
     <>
