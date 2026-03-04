@@ -10,7 +10,7 @@ import {
   PopoverHeader,
   PopoverTrigger,
   Portal,
-  Text
+  Text,
 } from "@chakra-ui/react";
 
 const TextPopup = ({ text = "", alwaysShowPopup = false, truncateAt }) => {
@@ -37,12 +37,17 @@ const TextPopup = ({ text = "", alwaysShowPopup = false, truncateAt }) => {
       </PopoverTrigger>
       <Portal>
         <PopoverContent
-          bg="white"
+          bg="blackAlpha.500"
           maxW="300px"
         >
-          <PopoverArrow />
+          <PopoverArrow bg="blackAlpha.500" />
           <PopoverBody>
-            <Text whiteSpace="pre-wrap">{text}</Text>
+            <Text
+              whiteSpace="pre-wrap"
+              color="whiteAlpha.900"
+            >
+              {text}
+            </Text>
           </PopoverBody>
         </PopoverContent>
       </Portal>
