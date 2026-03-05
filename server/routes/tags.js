@@ -11,21 +11,22 @@ async function removeTagFromProviders(tagId) {
 
   const traverse = (obj) => {
     if (Array.isArray(obj)) {
-      const filtered = obj.filter(
+      return obj.filter(
         (x) => x !== tagId && x !== String(tagId) && x !== Number(tagId)
       );
-      return filtered;
-    } else if (obj && typeof obj === "object") {
+    }
+    if (obj !== null && typeof obj === "object") {
+      const result = {};
       for (const key in obj) {
-        obj[key] = traverse(obj[key]);
+        result[key] = traverse(obj[key]);
       }
+      return result;
     }
     return obj;
   };
 
   providers.forEach((p) => {
-    const newData = JSON.parse(JSON.stringify(p.data));
-    traverse(newData);
+    const newData = traverse(p.data);
     // quick comparison - if different, propagate new data (without the deleted tags)
     if (JSON.stringify(newData) !== JSON.stringify(p.data)) {
       updates.push(

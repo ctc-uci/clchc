@@ -31,7 +31,7 @@ export const TagsProvider = ({ children }) => {
 export const useTagsContext = () => {
   const tagsContext = useContext(TagsContext);
   if (!tagsContext) {
-    console.error("useTagsContext must be called within TagsProvider");
+    throw new Error("useTagsContext must be called within TagsProvider");
   }
   return tagsContext;
 };

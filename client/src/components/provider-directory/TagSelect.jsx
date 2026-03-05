@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { DeleteIcon, AddIcon } from "@chakra-ui/icons";
+
+import { AddIcon, DeleteIcon } from "@chakra-ui/icons";
 import {
   Button,
   HStack,
@@ -19,8 +20,10 @@ import {
 } from "@chakra-ui/react";
 
 import { useApi } from "@/api.js";
+import { errorToString } from "@/utils/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { ChevronDown } from "lucide-react";
+
 import { useTagsContext } from "./tags/TagsContext";
 
 const TagSelect = ({
@@ -52,23 +55,27 @@ const TagSelect = ({
     if (readOnly || !newTagValue.trim()) return;
     setCreating(true);
     try {
-      await tagsApi.create({ tagValue: newTagValue.trim(), categoryId });
+      const rawCreated = await tagsApi.create({
+        tagValue: newTagValue.trim(),
+        categoryId,
+      });
+
+      const newTag = Array.isArray(rawCreated) ? rawCreated[0] : rawCreated;
+      const currentIds = Array.isArray(selectedTags) ? selectedTags : [];
+
+      if (newTag?.id !== undefined && newTag?.id !== null) {
+        onTagsChange([...currentIds, newTag.id]);
+      }
 
       queryClient.invalidateQueries({ queryKey: ["providers"] });
       queryClient.invalidateQueries({ queryKey: ["providersSummary"] });
-
-      if (typeof refetchTags === "function") await refetchTags();
-
-      // find newly created tag by value from the refreshed tags list
-      const newTag = tags.find((t) => t.tagValue === newTagValue.trim());
-      const newTagId = newTag?.id;
-
-      if (newTagId !== null) {
-        onTagsChange([...selectedTags, newTagId]);
+      queryClient.invalidateQueries({ queryKey: ["tags"] });
+      if (typeof refetchTags === "function") {
+        await refetchTags();
       }
 
       setNewTagValue("");
-      
+
       // feedback for successfully (or not) creating tags
       toast({
         title: "Success",
@@ -82,7 +89,7 @@ const TagSelect = ({
       console.error("Failed to create tag", err);
       toast({
         title: "Error",
-        description: err,
+        description: errorToString(err),
         status: "error",
         position: "bottom-right",
         duration: 5000,
@@ -104,14 +111,15 @@ const TagSelect = ({
         const next = selectedTags.filter((id) => id !== tagId);
         onTagsChange(next);
       }
-      
+
       queryClient.invalidateQueries({ queryKey: ["providers"] });
       queryClient.invalidateQueries({ queryKey: ["providersSummary"] });
+      queryClient.invalidateQueries({ queryKey: ["tags"] });
 
       if (typeof refetchTags === "function") await refetchTags();
       toast({
         title: "Success",
-        description: "Tag successsly deleted!",
+        description: "Tag successfully deleted!",
         status: "success",
         position: "bottom-right",
         duration: 5000,
@@ -121,7 +129,7 @@ const TagSelect = ({
       console.error("Failed to delete tag", err);
       toast({
         title: "Error",
-        description: err,
+        description: errorToString(err),
         status: "error",
         position: "bottom-right",
         duration: 5000,
@@ -190,7 +198,9 @@ const TagSelect = ({
             title="Select Tags"
             type="checkbox"
             value={selectedTags}
-            onChange={(values) => onTagsChange(values.filter((id) => id !== null && id !== ""))}
+            onChange={(values) =>
+              onTagsChange(values.filter((id) => id !== null && id !== ""))
+            }
           >
             {tags.map((tag) => (
               <MenuItemOption
