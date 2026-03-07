@@ -1,32 +1,23 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
-import { CheckIcon } from "@chakra-ui/icons";
 import {
   Badge,
   Box,
-  IconButton,
-  Popover,
-  PopoverArrow,
-  PopoverBody,
-  PopoverContent,
-  PopoverTrigger,
-  Portal,
   Skeleton,
   Table,
   TableContainer,
   Tbody,
   Td,
   Text,
-  Textarea,
   Th,
   Thead,
   Tr,
   useDisclosure,
 } from "@chakra-ui/react";
 
+import TextPopup from "@/components/common/TextPopup";
 import ProgressBar from "@/components/quota-tracking/ProgressBar";
 import QuotaDrawer from "@/components/quota-tracking/QuotaDrawer";
-import TextPopup from "@/components/common/TextPopup";
 
 const SELECTED_BG = "#EDF2F7";
 
@@ -96,8 +87,8 @@ const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
-        tableRef.current && 
-        !tableRef.current.contains(event.target) && 
+        tableRef.current &&
+        !tableRef.current.contains(event.target) &&
         !isDrawerOpen
       ) {
         setSelectedRowId(null);
@@ -206,6 +197,7 @@ const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
                 <Td>
                   <TextPopup
                     text={row.notes}
+                    truncateAt={200}
                     alwaysShowUp={true}
                   ></TextPopup>
                 </Td>

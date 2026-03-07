@@ -1,13 +1,9 @@
 import {
   Box,
   Popover,
-  PopoverAnchor,
   PopoverArrow,
   PopoverBody,
-  PopoverCloseButton,
   PopoverContent,
-  PopoverFooter,
-  PopoverHeader,
   PopoverTrigger,
   Portal,
   Text,
