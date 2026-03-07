@@ -57,7 +57,7 @@ const App = () => {
                   element={<ProviderDirectoryPage />}
                   />
                   <Route
-                  path="/version-log"
+                  path="/version-log/:date?"
                   element={<VersionLogPage />}
                   />
                 </Route>
