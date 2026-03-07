@@ -25,7 +25,7 @@ import UserRoleFilter from "./UserRoleFilter";
 import UserTable from "./UserTable";
 
 export const UserDirectory = () => {
-  const { role } = useUserContext();
+  const { role, loading: roleLoading } = useUserContext();
   const [searchInput, setSearchInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRole, setSelectedRole] = useState("all");
@@ -91,7 +91,8 @@ export const UserDirectory = () => {
         <PageHeader
           title="User Directory"
           subheading="Manage user accounts and permissions"
-          role={role ?? "Viewer"}
+          role={role}
+          isLoading={roleLoading}
         />
       </Flex>
 

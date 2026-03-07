@@ -75,7 +75,7 @@ export const QuotaTracking = () => {
     (value) => setProviderQuery(value),
     300
   );
-  const { role } = useUserContext();
+  const { role, loading: roleLoading } = useUserContext();
 
   // get current date and reformat
   const today = new Date().toLocaleDateString("en-CA");
@@ -172,7 +172,8 @@ export const QuotaTracking = () => {
         <PageHeader
           title="Quota Tracking"
           subheading="Monitor daily appointment progress across all providers"
-          role={role ?? "Viewer"}
+          role={role}
+          isLoading={roleLoading}
         />
 
         <Box

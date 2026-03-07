@@ -25,7 +25,7 @@ export const VersionLogPage = () => {
     (value) => setSearchQuery(value),
     300
   );
-  const { role } = useUserContext();
+  const { role, loading: roleLoading } = useUserContext();
   // const [loading, setLoading] = useState(true);
 
   const { data: logs = [], isLoading } = useVersionLogs({
@@ -51,7 +51,8 @@ export const VersionLogPage = () => {
         <PageHeader
           title="Version Log"
           subheading="View action history over given day"
-          role={role ?? "Viewer"}
+          role={role}
+          isLoading={roleLoading}
         />
       </Flex>
 

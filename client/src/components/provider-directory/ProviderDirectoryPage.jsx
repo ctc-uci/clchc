@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import { HamburgerIcon, SearchIcon } from "@chakra-ui/icons";
 import {
   Box,
@@ -13,14 +14,15 @@ import {
   MenuList,
   useDisclosure,
 } from "@chakra-ui/react";
-import { Navbar } from "@/components/layout/Navbar";
+
 import { PageHeader } from "@/components/common/PageHeader";
+import { Navbar } from "@/components/layout/Navbar";
 import CategoryDrawer from "@/components/provider-directory/CategoryDrawer";
 import ProviderDrawer from "@/components/provider-directory/ProviderDrawer";
 import ProviderTable from "@/components/provider-directory/ProviderTable";
-import { useUserContext } from "@/contexts/hooks/useUserContext";
-import { useProviders } from "@/contexts/hooks/data-fetching/useProviders";
 import { useDirectoryCategories } from "@/contexts/hooks/data-fetching/useDirectoryCategories";
+import { useProviders } from "@/contexts/hooks/data-fetching/useProviders";
+import { useUserContext } from "@/contexts/hooks/useUserContext";
 import { useDebounce } from "@/hooks/useDebounce";
 
 export const ProviderDirectoryPage = () => {
@@ -30,10 +32,10 @@ export const ProviderDirectoryPage = () => {
   const [highlightedProviderId, setHighlightedProviderId] = useState(null);
 
   const debouncedProviderQuery = useDebounce(
-  (value) => setProviderQuery(value),
-  300
-);
-  const { role } = useUserContext();
+    (value) => setProviderQuery(value),
+    300
+  );
+  const { role, loading: roleLoading } = useUserContext();
 
   const {
     isOpen: isCategoryDrawerOpen,
@@ -50,15 +52,15 @@ export const ProviderDirectoryPage = () => {
   const {
     data: providers = [],
     isLoading,
-    refetch: refetchProviders
+    refetch: refetchProviders,
   } = useProviders({
-    query: providerQuery
+    query: providerQuery,
   });
 
   const {
     data: providerCategories = [],
     isLoading: loadingCategories,
-    refetch: refetchCategories
+    refetch: refetchCategories,
   } = useDirectoryCategories();
 
   const handleChange = (e) => {
@@ -92,6 +94,7 @@ export const ProviderDirectoryPage = () => {
           title="Provider Directory"
           subheading="All current active providers in network"
           role={role}
+          isLoading={roleLoading}
         />
       </Box>
 
@@ -128,7 +131,9 @@ export const ProviderDirectoryPage = () => {
               <MenuList>
                 <MenuItem isDisabled>Tags</MenuItem>
                 <MenuItem onClick={onCategoryDrawerOpen}>Categories</MenuItem>
-                <MenuItem onClick={openCreateProviderDrawer}>Providers</MenuItem>
+                <MenuItem onClick={openCreateProviderDrawer}>
+                  Providers
+                </MenuItem>
               </MenuList>
             </Menu>
           </Flex>
@@ -149,7 +154,9 @@ export const ProviderDirectoryPage = () => {
                 : undefined
             }
             onProviderDoubleClick={
-              role === "ccm" || role === "master" ? openEditProviderDrawer : undefined
+              role === "ccm" || role === "master"
+                ? openEditProviderDrawer
+                : undefined
             }
             loading={isLoading || loadingCategories}
           />
