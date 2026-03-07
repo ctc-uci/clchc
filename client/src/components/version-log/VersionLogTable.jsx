@@ -90,6 +90,7 @@ const VersionLogTable = ({ loading, logs }) => {
             bg="#EBEBEB"
             position="sticky"
             top={0}
+            h="60px"
             zIndex={1}
           >
             <Tr>

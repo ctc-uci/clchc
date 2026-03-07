@@ -78,7 +78,6 @@ export default function ProviderTable({
     const columns = sortedCategories.map((cat) => (
       <Th
         key={cat.name}
-        fontSize="sm"
         fontWeight="bold"
         color="#2D3748"
       >

@@ -182,6 +182,7 @@ const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
         <Thead bg="#EBEBEB"
         position="sticky"
         top={0}
+        h="60px"
         zIndex={1}>
           <Tr>
             <Th width="20%">Providers</Th>
