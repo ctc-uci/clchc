@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { AddIcon, DeleteIcon } from "@chakra-ui/icons";
 import {
@@ -41,30 +41,66 @@ const TagSelect = ({
   const [deletingMap, setDeletingMap] = useState({});
   const toast = useToast();
 
+  const selectedIds = useMemo(() => {
+    return Array.isArray(selectedTags) ? selectedTags : [];
+  }, [selectedTags]);
+  const selectedIdsRef = useRef(selectedIds);
+
+  // avoid race condition during async: use ref for latest tags
+  useEffect(() => {
+    selectedIdsRef.current = selectedIds;
+  }, [selectedIds]);
+
   const handleRemoveTag = (tagId) => (e) => {
     e.stopPropagation();
     if (readOnly) {
       return;
     }
-    const nextTags = selectedTags.filter((id) => id !== tagId);
+    const nextTags = selectedIds.filter((id) => id !== tagId);
     onTagsChange(nextTags);
   };
 
   const handleCreateTag = async (e) => {
     e.stopPropagation();
-    if (readOnly || !newTagValue.trim()) return;
+    const trimmedTag = newTagValue.trim();
+    if (readOnly || !trimmedTag) return;
     setCreating(true);
+
+    const tempId = `tag-temp-${Date.now()}`;
+    const optimisticTag = { id: tempId, categoryId, tagValue: trimmedTag };
+    const prevTags = queryClient.getQueryData(["tags"]);
+    const prevSelectedIds = selectedIdsRef.current;
+
     try {
+      // add tag optimistically
+      await queryClient.cancelQueries({ queryKey: ["tags"] });
+      queryClient.setQueryData(["tags"], (oldData) => {
+        const curr = Array.isArray(oldData) ? oldData : [];
+        return [...curr, optimisticTag];
+      });
+      onTagsChange([...prevSelectedIds, tempId]);
+      setNewTagValue("");
+
       const rawCreated = await tagsApi.create({
-        tagValue: newTagValue.trim(),
+        tagValue: trimmedTag,
         categoryId,
       });
 
       const newTag = Array.isArray(rawCreated) ? rawCreated[0] : rawCreated;
-      const currentIds = Array.isArray(selectedTags) ? selectedTags : [];
+      const newTagId = newTag?.id;
 
-      if (newTag?.id !== undefined && newTag?.id !== null) {
-        onTagsChange([...currentIds, newTag.id]);
+      // replace optimistic tag with actual tag
+      if (newTagId !== undefined && newTagId !== null) {
+        queryClient.setQueryData(["tags"], (oldData) => {
+          const curr = Array.isArray(oldData) ? oldData : [];
+          return curr.map((t) => (t?.id === tempId ? newTag : t));
+        });
+
+        const latestSelected = selectedIdsRef.current;
+        const replaced = latestSelected.map((id) =>
+          id === tempId ? newTagId : id
+        );
+        onTagsChange([...new Set(replaced)]);
       }
 
       queryClient.invalidateQueries({ queryKey: ["providers"] });
@@ -73,8 +109,6 @@ const TagSelect = ({
       if (typeof refetchTags === "function") {
         await refetchTags();
       }
-
-      setNewTagValue("");
 
       // feedback for successfully (or not) creating tags
       toast({
@@ -87,6 +121,12 @@ const TagSelect = ({
       });
     } catch (err) {
       console.error("Failed to create tag", err);
+
+      // undo optimistic updates
+      queryClient.setQueryData(["tags"], prevTags);
+      onTagsChange(prevSelectedIds);
+      setNewTagValue(trimmedTag);
+
       toast({
         title: "Error",
         description: errorToString(err),
@@ -104,13 +144,22 @@ const TagSelect = ({
     e.stopPropagation();
     if (readOnly) return;
     setDeletingMap((m) => ({ ...m, [tagId]: true }));
+
+    const prevTags = queryClient.getQueryData(["tags"]);
+    const prevSelectedIds = selectedIdsRef.current;
+
     try {
-      await tagsApi.delete(tagId);
-      // if selected, removed from selectedTags too when deleting
-      if (Array.isArray(selectedTags) && selectedTags.includes(tagId)) {
-        const next = selectedTags.filter((id) => id !== tagId);
-        onTagsChange(next);
+      // remove from selection optimistically
+      await queryClient.cancelQueries({ queryKey: ["tags"] });
+      queryClient.setQueryData(["tags"], (old) => {
+        const curr = Array.isArray(old) ? old : [];
+        return curr.filter((t) => t?.id !== tagId);
+      });
+      if (prevSelectedIds.includes(tagId)) {
+        onTagsChange(prevSelectedIds.filter((id) => id !== tagId));
       }
+
+      await tagsApi.delete(tagId);
 
       queryClient.invalidateQueries({ queryKey: ["providers"] });
       queryClient.invalidateQueries({ queryKey: ["providersSummary"] });
@@ -127,6 +176,11 @@ const TagSelect = ({
       });
     } catch (err) {
       console.error("Failed to delete tag", err);
+
+      // undo optimistic updates
+      queryClient.setQueryData(["tags"], prevTags);
+      onTagsChange(prevSelectedIds);
+
       toast({
         title: "Error",
         description: errorToString(err),
@@ -197,7 +251,7 @@ const TagSelect = ({
           <MenuOptionGroup
             title="Select Tags"
             type="checkbox"
-            value={selectedTags}
+            value={selectedIds}
             onChange={(values) =>
               onTagsChange(values.filter((id) => id !== null && id !== ""))
             }
