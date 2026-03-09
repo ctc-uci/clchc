@@ -12,6 +12,8 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
+  Tag,
+  Text,
   useDisclosure,
 } from "@chakra-ui/react";
 
@@ -22,6 +24,7 @@ import ProviderDrawer from "@/components/provider-directory/ProviderDrawer";
 import ProviderTable from "@/components/provider-directory/ProviderTable";
 import { useDirectoryCategories } from "@/contexts/hooks/data-fetching/useDirectoryCategories";
 import { useProviders } from "@/contexts/hooks/data-fetching/useProviders";
+import { useTags } from "@/contexts/hooks/data-fetching/useTags";
 import { useUserContext } from "@/contexts/hooks/useUserContext";
 import { useDebounce } from "@/hooks/useDebounce";
 
@@ -36,6 +39,8 @@ export const ProviderDirectoryPage = () => {
     300
   );
   const { role, loading: roleLoading } = useUserContext();
+
+  const { refetch: refetchTags } = useTags();
 
   const {
     isOpen: isCategoryDrawerOpen,
@@ -81,6 +86,7 @@ export const ProviderDirectoryPage = () => {
 
   const handleDrawerSaved = () => {
     refetchProviders();
+    refetchTags();
   };
 
   return (

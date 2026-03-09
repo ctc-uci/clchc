@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 import {
   Alert,
@@ -16,11 +16,11 @@ import {
   FormControl,
   FormLabel,
   Input,
-  Select,
   Skeleton,
   Text,
 } from "@chakra-ui/react";
 
+import TagSelect from "@/components/provider-directory/TagSelect";
 import {
   useCreateProvider,
   useDeleteProvider,
@@ -28,12 +28,12 @@ import {
 } from "@/contexts/hooks/data-fetching/useProviders";
 import { useTags } from "@/contexts/hooks/data-fetching/useTags";
 
-
 const SkeletonBody = () => {
   return (
     <>
       {Array.from({ length: 8 }, (_, i) => (
-        <Skeleton key={i}
+        <Skeleton
+          key={i}
           height="15%"
           margin="20px"
         />
@@ -124,6 +124,13 @@ const ProviderFormFields = ({
   readOnly,
   errors,
 }) => {
+  const getTagsByCategory = useCallback(
+    (categoryId) => {
+      return tags.filter((tag) => tag.categoryId === categoryId);
+    },
+    [tags]
+  );
+
   // const fieldProps = (displayLabel) => {
   //   const key = catNames[displayLabel] || displayLabel;
   //   return {
@@ -187,24 +194,16 @@ const ProviderFormFields = ({
                 )}
 
                 {cat.inputType === "tag" && (
-                  <Select
-                    placeholder="Select"
-                    value={formValues[cat.id] || ""}
-                    onChange={(e) => onChange(cat.id, e.target.value)}
-                    isDisabled={readOnly}
-                    bg={readOnly ? "gray.50" : "white"}
-                  >
-                    {tags
-                      .filter((tag) => tag.categoryId === cat.id)
-                      .map((tag) => (
-                        <option
-                          key={tag.id}
-                          value={tag.tagValue}
-                        >
-                          {tag.tagValue}
-                        </option>
-                      ))}
-                  </Select>
+                  <TagSelect
+                    key={cat.id}
+                    categoryId={cat.id}
+                    tags={getTagsByCategory(cat.id)}
+                    selectedTags={formValues[cat.id] || []}
+                    onTagsChange={(value) => {
+                      onChange(cat.id, value);
+                    }}
+                    readOnly={readOnly}
+                  />
                 )}
 
                 {errors[cat.id] && (
@@ -238,7 +237,8 @@ const ProviderDrawer = ({
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [formValues, setFormValues] = useState({});
   const [errors, setErrors] = useState({});
-  const { data: tags = [], isLoading: loadingTags } = useTags();
+  const { data: tagsData, isLoading: loadingTags } = useTags();
+  const tags = tagsData?.tags ?? [];
   const { mutate: createProvider } = useCreateProvider();
   const { mutate: updateProvider } = useUpdateProvider();
   const { mutate: deleteProvider } = useDeleteProvider();
@@ -256,7 +256,16 @@ const ProviderDrawer = ({
           categories.forEach((cat) => {
             const existingValue = provider.data?.[cat.name];
 
-            if (existingValue !== undefined) {
+            if (existingValue === undefined) {
+              return;
+            }
+
+            if (cat.inputType === "tag") {
+              const tagArr = Array.isArray(existingValue)
+                ? existingValue
+                : [existingValue];
+              converted[cat.id] = tagArr;
+            } else {
               converted[cat.id] = existingValue;
             }
           });
@@ -273,9 +282,15 @@ const ProviderDrawer = ({
   }, [isOpen, mode, provider, categories]);
 
   const handleChange = (categoryId, value) => {
+    const cat = categories.find((c) => c.id === categoryId);
+    const sanitized =
+      cat?.inputType === "tag" && Array.isArray(value)
+        ? value.filter((id) => id !== null && id !== "")
+        : value;
+
     setFormValues((prev) => ({
       ...prev,
-      [categoryId]: value,
+      [categoryId]: sanitized,
     }));
   };
 
@@ -358,22 +373,23 @@ const ProviderDrawer = ({
     >
       <DrawerOverlay />
       <DrawerContent>
-            <DrawerCloseButton />
-            <DrawerHeader
-              fontWeight="bold"
-              fontSize="xl"
-            >
-              {showConfirmation && activeMode === "edit"
-                ? "Confirm Changes"
-                : activeMode === "create"
-                  ? "Create Provider"
-                  : activeMode === "edit"
-                    ? "Edit Provider"
-                    : "Delete Provider"}
-            </DrawerHeader>
-            {loadingTags ? (
+        <DrawerCloseButton />
+        <DrawerHeader
+          fontWeight="bold"
+          fontSize="xl"
+        >
+          {showConfirmation && activeMode === "edit"
+            ? "Confirm Changes"
+            : activeMode === "create"
+              ? "Create Provider"
+              : activeMode === "edit"
+                ? "Edit Provider"
+                : "Delete Provider"}
+        </DrawerHeader>
+        {loadingTags ? (
           <SkeletonBody />
-        ) : ( <>
+        ) : (
+          <>
             <DrawerBody>
               {showConfirmation && <ConfirmationBanner mode={activeMode} />}
 

@@ -13,6 +13,7 @@ import {
   WrapItem,
 } from "@chakra-ui/react";
 
+import { useTags } from "@/contexts/hooks/data-fetching/useTags";
 import TextPopup from "@/components/common/TextPopup";
 
 const SkeletonHeader = () => {
@@ -67,8 +68,10 @@ export default function ProviderTable({
   onProviderDoubleClick,
   loading,
 }) {
-  // sort categories by columnOrder
+  const { data: tagsData } = useTags();
+  const tagsMap = tagsData?.tagsMap ?? {};
 
+  // sort categories by columnOrder
   const sortedCategories = [...providerCategories].sort(
     (a, b) => a.columnOrder - b.columnOrder
   );
@@ -127,7 +130,7 @@ export default function ProviderTable({
     if (cat.inputType === "tag") {
       // Support either array or comma-separated string
       const tags = Array.isArray(raw)
-        ? raw
+        ? raw.filter((t) => t !== null && t !== "")
         : String(raw)
             .split(",")
             .map((t) => t.trim())
@@ -137,7 +140,8 @@ export default function ProviderTable({
         <Wrap>
           {tags.map((t) => (
             <WrapItem key={t}>
-              <Tag>{t}</Tag>
+              <Tag>{tagsMap[t]?.tagValue || t}</Tag>
+              {/* TODO: @xgraceyan Remove safeguard when we transition all the tags to IDs. */}
             </WrapItem>
           ))}
         </Wrap>
