@@ -82,7 +82,6 @@ export default function ProviderTable({
     const columns = sortedCategories.map((cat) => (
       <Th
         key={cat.name}
-        fontSize="sm"
         fontWeight="bold"
         color="#2D3748"
       >
@@ -92,8 +91,11 @@ export default function ProviderTable({
 
     return (
       <Thead
-        bg="#00000014"
+        bg="#EBEBEB"
         h="60px"
+        position="sticky"
+        top={0}
+        zIndex={1}
       >
         <Tr>{columns}</Tr>
       </Thead>
@@ -199,6 +201,8 @@ export default function ProviderTable({
       border="1px solid"
       borderColor="gray.200"
       borderRadius="lg"
+      maxHeight="60vh"
+      overflowY = "auto"
     >
       <Table>
         {/**Subcomps to simplify structure */}

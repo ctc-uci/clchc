@@ -172,12 +172,18 @@ const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
       borderWidth="1px"
       borderColor="gray.200"
       borderRadius="lg"
+      maxHeight="60vh"
+      overflowY="auto"
     >
       <Table
         variant="simple"
         sx={{ tableLayout: "fixed" }}
       >
-        <Thead bg="gray.50">
+        <Thead bg="#EBEBEB"
+        position="sticky"
+        top={0}
+        h="60px"
+        zIndex={1}>
           <Tr>
             <Th width="20%">Providers</Th>
             <Th width="20%">Location</Th>
