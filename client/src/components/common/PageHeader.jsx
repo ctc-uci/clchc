@@ -1,7 +1,6 @@
 import { Badge, Box, Flex, Heading, Skeleton, Text } from "@chakra-ui/react";
 
 export const PageHeader = ({ title, subheading, role, isLoading }) => {
-  isLoading = true;
   return (
     <Box>
       <Flex
@@ -38,7 +37,7 @@ export const PageHeader = ({ title, subheading, role, isLoading }) => {
               color="Black"
               fontWeight="500"
             >
-              {role === "ccm" ? "Manager" : role === "ccs" ? "Staff" : role}
+              {role === "ccm" ? "Manager" : role === "ccs" ? "Staff" : role === "viewer" ? "Viewer" : role === "master" ? "Master" : role}
             </Badge>
           )
         )}
