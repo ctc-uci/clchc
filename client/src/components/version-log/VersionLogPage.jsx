@@ -1,20 +1,19 @@
 import { useState, useEffect } from "react";
 import { SearchIcon } from "@chakra-ui/icons";
 import {
-  Badge,
   Box,
   Flex,
-  Heading,
   Input,
   InputGroup,
   InputLeftElement,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 
+import { PageHeader } from "@/components/common/PageHeader";
 import Navbar from "@/components/layout/Navbar";
 import VersionLogTable from "@/components/version-log/VersionLogTable";
 import { useVersionLogs } from "@/contexts/hooks/data-fetching/useVersionLogs";
+import { useUserContext } from "@/contexts/hooks/useUserContext";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useNavigate, useParams } from "react-router-dom";
 import CalendarCard from "../common/CalendarCard";
@@ -34,6 +33,7 @@ export const VersionLogPage = () => {
     (value) => setSearchQuery(value),
     300
   );
+  const { role, loading: roleLoading } = useUserContext();
   // const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -73,29 +73,12 @@ export const VersionLogPage = () => {
         align="flex-start"
         mb={6}
       >
-        <Box>
-          <Flex
-            align="flex-end"
-            gap={2}
-          >
-            <Heading size="lg">Version Log</Heading>
-            <Badge
-              colorScheme="yellow"
-              borderRadius="full"
-              px={2}
-              py={0.5}
-              fontSize="xs"
-            >
-              Master
-            </Badge>
-          </Flex>
-          <Text
-            color="gray.500"
-            mt={1}
-          >
-            View action history over given day
-          </Text>
-        </Box>
+        <PageHeader
+          title="Version Log"
+          subheading="View action history over given day"
+          role={role}
+          isLoading={roleLoading}
+        />
         <Box
           flex="1"
           display="flex"
@@ -106,7 +89,6 @@ export const VersionLogPage = () => {
             onChange={handleDateChange}
           />
         </Box>
-
       </Flex>
 
       <Stack gap={2}>
