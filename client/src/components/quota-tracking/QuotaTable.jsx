@@ -195,11 +195,15 @@ const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
 
                 {/* Notes */}
                 <Td>
-                  <TextPopup
-                    text={row.notes}
-                    truncateAt={200}
-                    alwaysShowUp={true}
-                  ></TextPopup>
+                  {row.notes && row.notes.length > 200 ? (
+                    <TextPopup
+                      text={row.notes}
+                      alwaysShowPopup={true}
+                      truncateAt={200}
+                    />
+                  ) : (
+                    <Text>{row.notes}</Text>
+                  )}
                 </Td>
               </Tr>
             ))
