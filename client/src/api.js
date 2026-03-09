@@ -38,6 +38,10 @@ export const useApi = () => {
       update: async (id, data) => {
         const res = await backend.put(`/directoryCategories/${id}`, data);
         return res.data
+      },
+      delete: async (id) => {
+        const res = await backend.delete(`/directoryCategories/${id}`);
+        return res.data;
       }
     },
     tags: {

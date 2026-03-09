@@ -766,7 +766,7 @@ export default function QuotaDrawer({
 
   useEffect(() => {
     // Auto-calculate quota based on total hours and apptCalcFactor
-    if (!startTime || !endTime || !apptCalcFactor) return;
+    if (!startTime || !endTime || !apptCalcFactor || quotaID) return;
 
     try {
       const [startHours, startMinutes] = startTime.split(":").map(Number);
@@ -947,7 +947,7 @@ export default function QuotaDrawer({
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton />
-        <DrawerHeader>{currentDrawerTitle}</DrawerHeader>
+        <DrawerHeader borderBottom="1px" borderColor="#E6E6E6">{currentDrawerTitle}</DrawerHeader>
         
         {isLoading ? <SkeletonBody /> :
         <form onSubmit={handleSubmit}>
