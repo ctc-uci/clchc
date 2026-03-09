@@ -14,6 +14,7 @@ import {
 } from "@chakra-ui/react";
 
 import { useTags } from "@/contexts/hooks/data-fetching/useTags";
+import TextPopup from "@/components/common/TextPopup";
 
 const SkeletonHeader = () => {
   return (
@@ -146,8 +147,17 @@ export default function ProviderTable({
         </Wrap>
       );
     }
+    if (cat.inputType === "text") {
+      const text = String(raw);
+    
+      if (text.length > 200) {
+        return <TextPopup text={text} truncateAt={200} />;
+      }
+    
+      return <Text>{text}</Text>;
+    }
 
-    // Default rendering for text/anything else
+    // Default rendering
     return String(raw);
   };
 

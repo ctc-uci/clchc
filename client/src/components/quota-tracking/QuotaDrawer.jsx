@@ -753,7 +753,7 @@ export default function QuotaDrawer({
 
   const {
     data: userData,
-  } = useUserByFirebaseUid(currentUser.uid);
+  } = useUserByFirebaseUid(currentUser?.uid);
   const {
     mutate: createLog,
   } = useCreateLog();
