@@ -13,7 +13,7 @@ import {
   WrapItem,
 } from "@chakra-ui/react";
 
-import { useTagsContext } from "./tags/TagsContext";
+import { useTags } from "@/contexts/hooks/data-fetching/useTags";
 
 const SkeletonHeader = () => {
   return (
@@ -67,7 +67,8 @@ export default function ProviderTable({
   onProviderDoubleClick,
   loading,
 }) {
-  const { tagsMap } = useTagsContext();
+  const { data: tagsData } = useTags();
+  const tagsMap = tagsData?.tagsMap ?? {};
 
   // sort categories by columnOrder
   const sortedCategories = [...providerCategories].sort(

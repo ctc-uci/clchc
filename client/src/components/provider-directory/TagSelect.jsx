@@ -20,11 +20,10 @@ import {
 } from "@chakra-ui/react";
 
 import { useApi } from "@/api.js";
+import { useTags } from "@/contexts/hooks/data-fetching/useTags";
 import { errorToString } from "@/utils/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { ChevronDown } from "lucide-react";
-
-import { useTagsContext } from "./tags/TagsContext";
 
 const TagSelect = ({
   categoryId,
@@ -34,7 +33,8 @@ const TagSelect = ({
   readOnly,
 }) => {
   const queryClient = useQueryClient();
-  const { tagsMap, refetchTags } = useTagsContext();
+  const { data: tagsData, refetch: refetchTags } = useTags();
+  const tagsMap = tagsData?.tagsMap ?? {};
   const { tags: tagsApi } = useApi();
   const [newTagValue, setNewTagValue] = useState("");
   const [creating, setCreating] = useState(false);

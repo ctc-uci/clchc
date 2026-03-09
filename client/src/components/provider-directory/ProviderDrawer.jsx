@@ -20,14 +20,13 @@ import {
   Text,
 } from "@chakra-ui/react";
 
+import TagSelect from "@/components/provider-directory/TagSelect";
 import {
   useCreateProvider,
   useDeleteProvider,
   useUpdateProvider,
 } from "@/contexts/hooks/data-fetching/useProviders";
 import { useTags } from "@/contexts/hooks/data-fetching/useTags";
-
-import TagSelect from "./TagSelect";
 
 const SkeletonBody = () => {
   return (
@@ -195,24 +194,6 @@ const ProviderFormFields = ({
                 )}
 
                 {cat.inputType === "tag" && (
-                  // <Select
-                  //   placeholder="Select"
-                  //   value={formValues[cat.id] || ""}
-                  //   onChange={(e) => onChange(cat.id, e.target.value)}
-                  //   isDisabled={readOnly}
-                  //   bg={readOnly ? "gray.50" : "white"}
-                  // >
-                  //   {tags
-                  //     .filter((tag) => tag.categoryId === cat.id)
-                  //     .map((tag) => (
-                  //       <option
-                  //         key={tag.id}
-                  //         value={tag.tagValue}
-                  //       >
-                  //         {tag.tagValue}
-                  //       </option>
-                  //     ))}
-                  // </Select>
                   <TagSelect
                     key={cat.id}
                     categoryId={cat.id}
@@ -256,7 +237,8 @@ const ProviderDrawer = ({
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [formValues, setFormValues] = useState({});
   const [errors, setErrors] = useState({});
-  const { data: tags = [], isLoading: loadingTags } = useTags();
+  const { data: tagsData, isLoading: loadingTags } = useTags();
+  const tags = tagsData?.tags ?? [];
   const { mutate: createProvider } = useCreateProvider();
   const { mutate: updateProvider } = useUpdateProvider();
   const { mutate: deleteProvider } = useDeleteProvider();
