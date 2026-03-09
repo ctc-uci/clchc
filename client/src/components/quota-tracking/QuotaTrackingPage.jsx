@@ -45,23 +45,23 @@ const SkeletonCard = () => {
       transition="box-shadow 0.2s ease"
     >
       <CardHeader pb={1}>
-        <Text
+        <Box
           fontSize="sm"
           color="gray.500"
           fontWeight="medium"
         >
           <Skeleton height="10px" />
-        </Text>
+        </Box>
       </CardHeader>
 
       <CardBody py={2}>
-        <Text
+        <Box
           fontSize="3xl"
           fontWeight="semibold"
           color="gray.900"
         >
           <Skeleton height="20px" />
-        </Text>
+        </Box>
       </CardBody>
     </Card>
   );

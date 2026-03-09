@@ -766,7 +766,7 @@ export default function QuotaDrawer({
 
   useEffect(() => {
     // Auto-calculate quota based on total hours and apptCalcFactor
-    if (!startTime || !endTime || !apptCalcFactor || !quotaID) return;
+    if (!startTime || !endTime || !apptCalcFactor || quotaID) return;
 
     try {
       const [startHours, startMinutes] = startTime.split(":").map(Number);

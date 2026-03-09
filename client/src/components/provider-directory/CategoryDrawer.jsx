@@ -2,12 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 
 import { DeleteIcon, HamburgerIcon } from "@chakra-ui/icons";
 import {
-  AlertDialog,
-  AlertDialogBody,
-  AlertDialogContent,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogOverlay,
   Box,
   Button,
   Drawer,
@@ -26,7 +20,6 @@ import {
   RadioGroup,
   Skeleton,
   Stack,
-  useDisclosure,
   useToast,
 } from "@chakra-ui/react";
 
@@ -124,17 +117,18 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
   const [deletedIds, setDeletedIds] = useState([]);
   const toast = useToast();
   const formStackRef = useRef(null);
-  const {
-    isOpen: isDiscardAlertOpen,
-    onOpen: onDiscardAlertOpen,
-    onClose: onDiscardAlertClose,
-  } = useDisclosure();
-  const cancelRef = useRef();
-  const pendingCloseRef = useRef(false);
   const { data: serverCategories = [], isLoading } = useDirectoryCategories();
   const { mutateAsync: createCategory } = useCreateCategory();
   const { mutateAsync: deleteCategory } = useDeleteCategory();
   const { mutateAsync: updateCategory } = useUpdateCategory();
+
+  const resetLocalState = () => {
+    setName("");
+    setInputType("");
+    setIsRequired(false);
+    setShowForm(false);
+    setDeletedIds([]);
+  };
 
   useEffect(() => {
     if (!isOpen) return;
@@ -146,6 +140,7 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
         );
 
         setCategories(sorted);
+        resetLocalState();
       } catch (err) {
         console.error("Failed to fetch categories", err);
       }
@@ -164,21 +159,9 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
     }
   }, [showForm]);
 
-  // alert pop ups for discarding unsaved changes
   const handleDrawerClose = () => {
-    const hasTempCategories = categories.some((cat) =>
-      String(cat.id).startsWith("temp-")
-    );
-    if (hasTempCategories) {
-      pendingCloseRef.current = true;
-      onDiscardAlertOpen();
-    } else {
-      onClose();
-    }
-  };
-
-  const handleConfirmDiscard = () => {
-    onDiscardAlertClose();
+    setCategories([]);
+    resetLocalState();
     onClose();
   };
 
@@ -223,22 +206,35 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
 
   const handleSubmit = async () => {
     try {
-      for (const id of deletedIds) {
-        if (!String(id).startsWith("temp-")) {
-          await deleteCategory(id);
-        }
+      const idsToDelete = deletedIds.filter(
+        (id) => !String(id).startsWith("temp-")
+      );
+      const idsToDeleteSet = new Set(idsToDelete);
+
+      for (const id of idsToDelete) {
+        await deleteCategory(id);
       }
 
-      const existingCategories = categories.filter(
+      const categoriesToPersist = categories.filter(
+        (cat) => !idsToDeleteSet.has(cat.id)
+      );
+      const orderById = new Map(
+        categoriesToPersist.map((cat, index) => [cat.id, index])
+      );
+
+      const existingCategories = categoriesToPersist.filter(
         (cat) => !String(cat.id).startsWith("temp-")
       );
-      const newCategories = categories.filter((cat) =>
+      const newCategories = categoriesToPersist.filter((cat) =>
         String(cat.id).startsWith("temp-")
       );
 
       await Promise.all(
-        existingCategories.map((cat, index) =>
-          updateCategory({ id: cat.id, categoryData: { columnOrder: index } })
+        existingCategories.map((cat) =>
+          updateCategory({
+            id: cat.id,
+            categoryData: { columnOrder: orderById.get(cat.id) },
+          })
         )
       );
 
@@ -248,17 +244,10 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
             name: cat.name,
             inputType: cat.inputType,
             isRequired: cat.isRequired,
-            columnOrder: cat.columnOrder,
+            columnOrder: orderById.get(cat.id),
           })
         )
       );
-
-      onClose();
-      setDeletedIds([]);
-      setName("");
-      setInputType("");
-      setIsRequired(false);
-      setShowForm(false);
 
       // feedback for successfully saving categories
       toast({
@@ -270,15 +259,14 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
         isClosable: true,
       });
 
+      setCategories([]);
+      resetLocalState();
+      onClose();
+
       if (typeof onSaved === "function") {
         onSaved();
       }
     } catch (err) {
-      // feedback for error + deleting the bad category
-      setCategories((prevCategories) =>
-        prevCategories.filter((cat) => !String(cat.id).startsWith("temp-"))
-      );
-
       const errorMessage =
         err?.response?.data || err.message || "Failed to save changes";
       console.error(
@@ -299,8 +287,14 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
 
   const handleMarkForDelete = (id) => {
     setCategories((prev) => prev.filter((cat) => cat.id !== id));
-    setDeletedIds((prev) => [...prev, id]);
-  }
+    setDeletedIds((prev) => {
+      if (String(id).startsWith("temp-") || prev.includes(id)) {
+        return prev;
+      }
+
+      return [...prev, id];
+    });
+  };
   return (
     <>
       <Drawer
@@ -421,42 +415,6 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
           )}
         </DrawerContent>
       </Drawer>
-
-      <AlertDialog
-        isOpen={isDiscardAlertOpen}
-        leastDestructiveRef={cancelRef}
-        onClose={onDiscardAlertClose}
-      >
-        <AlertDialogOverlay>
-          <AlertDialogContent>
-            <AlertDialogHeader
-              fontSize="lg"
-              fontWeight="bold"
-            >
-              Discard Changes
-            </AlertDialogHeader>
-            <AlertDialogBody>
-              You have unsaved categories. Are you sure you want to discard
-              these changes?
-            </AlertDialogBody>
-            <AlertDialogFooter>
-              <Button
-                ref={cancelRef}
-                onClick={onDiscardAlertClose}
-              >
-                Keep Changes
-              </Button>
-              <Button
-                colorScheme="red"
-                onClick={handleConfirmDiscard}
-                ml={3}
-              >
-                Discard
-              </Button>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialogOverlay>
-      </AlertDialog>
     </>
   );
 };
