@@ -2,12 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 
 import { DeleteIcon, HamburgerIcon } from "@chakra-ui/icons";
 import {
-  AlertDialog,
-  AlertDialogBody,
-  AlertDialogContent,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogOverlay,
   Box,
   Button,
   Drawer,
@@ -26,12 +20,12 @@ import {
   RadioGroup,
   Skeleton,
   Stack,
-  useDisclosure,
   useToast,
 } from "@chakra-ui/react";
 
 import {
   useCreateCategory,
+  useDeleteCategory,
   useDirectoryCategories,
   useUpdateCategory,
 } from "@/contexts/hooks/data-fetching/useDirectoryCategories";
@@ -62,7 +56,7 @@ const SkeletonBody = () => {
   );
 };
 
-function SortableCategory({ category }) {
+function SortableCategory({ category, onDelete }) {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: category.id });
 
@@ -103,12 +97,12 @@ function SortableCategory({ category }) {
         {category.name}
       </Box>
 
-      {/* Trash Button (future functionality) */}
       <IconButton
         icon={<DeleteIcon />}
         aria-label="Delete category"
         variant="ghost"
         mr={2}
+        onClick={() => onDelete(category.id)}
       />
     </Flex>
   );
@@ -120,18 +114,21 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
   const [isRequired, setIsRequired] = useState(false);
   const [categories, setCategories] = useState([]);
   const [showForm, setShowForm] = useState(false);
+  const [deletedIds, setDeletedIds] = useState([]);
   const toast = useToast();
   const formStackRef = useRef(null);
-  const {
-    isOpen: isDiscardAlertOpen,
-    onOpen: onDiscardAlertOpen,
-    onClose: onDiscardAlertClose,
-  } = useDisclosure();
-  const cancelRef = useRef();
-  const pendingCloseRef = useRef(false);
   const { data: serverCategories = [], isLoading } = useDirectoryCategories();
   const { mutateAsync: createCategory } = useCreateCategory();
+  const { mutateAsync: deleteCategory } = useDeleteCategory();
   const { mutateAsync: updateCategory } = useUpdateCategory();
+
+  const resetLocalState = () => {
+    setName("");
+    setInputType("");
+    setIsRequired(false);
+    setShowForm(false);
+    setDeletedIds([]);
+  };
 
   useEffect(() => {
     if (!isOpen) return;
@@ -143,6 +140,7 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
         );
 
         setCategories(sorted);
+        resetLocalState();
       } catch (err) {
         console.error("Failed to fetch categories", err);
       }
@@ -161,21 +159,9 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
     }
   }, [showForm]);
 
-  // alert pop ups for discarding unsaved changes
   const handleDrawerClose = () => {
-    const hasTempCategories = categories.some((cat) =>
-      String(cat.id).startsWith("temp-")
-    );
-    if (hasTempCategories) {
-      pendingCloseRef.current = true;
-      onDiscardAlertOpen();
-    } else {
-      onClose();
-    }
-  };
-
-  const handleConfirmDiscard = () => {
-    onDiscardAlertClose();
+    setCategories([]);
+    resetLocalState();
     onClose();
   };
 
@@ -220,38 +206,48 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
 
   const handleSubmit = async () => {
     try {
-      // Separate existing and new categories
-      const existingCategories = categories.filter(
+      const idsToDelete = deletedIds.filter(
+        (id) => !String(id).startsWith("temp-")
+      );
+      const idsToDeleteSet = new Set(idsToDelete);
+
+      for (const id of idsToDelete) {
+        await deleteCategory(id);
+      }
+
+      const categoriesToPersist = categories.filter(
+        (cat) => !idsToDeleteSet.has(cat.id)
+      );
+      const orderById = new Map(
+        categoriesToPersist.map((cat, index) => [cat.id, index])
+      );
+
+      const existingCategories = categoriesToPersist.filter(
         (cat) => !String(cat.id).startsWith("temp-")
       );
-      const newCategories = categories.filter((cat) =>
+      const newCategories = categoriesToPersist.filter((cat) =>
         String(cat.id).startsWith("temp-")
       );
 
-      // Update existing categories with new column order
       await Promise.all(
-        existingCategories.map((cat, index) =>
-          updateCategory({ id: cat.id, categoryData: { columnOrder: index } })
+        existingCategories.map((cat) =>
+          updateCategory({
+            id: cat.id,
+            categoryData: { columnOrder: orderById.get(cat.id) },
+          })
         )
       );
 
-      // Post new categories
       await Promise.all(
         newCategories.map((cat) =>
           createCategory({
             name: cat.name,
             inputType: cat.inputType,
             isRequired: cat.isRequired,
-            columnOrder: cat.columnOrder,
+            columnOrder: orderById.get(cat.id),
           })
         )
       );
-
-      onClose();
-      setName("");
-      setInputType("");
-      setIsRequired(false);
-      setShowForm(false);
 
       // feedback for successfully saving categories
       toast({
@@ -263,15 +259,14 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
         isClosable: true,
       });
 
+      setCategories([]);
+      resetLocalState();
+      onClose();
+
       if (typeof onSaved === "function") {
         onSaved();
       }
     } catch (err) {
-      // feedback for error + deleting the bad category
-      setCategories((prevCategories) =>
-        prevCategories.filter((cat) => !String(cat.id).startsWith("temp-"))
-      );
-
       const errorMessage =
         err?.response?.data || err.message || "Failed to save changes";
       console.error(
@@ -290,6 +285,16 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
     }
   };
 
+  const handleMarkForDelete = (id) => {
+    setCategories((prev) => prev.filter((cat) => cat.id !== id));
+    setDeletedIds((prev) => {
+      if (String(id).startsWith("temp-") || prev.includes(id)) {
+        return prev;
+      }
+
+      return [...prev, id];
+    });
+  };
   return (
     <>
       <Drawer
@@ -319,6 +324,7 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
                       <SortableCategory
                         key={cat.id}
                         category={cat}
+                        onDelete={handleMarkForDelete}
                       />
                     ))}
                   </SortableContext>
@@ -409,42 +415,6 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
           )}
         </DrawerContent>
       </Drawer>
-
-      <AlertDialog
-        isOpen={isDiscardAlertOpen}
-        leastDestructiveRef={cancelRef}
-        onClose={onDiscardAlertClose}
-      >
-        <AlertDialogOverlay>
-          <AlertDialogContent>
-            <AlertDialogHeader
-              fontSize="lg"
-              fontWeight="bold"
-            >
-              Discard Changes
-            </AlertDialogHeader>
-            <AlertDialogBody>
-              You have unsaved categories. Are you sure you want to discard
-              these changes?
-            </AlertDialogBody>
-            <AlertDialogFooter>
-              <Button
-                ref={cancelRef}
-                onClick={onDiscardAlertClose}
-              >
-                Keep Changes
-              </Button>
-              <Button
-                colorScheme="red"
-                onClick={handleConfirmDiscard}
-                ml={3}
-              >
-                Discard
-              </Button>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialogOverlay>
-      </AlertDialog>
     </>
   );
 };

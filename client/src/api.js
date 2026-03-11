@@ -38,11 +38,23 @@ export const useApi = () => {
       update: async (id, data) => {
         const res = await backend.put(`/directoryCategories/${id}`, data);
         return res.data
+      },
+      delete: async (id) => {
+        const res = await backend.delete(`/directoryCategories/${id}`);
+        return res.data;
       }
     },
     tags: {
       getAll: async () => {
         const res = await backend.get("/tags");
+        return res.data;
+      },
+      create: async (data) => {
+        const res = await backend.post("/tags", data);
+        return res.data;
+      },
+      delete: async (id) => {
+        const res = await backend.delete(`/tags/${id}`);
         return res.data;
       },
     },
@@ -106,11 +118,5 @@ export const useApi = () => {
         return res.data;
       }
     },
-    tags: {
-      getAll: async () => {
-        const res = await backend.get("/tags");
-        return res.data;
-      }
-    }
   };
 };

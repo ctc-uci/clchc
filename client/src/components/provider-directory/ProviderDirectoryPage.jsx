@@ -1,28 +1,31 @@
 import { useState } from "react";
+
 import { HamburgerIcon, SearchIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
   Flex,
-  Heading,
   Input,
   InputGroup,
   InputLeftElement,
-  Tag,
-  Text,
   Menu,
   MenuButton,
   MenuItem,
   MenuList,
+  Tag,
+  Text,
   useDisclosure,
 } from "@chakra-ui/react";
+
+import { PageHeader } from "@/components/common/PageHeader";
 import { Navbar } from "@/components/layout/Navbar";
 import CategoryDrawer from "@/components/provider-directory/CategoryDrawer";
 import ProviderDrawer from "@/components/provider-directory/ProviderDrawer";
 import ProviderTable from "@/components/provider-directory/ProviderTable";
-import { useUserContext } from "@/contexts/hooks/useUserContext";
-import { useProviders } from "@/contexts/hooks/data-fetching/useProviders";
 import { useDirectoryCategories } from "@/contexts/hooks/data-fetching/useDirectoryCategories";
+import { useProviders } from "@/contexts/hooks/data-fetching/useProviders";
+import { useTags } from "@/contexts/hooks/data-fetching/useTags";
+import { useUserContext } from "@/contexts/hooks/useUserContext";
 import { useDebounce } from "@/hooks/useDebounce";
 
 export const ProviderDirectoryPage = () => {
@@ -32,10 +35,12 @@ export const ProviderDirectoryPage = () => {
   const [highlightedProviderId, setHighlightedProviderId] = useState(null);
 
   const debouncedProviderQuery = useDebounce(
-  (value) => setProviderQuery(value),
-  300
-);
-  const { role } = useUserContext();
+    (value) => setProviderQuery(value),
+    300
+  );
+  const { role, loading: roleLoading } = useUserContext();
+
+  const { refetch: refetchTags } = useTags();
 
   const {
     isOpen: isCategoryDrawerOpen,
@@ -52,15 +57,15 @@ export const ProviderDirectoryPage = () => {
   const {
     data: providers = [],
     isLoading,
-    refetch: refetchProviders
+    refetch: refetchProviders,
   } = useProviders({
-    query: providerQuery
+    query: providerQuery,
   });
 
   const {
     data: providerCategories = [],
     isLoading: loadingCategories,
-    refetch: refetchCategories
+    refetch: refetchCategories,
   } = useDirectoryCategories();
 
   const handleChange = (e) => {
@@ -81,6 +86,7 @@ export const ProviderDirectoryPage = () => {
 
   const handleDrawerSaved = () => {
     refetchProviders();
+    refetchTags();
   };
 
   return (
@@ -89,34 +95,14 @@ export const ProviderDirectoryPage = () => {
       maxW="1200px"
       mx="auto"
     >
-      <Flex
-        alignItems="center"
-        gap={3}
-        mb={5}
-      >
-        <Heading
-          size="2xl"
-          fontWeight="medium"
-        >
-          Provider Directory
-        </Heading>
-        <Tag
-          bg="yellow.300"
-          color="black"
-          fontSize="lg"
-        >
-          {role}
-        </Tag>
-      </Flex>
-      <Text
-        size="lg"
-        fontWeight="normal"
-        color="#00000080"
-        mb={5}
-      >
-        {" "}
-        All current active providers in network
-      </Text>
+      <Box mb={5}>
+        <PageHeader
+          title="Provider Directory"
+          subheading="All current active providers in network"
+          role={role}
+          isLoading={roleLoading}
+        />
+      </Box>
 
       {role === "ccm" || role === "master" ? (
         <Flex
@@ -151,7 +137,9 @@ export const ProviderDirectoryPage = () => {
               <MenuList>
                 <MenuItem isDisabled>Tags</MenuItem>
                 <MenuItem onClick={onCategoryDrawerOpen}>Categories</MenuItem>
-                <MenuItem onClick={openCreateProviderDrawer}>Providers</MenuItem>
+                <MenuItem onClick={openCreateProviderDrawer}>
+                  Providers
+                </MenuItem>
               </MenuList>
             </Menu>
           </Flex>
@@ -172,7 +160,9 @@ export const ProviderDirectoryPage = () => {
                 : undefined
             }
             onProviderDoubleClick={
-              role === "ccm" || role === "master" ? openEditProviderDrawer : undefined
+              role === "ccm" || role === "master"
+                ? openEditProviderDrawer
+                : undefined
             }
             loading={isLoading || loadingCategories}
           />

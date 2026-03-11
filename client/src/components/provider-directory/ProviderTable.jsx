@@ -13,6 +13,9 @@ import {
   WrapItem,
 } from "@chakra-ui/react";
 
+import { useTags } from "@/contexts/hooks/data-fetching/useTags";
+import TextPopup from "@/components/common/TextPopup";
+
 const SkeletonHeader = () => {
   return (
     <Thead>
@@ -65,8 +68,10 @@ export default function ProviderTable({
   onProviderDoubleClick,
   loading,
 }) {
-  // sort categories by columnOrder
+  const { data: tagsData } = useTags();
+  const tagsMap = tagsData?.tagsMap ?? {};
 
+  // sort categories by columnOrder
   const sortedCategories = [...providerCategories].sort(
     (a, b) => a.columnOrder - b.columnOrder
   );
@@ -78,7 +83,6 @@ export default function ProviderTable({
     const columns = sortedCategories.map((cat) => (
       <Th
         key={cat.name}
-        fontSize="sm"
         fontWeight="bold"
         color="#2D3748"
       >
@@ -88,8 +92,11 @@ export default function ProviderTable({
 
     return (
       <Thead
-        bg="#00000014"
+        bg="#EBEBEB"
         h="60px"
+        position="sticky"
+        top={0}
+        zIndex={1}
       >
         <Tr>{columns}</Tr>
       </Thead>
@@ -123,7 +130,7 @@ export default function ProviderTable({
     if (cat.inputType === "tag") {
       // Support either array or comma-separated string
       const tags = Array.isArray(raw)
-        ? raw
+        ? raw.filter((t) => t !== null && t !== "")
         : String(raw)
             .split(",")
             .map((t) => t.trim())
@@ -133,14 +140,24 @@ export default function ProviderTable({
         <Wrap>
           {tags.map((t) => (
             <WrapItem key={t}>
-              <Tag>{t}</Tag>
+              <Tag>{tagsMap[t]?.tagValue || t}</Tag>
+              {/* TODO: @xgraceyan Remove safeguard when we transition all the tags to IDs. */}
             </WrapItem>
           ))}
         </Wrap>
       );
     }
+    if (cat.inputType === "text") {
+      const text = String(raw);
+    
+      if (text.length > 200) {
+        return <TextPopup text={text} truncateAt={200} />;
+      }
+    
+      return <Text>{text}</Text>;
+    }
 
-    // Default rendering for text/anything else
+    // Default rendering
     return String(raw);
   };
 
@@ -194,6 +211,8 @@ export default function ProviderTable({
       border="1px solid"
       borderColor="gray.200"
       borderRadius="lg"
+      maxHeight="60vh"
+      overflowY = "auto"
     >
       <Table>
         {/**Subcomps to simplify structure */}
