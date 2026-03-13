@@ -84,6 +84,15 @@ const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
     onClose: onDrawerClose,
   } = useDisclosure();
 
+  function formatHoursRange(startTime, endTime) {
+  const fmt = (t) => {
+    const [h, m] = t.split(":").map(Number);
+    const period = h >= 12 ? "pm" : "am";
+    const hour = h % 12 === 0 ? 12 : h % 12;
+    return `${hour}:${m.toString().padStart(2, "0")}${period}`;
+  };
+  return `${fmt(startTime)} to ${fmt(endTime)}`;
+}
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -114,11 +123,13 @@ const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
         variant="simple"
         sx={{ tableLayout: "fixed" }}
       >
-        <Thead bg="#EBEBEB"
-        position="sticky"
-        top={0}
-        h="60px"
-        zIndex={1}>
+        <Thead
+          bg="#EBEBEB"
+          position="sticky"
+          top={0}
+          h="60px"
+          zIndex={1}
+        >
           <Tr>
             <Th width="20%">Providers</Th>
             <Th width="20%">Location</Th>
@@ -156,12 +167,14 @@ const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
                 <Td>
                   <Box>
                     <Text fontWeight="medium">{row.providerName}</Text>
-                    <Text
-                      fontSize="sm"
-                      color="gray.500"
-                    >
-                      {row.hours} hours
-                    </Text>
+                    {row.startTime && row.endTime && (
+                      <Text
+                        fontSize="sm"
+                        color="gray.500"
+                      >
+                        {formatHoursRange(row.startTime, row.endTime)}
+                      </Text>
+                    )}
                   </Box>
                 </Td>
 
