@@ -1,11 +1,9 @@
 import React, { useState } from "react";
 
 import {
-  Box,
   Button,
   Flex,
   FormControl,
-  FormErrorMessage,
   Grid,
   HStack,
   Input,
@@ -13,20 +11,26 @@ import {
 } from "@chakra-ui/react";
 
 import { useAuthContext } from "@/contexts/hooks/useAuthContext";
-import { useBackendContext } from "@/contexts/hooks/useBackendContext";
+import {
+  useDeleteUser,
+  useUserByFirebaseUid,
+} from "@/contexts/hooks/data-fetching/useUsers";
 import { useNavigate } from "react-router-dom";
 
 export default function DeleteAccount() {
-  const { backend } = useBackendContext();
   const { currentUser } = useAuthContext();
   const navigate = useNavigate();
   const [input, setInput] = useState("");
+  const { data: userData } = useUserByFirebaseUid(currentUser?.uid);
+  const { mutateAsync: deleteUser } = useDeleteUser();
+  const dbUser = userData?.[0] ?? null;
 
   const handleDelete = async () => {
     try {
-      if (input === "DELETE") {
-        await backend.delete(`/users/firebase/${currentUser.uid}`);
+      if (input !== "DELETE" || !dbUser?.id) {
+        return;
       }
+      await deleteUser(dbUser.id);
       navigate("/login");
     } catch (e) {
       alert("Incorrect.");

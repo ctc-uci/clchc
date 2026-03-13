@@ -12,13 +12,19 @@ import {
 } from "@chakra-ui/react";
 
 import { useAuthContext } from "@/contexts/hooks/useAuthContext";
-import { useBackendContext } from "@/contexts/hooks/useBackendContext";
-import { useUserContext } from "@/contexts/hooks/useUserContext";
+import {
+  useUpdateUser,
+  useUserByFirebaseUid,
+} from "@/contexts/hooks/data-fetching/useUsers";
 
 export default function QuotaCalcFactor() {
-  const { backend } = useBackendContext();
   const { currentUser } = useAuthContext();
-  const { dbUser, refetch } = useUserContext();
+  const {
+    data: userData,
+    refetch,
+  } = useUserByFirebaseUid(currentUser?.uid);
+  const { mutateAsync: updateUser } = useUpdateUser();
+  const dbUser = userData?.[0] ?? null;
 
   const [factor, setFactor] = useState(0);
 
@@ -27,9 +33,12 @@ export default function QuotaCalcFactor() {
   }, [dbUser]);
 
   const updateQuota = async (newQuota) => {
-    if (!currentUser?.uid) return;
-    await backend.put(`/users/firebase/${currentUser.uid}`, {
-      apptCalcFactor: newQuota,
+    if (!dbUser?.id) return;
+    await updateUser({
+      id: dbUser.id,
+      data: {
+        apptCalcFactor: newQuota,
+      },
     });
     await refetch();
   };
