@@ -24,6 +24,7 @@ export const VersionLogPage = () => {
   // const { backend } = useBackendContext();
   const navigate = useNavigate();
   const { dateParam } = useParams();
+  const [inputValue, setInputValue] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const today = new Date().toLocaleDateString("en-CA");
   const [selectedDate, setSelectedDate] = useState(
@@ -45,6 +46,8 @@ export const VersionLogPage = () => {
 
   useEffect(() => {
     sessionStorage.setItem("logDate", selectedDate);
+    setSearchQuery("");
+    setInputValue("");
   }, [selectedDate]);
 
   const { data: logs = [], isLoading } = useVersionLogs({
@@ -54,6 +57,7 @@ export const VersionLogPage = () => {
 
   // handleChange
   const handleChange = (e) => {
+    setInputValue(e.target.value);
     debouncedSearchQuery(e.target.value);
   };
 
@@ -99,6 +103,7 @@ export const VersionLogPage = () => {
           <Input
             placeholder="Search Version Log"
             borderRadius="md"
+            value={inputValue}  
             onChange={handleChange}
           />
         </InputGroup>
