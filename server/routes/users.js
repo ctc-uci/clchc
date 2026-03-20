@@ -1,7 +1,7 @@
 import { keysToCamel } from "@/common/utils";
 import { admin } from "@/config/firebase";
 import { db } from "@/db/db-pgp"; // TODO: replace this db with
-import { verifyRole } from "@/middleware";
+import { verifyToken, verifyRole } from "@/middleware";
 import { notifyCcmNewUserRequest, notifyApprovedNewUser } from "@/utils/emailService";
 import { Router } from "express";
 
@@ -56,7 +56,7 @@ usersRouter.post("/", async (req, res) => {
 });
 
 // Get all users w/ optional status filter
-usersRouter.get("/", async (req, res) => {
+usersRouter.get("/", verifyToken, verifyRole("ccm"), async (req, res) => {
   try {
     const { status, user } = req.query;
 
@@ -104,7 +104,7 @@ usersRouter.get("/", async (req, res) => {
 });
 
 // Get statistics of all users
-usersRouter.get("/stats", async (req, res) => {
+usersRouter.get("/stats", verifyToken, verifyRole("ccm"), async (req, res) => {
   try {
     const [roleCounts, totalCount] = await db.multi(`
       SELECT role, COUNT(*)::int AS count
@@ -140,7 +140,7 @@ usersRouter.get("/stats", async (req, res) => {
 });
 
 // Get user by ID
-usersRouter.get("/:id", async (req, res) => {
+usersRouter.get("/:id", verifyToken, verifyRole("ccm"), async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -153,7 +153,7 @@ usersRouter.get("/:id", async (req, res) => {
 });
 
 // Get a user by Firebase ID
-usersRouter.get("/firebase/:firebaseUid", async (req, res) => {
+usersRouter.get("/firebase/:firebaseUid", verifyToken, async (req, res) => {
   try {
     const { firebaseUid } = req.params;
 
@@ -184,7 +184,7 @@ usersRouter.get("/firebase/:firebaseUid", async (req, res) => {
 });
 
 // Delete a user by ID, both in Firebase and NPO DB
-usersRouter.delete("/:id", async (req, res) => {
+usersRouter.delete("/:id", verifyToken, verifyRole("ccm"), async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -213,7 +213,7 @@ usersRouter.delete("/:id", async (req, res) => {
 });
 
 // Delete a user by Firebase ID, both in Firebase and NPO DB
-usersRouter.delete("/firebase/:firebaseUid", async (req, res) => {
+usersRouter.delete("/firebase/:firebaseUid", verifyToken, verifyRole("ccm"), async (req, res) => {
   try {
     const { firebaseUid } = req.params;
 

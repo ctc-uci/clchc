@@ -1,12 +1,12 @@
 import { keysToCamel } from "@/common/utils";
 import { db } from "@/db/db-pgp"; // TODO: replace this db with
-import { verifyRole } from "@/middleware";
+import { verifyToken, verifyRole } from "@/middleware";
 import { Router } from "express";
 
 export const quotaRouter = Router();
 
 // create quota
-quotaRouter.post("/", async (req, res) => {
+quotaRouter.post("/", verifyToken, verifyRole("ccs"), async (req, res) => {
   try {
     const {
       providerId,
@@ -43,7 +43,7 @@ quotaRouter.post("/", async (req, res) => {
 });
 
 // get all quotas
-quotaRouter.get("/", async (req, res) => {
+quotaRouter.get("/", verifyToken, verifyRole("viewer"), async (req, res) => {
   try {
     const quotas = await db.query(`SELECT * FROM quota ORDER BY id ASC`);
 
@@ -54,7 +54,7 @@ quotaRouter.get("/", async (req, res) => {
 });
 
 // get quota data with location and provider name
-quotaRouter.get("/details", async (req, res) => {
+quotaRouter.get("/details", verifyToken, verifyRole("viewer"), async (req, res) => {
   try {
     const { provider, date } = req.query;
 
@@ -93,7 +93,7 @@ quotaRouter.get("/details", async (req, res) => {
 });
 
 // get quotas by id
-quotaRouter.get("/:id", async (req, res) => {
+quotaRouter.get("/:id", verifyToken, verifyRole("viewer"), async (req, res) => {
   try {
     const { id } = req.params;
     const quotas = await db.query(`SELECT * FROM quota WHERE id = $1`, [id]);
@@ -109,7 +109,7 @@ quotaRouter.get("/:id", async (req, res) => {
 });
 
 // update quota by id
-quotaRouter.put("/:id", async (req, res) => {
+quotaRouter.put("/:id", verifyToken, verifyRole("ccs"), async (req, res) => {
   try {
     const { id } = req.params;
     const {
@@ -162,7 +162,7 @@ quotaRouter.put("/:id", async (req, res) => {
 });
 
 // delete quota by id
-quotaRouter.delete("/:id", async (req, res) => {
+quotaRouter.delete("/:id", verifyToken, verifyRole("ccm"), async (req, res) => {
   try {
     const { id } = req.params;
     const result = await db.query(
