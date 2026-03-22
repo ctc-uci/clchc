@@ -28,7 +28,7 @@ versionLogRouter.post("/", verifyToken, verifyRole("ccs"), async (req, res) => {
   }
 });
 
-versionLogRouter.get("/", verifyToken, verifyRole("viewer"), async (req, res) => {
+versionLogRouter.get("/", verifyToken, verifyRole("ccm"), async (req, res) => {
   try {
     const versionLogs = await db.query(
       `SELECT * FROM version_log ORDER BY id ASC`
@@ -40,7 +40,7 @@ versionLogRouter.get("/", verifyToken, verifyRole("viewer"), async (req, res) =>
   }
 });
 
-versionLogRouter.get("/details", verifyToken, verifyRole("viewer"), async (req, res) => {
+versionLogRouter.get("/details", verifyToken, verifyRole("ccm"), async (req, res) => {
   const { q, date } = req.query;
 
   try {
@@ -98,7 +98,7 @@ versionLogRouter.get("/details", verifyToken, verifyRole("viewer"), async (req, 
   }
 });
 
-versionLogRouter.get("/:id", verifyToken, verifyRole("viewer"), async (req, res) => {
+versionLogRouter.get("/:id", verifyToken, verifyRole("ccm"), async (req, res) => {
   try {
     const { id } = req.params;
     const versionLog = await db.query(

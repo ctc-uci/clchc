@@ -6,7 +6,7 @@ import { Router } from "express";
 export const quotaRouter = Router();
 
 // create quota
-quotaRouter.post("/", verifyToken, verifyRole("ccs"), async (req, res) => {
+quotaRouter.post("/", verifyToken, verifyRole("ccm"), async (req, res) => {
   try {
     const {
       providerId,

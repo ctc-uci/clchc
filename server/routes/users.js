@@ -213,7 +213,7 @@ usersRouter.delete("/:id", verifyToken, verifyRole("ccm"), async (req, res) => {
 });
 
 // Delete a user by Firebase ID, both in Firebase and NPO DB
-usersRouter.delete("/firebase/:firebaseUid", verifyToken, verifyRole("ccm"), async (req, res) => {
+usersRouter.delete("/firebase/:firebaseUid", verifyToken, verifyRole("viewer"), async (req, res) => {
   try {
     const { firebaseUid } = req.params;
 
