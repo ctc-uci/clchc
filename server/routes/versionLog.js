@@ -50,9 +50,11 @@ versionLogRouter.get("/details", async (req, res) => {
     if (q) {
       values.push(`%${q}%`);
       conditions.push(`
-        "users".first_name ILIKE $${values.length} OR
-        "users".last_name ILIKE $${values.length} OR
-        providers.data->>'Name' ILIKE $${values.length}
+        (
+          "users".first_name ILIKE $${values.length} OR
+          "users".last_name ILIKE $${values.length} OR
+          providers.data->>'Name' ILIKE $${values.length}
+        )
       `);
     }
 
