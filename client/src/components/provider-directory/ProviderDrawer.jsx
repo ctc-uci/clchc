@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
   Alert,
@@ -18,8 +18,10 @@ import {
   Input,
   Skeleton,
   Text,
+  useToast,
 } from "@chakra-ui/react";
 
+import { useApi } from "@/api.js";
 import TagSelect from "@/components/provider-directory/TagSelect";
 import {
   useCreateProvider,
@@ -27,6 +29,8 @@ import {
   useUpdateProvider,
 } from "@/contexts/hooks/data-fetching/useProviders";
 import { useTags } from "@/contexts/hooks/data-fetching/useTags";
+import { errorToString } from "@/utils/utils";
+import { useQueryClient } from "@tanstack/react-query";
 
 const SkeletonBody = () => {
   return (
@@ -42,7 +46,7 @@ const SkeletonBody = () => {
   );
 };
 
-const ConfirmationBanner = ({ mode }) => {
+const ConfirmationBanner = ({ mode, pendingTagDeletes = [] }) => {
   const messages = {
     create:
       "Please confirm you would like to create a new provider with the following information",
@@ -86,6 +90,17 @@ const ConfirmationBanner = ({ mode }) => {
       >
         {messages[mode]}
       </Text>
+      {pendingTagDeletes.length > 0 && (
+        <Text
+          color="red.600"
+          fontSize="sm"
+          mt={2}
+        >
+          {pendingTagDeletes.length} tag(s) will be deleted:{" "}
+          {pendingTagDeletes.map((t) => t.tagValue).join(", ")}. This will
+          remove them from all providers.
+        </Text>
+      )}
     </Alert>
   );
 };
@@ -123,12 +138,22 @@ const ProviderFormFields = ({
   onChange,
   readOnly,
   errors,
+  onRequestDeleteTag,
+  pendingTagDeletes = [],
 }) => {
+  const pendingTagDeleteIds = useMemo(
+    () => new Set(pendingTagDeletes.map((t) => t.id)),
+    [pendingTagDeletes]
+  );
+
   const getTagsByCategory = useCallback(
     (categoryId) => {
-      return tags.filter((tag) => tag.categoryId === categoryId);
+      return tags.filter(
+        (tag) =>
+          tag.categoryId === categoryId && !pendingTagDeleteIds.has(tag.id)
+      );
     },
-    [tags]
+    [tags, pendingTagDeleteIds]
   );
 
   // const fieldProps = (displayLabel) => {
@@ -203,6 +228,7 @@ const ProviderFormFields = ({
                       onChange(cat.id, value);
                     }}
                     readOnly={readOnly}
+                    onRequestDeleteTag={onRequestDeleteTag}
                   />
                 )}
 
@@ -235,13 +261,21 @@ const ProviderDrawer = ({
 }) => {
   const [activeMode, setActiveMode] = useState(mode);
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [pendingTagDeletes, setPendingTagDeletes] = useState([]);
   const [formValues, setFormValues] = useState({});
   const [errors, setErrors] = useState({});
-  const { data: tagsData, isLoading: loadingTags } = useTags();
+  const queryClient = useQueryClient();
+  const toast = useToast();
+  const { tags: tagsApi } = useApi();
+  const {
+    data: tagsData,
+    isLoading: loadingTags,
+    refetch: refetchTags,
+  } = useTags();
   const tags = tagsData?.tags ?? [];
-  const { mutate: createProvider } = useCreateProvider();
-  const { mutate: updateProvider } = useUpdateProvider();
-  const { mutate: deleteProvider } = useDeleteProvider();
+  const { mutateAsync: createProvider } = useCreateProvider();
+  const { mutateAsync: updateProvider } = useUpdateProvider();
+  const { mutateAsync: deleteProvider } = useDeleteProvider();
 
   useEffect(() => {
     if (!isOpen) return;
@@ -279,6 +313,7 @@ const ProviderDrawer = ({
 
     init();
     setShowConfirmation(false);
+    setPendingTagDeletes([]);
   }, [isOpen, mode, provider, categories]);
 
   const handleChange = (categoryId, value) => {
@@ -294,18 +329,18 @@ const ProviderDrawer = ({
     }));
   };
 
-  const buildPayload = () => {
+  const buildPayload = (formState = formValues) => {
     const dataPayload = {};
 
     categories.forEach((cat) => {
-      if (formValues[cat.id] !== undefined) {
-        dataPayload[cat.name] = formValues[cat.id];
+      if (formState[cat.id] !== undefined) {
+        dataPayload[cat.name] = formState[cat.id];
       }
     });
 
     return {
       data: dataPayload,
-      note: formValues.note || "",
+      note: formState.note || "",
     };
   };
 
@@ -320,10 +355,43 @@ const ProviderDrawer = ({
     }
 
     try {
+      // remove staged tag ids from form state so payload doesn't include them
+      const idsToRemove = new Set(pendingTagDeletes.map((t) => t.id));
+      const formValuesAfterTagDeletes = { ...formValues };
+      categories.forEach((cat) => {
+        if (
+          cat.inputType === "tag" &&
+          Array.isArray(formValuesAfterTagDeletes[cat.id])
+        ) {
+          formValuesAfterTagDeletes[cat.id] = formValuesAfterTagDeletes[
+            cat.id
+          ].filter((id) => !idsToRemove.has(id));
+        }
+      });
+
+      // confirmation, delete staged tags
+      for (const { id } of pendingTagDeletes) {
+        await tagsApi.delete(id);
+      }
+      if (pendingTagDeletes.length > 0) {
+        queryClient.invalidateQueries({
+          predicate: (query) =>
+            ["providers", "providersSummary", "tags"].includes(
+              query.queryKey[0]
+            ),
+        });
+        if (typeof refetchTags === "function") await refetchTags();
+        setFormValues(formValuesAfterTagDeletes);
+        setPendingTagDeletes([]);
+      }
+
       if (activeMode === "create") {
-        await createProvider(buildPayload());
+        await createProvider(buildPayload(formValuesAfterTagDeletes));
       } else if (activeMode === "edit") {
-        await updateProvider({ id: provider.id, providerData: buildPayload() });
+        await updateProvider({
+          id: provider.id,
+          providerData: buildPayload(formValuesAfterTagDeletes),
+        });
       } else if (activeMode === "delete") {
         await deleteProvider(provider.id);
       }
@@ -332,15 +400,41 @@ const ProviderDrawer = ({
       if (typeof onSaved === "function") onSaved();
     } catch (err) {
       console.error(`Failed to ${activeMode} provider`, err);
+      toast({
+        title: "Error",
+        description: errorToString(err),
+        status: "error",
+        position: "bottom-right",
+        duration: 5000,
+        isClosable: true,
+      });
     }
   };
 
   const handleClose = () => {
     setShowConfirmation(false);
+    setPendingTagDeletes([]);
     setActiveMode(mode);
     setFormValues({});
     onClose();
   };
+
+  const handleRequestDeleteTag = useCallback((tag) => {
+    setPendingTagDeletes((prev) => {
+      const hasTagId = prev.some((t) => t.id === tag.id);
+      if (hasTagId) return prev;
+      return [...prev, tag];
+    });
+    // optimistic
+    if (tag.categoryId !== undefined && tag.categoryId !== null) {
+      setFormValues((prev) => ({
+        ...prev,
+        [tag.categoryId]: (prev[tag.categoryId] || []).filter(
+          (id) => id !== tag.id
+        ),
+      }));
+    }
+  }, []);
 
   const validateForm = () => {
     const newErrors = {};
@@ -391,7 +485,12 @@ const ProviderDrawer = ({
         ) : (
           <>
             <DrawerBody>
-              {showConfirmation && <ConfirmationBanner mode={activeMode} />}
+              {showConfirmation && (
+                <ConfirmationBanner
+                  mode={activeMode}
+                  pendingTagDeletes={pendingTagDeletes}
+                />
+              )}
 
               <ProviderFormFields
                 categories={categories}
@@ -400,6 +499,8 @@ const ProviderDrawer = ({
                 onChange={handleChange}
                 readOnly={isReadOnly}
                 errors={errors}
+                onRequestDeleteTag={handleRequestDeleteTag}
+                pendingTagDeletes={pendingTagDeletes}
               />
             </DrawerBody>
 
