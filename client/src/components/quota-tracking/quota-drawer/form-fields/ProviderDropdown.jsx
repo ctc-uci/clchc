@@ -9,8 +9,8 @@ import {
 
 import { useProvidersSummary } from "@/contexts/hooks/data-fetching/useProviders";
 
-import { selectStyles } from "./constants";
-import { LockRightElement } from "./shared";
+import { selectStyles } from "../tools//constants";
+import { LockRightElement } from "../tools/shared";
 
 export function ProviderDropdown({ providerId, setProviderId, isLocked }) {
   const { data: providers = [], isLoading: loadingSummary } =

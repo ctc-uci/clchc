@@ -1,6 +1,6 @@
 import { Box, FormControl, FormLabel, Textarea } from "@chakra-ui/react";
 
-import { inputStyles } from "./constants";
+import { inputStyles } from "../tools/constants";
 
 export const DailyNoteInput = ({ note, setNote, isLocked }) => {
   return (

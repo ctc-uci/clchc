@@ -2,7 +2,7 @@ import { Box, Stack, Text } from "@chakra-ui/react";
 
 import { AlertCircle } from "lucide-react";
 
-import { actionMessage } from "./constants";
+import { actionMessage } from "./tools/constants";
 
 export const NotificationBanner = ({ action }) => {
   return (

@@ -7,8 +7,8 @@ import {
   InputGroup,
 } from "@chakra-ui/react";
 
-import { inputStyles } from "./constants";
-import { formatTimeForDisplay } from "./utils";
+import { inputStyles } from "../tools/constants";
+import { formatTimeForDisplay } from "../tools/utils";
 
 export const TimeInput = ({
   startTime,

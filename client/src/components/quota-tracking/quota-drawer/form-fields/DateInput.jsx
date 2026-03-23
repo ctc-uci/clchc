@@ -6,9 +6,9 @@ import {
   InputGroup,
 } from "@chakra-ui/react";
 
-import { inputStyles } from "./constants";
-import { LockRightElement } from "./shared";
-import { formatDateForDisplay } from "./utils";
+import { inputStyles } from "../tools/constants";
+import { LockRightElement } from "../tools/shared";
+import { formatDateForDisplay } from "../tools/utils";
 
 export const DateInput = ({ date, setDate, isLocked }) => {
   return (

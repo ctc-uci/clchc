@@ -6,8 +6,8 @@ import {
   Select,
 } from "@chakra-ui/react";
 
-import { selectStyles, TYPE_OPTIONS } from "./constants";
-import { LockRightElement } from "./shared";
+import { selectStyles, TYPE_OPTIONS } from "../tools/constants";
+import { LockRightElement } from "../tools/shared";
 
 export const TypeInput = ({ type, setType, isLocked }) => {
   return (

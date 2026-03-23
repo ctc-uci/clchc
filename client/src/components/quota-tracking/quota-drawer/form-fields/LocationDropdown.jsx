@@ -9,8 +9,8 @@ import {
 
 import { useLocations } from "@/contexts/hooks/data-fetching/useLocations";
 
-import { selectStyles } from "./constants";
-import { LockRightElement } from "./shared";
+import { selectStyles } from "../tools/constants";
+import { LockRightElement } from "../tools/shared";
 
 export function LocationDropdown({ locationId, setLocationId, isLocked }) {
   const { data: locations = [], isLoading: loadingLocations } = useLocations();

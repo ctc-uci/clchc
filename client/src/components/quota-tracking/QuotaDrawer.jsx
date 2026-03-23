@@ -18,22 +18,25 @@ import {
   useQuotaById,
   useUpdateQuota,
 } from "@/contexts/hooks/data-fetching/useQuotas";
-import { useUserByFirebaseUid } from "@/contexts/hooks/data-fetching/useUsers";
 import { useCreateLog } from "@/contexts/hooks/data-fetching/useVersionLogs";
 import { useAuthContext } from "@/contexts/hooks/useAuthContext";
+import { useUserContext } from "@/contexts/hooks/useUserContext";
 
-import { drawerTitle } from "./quota-drawer/constants";
-import { DailyNoteInput } from "./quota-drawer/DailyNoteInput";
-import { DateInput } from "./quota-drawer/DateInput";
-import { LocationDropdown } from "./quota-drawer/LocationDropdown";
+import { DailyNoteInput } from "./quota-drawer/form-fields/DailyNoteInput";
+import { DateInput } from "./quota-drawer/form-fields/DateInput";
+import { LocationDropdown } from "./quota-drawer/form-fields/LocationDropdown";
+import { ProviderDropdown } from "./quota-drawer/form-fields/ProviderDropdown";
+import { QuotaProgress } from "./quota-drawer/form-fields/QuotaProgress";
+import { TimeInput } from "./quota-drawer/form-fields/TimeInput";
+import { TypeInput } from "./quota-drawer/form-fields/TypeInput";
 import { NotificationBanner } from "./quota-drawer/NotificationBanner";
-import { ProviderDropdown } from "./quota-drawer/ProviderDropdown";
 import { QuotaDrawerFooter } from "./quota-drawer/QuotaDrawerFooter";
-import { QuotaProgress } from "./quota-drawer/QuotaProgress";
-import { SkeletonBody } from "./quota-drawer/shared";
-import { TimeInput } from "./quota-drawer/TimeInput";
-import { TypeInput } from "./quota-drawer/TypeInput";
-import { formatDateForInput, formatTimeForInput } from "./quota-drawer/utils";
+import { drawerTitle } from "./quota-drawer/tools/constants";
+import { SkeletonBody } from "./quota-drawer/tools/shared";
+import {
+  formatDateForInput,
+  formatTimeForInput,
+} from "./quota-drawer/tools/utils";
 
 export default function QuotaDrawer({
   quotaID = 0,
@@ -49,6 +52,7 @@ export default function QuotaDrawer({
   const onClose = externalOnClose || internalDisclosure.onClose;
   const btnRef = React.useRef();
   const { currentUser } = useAuthContext();
+  const userInfo = useUserContext();
   const [quota, setQuota] = useState(0);
   const { data: quotaData, isLoading } = useQuotaById(
     quotaID,
@@ -75,9 +79,10 @@ export default function QuotaDrawer({
   const [action, setAction] = useState("");
   const [originalProgress, setOriginalProgress] = useState(0);
 
-  const { data: userData } = useUserByFirebaseUid(currentUser?.uid);
   const { mutate: createLog } = useCreateLog();
-  const apptCalcFactor = userData?.[0]?.apptCalcFactor ?? null;
+  
+  const apptCalcFactor = userInfo?.dbUser?.apptCalcFactor ?? null;
+
   const currentDrawerTitle = !quotaID
     ? drawerTitle.create
     : isLocked && action === "delete"
@@ -225,7 +230,7 @@ export default function QuotaDrawer({
        use a POST endpoint to the /VersionLog route */
         try {
           await createLog({
-            userId: userData?.[0]?.id ?? null,
+            userId: userInfo?.dbUser?.id ?? null,
             quotaId: quotaID,
             action: progress > originalProgress ? "increment" : "decrement",
             delta: progress - originalProgress,

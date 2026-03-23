@@ -9,7 +9,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 
-import { MAX_INPUT_NUMBER } from "./constants";
+import { MAX_INPUT_NUMBER } from "../tools/constants";
 
 export function QuotaProgress({
   quota,
