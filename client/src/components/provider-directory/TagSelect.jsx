@@ -31,6 +31,7 @@ const TagSelect = ({
   selectedTags,
   onTagsChange,
   readOnly,
+  onRequestDeleteTag,
 }) => {
   const queryClient = useQueryClient();
   const { data: tagsData, refetch: refetchTags } = useTags();
@@ -40,6 +41,7 @@ const TagSelect = ({
   const [creating, setCreating] = useState(false);
   const [deletingMap, setDeletingMap] = useState({});
   const toast = useToast();
+  const useConfirmDelete = typeof onRequestDeleteTag === "function";
 
   const selectedIds = useMemo(() => {
     return Array.isArray(selectedTags) ? selectedTags : [];
@@ -75,8 +77,12 @@ const TagSelect = ({
       // add tag optimistically
       await queryClient.cancelQueries({ queryKey: ["tags"] });
       queryClient.setQueryData(["tags"], (oldData) => {
-        const curr = Array.isArray(oldData) ? oldData : [];
-        return [...curr, optimisticTag];
+        const curr = oldData?.tags ?? (Array.isArray(oldData) ? oldData : []);
+        const next = [...curr, optimisticTag];
+        return {
+          tags: next,
+          tagsMap: Object.fromEntries(next.map((t) => [t.id, t])),
+        };
       });
       onTagsChange([...prevSelectedIds, tempId]);
       setNewTagValue("");
@@ -92,8 +98,12 @@ const TagSelect = ({
       // replace optimistic tag with actual tag
       if (newTagId !== undefined && newTagId !== null) {
         queryClient.setQueryData(["tags"], (oldData) => {
-          const curr = Array.isArray(oldData) ? oldData : [];
-          return curr.map((t) => (t?.id === tempId ? newTag : t));
+          const curr = oldData?.tags ?? (Array.isArray(oldData) ? oldData : []);
+          const next = curr.map((t) => (t?.id === tempId ? newTag : t));
+          return {
+            tags: next,
+            tagsMap: Object.fromEntries(next.map((t) => [t.id, t])),
+          };
         });
 
         const latestSelected = selectedIdsRef.current;
@@ -140,62 +150,74 @@ const TagSelect = ({
     }
   };
 
-  const handleDeleteTag = (tagId) => async (e) => {
+  const handleDeleteTag = (tag) => (e) => {
     e.stopPropagation();
     if (readOnly) return;
-    setDeletingMap((m) => ({ ...m, [tagId]: true }));
 
-    const prevTags = queryClient.getQueryData(["tags"]);
-    const prevSelectedIds = selectedIdsRef.current;
-
-    try {
-      // remove from selection optimistically
-      await queryClient.cancelQueries({ queryKey: ["tags"] });
-      queryClient.setQueryData(["tags"], (old) => {
-        const curr = Array.isArray(old) ? old : [];
-        return curr.filter((t) => t?.id !== tagId);
-      });
-      if (prevSelectedIds.includes(tagId)) {
-        onTagsChange(prevSelectedIds.filter((id) => id !== tagId));
-      }
-
-      await tagsApi.delete(tagId);
-
-      queryClient.invalidateQueries({ queryKey: ["providers"] });
-      queryClient.invalidateQueries({ queryKey: ["providersSummary"] });
-      queryClient.invalidateQueries({ queryKey: ["tags"] });
-
-      if (typeof refetchTags === "function") await refetchTags();
-      toast({
-        title: "Success",
-        description: "Tag successfully deleted!",
-        status: "success",
-        position: "bottom-right",
-        duration: 5000,
-        isClosable: true,
-      });
-    } catch (err) {
-      console.error("Failed to delete tag", err);
-
-      // undo optimistic updates
-      queryClient.setQueryData(["tags"], prevTags);
-      onTagsChange(prevSelectedIds);
-
-      toast({
-        title: "Error",
-        description: errorToString(err),
-        status: "error",
-        position: "bottom-right",
-        duration: 5000,
-        isClosable: true,
-      });
-    } finally {
-      setDeletingMap((m) => {
-        const copy = { ...m };
-        delete copy[tagId];
-        return copy;
-      });
+    if (useConfirmDelete) {
+      onRequestDeleteTag(tag);
+      return;
     }
+
+    (async () => {
+      const tagId = tag?.id ?? tag;
+      setDeletingMap((m) => ({ ...m, [tagId]: true }));
+
+      const prevTags = queryClient.getQueryData(["tags"]);
+      const prevSelectedIds = selectedIdsRef.current;
+
+      try {
+        await queryClient.cancelQueries({ queryKey: ["tags"] });
+        queryClient.setQueryData(["tags"], (old) => {
+          const curr = old?.tags ?? (Array.isArray(old) ? old : []);
+          const next = curr.filter((t) => t?.id !== tagId);
+          return {
+            tags: next,
+            tagsMap: Object.fromEntries(next.map((t) => [t.id, t])),
+          };
+        });
+        if (prevSelectedIds.includes(tagId)) {
+          onTagsChange(prevSelectedIds.filter((id) => id !== tagId));
+        }
+
+        await tagsApi.delete(tagId);
+
+        queryClient.invalidateQueries({
+          predicate: (query) =>
+            ["providers", "providersSummary", "tags"].includes(
+              query.queryKey[0]
+            ),
+        });
+
+        if (typeof refetchTags === "function") await refetchTags();
+        toast({
+          title: "Success",
+          description: "Tag successfully deleted!",
+          status: "success",
+          position: "bottom-right",
+          duration: 5000,
+          isClosable: true,
+        });
+      } catch (err) {
+        console.error("Failed to delete tag", err);
+        queryClient.setQueryData(["tags"], prevTags);
+        onTagsChange(prevSelectedIds);
+        toast({
+          title: "Error",
+          description: errorToString(err),
+          status: "error",
+          position: "bottom-right",
+          duration: 5000,
+          isClosable: true,
+        });
+      } finally {
+        setDeletingMap((m) => {
+          const copy = { ...m };
+          delete copy[tagId];
+          return copy;
+        });
+      }
+    })();
   };
 
   return (
@@ -270,7 +292,7 @@ const TagSelect = ({
                     <Button
                       size="xs"
                       colorScheme="gray"
-                      onClick={handleDeleteTag(tag.id)}
+                      onClick={handleDeleteTag(tag)}
                       isLoading={!!deletingMap[tag.id]}
                     >
                       <DeleteIcon />
