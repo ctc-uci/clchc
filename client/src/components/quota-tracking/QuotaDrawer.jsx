@@ -51,7 +51,6 @@ export default function QuotaDrawer({
   // const onOpen = externalOnOpen || internalDisclosure.onOpen;
   const onClose = externalOnClose || internalDisclosure.onClose;
   const btnRef = React.useRef();
-  const { currentUser } = useAuthContext();
   const userInfo = useUserContext();
   const [quota, setQuota] = useState(0);
   const { data: quotaData, isLoading } = useQuotaById(
