@@ -67,6 +67,26 @@ export const useUpdateUser = () => {
   });
 };
 
+export const useUpdateUserByFirebaseUid = () => {
+  const { users } = useApi();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ uid, data }) => {
+      return users.updateByFirebaseUid(uid, data);
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["users"], exact: false });
+      queryClient.invalidateQueries({ queryKey: ["user"], exact: false });
+
+      if (variables?.uid) {
+        queryClient.invalidateQueries({ queryKey: ["user", variables.uid] });
+      }
+
+    },
+  });
+};
+
 export const useDeleteUser = () => {
   const queryClient = useQueryClient();
   const { users } = useApi()

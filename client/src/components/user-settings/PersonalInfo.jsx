@@ -10,17 +10,16 @@ import {
   VStack,
 } from "@chakra-ui/react";
 
-import {
-  useUpdateUser,
-  useUserByFirebaseUid,
-} from "@/contexts/hooks/data-fetching/useUsers";
-import { useAuthContext } from "@/contexts/hooks/useAuthContext";
+import { useUpdateUser } from "@/contexts/hooks/data-fetching/useUsers";
+import { useUserContext } from "@/contexts/hooks/useUserContext";
 
 export default function PersonalInfo() {
-  const { currentUser } = useAuthContext();
-  const { data: userData, refetch } = useUserByFirebaseUid(currentUser?.uid);
+  // const { currentUser } = useAuthContext();
+  // const { data: userData, refetch } = useUserByFirebaseUid(currentUser?.uid);
+  const userData = useUserContext();
   const { mutateAsync: update } = useUpdateUser();
-  const dbUser = userData?.[0] ?? null;
+  const dbUser = userData?.dbUser;
+  const refetch = userData?.refetch;
   const [userInfo, setUserInfo] = useState({
     firstName: dbUser?.firstName ?? "",
     lastName: dbUser?.lastName ?? "",

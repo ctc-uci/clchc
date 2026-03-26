@@ -10,20 +10,18 @@ import {
   Text,
 } from "@chakra-ui/react";
 
-import { useAuthContext } from "@/contexts/hooks/useAuthContext";
+import { useUserContext } from "@/contexts/hooks/useUserContext";
 import {
-  useDeleteUser,
-  useUserByFirebaseUid,
+  useDeleteUser
 } from "@/contexts/hooks/data-fetching/useUsers";
 import { useNavigate } from "react-router-dom";
 
 export default function DeleteAccount() {
-  const { currentUser } = useAuthContext();
+  const userData = useUserContext();
   const navigate = useNavigate();
   const [input, setInput] = useState("");
-  const { data: userData } = useUserByFirebaseUid(currentUser?.uid);
   const { mutateAsync: deleteUser } = useDeleteUser();
-  const dbUser = userData?.[0] ?? null;
+  const dbUser = userData?.dbUser;
 
   const handleDelete = async () => {
     try {
