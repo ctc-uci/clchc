@@ -10,15 +10,16 @@ import {
   VStack,
 } from "@chakra-ui/react";
 
-import { useAuthContext } from "@/contexts/hooks/useAuthContext";
-import { useBackendContext } from "@/contexts/hooks/useBackendContext";
+import { useUpdateUser } from "@/contexts/hooks/data-fetching/useUsers";
 import { useUserContext } from "@/contexts/hooks/useUserContext";
 
 export default function PersonalInfo() {
-  const { backend } = useBackendContext();
-  const { currentUser } = useAuthContext();
-  const { dbUser, refetch } = useUserContext();
-
+  // const { currentUser } = useAuthContext();
+  // const { data: userData, refetch } = useUserByFirebaseUid(currentUser?.uid);
+  const userData = useUserContext();
+  const { mutateAsync: update } = useUpdateUser();
+  const dbUser = userData?.dbUser;
+  const refetch = userData?.refetch;
   const [userInfo, setUserInfo] = useState({
     firstName: dbUser?.firstName ?? "",
     lastName: dbUser?.lastName ?? "",
@@ -43,10 +44,13 @@ export default function PersonalInfo() {
 
   const updateUser = async () => {
     try {
-      await backend.put(`/users/firebase/${currentUser.uid}`, {
-        firstName: userInfo.firstName,
-        lastName: userInfo.lastName,
-        email: userInfo.email,
+      await update({
+        id: dbUser.id,
+        data: {
+          firstName: userInfo.firstName,
+          lastName: userInfo.lastName,
+          email: userInfo.email,
+        },
       });
       await refetch();
       alert("Changes saved successfully.");

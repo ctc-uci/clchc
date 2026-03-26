@@ -101,6 +101,10 @@ export const useApi = () => {
         const res = await backend.put(`/users/${id}`, data);
         return res.data;
       },
+      updateByFirebaseUid: async (uid, data) => {
+        const res = await backend.put(`/users/firebase/${uid}`, data);
+        return res.data;
+      },
     },
     locations: {
       getAll: async () => {

@@ -368,17 +368,17 @@ usersRouter.get("/admin/all", verifyRole("ccm"), async (req, res) => {
   }
 });
 
-usersRouter.put("/update/set-role", verifyRole("ccm"), async (req, res) => {
-  try {
-    const { role, firebaseUid } = req.body;
+// usersRouter.put("/update/set-role", verifyRole("ccm"), async (req, res) => {
+//   try {
+//     const { role, firebaseUid } = req.body;
 
-    const user = await db.query(
-      "UPDATE users SET role = $1 WHERE firebase_uid = $2 RETURNING *",
-      [role, firebaseUid]
-    );
+//     const user = await db.query(
+//       "UPDATE users SET role = $1 WHERE firebase_uid = $2 RETURNING *",
+//       [role, firebaseUid]
+//     );
 
-    res.status(200).json(keysToCamel(user));
-  } catch (err) {
-    res.status(400).send(err.message);
-  }
-});
+//     res.status(200).json(keysToCamel(user));
+//   } catch (err) {
+//     res.status(400).send(err.message);
+//   }
+// });

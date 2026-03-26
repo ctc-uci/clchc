@@ -17,11 +17,11 @@ import {
   VStack,
 } from "@chakra-ui/react";
 
-import { useBackendContext } from "@/contexts/hooks/useBackendContext";
+import { useUpdateUserByFirebaseUid } from "@/contexts/hooks/data-fetching/useUsers";
 
 export default function UserEditModal({ isOpen, onClose, user, onUpdated }) {
-  const { backend } = useBackendContext();
   const [selectedRole, setSelectedRole] = useState(user?.role ?? "viewer");
+  const { mutateAsync: updateUser } = useUpdateUserByFirebaseUid();
 
   useEffect(() => {
     setSelectedRole(user?.role ?? "viewer");
@@ -45,9 +45,11 @@ export default function UserEditModal({ isOpen, onClose, user, onUpdated }) {
     }
 
     try {
-      await backend.put("/users/update/set-role/", {
-        role: selectedRole,
-        firebaseUid: currentFirebaseUid,
+      await updateUser({
+        uid: currentFirebaseUid,
+        data: {
+          role: selectedRole,
+        },
       });
       if (onUpdated) await onUpdated();
       onClose();
