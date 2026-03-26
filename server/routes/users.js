@@ -1,7 +1,7 @@
 import { keysToCamel } from "@/common/utils";
 import { admin } from "@/config/firebase";
 import { db } from "@/db/db-pgp"; // TODO: replace this db with
-import { verifyToken, verifyRole } from "@/middleware";
+import { verifyRole } from "@/middleware";
 import { notifyCcmNewUserRequest, notifyApprovedNewUser } from "@/utils/emailService";
 import { Router } from "express";
 
@@ -153,7 +153,7 @@ usersRouter.get("/:id", verifyToken, verifyRole("ccm"), async (req, res) => {
 });
 
 // Get a user by Firebase ID
-usersRouter.get("/firebase/:firebaseUid", verifyToken, async (req, res) => {
+usersRouter.get("/firebase/:firebaseUid", async (req, res) => {
   try {
     const { firebaseUid } = req.params;
 
