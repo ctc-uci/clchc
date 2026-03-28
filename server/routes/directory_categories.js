@@ -6,7 +6,7 @@ import { verifyToken, verifyRole } from "@/middleware"; // <-- add this
 export const directoryCategoriesRouter = Router();
 
 // Get all directory categories
-directoryCategoriesRouter.get("/", verifyToken, verifyRole("viewer"), async (req, res) => {
+directoryCategoriesRouter.get("/", verifyRole("viewer"), async (req, res) => {
   try {
     const categories = await db.query(`SELECT * FROM directory_categories ORDER BY column_order`);
 
@@ -17,7 +17,7 @@ directoryCategoriesRouter.get("/", verifyToken, verifyRole("viewer"), async (req
 });
 
 // Get directory categories by id
-directoryCategoriesRouter.get("/:id", verifyToken, verifyRole("viewer"), async (req, res) => {
+directoryCategoriesRouter.get("/:id", verifyRole("viewer"), async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -34,7 +34,7 @@ directoryCategoriesRouter.get("/:id", verifyToken, verifyRole("viewer"), async (
 });
 
 // Adds a new category
-directoryCategoriesRouter.post("/", verifyToken, verifyRole("ccm"), async (req, res) => {
+directoryCategoriesRouter.post("/", verifyRole("ccm"), async (req, res) => {
   try {
     const { name, inputType, isRequired, columnOrder } = req.body;
     
@@ -57,7 +57,7 @@ directoryCategoriesRouter.post("/", verifyToken, verifyRole("ccm"), async (req, 
 
 
 // Delete a category
-directoryCategoriesRouter.delete("/:id", verifyToken, verifyRole("ccm"), async (req, res) => {
+directoryCategoriesRouter.delete("/:id", verifyRole("ccm"), async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -76,7 +76,7 @@ directoryCategoriesRouter.delete("/:id", verifyToken, verifyRole("ccm"), async (
 });
 
 // Updates only the fields present in the request body
-directoryCategoriesRouter.put("/:id", verifyToken, verifyRole("ccm"), async (req, res) => {
+directoryCategoriesRouter.put("/:id", verifyRole("ccm"), async (req, res) => {
     try {
         const { id } = req.params
         const {

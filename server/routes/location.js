@@ -1,12 +1,12 @@
 import { keysToCamel } from "@/common/utils";
 import express from "express";
 import { db } from "@/db/db-pgp";
-import { verifyToken, verifyRole } from "@/middleware";
+import { verifyRole } from "@/middleware";
 
 export const locationRouter = express.Router();
 
 //Create (POST /location) - adds a new location to the Location table
-locationRouter.post("/", verifyToken, verifyRole("ccm"), async (req, res) => {
+locationRouter.post("/", verifyRole("ccm"), async (req, res) => {
     try {
         const { tagValue } = req.body;
 
@@ -27,7 +27,7 @@ locationRouter.post("/", verifyToken, verifyRole("ccm"), async (req, res) => {
 });
 
 //Read (GET /location, GET /location/:id) - gets all locations and gets location by ID
-locationRouter.get("/", verifyToken, verifyRole("viewer"), async (req, res) => {
+locationRouter.get("/", verifyRole("viewer"), async (req, res) => {
   try {
     const allLocations = await db.query("SELECT * FROM location");
 
@@ -39,7 +39,7 @@ locationRouter.get("/", verifyToken, verifyRole("viewer"), async (req, res) => {
 });
 
 //Read (GET /location/:id) - gets location by ID (Added error handling for not found)
-locationRouter.get("/:id", verifyToken, verifyRole("viewer"), async (req, res) => {
+locationRouter.get("/:id", verifyRole("viewer"), async (req, res) => {
   try {
     const { id } = req.params;
     const location = await db.query(
@@ -59,7 +59,7 @@ locationRouter.get("/:id", verifyToken, verifyRole("viewer"), async (req, res) =
 });
 
 //Update (PUT/PATCH /location/:id) - updates the values of a location
-locationRouter.put("/:id", verifyToken, verifyRole("ccm"), async (req, res) => {
+locationRouter.put("/:id", verifyRole("ccm"), async (req, res) => {
   try {
     const { id } = req.params;
     const { tagValue } = req.body;
@@ -81,7 +81,7 @@ locationRouter.put("/:id", verifyToken, verifyRole("ccm"), async (req, res) => {
 });
 
 //Delete (DELETE /location/:id) - deletes a location from the Location Table
-locationRouter.delete("/:id", verifyToken, verifyRole("ccm"), async (req, res) => {
+locationRouter.delete("/:id", verifyRole("ccm"), async (req, res) => {
   try {
     const { id } = req.params;
 

@@ -1,11 +1,11 @@
 import { keysToCamel } from "@/common/utils";
 import { db } from "@/db/db-pgp";
 import express from "express";
-import { verifyToken, verifyRole } from "@/middleware";
+import { verifyRole } from "@/middleware";
 
 const providersRouter = express.Router();
 
-providersRouter.post("/", verifyToken, verifyRole("ccm"), async (req, res) => {
+providersRouter.post("/", verifyRole("ccm"), async (req, res) => {
   try {
     const { data, note } = req.body;
 
@@ -26,7 +26,7 @@ providersRouter.post("/", verifyToken, verifyRole("ccm"), async (req, res) => {
   }
 });
 
-providersRouter.get("/", verifyToken, verifyRole("viewer"), async (req, res) => {
+providersRouter.get("/", verifyRole("viewer"), async (req, res) => {
   try {
     const { search } = req.query;
 
@@ -59,7 +59,7 @@ providersRouter.get("/", verifyToken, verifyRole("viewer"), async (req, res) => 
   }
 });
 
-providersRouter.get("/summary", verifyToken, verifyRole("viewer"), async (req, res) => {
+providersRouter.get("/summary", verifyRole("viewer"), async (req, res) => {
   try {
     const result = await db.any(
       `SELECT id, data->>'Name' AS name FROM providers;`
@@ -71,7 +71,7 @@ providersRouter.get("/summary", verifyToken, verifyRole("viewer"), async (req, r
   }
 });
 
-providersRouter.get("/:id", verifyToken, verifyRole("viewer"), async (req, res) => {
+providersRouter.get("/:id", verifyRole("viewer"), async (req, res) => {
   try {
     const result = await db.oneOrNone(
       `
@@ -89,7 +89,7 @@ providersRouter.get("/:id", verifyToken, verifyRole("viewer"), async (req, res) 
   }
 });
 
-providersRouter.put("/:id", verifyToken, verifyRole("ccm"), async (req, res) => {
+providersRouter.put("/:id", verifyRole("ccm"), async (req, res) => {
   try {
     const { data, note } = req.body;
 
@@ -113,7 +113,7 @@ providersRouter.put("/:id", verifyToken, verifyRole("ccm"), async (req, res) => 
   }
 });
 
-providersRouter.delete("/:id", verifyToken, verifyRole("ccm"), async (req, res) => {
+providersRouter.delete("/:id", verifyRole("ccm"), async (req, res) => {
   try {
     const result = await db.oneOrNone(
       `
