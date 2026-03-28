@@ -1,12 +1,12 @@
 import { keysToCamel } from "@/common/utils";
 import { db } from "@/db/db-pgp"; // TODO: replace this db with
-import { verifyRole } from "@/middleware";
+import { verifyToken, verifyRole } from "@/middleware";
 import { Router } from "express";
 
 export const quotaRouter = Router();
 
 // create quota
-quotaRouter.post("/", async (req, res) => {
+quotaRouter.post("/", verifyRole("ccm"), async (req, res) => {
   try {
     const {
       providerId,
@@ -43,7 +43,7 @@ quotaRouter.post("/", async (req, res) => {
 });
 
 // get all quotas
-quotaRouter.get("/", async (req, res) => {
+quotaRouter.get("/", verifyRole("viewer"), async (req, res) => {
   try {
     const quotas = await db.query(`SELECT * FROM quota ORDER BY id ASC`);
 
@@ -54,7 +54,7 @@ quotaRouter.get("/", async (req, res) => {
 });
 
 // get quota data with location and provider name
-quotaRouter.get("/details", async (req, res) => {
+quotaRouter.get("/details", verifyRole("viewer"), async (req, res) => {
   try {
     const { provider, date } = req.query;
 
@@ -93,7 +93,7 @@ quotaRouter.get("/details", async (req, res) => {
 });
 
 // get quotas by id
-quotaRouter.get("/:id", async (req, res) => {
+quotaRouter.get("/:id", verifyRole("viewer"), async (req, res) => {
   try {
     const { id } = req.params;
     const quotas = await db.query(`SELECT * FROM quota WHERE id = $1`, [id]);
@@ -109,9 +109,9 @@ quotaRouter.get("/:id", async (req, res) => {
 });
 
 // update quota by id
-quotaRouter.put("/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
+quotaRouter.put(
+  "/:id",
+  async (req, res, next) => {
     const {
       providerId,
       locationId,
@@ -123,21 +123,28 @@ quotaRouter.put("/:id", async (req, res) => {
       appointmentType,
       notes,
     } = req.body;
-    const result = await db.query(
-      `UPDATE quota
-            SET
-            provider_id = COALESCE($1, provider_id),
-            location_id = COALESCE($2, location_id),
-            quota = COALESCE($3, quota),
-            progress = COALESCE($4, progress),
-            date = COALESCE($5, date),
-            start_time = COALESCE($6, start_time),
-            end_time = COALESCE($7, end_time),
-            appointment_type = COALESCE($8, appointment_type),
-            notes = COALESCE($9, notes)
-            WHERE id = $10
-            RETURNING *`,
-      [
+
+    const isProgressUpdate = progress !== undefined;
+
+    const hasOtherUpdates =
+      providerId !== undefined ||
+      locationId !== undefined ||
+      quota !== undefined ||
+      date !== undefined ||
+      startTime !== undefined ||
+      endTime !== undefined ||
+      appointmentType !== undefined ||
+      notes !== undefined;
+
+    const requiredRole =
+      isProgressUpdate && !hasOtherUpdates ? "ccs" : "ccm";
+
+    return verifyRole(requiredRole)(req, res, next);
+  },
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      const {
         providerId,
         locationId,
         quota,
@@ -147,22 +154,49 @@ quotaRouter.put("/:id", async (req, res) => {
         endTime,
         appointmentType,
         notes,
-        id,
-      ]
-    );
+      } = req.body;
 
-    if (result.length === 0) {
-      return res.status(404).json({ error: `Quota with id ${id} not found.` });
-    } else {
-      res.status(200).json(keysToCamel(result));
+      const result = await db.query(
+        `UPDATE quota
+          SET
+            provider_id = COALESCE($1, provider_id),
+            location_id = COALESCE($2, location_id),
+            quota = COALESCE($3, quota),
+            progress = COALESCE($4, progress),
+            date = COALESCE($5, date),
+            start_time = COALESCE($6, start_time),
+            end_time = COALESCE($7, end_time),
+            appointment_type = COALESCE($8, appointment_type),
+            notes = COALESCE($9, notes)
+          WHERE id = $10
+          RETURNING *`,
+        [
+          providerId,
+          locationId,
+          quota,
+          progress,
+          date,
+          startTime,
+          endTime,
+          appointmentType,
+          notes,
+          id,
+        ]
+      );
+
+      if (result.length === 0) {
+        return res.status(404).json({ error: `Quota with id ${id} not found.` });
+      }
+
+      return res.status(200).json(keysToCamel(result));
+    } catch (err) {
+      return res.status(400).send(err.message);
     }
-  } catch (err) {
-    res.status(400).send(err.message);
   }
-});
+);
 
 // delete quota by id
-quotaRouter.delete("/:id", async (req, res) => {
+quotaRouter.delete("/:id", verifyRole("ccm"), async (req, res) => {
   try {
     const { id } = req.params;
     const result = await db.query(

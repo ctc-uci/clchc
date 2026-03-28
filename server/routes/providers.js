@@ -1,10 +1,11 @@
 import { keysToCamel } from "@/common/utils";
 import { db } from "@/db/db-pgp";
 import express from "express";
+import { verifyRole } from "@/middleware";
 
 const providersRouter = express.Router();
 
-providersRouter.post("/", async (req, res) => {
+providersRouter.post("/", verifyRole("ccm"), async (req, res) => {
   try {
     const { data, note } = req.body;
 
@@ -25,7 +26,7 @@ providersRouter.post("/", async (req, res) => {
   }
 });
 
-providersRouter.get("/", async (req, res) => {
+providersRouter.get("/", verifyRole("viewer"), async (req, res) => {
   try {
     const { search } = req.query;
 
@@ -58,7 +59,7 @@ providersRouter.get("/", async (req, res) => {
   }
 });
 
-providersRouter.get("/summary", async (req, res) => {
+providersRouter.get("/summary", verifyRole("viewer"), async (req, res) => {
   try {
     const result = await db.any(
       `SELECT id, data->>'Name' AS name FROM providers;`
@@ -70,7 +71,7 @@ providersRouter.get("/summary", async (req, res) => {
   }
 });
 
-providersRouter.get("/:id", async (req, res) => {
+providersRouter.get("/:id", verifyRole("viewer"), async (req, res) => {
   try {
     const result = await db.oneOrNone(
       `
@@ -88,7 +89,7 @@ providersRouter.get("/:id", async (req, res) => {
   }
 });
 
-providersRouter.put("/:id", async (req, res) => {
+providersRouter.put("/:id", verifyRole("ccm"), async (req, res) => {
   try {
     const { data, note } = req.body;
 
@@ -112,7 +113,7 @@ providersRouter.put("/:id", async (req, res) => {
   }
 });
 
-providersRouter.delete("/:id", async (req, res) => {
+providersRouter.delete("/:id", verifyRole("ccm"), async (req, res) => {
   try {
     const result = await db.oneOrNone(
       `
