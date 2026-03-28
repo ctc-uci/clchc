@@ -1,10 +1,11 @@
 import { keysToCamel } from "@/common/utils";
 import { db } from "@/db/db-pgp";
 import { Router } from "express";
+import { verifyToken, verifyRole } from "@/middleware";
 
 export const versionLogRouter = Router();
 
-versionLogRouter.post("/", async (req, res) => {
+versionLogRouter.post("/", verifyRole("ccs"), async (req, res) => {
   try {
     const { userId, quotaId, action, delta } = req.body;
 
@@ -27,7 +28,7 @@ versionLogRouter.post("/", async (req, res) => {
   }
 });
 
-versionLogRouter.get("/", async (req, res) => {
+versionLogRouter.get("/", verifyRole("ccm"), async (req, res) => {
   try {
     const versionLogs = await db.query(
       `SELECT * FROM version_log ORDER BY id ASC`
@@ -39,7 +40,7 @@ versionLogRouter.get("/", async (req, res) => {
   }
 });
 
-versionLogRouter.get("/details", async (req, res) => {
+versionLogRouter.get("/details", verifyRole("ccm"), async (req, res) => {
   const { q, date } = req.query;
 
   try {
@@ -99,7 +100,7 @@ versionLogRouter.get("/details", async (req, res) => {
   }
 });
 
-versionLogRouter.get("/:id", async (req, res) => {
+versionLogRouter.get("/:id", verifyRole("ccm"), async (req, res) => {
   try {
     const { id } = req.params;
     const versionLog = await db.query(
@@ -117,7 +118,7 @@ versionLogRouter.get("/:id", async (req, res) => {
   }
 });
 
-versionLogRouter.put("/:id", async (req, res) => {
+versionLogRouter.put("/:id", verifyRole("ccs"), async (req, res) => {
   try {
     const { id } = req.params;
     const { userId, quotaId, action } = req.body;
@@ -141,7 +142,7 @@ versionLogRouter.put("/:id", async (req, res) => {
   }
 });
 
-versionLogRouter.delete("/:id", async (req, res) => {
+versionLogRouter.delete("/:id", verifyRole("ccm"), async (req, res) => {
   try {
     const { id } = req.params;
 
