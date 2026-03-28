@@ -22,7 +22,7 @@ const ROLE_MAP = {
 const ROLE_ORDER = ["Managers", "Staff", "Viewers"];
 
 // Create new user
-usersRouter.post("/", verifyRole("viewer"), async (req, res) => {
+usersRouter.post("/", async (req, res) => {
   try {
     const { firebaseUid, firstName, lastName, email } = req.body;
 
@@ -153,7 +153,7 @@ usersRouter.get("/:id", verifyRole("ccm"), async (req, res) => {
 });
 
 // Get a user by Firebase ID
-usersRouter.get("/firebase/:firebaseUid", verifyRole("ccm"), async (req, res) => {
+usersRouter.get("/firebase/:firebaseUid", async (req, res) => {
   try {
     const { firebaseUid } = req.params;
 
@@ -213,7 +213,7 @@ usersRouter.delete("/:id", verifyRole("ccm"), async (req, res) => {
 });
 
 // Delete a user by Firebase ID, both in Firebase and NPO DB
-usersRouter.delete("/firebase/:firebaseUid", verifyToken, verifyRole("viewer"), async (req, res) => {
+usersRouter.delete("/firebase/:firebaseUid", verifyRole("viewer"), async (req, res) => {
   try {
     const { firebaseUid } = req.params;
 
