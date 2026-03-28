@@ -103,3 +103,21 @@ export const useDeleteUser = () => {
     },
   });
 }
+
+export const useDeleteUserByFirebaseUid = () => {
+  const queryClient = useQueryClient();
+  const { users } = useApi();
+
+  return useMutation({
+    mutationFn: (uid) => users.deleteByFirebaseUid(uid),
+    onSuccess: (_, uid) => {
+      queryClient.invalidateQueries({ queryKey: ["users"], exact: false });
+      queryClient.invalidateQueries({ queryKey: ["user"], exact: false });
+      queryClient.invalidateQueries({ queryKey: ["usersStats"] });
+
+      if (uid) {
+        queryClient.invalidateQueries({ queryKey: ["user", uid] });
+      }
+    },
+  });
+};

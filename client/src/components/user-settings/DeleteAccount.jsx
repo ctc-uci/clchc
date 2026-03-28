@@ -10,25 +10,24 @@ import {
   Text,
 } from "@chakra-ui/react";
 
-import { useUserContext } from "@/contexts/hooks/useUserContext";
+import { useAuthContext } from "@/contexts/hooks/useAuthContext";
 import {
-  useDeleteUser
+  useDeleteUserByFirebaseUid
 } from "@/contexts/hooks/data-fetching/useUsers";
 import { useNavigate } from "react-router-dom";
 
 export default function DeleteAccount() {
-  const userData = useUserContext();
+  const { currentUser } = useAuthContext();
+  console.log(currentUser);
   const navigate = useNavigate();
   const [input, setInput] = useState("");
-  const { mutateAsync: deleteUser } = useDeleteUser();
-  const dbUser = userData?.dbUser;
-
+  const { mutateAsync: deleteUser } = useDeleteUserByFirebaseUid();
   const handleDelete = async () => {
     try {
-      if (input !== "DELETE" || !dbUser?.id) {
+      if (input !== "DELETE" || !currentUser?.uid) {
         return;
       }
-      await deleteUser(dbUser.id);
+      await deleteUser(currentUser.uid);
       navigate("/login");
     } catch (e) {
       alert("Incorrect.");

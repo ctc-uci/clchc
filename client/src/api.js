@@ -97,6 +97,10 @@ export const useApi = () => {
         const res = await backend.delete(`/users/${id}`);
         return res.data;
       },
+      deleteByFirebaseUid: async (uid) => {
+        const res = await backend.delete(`/users/firebase/${uid}`);
+        return res.data;
+      },
       update: async (id, data) => {
         const res = await backend.put(`/users/${id}`, data);
         return res.data;
