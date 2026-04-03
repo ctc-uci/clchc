@@ -15,6 +15,7 @@ import {
   Flex,
   FormControl,
   FormLabel,
+  Grid,
   Input,
   Skeleton,
   Text,
@@ -47,60 +48,78 @@ const SkeletonBody = () => {
 };
 
 const ConfirmationBanner = ({ mode, pendingTagDeletes = [] }) => {
-  const messages = {
-    create:
-      "Please confirm you would like to create a new provider with the following information",
-    edit: "Please confirm you would like to save the changes to the provider with the following information",
-    delete:
-      "Please confirm you would like to delete the provider with the following information",
+  const bannerModes = {
+    create: {
+      message:
+        "Please confirm you would like to create a new provider with the following information",
+      primary: "#0052CE",
+      bg: "#92CAFD",
+    },
+    edit: {
+      message:
+        "Please confirm you would like to save the changes to the provider with the following information",
+      primary: "#0052CE",
+      bg: "#92CAFD",
+    },
+    delete: {
+      message:
+        "Please confirm you would like to delete the provider with the following information",
+      primary: "#CE0000",
+      bg: "#FFD2D2",
+    },
   };
 
   return (
     <Alert
       status="error"
       variant="subtle"
-      borderRadius="md"
-      border="1px solid"
-      borderColor="red.200"
-      bg="red.50"
-      flexDirection="column"
+      borderRadius="8px"
+      border="2px solid"
+      borderColor={bannerModes[mode].primary}
+      bg={bannerModes[mode].bg}
+      display="flex"
+      width="370px"
+      height="192px"
+      flexDir="column"
       alignItems="flex-start"
-      p={4}
-      mb={4}
+      gap="10px"
     >
       <Box
         display="flex"
-        alignItems="center"
-        mb={1}
+        width="314px"
+        flexDir="column"
+        alignItems="flex-start"
+        gap="19px"
       >
         <AlertIcon
-          color="red.500"
+          color={bannerModes[mode].primary}
           mr={2}
         />
         <Text
           fontWeight="bold"
-          color="red.500"
+          color={bannerModes[mode].primary}
         >
           Notification
         </Text>
-      </Box>
-      <Text
-        color="red.500"
-        fontSize="sm"
-      >
-        {messages[mode]}
-      </Text>
-      {pendingTagDeletes.length > 0 && (
+
         <Text
-          color="red.600"
+          color={bannerModes[mode].primary}
           fontSize="sm"
-          mt={2}
         >
-          {pendingTagDeletes.length} tag(s) will be deleted:{" "}
-          {pendingTagDeletes.map((t) => t.tagValue).join(", ")}. This will
-          remove them from all providers.
+          {bannerModes[mode].message}
         </Text>
-      )}
+        {pendingTagDeletes.length > 0 && (
+          <Text
+            color="red.600"
+            fontSize="sm"
+            mt={2}
+          >
+            {pendingTagDeletes.length} tag(s) will be deleted:{" "}
+            {pendingTagDeletes.map((t) => t.tagValue).join(", ")}. This will
+            remove them from all providers.
+          </Text>
+        )}
+      </Box>
     </Alert>
   );
 };
@@ -191,8 +210,8 @@ const ProviderFormFields = ({
       direction="column"
       gap={6}
     >
-      <Flex
-        wrap="wrap"
+      <Grid
+        templateColumns="repeat(2, 1fr)"
         gap={6}
       >
         {categories.map((cat) => {
@@ -207,7 +226,7 @@ const ProviderFormFields = ({
                 isRequired={cat.isRequired}
                 isInvalid={!!errors[cat.id]}
               >
-                <FormLabel fontWeight={600}>{cat.name}</FormLabel>
+                <FormLabel color="#113D64">{cat.name}</FormLabel>
 
                 {cat.inputType === "text" && (
                   <Input
@@ -245,7 +264,7 @@ const ProviderFormFields = ({
             </Box>
           );
         })}
-      </Flex>
+      </Grid>
     </Flex>
   );
 };
@@ -289,7 +308,6 @@ const ProviderDrawer = ({
 
           categories.forEach((cat) => {
             const existingValue = provider.data?.[cat.name];
-
             if (existingValue === undefined) {
               return;
             }
@@ -469,17 +487,45 @@ const ProviderDrawer = ({
       <DrawerContent>
         <DrawerCloseButton />
         <DrawerHeader
-          fontWeight="bold"
-          fontSize="xl"
+          sx={{
+            display: "flex",
+            width: "371px",
+            flexDirection: "column",
+            alignItems: "flex-start",
+            gap: "3px",
+            flexShrink: 0,
+          }}
         >
-          {showConfirmation && activeMode === "edit"
-            ? "Confirm Changes"
-            : activeMode === "create"
-              ? "Create Provider"
-              : activeMode === "edit"
-                ? "Edit Provider"
-                : "Delete Provider"}
+          <Text
+            sx={{
+              color: "#113D64",
+              fontSize: "23.4px",
+              fontStyle: "normal",
+              fontWeight: "500",
+              lineHeight: "normal",
+            }}
+          >
+            {showConfirmation && activeMode === "edit"
+              ? "Confirm Changes"
+              : activeMode === "create"
+                ? "Create Provider"
+                : activeMode === "edit"
+                  ? "Edit Provider"
+                  : "Delete Provider"}
+          </Text>
+          <Text
+            sx={{
+              color: "#586771",
+              fontSize: "16px",
+              fontStyle: "normal",
+              fontWeight: "400",
+              lineHeight: "normal",
+            }}
+          >
+            Please provide basic info about the provider
+          </Text>
         </DrawerHeader>
+
         {loadingTags ? (
           <SkeletonBody />
         ) : (
