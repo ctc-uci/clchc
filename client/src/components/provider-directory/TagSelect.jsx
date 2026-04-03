@@ -236,7 +236,6 @@ const TagSelect = ({
               <Tag
                 size="md"
                 key={tagId}
-                borderRadius="full"
                 variant="solid"
                 backgroundColor="black"
               >

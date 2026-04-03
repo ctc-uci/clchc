@@ -13,8 +13,8 @@ import {
   WrapItem,
 } from "@chakra-ui/react";
 
-import { useTags } from "@/contexts/hooks/data-fetching/useTags";
 import TextPopup from "@/components/common/TextPopup";
+import { useTags } from "@/contexts/hooks/data-fetching/useTags";
 
 const SkeletonHeader = () => {
   return (
@@ -83,8 +83,13 @@ export default function ProviderTable({
     const columns = sortedCategories.map((cat) => (
       <Th
         key={cat.name}
-        fontWeight="bold"
-        color="#2D3748"
+        fontFamily="Inter"
+        fontSize="16px"
+        fontStyle="normal"
+        fontWeight="700"
+        lineHeight="24px"
+        backgroundColor="#C8D4E6"
+        color="#113D64"
       >
         {cat.name}
       </Th>
@@ -140,7 +145,22 @@ export default function ProviderTable({
         <Wrap>
           {tags.map((t) => (
             <WrapItem key={t}>
-              <Tag>{tagsMap[t]?.tagValue || t}</Tag>
+              <Tag
+                display="flex"
+                padding="2px 6px"
+                alignItems="center"
+                gap="6px"
+                border-radius="6px"
+                backgroundColor="#35639D"
+                font-family="Lato"
+                font-size="14px"
+                font-style="normal"
+                font-weight="500"
+                line-height="normal"
+                color="#FFF"
+              >
+                {tagsMap[t]?.tagValue || t}
+              </Tag>
               {/* TODO: @xgraceyan Remove safeguard when we transition all the tags to IDs. */}
             </WrapItem>
           ))}
@@ -149,12 +169,28 @@ export default function ProviderTable({
     }
     if (cat.inputType === "text") {
       const text = String(raw);
-    
+
       if (text.length > 200) {
-        return <TextPopup text={text} truncateAt={200} />;
+        return (
+          <TextPopup
+            text={text}
+            truncateAt={200}
+          />
+        );
       }
-    
-      return <Text>{text}</Text>;
+
+      return (
+        <Text
+          font-family="Inter"
+          font-size="14px"
+          font-style="normal"
+          font-weight="400"
+          line-height="20px"
+          color="#113D64"
+        >
+          {text}
+        </Text>
+      );
     }
 
     // Default rendering
@@ -212,7 +248,7 @@ export default function ProviderTable({
       borderColor="gray.200"
       borderRadius="lg"
       maxHeight="60vh"
-      overflowY = "auto"
+      overflowY="auto"
     >
       <Table>
         {/**Subcomps to simplify structure */}
