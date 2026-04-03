@@ -26,8 +26,7 @@ export const Navbar = () => {
     px: 2,
     py: 1,
     borderRadius: "md",
-    // fontSize: { base: "12px", sm: "16px", md: "18px" },
-    fontSize: "18px",
+    fontSize: { base: "12px", sm: "16px", md: "18px" },
 
     fontWeight: isActive ? "700" : "400",
     textDecoration: "none",
