@@ -7,6 +7,7 @@ import {
   InputGroup,
   InputLeftElement,
   Stack,
+  HStack,
 } from "@chakra-ui/react";
 
 import { PageHeader } from "@/components/common/PageHeader";
@@ -65,7 +66,7 @@ export const VersionLogPage = () => {
     setSelectedDate(newDate);
     navigate(`/version-log/${newDate}`);
   };
-  // console.log("Selected Date:", selectedDate);
+
   return (
     <Box
       p={6}
@@ -77,43 +78,37 @@ export const VersionLogPage = () => {
         align="flex-start"
         mb={6}
       >
-        <PageHeader
-          title="Version Log"
-          subheading="View action history over given day"
-          role={role}
-          isLoading={roleLoading}
-        />
         <Box
           flex="1"
           display="flex"
           justifyContent="flex-end"
         >
-          <CalendarCard
-            value={selectedDate}
-            onChange={handleDateChange}
-          />
         </Box>
       </Flex>
 
-      <Stack gap={2}>
-        <InputGroup>
+      <HStack paddingBottom="12px">
+        <InputGroup paddingRight="15px">
           <InputLeftElement pointerEvents="none">
             <SearchIcon color="gray.400" />
           </InputLeftElement>
           <Input
-            placeholder="Search Version Log"
+            placeholder="Dr. Sarah Chen"
             borderRadius="md"
             value={inputValue}  
             onChange={handleChange}
           />
         </InputGroup>
-        <VersionLogTable
-          loading={isLoading}
-          logs={logs}
-          selectedDate={selectedDate}
+
+        <CalendarCard
+          value={selectedDate}
+          onChange={handleDateChange}
         />
-      </Stack>
-      <Navbar />
+      </HStack>
+      <VersionLogTable
+        loading={isLoading}
+        logs={logs}
+        selectedDate={selectedDate}
+      />
     </Box>
   );
 };

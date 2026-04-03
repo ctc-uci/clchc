@@ -1,7 +1,6 @@
 import React from "react";
 
 import {
-  Box,
   Skeleton,
   Table,
   TableContainer,
@@ -14,60 +13,85 @@ import {
   VStack,
 } from "@chakra-ui/react";
 
+const CELL_BORDER_COLOR = "#E2E8F0";
+const HEADER_BG = "#CBD7E8";
+const COLUMN_WIDTH = "25%";
+
 const SkeletonRows = () => {
   return (
     <>
       {Array.from({ length: 5 }, (_, i) => (
-        <Tr key={i}>
-          <Td>
-            <Skeleton height="30px" />
+        <Tr
+          key={i}
+          borderBottom="1.5px solid"
+          borderColor={CELL_BORDER_COLOR}
+        >
+          <Td
+            w={COLUMN_WIDTH}
+            py="18px"
+            borderColor={CELL_BORDER_COLOR}
+          >
+            <Skeleton height="24px" />
           </Td>
-          <Td>
-            <Box
-              display="flex"
-              flexDirection="row"
-              gap={2}
-            >
-              <Skeleton
-                height="30px"
-                width="40%"
-              />
-              <Skeleton
-                height="30px"
-                width="25%"
-              />
-            </Box>
-          </Td>
-          <Td>
-            <Skeleton height="30px" />
-          </Td>
-          <Td>
+          <Td
+            w={COLUMN_WIDTH}
+            py="18px"
+            borderColor={CELL_BORDER_COLOR}
+          >
             <Skeleton
-              height="30px"
-              width="50%"
+              height="24px"
+              width="90px"
             />
           </Td>
-          <Td>
-            <Box
-              display="flex"
-              flexDirection="column"
-              gap="2px"
-            >
-              <Skeleton height="15px" />
-              <Skeleton
-                height="10px"
-                width="80%"
-              />
-            </Box>
+          <Td
+            w={COLUMN_WIDTH}
+            py="18px"
+            borderColor={CELL_BORDER_COLOR}
+          >
+            <Skeleton
+              height="24px"
+              width="140px"
+            />
           </Td>
-          <Td>
-            <Skeleton height="30px" />
+          <Td
+            w={COLUMN_WIDTH}
+            py="18px"
+          >
+            <Skeleton
+              height="24px"
+              width="220px"
+            />
           </Td>
         </Tr>
       ))}
     </>
   );
 };
+
+const headerCellProps = () => ({
+  w: COLUMN_WIDTH,
+  h: "48px",
+  px: "28px",
+  py: "12px",
+  color: "#4A5568",
+  fontSize: "16px",
+  fontWeight: "700",
+  textTransform: "none",
+  borderBottom: "1.5px solid",
+  borderColor: CELL_BORDER_COLOR,
+  bg: HEADER_BG,
+});
+
+const bodyCellProps = () => ({
+  w: COLUMN_WIDTH,
+  px: "28px",
+  py: "18px",
+  fontSize: "16px",
+  color: "#2D3748",
+  borderBottom: "1.5px solid",
+  borderColor: CELL_BORDER_COLOR,
+  verticalAlign: "middle",
+});
 
 const VersionLogTable = ({ loading, logs }) => {
   return (
@@ -76,44 +100,41 @@ const VersionLogTable = ({ loading, logs }) => {
       align="stretch"
     >
       <TableContainer
-        border="1px solid"
-        borderColor="gray.200"
-        borderRadius="lg"
-        maxHeight="60vh"
+        w="100%"
+        maxW="1360px"
+        minH="818px"
+        borderRadius="6px"
+        border="1.5px solid"
+        borderColor={CELL_BORDER_COLOR}
+        p="12px"
+        bg="white"
+        overflowX="auto"
         overflowY="auto"
       >
         <Table
-          size="sm"
+          variant="unstyled"
           sx={{ tableLayout: "fixed" }}
         >
-          <Thead
-            bg="#EBEBEB"
-            position="sticky"
-            top={0}
-            h="60px"
-            zIndex={1}
-          >
+          <Thead>
             <Tr>
-              <Th width="20%">Editor</Th>
-              <Th width="15%">Action</Th>
-              <Th width="15%">Date</Th>
-              <Th width="15%">Time</Th>
-              <Th width="17.5%">Provider</Th>
-              <Th width="17.5%">Quota Created</Th>
+              <Th {...headerCellProps()}>Editor</Th>
+              <Th {...headerCellProps()}>Action</Th>
+              <Th {...headerCellProps()}>Date & Time</Th>
+              <Th {...headerCellProps()}>Provider</Th>
             </Tr>
           </Thead>
 
           <Tbody>
             {!loading && logs.length === 0 && (
               <Tr>
-                <Td colSpan={6}>
-                  <Text
-                    textAlign="center"
-                    py={6}
-                    color="gray.500"
-                  >
-                    No version history available
-                  </Text>
+                <Td
+                  colSpan={4}
+                  py="40px"
+                  textAlign="center"
+                  color="gray.500"
+                  fontSize="16px"
+                >
+                  No version history available
                 </Td>
               </Tr>
             )}
@@ -122,55 +143,51 @@ const VersionLogTable = ({ loading, logs }) => {
               <SkeletonRows />
             ) : (
               logs.map((entry) => {
-                const log_d = new Date(entry.timestamp);
+                const logDate = new Date(entry.timestamp);
 
-                const log_date = log_d.toLocaleDateString("en-US", {
+                const formattedDate = logDate.toLocaleDateString("en-US", {
                   month: "2-digit",
                   day: "2-digit",
-                  year: "numeric",
                 });
 
-                const log_time = log_d.toLocaleTimeString("en-US", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  hour12: false,
-                });
-
-                const quota_d = new Date(entry.date);
-
-                const quota_date = quota_d.toLocaleDateString("en-US", {
-                  month: "2-digit",
-                  day: "2-digit",
-                  year: "numeric",
-                });
+                const formattedTime = logDate
+                  .toLocaleTimeString("en-US", {
+                    hour: "numeric",
+                    minute: "2-digit",
+                    hour12: true,
+                  })
+                  .toLowerCase();
 
                 return (
                   <Tr
                     key={entry.id}
-                    _hover={{ bg: "gray.50" }}
+                    _hover={{ bg: "#F8FAFC" }}
                   >
-                    <Td>
+                    <Td {...bodyCellProps()}>
                       {entry.firstName} {entry.lastName}
                     </Td>
 
-                    <Td fontWeight="medium">
+                    <Td {...bodyCellProps()}>
                       {entry.action === "increment" && (
                         <>
                           Quota{" "}
                           <Text
                             as="span"
-                            color="green.500"
+                            color="#38A169"
+                            fontWeight="500"
                           >
                             +{entry.delta}
                           </Text>
                         </>
                       )}
+
                       {entry.action === "decrement" && (
                         <>
                           Quota{" "}
                           <Text
                             as="span"
-                            color="red.500"
+                            color="#E53E3E"
+                            fontWeight="500"
                           >
                             {entry.delta}
                           </Text>
@@ -178,21 +195,13 @@ const VersionLogTable = ({ loading, logs }) => {
                       )}
                     </Td>
 
-                    <Td color="gray.600">{log_date}</Td>
-                    <Td color="gray.600">{log_time}</Td>
-
-                    <Td fontWeight="medium">
-                      {entry.providerData["Name"]}
-                      <Text
-                        fontWeight="normal"
-                        color="gray.500"
-                      >
-                        {entry.providerData["Office Hours"]}
-                      </Text>
-                      {/* TODO: We should really camel case the jsonb data keys. */}
+                    <Td {...bodyCellProps()}>
+                      {formattedDate} {formattedTime}
                     </Td>
 
-                    <Td color="gray.600">{quota_date}</Td>
+                    <Td {...bodyCellProps()}>
+                      {entry.providerData["Name"]}
+                    </Td>
                   </Tr>
                 );
               })

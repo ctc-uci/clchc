@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
+import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
@@ -25,6 +25,12 @@ const CalendarCard = ({ value, onChange }) => {
     const d = value ? new Date(value + "T00:00:00") : new Date();
     return new Date(d.getFullYear(), d.getMonth(), 1);
   });
+
+  useEffect(() => {
+    const d = value ? new Date(value + "T00:00:00") : new Date();
+    setTempDate(d);
+    setViewMonth(new Date(d.getFullYear(), d.getMonth(), 1));
+  }, [value]);
 
   const handleOpen = () => {
     const d = value ? new Date(value + "T00:00:00") : new Date();
@@ -58,15 +64,14 @@ const CalendarCard = ({ value, onChange }) => {
   const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-  const monthLabel = viewMonth.toLocaleString("default", { month: "long", year: "numeric" });
+  const monthLabel = viewMonth.toLocaleString("default", {
+    month: "long",
+    year: "numeric",
+  });
 
   const today = new Date();
   const displayValue = value
-    ? new Date(value + "T00:00:00").toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      })
+    ? new Date(value + "T00:00:00").toLocaleDateString("en-US")
     : "Select date";
 
   return (
@@ -79,7 +84,7 @@ const CalendarCard = ({ value, onChange }) => {
       <PopoverTrigger>
         <Button
           variant="outline"
-          leftIcon={<CalendarIcon />}
+          rightIcon={<ChevronDownIcon />}
           onClick={handleOpen}
           fontWeight="normal"
           fontSize="sm"
@@ -97,7 +102,6 @@ const CalendarCard = ({ value, onChange }) => {
         p={0}
       >
         <PopoverBody p={4}>
-          {/* Month navigation */}
           <Flex
             justify="space-between"
             align="center"
@@ -127,7 +131,6 @@ const CalendarCard = ({ value, onChange }) => {
             />
           </Flex>
 
-          {/* Day-of-week headers */}
           <Grid
             templateColumns="repeat(7, 1fr)"
             mb={1}
@@ -146,11 +149,11 @@ const CalendarCard = ({ value, onChange }) => {
             ))}
           </Grid>
 
-          {/* Day cells */}
           <Grid templateColumns="repeat(7, 1fr)">
             {Array.from({ length: firstDay }).map((_, i) => (
               <Box key={`empty-${i}`} />
             ))}
+
             {Array.from({ length: daysInMonth }).map((_, i) => {
               const day = i + 1;
               const isSelected =
@@ -183,7 +186,6 @@ const CalendarCard = ({ value, onChange }) => {
             })}
           </Grid>
 
-          {/* Cancel / Apply */}
           <Flex
             mt={4}
             gap={2}
