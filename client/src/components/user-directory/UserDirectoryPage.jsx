@@ -79,7 +79,7 @@ export const UserDirectory = () => {
 
   return (
     <Box
-      p={6}
+      py={6}
       maxW="1200px"
       mx="auto"
     >
@@ -117,6 +117,18 @@ export const UserDirectory = () => {
       </Flex>
       <Box mb={8}>
         <UserPendingStatusList />
+        {/* TODO: Implement view all requests functionality */}
+        <Flex justify="flex-end" mt={2}>
+          <Box
+            as="button"
+            fontSize="12px"
+            color="gray.500"
+            _hover={{ color: "gray.700" }}
+
+          >
+            View All Requests
+          </Box>
+        </Flex>
       </Box>
       <Flex
         gap={4}
@@ -135,6 +147,12 @@ export const UserDirectory = () => {
             fontWeight="normal"
             fontSize="sm"
             py={5}
+            display="flex"
+            //             display: flex;
+            // width="1230px"
+            // height: 44px;
+            // justify-content: center;
+            // align-items: center;
           />
         </InputGroup>
 

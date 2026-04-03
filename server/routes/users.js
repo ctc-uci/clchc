@@ -24,7 +24,7 @@ const ROLE_ORDER = ["Managers", "Staff", "Viewers"];
 // Create new user
 usersRouter.post("/", async (req, res) => {
   try {
-    const { firebaseUid, firstName, lastName, email } = req.body;
+    const { firebaseUid, firstName, lastName, email, photoURL } = req.body;
 
     const existing = await db.query(
       "SELECT * FROM users WHERE firebase_uid = $1",
@@ -40,11 +40,12 @@ usersRouter.post("/", async (req, res) => {
         firebase_uid,
         first_name,
         last_name,
-        email
+        email,
+        photo_url
       )
-      VALUES ($1, $2, $3, $4)
+      VALUES ($1, $2, $3, $4, $5)
       RETURNING *`,
-      [firebaseUid, firstName, lastName, email]
+      [firebaseUid, firstName, lastName, email, photoURL ?? null]
     );
 
     notifyCcmNewUserRequest(`${firstName} ${lastName}`, email);
@@ -263,6 +264,7 @@ usersRouter.put(
         email,
         status,
         apptCalcFactor,
+        photoURL,
       } = req.body;
 
       const result = await db.query(
@@ -274,8 +276,9 @@ usersRouter.put(
            last_name = COALESCE($4, last_name),
            email = COALESCE($5, email),
            status = COALESCE($6, status),
-           appt_calc_factor = COALESCE($7, appt_calc_factor)
-         WHERE id = $8
+           appt_calc_factor = COALESCE($7, appt_calc_factor),
+           photo_url = COALESCE($8, photo_url)
+         WHERE id = $9
          RETURNING *`,
         [
           firebaseUid,
@@ -285,6 +288,7 @@ usersRouter.put(
           email,
           status,
           apptCalcFactor,
+          photoURL,
           id,
         ]
       );
@@ -322,7 +326,7 @@ usersRouter.put(
   async (req, res) => {
     try {
       const { firebaseUid } = req.params;
-      const { role, firstName, lastName, email, status, apptCalcFactor } =
+      const { role, firstName, lastName, email, status, apptCalcFactor, photoURL } =
         req.body;
 
       const result = await db.query(
@@ -333,10 +337,11 @@ usersRouter.put(
            last_name = COALESCE($3, last_name),
            email = COALESCE($4, email),
            status = COALESCE($5, status),
-           appt_calc_factor = COALESCE($6, appt_calc_factor)
-         WHERE firebase_uid = $7
+           appt_calc_factor = COALESCE($6, appt_calc_factor),
+           photo_url = COALESCE($7, photo_url)
+         WHERE firebase_uid = $8
          RETURNING *`,
-        [role, firstName, lastName, email, status, apptCalcFactor, firebaseUid]
+        [role, firstName, lastName, email, status, apptCalcFactor, photoURL ?? null, firebaseUid]
       );
 
       if (!result || result.length === 0) {

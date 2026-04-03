@@ -103,6 +103,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             firebaseUid: result.user.uid,
             firstName: result.user.displayName?.split(" ")[0] || "",
             lastName: result.user.displayName?.split(" ").slice(1).join(" ") || "",
+            photoURL: result.user.photoURL ?? null,
           });
 
         } catch (e) {
@@ -115,6 +116,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           });
           return;
         }
+      } else {
+        // Sync photoURL in case the user updated their Google profile picture
+        await backend.put(`/users/firebase/${result.user.uid}`, {
+          photoURL: result.user.photoURL ?? null,
+        });
       }
 
       const data = response.data;

@@ -7,4 +7,5 @@ export type User = {
   lastName: string;
   status: "approved" | "pending" | "rejected";
   apptCalcFactor: number | null;
+  photoUrl: string | null;
 };
