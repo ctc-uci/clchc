@@ -5,6 +5,7 @@ import {
   AlertIcon,
   Box,
   Button,
+  Divider,
   Drawer,
   DrawerBody,
   DrawerCloseButton,
@@ -14,6 +15,7 @@ import {
   DrawerOverlay,
   Flex,
   FormControl,
+  FormHelperText,
   FormLabel,
   Grid,
   Input,
@@ -216,17 +218,21 @@ const ProviderFormFields = ({
       >
         {categories.map((cat) => {
           return (
-            <Box
-              key={cat.id}
-              flex="1 1 48%"
-            >
+            <Box key={cat.id}>
               <FormControl
                 key={cat.id}
-                mb={4}
                 isRequired={cat.isRequired}
                 isInvalid={!!errors[cat.id]}
               >
-                <FormLabel color="#113D64">{cat.name}</FormLabel>
+                <FormLabel
+                  color="#113D64"
+                  fontSize="14px"
+                  fontStyle="normal"
+                  fontWeight={400}
+                  lineHeight="normal"
+                >
+                  {cat.name}
+                </FormLabel>
 
                 {cat.inputType === "text" && (
                   <Input
@@ -522,9 +528,10 @@ const ProviderDrawer = ({
               lineHeight: "normal",
             }}
           >
-            Please provide basic info about the provider
+            Please provide basic info about the provider.
           </Text>
         </DrawerHeader>
+        <Divider my={6} />
 
         {loadingTags ? (
           <SkeletonBody />
@@ -550,13 +557,18 @@ const ProviderDrawer = ({
               />
             </DrawerBody>
 
-            <DrawerFooter justifyContent="space-between">
+            <DrawerFooter
+              justifyContent="space-between"
+              gap={4}
+              px={6}
+            >
               {activeMode === "edit" && !showConfirmation ? (
                 <>
                   <Button
                     bg="red.600"
                     color="white"
                     _hover={{ bg: "red.700" }}
+                    flex={1}
                     onClick={() => {
                       setActiveMode("delete");
                       setShowConfirmation(true);
@@ -566,10 +578,11 @@ const ProviderDrawer = ({
                   </Button>
 
                   <Button
-                    bg="black"
+                    bg="#113D64"
                     color="white"
-                    _hover={{ bg: "gray.800" }}
+                    _hover={{ bg: "#1a4f7a" }}
                     onClick={handleSubmit}
+                    flex={1}
                   >
                     Save Changes
                   </Button>
@@ -579,15 +592,17 @@ const ProviderDrawer = ({
                   <Button
                     variant="outline"
                     onClick={handleClose}
+                    flex={1}
                   >
                     Cancel
                   </Button>
 
                   <Button
-                    bg={activeMode === "delete" ? "red.600" : "black"}
+                    flex={1}
+                    bg={activeMode === "delete" ? "red.600" : "#113D64"}
                     color="white"
                     _hover={{
-                      bg: activeMode === "delete" ? "red.700" : "gray.800",
+                      bg: activeMode === "delete" ? "red.700" : "#1a4f7a",
                     }}
                     onClick={handleSubmit}
                   >

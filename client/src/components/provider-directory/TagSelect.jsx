@@ -262,7 +262,7 @@ const TagSelect = ({
           rightIcon={<ChevronDown />}
           isDisabled={readOnly}
         >
-          Select Tags
+          Select
         </MenuButton>
 
         <MenuList
