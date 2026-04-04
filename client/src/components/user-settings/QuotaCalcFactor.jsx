@@ -1,88 +1,112 @@
 import React, { useEffect, useState } from "react";
 
+import { CheckIcon, EditIcon } from "@chakra-ui/icons";
 import {
-  Button,
-  NumberDecrementStepper,
-  NumberIncrementStepper,
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
+  Box,
+  Flex,
+  FormControl,
+  FormLabel,
+  IconButton,
+  Input,
   Text,
-  VStack,
+  useDisclosure,
 } from "@chakra-ui/react";
 
-import { useUserContext } from "@/contexts/hooks/useUserContext";
 import { useUpdateUser } from "@/contexts/hooks/data-fetching/useUsers";
+import { useUserContext } from "@/contexts/hooks/useUserContext";
+
+import ConfirmationModal from "./ConfirmationModal";
 
 export default function QuotaCalcFactor() {
   const userData = useUserContext();
   const { mutateAsync: updateUser } = useUpdateUser();
   const dbUser = userData?.dbUser;
   const refetch = userData?.refetch;
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const [factor, setFactor] = useState(0);
+  const [isEditMode, setIsEditMode] = useState(false);
 
   useEffect(() => {
     setFactor(dbUser?.apptCalcFactor ?? 0);
   }, [dbUser]);
 
-  const updateQuota = async (newQuota) => {
+  const handleSave = async () => {
     if (!dbUser?.id) return;
-    await updateUser({
-      id: dbUser.id,
-      data: {
-        apptCalcFactor: newQuota,
-      },
-    });
+    await updateUser({ id: dbUser.id, data: { apptCalcFactor: factor } });
     await refetch();
-    alert("Changes saved successfully.");
+    setIsEditMode(false);
   };
 
-  const handleClick = async () => {
-    await updateQuota(factor);
+  const handleToggle = () => {
+    if (isEditMode) {
+      onOpen();
+    } else {
+      setIsEditMode(true);
+    }
   };
+
+  const modalPreview = (
+    <Flex
+      align="center"
+      justify="space-between"
+    >
+      <Text fontSize="sm">Quota Calculation Factor</Text>
+      <Box
+        border="1px solid"
+        borderColor="gray.300"
+        borderRadius="md"
+        px={2}
+        py={0.5}
+      >
+        <Text fontSize="sm">{Number.isFinite(factor) ? factor : 0}</Text>
+      </Box>
+    </Flex>
+  );
 
   return (
-    <VStack
-      align="stretch"
-      spacing="2em"
-      backgroundColor="#ddd"
-      borderRadius="1em"
-      padding="1.5em"
-      margin="1.5em"
-    >
-      <Text
-        fontSize={20}
-        fontWeight={"bold"}
-      >
-        Quota Calculation Factor
-      </Text>
+    <>
+      <FormControl maxW="300px">
+        <FormLabel
+          fontWeight="semibold"
+          fontSize="sm"
+        >
+          Calculation Factor
+        </FormLabel>
+        <Flex
+          align="center"
+          gap={2}
+        >
+          <Input
+            type="number"
+            value={Number.isFinite(factor) ? factor : 0}
+            onChange={(e) => setFactor(parseFloat(e.target.value) || 0)}
+            isReadOnly={!isEditMode}
+            bg={isEditMode ? "white" : "gray.100"}
+            border={isEditMode ? "1px solid" : "none"}
+            borderColor={isEditMode ? "blue.400" : "transparent"}
+            transition="all 0.15s"
+          />
+          <IconButton
+            icon={isEditMode ? <CheckIcon /> : <EditIcon />}
+            size="s"
+            variant="ghost"
+            colorScheme="gray"
+            aria-label={
+              isEditMode ? "Save Calculation Factor" : "Edit Calculation Factor"
+            }
+            onClick={handleToggle}
+            flexShrink={0}
+          />
+        </Flex>
+      </FormControl>
 
-      <Text>
-        This value is used to automatically calculate appointment quotas when
-        creating new schedules. Individual quotas can still be overridden.
-      </Text>
-
-      <NumberInput
-        value={Number.isFinite(factor) ? factor : 0}
-        onChange={(_, valueAsNumber) => {
-          setFactor(Number.isFinite(valueAsNumber) ? valueAsNumber : 0);
-        }}
-        bg="gray.100"
-      >
-        <NumberInputField />
-        <NumberInputStepper>
-          <NumberIncrementStepper />
-          <NumberDecrementStepper />
-        </NumberInputStepper>
-      </NumberInput>
-
-      <Button
-        onClick={handleClick}
-        isDisabled={!dbUser?.id}
-      >
-        Save Changes
-      </Button>
-    </VStack>
+      <ConfirmationModal
+        isOpen={isOpen}
+        onClose={onClose}
+        onConfirm={handleSave}
+        preview={modalPreview}
+      />
+    </>
   );
 }

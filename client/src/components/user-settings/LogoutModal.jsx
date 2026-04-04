@@ -20,7 +20,6 @@ import { useUserContext } from "@/contexts/hooks/useUserContext";
 export default function LogoutModal({ isOpen, onClose }) {
   const { role } = useUserContext();
   const { logout } = useAuthContext();
-  const [userInfo] = useState();
   const handleLogout = () => logout();
 
   return (

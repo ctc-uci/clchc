@@ -1,27 +1,157 @@
-import React, { useEffect, useState } from "react";
-import { Grid } from "@chakra-ui/react";
-import Sidebar from "./Sidebar.jsx";
-import View from "./View.jsx";
+import {
+  Avatar,
+  Box,
+  Grid,
+  GridItem,
+  Text,
+} from "@chakra-ui/react";
+
+import { useUserContext } from "@/contexts/hooks/useUserContext";
+
+import PersonalInfo from "./PersonalInfo.jsx";
+import QuotaCalcFactor from "./QuotaCalcFactor.jsx";
+import SignOutSection from "./SignOutSection.jsx";
 
 export const PERSONAL_INFO = "personal-info";
 export const DELETE_ACCOUNT = "delete-account";
 export const CALCULATION_FACTOR = "calculation-factor";
 
-export function Settings({ view = PERSONAL_INFO }) {
-    // State to determine which "tab" being shown in the View.
-    const [currentView, setCurrentView] = useState(view);
+export function Settings() {
+  const userData = useUserContext();
+  const dbUser = userData?.dbUser;
 
-    return (
-        <Grid
-            templateColumns="auto 1fr"
-            padding="2em"
-            gap="2em"
+  return (
+    <Box
+      paddingTop="5%"
+      paddingX="50px"
+    >
+      <Grid
+        templateColumns="220px 260px 1fr"
+        templateRows="auto auto auto"
+        minH="520px"
+      >
+        <GridItem
+          rowSpan={3}
+          bg="white"
+          p="2em"
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
+          justifyContent="flex-start"
+          pt="3em"
+          gap="1em"
+          width="278px"
         >
-            <Sidebar
-                currentView={currentView}
-                setCurrentView={setCurrentView}
-            />
-            <View currentView={currentView} />
-        </Grid>
-    )
-};
+          <Avatar
+            w="200px"
+            h="200px"
+            name={`${dbUser?.firstName} ${dbUser?.lastName}`}
+          />
+          <Text
+            fontWeight="bold"
+            fontSize="xl"
+            textAlign="center"
+          >
+            {dbUser?.firstName} {dbUser?.lastName}
+          </Text>
+          <Text
+            color="gray.600"
+            fontSize="sm"
+            textAlign="center"
+          >
+            {dbUser?.email}
+          </Text>
+        </GridItem>
+
+        <GridItem
+          bg="white"
+          p="1.5em"
+          borderColor="gray.200"
+          ml="80px"
+        >
+          <Text
+            fontWeight="bold"
+            fontSize="lg"
+          >
+            Personal Information
+          </Text>
+          <Text
+            fontSize="sm"
+            color="gray.600"
+            mt="0.5em"
+          >
+            Edit your personal information here.
+          </Text>
+        </GridItem>
+        <GridItem
+          bg="white"
+          p="1.5em"
+          borderColor="gray.200"
+        >
+          <PersonalInfo />
+        </GridItem>
+
+        {dbUser.role === "master" || dbUser.role === "ccm" ? (
+          <>
+            <GridItem
+              bg="white"
+              p="1.5em"
+              borderColor="gray.200"
+              ml="80px"
+            >
+              <Text
+                fontWeight="bold"
+                fontSize="lg"
+              >
+                Quota Calculation Factor
+              </Text>
+              <Text
+                fontSize="sm"
+                color="gray.600"
+                mt="0.5em"
+              >
+                This value is used to automatically calculate appointment quotas
+                when creating new schedules.
+              </Text>
+            </GridItem>
+            <GridItem
+              bg="white"
+              p="1.5em"
+              borderColor="gray.200"
+            >
+              <QuotaCalcFactor />
+            </GridItem>
+          </>
+        ) : (
+          <></>
+        )}
+
+        <GridItem
+          bg="white"
+          p="1.5em"
+          ml="80px"
+        >
+          <Text
+            fontWeight="bold"
+            fontSize="lg"
+          >
+            Sign Out
+          </Text>
+          <Text
+            fontSize="sm"
+            color="gray.600"
+            mt="0.5em"
+          >
+            Sign out of your account
+          </Text>
+        </GridItem>
+        <GridItem
+          bg="white"
+          p="1.5em"
+        >
+          <SignOutSection />
+        </GridItem>
+      </Grid>
+    </Box>
+  );
+}
