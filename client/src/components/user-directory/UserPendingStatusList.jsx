@@ -110,7 +110,10 @@ export const UserPendingStatusList = () => {
       border="0.5px solid #00000026"
       boxShadow="sm"
     >
-      <Grid templateColumns="1fr" gap={0}>
+      <Grid
+        templateColumns="1fr"
+        gap={0}
+      >
         {isLoading ? (
           <>
             <RequestSkeleton />

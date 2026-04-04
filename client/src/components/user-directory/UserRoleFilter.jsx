@@ -25,7 +25,7 @@ export default function UserRoleFilter({ selectedRole, onChange }) {
         type="button"
         bg="var(--Primary-3, #586771)"
         color="white"
-        _hover={{ bg: "blackAlpha.500" }}
+        _hover={{ bg: "var(--Primary-3, #586771)" }}
         leftIcon={<FiFilter />}
         rightIcon={<ChevronDownIcon />}
       >
