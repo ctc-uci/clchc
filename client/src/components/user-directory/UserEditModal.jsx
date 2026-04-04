@@ -169,6 +169,7 @@ export default function UserEditModal({ isOpen, onClose, user, onUpdated }) {
                 name={username}
                 size="lg"
                 bg="white"
+                src={user.photoUrl ?? undefined}
                 color="black"
               />
             </Box>

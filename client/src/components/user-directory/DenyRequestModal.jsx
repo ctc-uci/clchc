@@ -117,6 +117,7 @@ export const DenyRequestModal = ({ isOpen, onClose, user }) => {
                       align="center"
                       justify="center"
                       fontSize="lg"
+                      src={user.photoUrl ?? undefined}
                     >
                       {`${user.firstName?.[0] ?? ""}${user.lastName?.[0] ?? ""}`}
                     </Flex>
@@ -142,7 +143,16 @@ export const DenyRequestModal = ({ isOpen, onClose, user }) => {
                     color="#00000080"
                     p={4}
                   >
-                    Request Date
+                    {user.userSignupDate
+                      ? new Date(user.userSignupDate).toLocaleDateString(
+                          "en-US",
+                          {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          }
+                        )
+                      : "—"}
                   </Text>
                 </Flex>
               </Box>
