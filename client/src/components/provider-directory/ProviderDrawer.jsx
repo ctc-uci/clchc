@@ -528,7 +528,9 @@ const ProviderDrawer = ({
               lineHeight: "normal",
             }}
           >
-            Please provide basic info about the provider.
+            {activeMode === "edit"
+              ? "Provider Profile"
+              : "Please provide basic info about the provider."}
           </Text>
         </DrawerHeader>
         <Divider my={6} />
