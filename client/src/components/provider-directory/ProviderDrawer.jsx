@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
   Alert,
-  AlertIcon,
+  // AlertIcon,
   Box,
   Button,
   Divider,
@@ -15,7 +15,6 @@ import {
   DrawerOverlay,
   Flex,
   FormControl,
-  FormHelperText,
   FormLabel,
   Grid,
   Input,
@@ -34,6 +33,7 @@ import {
 import { useTags } from "@/contexts/hooks/data-fetching/useTags";
 import { errorToString } from "@/utils/utils";
 import { useQueryClient } from "@tanstack/react-query";
+import { PiWarningCircle } from "react-icons/pi";
 
 const SkeletonBody = () => {
   return (
@@ -52,20 +52,32 @@ const SkeletonBody = () => {
 const ConfirmationBanner = ({ mode, pendingTagDeletes = [] }) => {
   const bannerModes = {
     create: {
-      message:
-        "Please confirm you would like to create a new provider with the following information",
+      message: (
+        <>
+          Please confirm you would like to <strong>create</strong> a new
+          provider with the following information
+        </>
+      ),
       primary: "#0052CE",
       bg: "#92CAFD",
     },
     edit: {
-      message:
-        "Please confirm you would like to save the changes to the provider with the following information",
+      message: (
+        <>
+          Please confirm you would like to <strong>save</strong> the changes to
+          the provider with the following information
+        </>
+      ),
       primary: "#0052CE",
       bg: "#92CAFD",
     },
     delete: {
-      message:
-        "Please confirm you would like to delete the provider with the following information",
+      message: (
+        <>
+          Please confirm you would like to <strong>delete</strong> the provider
+          with the following information
+        </>
+      ),
       primary: "#CE0000",
       bg: "#FFD2D2",
     },
@@ -80,33 +92,37 @@ const ConfirmationBanner = ({ mode, pendingTagDeletes = [] }) => {
       borderColor={bannerModes[mode].primary}
       bg={bannerModes[mode].bg}
       display="flex"
-      width="370px"
-      height="192px"
-      flexDir="column"
-      alignItems="flex-start"
-      gap="10px"
+      height="175px"
     >
       <Box
         display="flex"
-        width="314px"
-        flexDir="column"
-        alignItems="flex-start"
         gap="19px"
+        flexDirection="column"
+        alignItems="flex-start"
       >
-        <AlertIcon
-          color={bannerModes[mode].primary}
-          mr={2}
-        />
-        <Text
-          fontWeight="bold"
-          color={bannerModes[mode].primary}
+        <Box
+          display="flex"
+          alignItems="center"
+          mb={1}
+          gap="10px"
         >
-          Notification
-        </Text>
+          <PiWarningCircle
+            color={bannerModes[mode].primary}
+            size={32}
+          />
+          <Text
+            fontSize="20px"
+            fontWeight={500}
+            color={bannerModes[mode].primary}
+          >
+            Notification
+          </Text>
+        </Box>
 
         <Text
           color={bannerModes[mode].primary}
-          fontSize="sm"
+          fontSize="18px"
+          fontWeight={400}
         >
           {bannerModes[mode].message}
         </Text>
@@ -210,15 +226,19 @@ const ProviderFormFields = ({
   return (
     <Flex
       direction="column"
-      gap={6}
+      gap="20px"
     >
       <Grid
-        templateColumns="repeat(2, 1fr)"
+        templateColumns="repeat(2, minmax(0, 1fr))"
         gap={6}
+        alignItems="end"
       >
         {categories.map((cat) => {
           return (
-            <Box key={cat.id}>
+            <Box
+              key={cat.id}
+              maxW="172px"
+            >
               <FormControl
                 key={cat.id}
                 isRequired={cat.isRequired}
@@ -240,6 +260,7 @@ const ProviderFormFields = ({
                     onChange={(e) => onChange(cat.id, e.target.value)}
                     isReadOnly={readOnly}
                     bg={readOnly ? "gray.50" : "white"}
+                    color="gray.700"
                   />
                 )}
 
@@ -418,6 +439,15 @@ const ProviderDrawer = ({
         });
       } else if (activeMode === "delete") {
         await deleteProvider(provider.id);
+        toast({
+          title: "Provider Deletion",
+          description: "You have deleted a provider from the directory.",
+          status: "error", // This is a successful delete, but the toast should be red according to Hi-Fi.
+          position: "bottom-right",
+          variant: "top-accent",
+          duration: 5000,
+          isClosable: true,
+        });
       }
 
       handleClose();
@@ -490,16 +520,19 @@ const ProviderDrawer = ({
       size="md"
     >
       <DrawerOverlay />
-      <DrawerContent>
-        <DrawerCloseButton />
+      <DrawerContent maxW="432px">
+        <DrawerCloseButton
+          top="38px"
+          color="#113D64"
+        />
         <DrawerHeader
           sx={{
             display: "flex",
-            width: "371px",
             flexDirection: "column",
             alignItems: "flex-start",
             gap: "3px",
             flexShrink: 0,
+            paddingTop: "38px",
           }}
         >
           <Text
@@ -539,7 +572,12 @@ const ProviderDrawer = ({
           <SkeletonBody />
         ) : (
           <>
-            <DrawerBody>
+            <DrawerBody
+              display="flex"
+              flexDir="column"
+              gap="32px"
+              overflowX="hidden"
+            >
               {showConfirmation && (
                 <ConfirmationBanner
                   mode={activeMode}
@@ -562,14 +600,14 @@ const ProviderDrawer = ({
             <DrawerFooter
               justifyContent="space-between"
               gap={4}
-              px={6}
+              // px={6}
             >
               {activeMode === "edit" && !showConfirmation ? (
                 <>
                   <Button
-                    bg="red.600"
+                    bg="red.700"
                     color="white"
-                    _hover={{ bg: "red.700" }}
+                    _hover={{ bg: "red.800" }}
                     flex={1}
                     onClick={() => {
                       setActiveMode("delete");
@@ -595,21 +633,25 @@ const ProviderDrawer = ({
                     variant="outline"
                     onClick={handleClose}
                     flex={1}
+                    color="#022442"
+                    fontWeight={600}
                   >
-                    Cancel
+                    Back to Editing
                   </Button>
 
                   <Button
                     flex={1}
-                    bg={activeMode === "delete" ? "red.600" : "#113D64"}
+                    bg={activeMode === "delete" ? "red.700" : "#113D64"}
                     color="white"
                     _hover={{
-                      bg: activeMode === "delete" ? "red.700" : "#1a4f7a",
+                      bg: activeMode === "delete" ? "red.800" : "#1a4f7a",
                     }}
                     onClick={handleSubmit}
                   >
                     {showConfirmation
-                      ? "Confirm"
+                      ? activeMode === "delete"
+                        ? "Delete"
+                        : "Confirm"
                       : activeMode === "create"
                         ? "Create"
                         : "Confirm"}

@@ -261,6 +261,7 @@ const TagSelect = ({
           fontWeight="normal"
           rightIcon={<ChevronDown />}
           isDisabled={readOnly}
+          color="gray.700"
         >
           Select
         </MenuButton>
