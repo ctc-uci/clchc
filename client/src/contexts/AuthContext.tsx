@@ -1,6 +1,8 @@
 import { createContext, ReactNode, useEffect, useState } from "react";
 
-import { CreateToastFnReturn, Spinner } from "@chakra-ui/react";
+import { CreateToastFnReturn } from "@chakra-ui/react";
+import { AnimatePresence } from "framer-motion";
+import { LoadingScreen } from "../components/common/LoadingScreen";
 
 import { AxiosInstance } from "axios";
 import {
@@ -153,7 +155,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         handleRedirectResult,
       }}
     >
-      {loading ? <Spinner /> : children}
+      <AnimatePresence>{loading && <LoadingScreen key="loading" />}</AnimatePresence>
+      {!loading && children}
     </AuthContext.Provider>
   );
 };
