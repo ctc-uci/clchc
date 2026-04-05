@@ -16,25 +16,28 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { BackendProvider } from "@/contexts/BackendContext";
 import { UserProvider } from "@/contexts/UserContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { motion } from "framer-motion";
 import { CookiesProvider } from "react-cookie";
 import {
   Navigate,
   Route,
   BrowserRouter as Router,
   Routes,
+  useLocation,
 } from "react-router-dom";
 
 const queryClient = new QueryClient();
 
-const App = () => {
+const AppRoutes = () => {
+  const location = useLocation();
   return (
-    <QueryClientProvider client={queryClient}>
-    <CookiesProvider>
-      <BackendProvider>
-        <AuthProvider>
-          <UserProvider>
-            <Router>
-              <Routes>
+    <motion.div
+      key={location.pathname}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+    >
+      <Routes location={location}>
                 <Route element={<Layout/>}>
                   <Route
                   path="/user-directory"
@@ -115,12 +118,25 @@ const App = () => {
                   path="*"
                   element={<ProtectedRoute element={<CatchAll />} />}
                 />
-              </Routes>
-            </Router>
-          </UserProvider>
-        </AuthProvider>
-      </BackendProvider>
-    </CookiesProvider>
+      </Routes>
+    </motion.div>
+  );
+};
+
+const App = () => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <CookiesProvider>
+        <BackendProvider>
+          <AuthProvider>
+            <UserProvider>
+              <Router>
+                <AppRoutes />
+              </Router>
+            </UserProvider>
+          </AuthProvider>
+        </BackendProvider>
+      </CookiesProvider>
     </QueryClientProvider>
   );
 };
