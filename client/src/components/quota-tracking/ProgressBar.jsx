@@ -176,11 +176,11 @@ export default function ProgressBar({ quota }) {
       </Flex>
       <Text
         color="black"
-        fontSize="16px"
-        fontWeight="600"
+        fontSize="14px"
+        fontWeight="normal"
         lineHeight="24px"
         flexShrink={0}
-        marginLeft="10px"
+        marginLeft="12px"
         minWidth="40px"
       >
         {currentProgress}/{maxProgress}
