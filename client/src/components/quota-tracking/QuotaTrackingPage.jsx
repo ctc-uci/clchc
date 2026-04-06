@@ -6,7 +6,6 @@ import {
   Button,
   Card,
   CardBody,
-  CardFooter,
   CardHeader,
   Flex,
   HStack,
@@ -14,7 +13,6 @@ import {
   InputGroup,
   InputLeftElement,
   Skeleton,
-  Text,
   useDisclosure,
 } from "@chakra-ui/react";
 
@@ -164,38 +162,14 @@ export const QuotaTracking = () => {
       maxW="1200px"
       mx="auto"
     >
-      <Flex
-        justify="space-between"
-        align="flex-start"
-        mb={6}
-      >
+      <Box mb={6}>
         <PageHeader
           title="Quota Tracking"
           subheading="Monitor daily appointment progress across all providers"
           role={role}
           isLoading={roleLoading}
         />
-
-        <Box
-          flex="1"
-          display="flex"
-          justifyContent="flex-end"
-        >
-          <CalendarCard
-            value={selectedDate}
-            onChange={handleDateChange}
-          />
-        </Box>
-
-        <Button
-          leftIcon={<AddIcon />}
-          colorScheme="blue"
-          ml={4}
-          onClick={onCreateDrawerOpen}
-        >
-          Create Quota
-        </Button>
-      </Flex>
+      </Box>
 
       <Box
         overflowX="auto"
@@ -218,48 +192,76 @@ export const QuotaTracking = () => {
               <CustomCard
                 title="Total Progress"
                 body={`${stats.totalProgress}/${stats.totalQuota}`}
-                height="12rem"
-                width="14rem"
+                height="172.826px"
+                width="332px"
               />
               <CustomCard
                 title="Completion Rate"
                 body={`${stats.rate}%`}
                 footer="Overall Progress"
-                height="12rem"
-                width="14rem"
+                height="172.826px"
+                width="332px"
               />
               <CustomCard
                 title="Active Providers"
                 body={stats.activeProviders.toString()}
                 footer={`${stats.differentLocations} different locations`}
-                height="12rem"
-                width="14rem"
+                height="172.826px"
+                width="332px"
               />
               <CustomCard
                 title="Needs Attention"
                 body={stats.needsAttention.toString()}
-                footer="Below 40% Progress"
-                height="12rem"
-                width="14rem"
+                footer=""
+                height="172.826px"
+                width="332px"
               />
             </>
           )}
         </HStack>
       </Box>
 
-      <InputGroup
-        maxW="400px"
-        pb={6}
-      >
-        <InputLeftElement pointerEvents="none">
-          <SearchIcon color="gray.400" />
-        </InputLeftElement>
-        <Input
-          placeholder="Search Providers"
-          borderRadius="md"
-          onChange={handleChange}
-        />
-      </InputGroup>
+
+      <Flex gap={"6px"}>
+        <InputGroup
+          maxW="auto"
+          pb={6}
+        >
+          <InputLeftElement pointerEvents="none">
+            <SearchIcon color="gray.400" />
+          </InputLeftElement>
+          <Input
+            placeholder="Search Providers"
+            borderRadius="md"
+            onChange={handleChange}
+          />
+        </InputGroup>
+        
+        <Box
+          flex="1"
+          display="flex"
+          justifyContent="flex-end"
+        >
+          <CalendarCard
+            value={selectedDate}
+            onChange={handleDateChange}
+          />
+        </Box>
+
+        <Button
+          rightIcon={<AddIcon boxSize={3} />}
+          padding={"0 24px"}
+          background="#113D64"
+          borderRadius="4px"
+          onClick={onCreateDrawerOpen}
+          textColor={"white"}
+          fontSize="14px"
+          fontWeight="normal"
+          _hover={{ background: "#485365" }}
+        >
+          Create Quota
+        </Button>
+      </Flex>
 
       <QuotaTable
         rows={quotas}

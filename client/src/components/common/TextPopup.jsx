@@ -33,7 +33,7 @@ const TextPopup = ({ text = "", alwaysShowPopup = false, truncateAt }) => {
       </PopoverTrigger>
       <Portal>
         <PopoverContent
-          bg="blackAlpha.500"
+          bg="blackAlpha.900"
           maxW="300px"
         >
           <PopoverArrow bg="blackAlpha.500" />

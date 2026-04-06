@@ -113,29 +113,27 @@ const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
   return (
     <TableContainer
       ref={tableRef}
-      borderWidth="1px"
-      borderColor="gray.200"
-      borderRadius="lg"
+      borderRadius="4px 0 0 0"
       maxHeight="60vh"
       overflowY="auto"
     >
       <Table
         variant="simple"
-        sx={{ tableLayout: "fixed" }}
+        sx={{
+          "td, th": { borderBottom: "none" },
+        }}
       >
-        <Thead
-          bg="#EBEBEB"
-          position="sticky"
-          top={0}
-          h="60px"
-          zIndex={1}
-        >
+        <Thead bg="#C8D4E6"
+        position="sticky"
+        top={0}
+        h="40px"
+        zIndex={1}>
           <Tr>
-            <Th width="20%">Providers</Th>
-            <Th width="20%">Location</Th>
-            <Th width="20%">Type</Th>
-            <Th width="20%">Progress</Th>
-            <Th width="20%">Notes</Th>
+            <Th textColor="#113D64">Providers</Th>
+            <Th textColor="#113D64">Location</Th>
+            <Th textColor="#113D64">Type</Th>
+            <Th textColor="#113D64">Progress</Th>
+            <Th textColor="#113D64">Notes</Th>
           </Tr>
         </Thead>
 
@@ -143,10 +141,11 @@ const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
           {loading ? (
             <SkeletonRows />
           ) : (
-            rows.map((row) => (
+            rows.map((row, index) => (
               <Tr
                 key={row.id}
-                bg={selectedRowId === row.id ? SELECTED_BG : "transparent"}
+                bg={selectedRowId === row.id ? SELECTED_BG : index % 2 === 0 ? "#FFF" : "#F9F9F9"}
+                border="1.5px solid rgba(0, 0, 0, 0.06)"
                 onClick={() => {
                   if (selectedRowId === row.id) {
                     // Second click - open drawer
@@ -164,37 +163,39 @@ const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
                 }}
               >
                 {/* Provider */}
-                <Td>
+                <Td border="1.5px solid rgba(0, 0, 0, 0.06)">
                   <Box>
-                    <Text fontWeight="medium">{row.providerName}</Text>
-                    {row.startTime && row.endTime && (
-                      <Text
-                        fontSize="sm"
-                        color="gray.500"
-                      >
-                        {formatHoursRange(row.startTime, row.endTime)}
-                      </Text>
-                    )}
+                    <Text fontWeight="normal" fontSize={"14px"}>{row.providerName}</Text>
                   </Box>
                 </Td>
 
                 {/* Location */}
-                <Td>
+                <Td padding="16px 24px" border="1.5px solid rgba(0, 0, 0, 0.06)">
                   <Badge
                     px={3}
                     py={1}
-                    borderRadius="full"
+                    fontWeight={0}
+                    fontSize={"14px"}
+                    textTransform="none"
+                    bgColor={"#35639D"}
+                    textColor={"white"}
+                    borderRadius="6px"
                   >
                     {row.locationName}
                   </Badge>
                 </Td>
 
                 {/* Type */}
-                <Td>
+                <Td padding="16px 24px" border="1.5px solid rgba(0, 0, 0, 0.06)">
                   <Badge
                     px={3}
                     py={1}
-                    borderRadius="full"
+                    fontWeight={0}
+                    fontSize={"14px"}
+                    textTransform="none"
+                    bgColor={"#35639D"}
+                    textColor={"white"}
+                    borderRadius="6px"
                   >
                     <Text textTransform="capitalize">
                       {row.appointmentType}
@@ -206,6 +207,8 @@ const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
                 <Td
                   px={2}
                   py={34.5}
+                  border="1.5px solid rgba(0, 0, 0, 0.06)"
+                  padding="16px 24px" 
                 >
                   <Box onClick={(e) => e.stopPropagation()}>
                     <ProgressBar quota={row} />
@@ -213,7 +216,7 @@ const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
                 </Td>
 
                 {/* Notes */}
-                <Td>
+                <Td padding="16px 24px" border="1.5px solid rgba(0, 0, 0, 0.06)">
                   {row.notes && row.notes.length > 200 ? (
                     <TextPopup
                       text={row.notes}
@@ -221,7 +224,7 @@ const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
                       truncateAt={200}
                     />
                   ) : (
-                    <Text>{row.notes}</Text>
+                    <Text textColor={"#718096"}>{row.notes}</Text>
                   )}
                 </Td>
               </Tr>
