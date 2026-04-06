@@ -16,6 +16,7 @@ import {
   Text,
   Textarea,
   useToast,
+  Avatar
 } from "@chakra-ui/react";
 
 import { useDeleteUser } from "@/contexts/hooks/data-fetching/useUsers";
@@ -109,7 +110,7 @@ export const DenyRequestModal = ({ isOpen, onClose, user }) => {
                     gap={3}
                     p={2}
                   >
-                    <Flex
+                    <Avatar
                       w="58px"
                       h="58px"
                       bg="#FFFFFF"
@@ -118,9 +119,9 @@ export const DenyRequestModal = ({ isOpen, onClose, user }) => {
                       justify="center"
                       fontSize="lg"
                       src={user.photoUrl ?? undefined}
+                      name={`${user.firstName ?? ""} ${user.lastName ?? ""}`}
                     >
-                      {`${user.firstName?.[0] ?? ""}${user.lastName?.[0] ?? ""}`}
-                    </Flex>
+                    </Avatar>
 
                     <Box>
                       <Text

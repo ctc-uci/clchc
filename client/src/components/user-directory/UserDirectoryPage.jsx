@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { SearchIcon } from "@chakra-ui/icons";
 import {
@@ -29,6 +30,7 @@ export const UserDirectory = () => {
   const [searchInput, setSearchInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRole, setSelectedRole] = useState("all");
+  const navigate = useNavigate();
 
   const debouncedSetSearchQuery = useDebounce((value) => {
     setSearchQuery(value);
@@ -101,16 +103,10 @@ export const UserDirectory = () => {
         gap={1}
         mb={2}
       >
-        <Box
-          w="8px"
-          h="8px"
-          bg="red.500"
-          borderRadius="full"
-        />
         <Heading
           color="#00000080"
           fontSize="xs"
-          fontWeight="semibold"
+          fontWeight="500px"
         >
           PENDING REQUESTS
         </Heading>
@@ -124,9 +120,9 @@ export const UserDirectory = () => {
             fontSize="12px"
             color="gray.500"
             _hover={{ color: "gray.700" }}
-
+            onClick={() => navigate("/user-requests")}
           >
-            View All Requests
+            View All
           </Box>
         </Flex>
       </Box>

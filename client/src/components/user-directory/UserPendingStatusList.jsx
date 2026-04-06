@@ -69,7 +69,7 @@ const RequestSkeleton = () => {
   );
 };
 
-export const UserPendingStatusList = () => {
+export const UserPendingStatusList = ({ showAll = false }) => {
   const {
     data: pendingUsers = [],
     isLoading,
@@ -77,6 +77,8 @@ export const UserPendingStatusList = () => {
   } = useUsers({
     status: "pending",
   });
+
+  const displayUsers = showAll ? pendingUsers : pendingUsers.slice(0, 2);
 
   const { mutate: updateUser } = useUpdateUser();
 
@@ -123,7 +125,7 @@ export const UserPendingStatusList = () => {
         ) : error ? (
           <Text color="red.500">Failed to load pending requests.</Text>
         ) : (
-          pendingUsers.map((req) => (
+          displayUsers.map((req) => (
             <Flex
               key={req.id}
               align="center"
