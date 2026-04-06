@@ -54,7 +54,7 @@ export default function ConfirmationModal({
               fontWeight="600"
               mb={1}
             >
-              Are you Sure?
+              Are you sure?
             </Text>
 
             <Text
