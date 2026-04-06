@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import {
   Box,
   Button,
@@ -21,6 +23,7 @@ export default function ConfirmationModal({
   preview,
 }) {
   const toast = useToast();
+  const [isSaving, setIsSaving] = useState(false);
 
   return (
     <Modal
@@ -80,7 +83,13 @@ export default function ConfirmationModal({
               borderRadius="xl"
               px={8}
               _hover={{ bg: "blue.900" }}
+              isLoading={isSaving}
+              loadingText="Saving"
               onClick={async () => {
+                if (isSaving) return;
+
+                setIsSaving(true);
+
                 try {
                   const didSave = await onConfirm();
 
@@ -106,6 +115,8 @@ export default function ConfirmationModal({
                     isClosable: true,
                     position: "top-right",
                   });
+                } finally {
+                  setIsSaving(false);
                 }
               }}
             >
