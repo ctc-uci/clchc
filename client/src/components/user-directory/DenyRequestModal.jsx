@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import { CheckCircleIcon } from "@chakra-ui/icons";
 import {
+  Avatar,
   Box,
   Button,
   Checkbox,
@@ -16,7 +17,6 @@ import {
   Text,
   Textarea,
   useToast,
-  Avatar
 } from "@chakra-ui/react";
 
 import { useDeleteUser } from "@/contexts/hooks/data-fetching/useUsers";
@@ -119,8 +119,7 @@ export const DenyRequestModal = ({ isOpen, onClose, user }) => {
                       fontSize="lg"
                       src={user.photoUrl ?? undefined}
                       name={`${user.firstName ?? ""} ${user.lastName ?? ""}`}
-                    >
-                    </Avatar>
+                    ></Avatar>
 
                     <Box>
                       <Text
@@ -184,26 +183,42 @@ export const DenyRequestModal = ({ isOpen, onClose, user }) => {
           )}
         </ModalBody>
 
-        <ModalFooter
-          gap={3}
-          px={8}
-        >
-          <Button
-            bg="#D9D9D9"
-            _hover={{ bg: "#CFCFCF" }}
-            px={7}
-            onClick={onClose}
-          >
-            Cancel
-          </Button>
-          <Button
-            bg="#CE3131"
-            _hover={{ bg: "#B92B2B" }}
-            color="white"
-            onClick={handleDeny}
-          >
-            Deny Request
-          </Button>
+        <ModalFooter>
+          <Flex w="75%">
+            <Button
+              fontWeight="400"
+              fontSize="20px"
+              variant="outline"
+              border="1px"
+              borderRadius="6px"
+              borderColor="#00000026"
+              mr={3}
+              onClick={onClose}
+              flex="1"
+              maxW="181px"
+              py={3}
+              h="auto"
+              bg="#F9FAFB"
+            >
+              Cancel
+            </Button>
+            <Button
+              fontWeight="400"
+              fontSize="20px"
+              colorScheme="blackAlpha"
+              bg="#90080F"
+              color="white"
+              borderRadius="6px"
+              flex="1"
+              maxW="181px"
+              py={3}
+              h="auto"
+              onClick={handleDeny}
+              _hover={{ bg: "#A50F15" }}
+            >
+              Deny
+            </Button>
+          </Flex>
         </ModalFooter>
       </ModalContent>
     </Modal>
