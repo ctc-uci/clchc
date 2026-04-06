@@ -1,5 +1,4 @@
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 import { SearchIcon } from "@chakra-ui/icons";
 import {
@@ -20,6 +19,7 @@ import {
 } from "@/contexts/hooks/data-fetching/useUsers";
 import { useUserContext } from "@/contexts/hooks/useUserContext";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useNavigate } from "react-router-dom";
 
 import { UserPendingStatusList } from "./UserPendingStatusList";
 import UserRoleFilter from "./UserRoleFilter";
@@ -105,24 +105,27 @@ export const UserDirectory = () => {
       >
         <Heading
           color="#00000080"
-          fontSize="xs"
+          fontSize="14px"
           fontWeight="500px"
         >
           PENDING REQUESTS
         </Heading>
       </Flex>
-      <Box mb={8}>
+      <Box mb={4}>
         <UserPendingStatusList />
-        {/* TODO: Implement view all requests functionality */}
-        <Flex justify="flex-end" mt={2}>
+        <Flex
+          justify="flex-end"
+          mt={2}
+        >
           <Box
             as="button"
-            fontSize="12px"
+            fontSize="14px"
+            fontStyle="italic"
             color="gray.500"
             _hover={{ color: "gray.700" }}
             onClick={() => navigate("/user-requests")}
           >
-            View All
+          View All
           </Box>
         </Flex>
       </Box>
