@@ -18,7 +18,7 @@ export const CustomCard = ({ title, body, footer, footerUnderline, height, width
         <Text
           fontSize="16px"
           color="gray.500"
-          fontWeight="medium"
+          fontWeight="normal"
         >
           {title}
         </Text>
