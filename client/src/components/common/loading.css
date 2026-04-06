@@ -11,7 +11,7 @@
 
 .ring-container {
   position: relative;
-  width: 420px;
+  width: min(420px, 100vw);
   height: 165px;
   margin: 0;
   padding: 0;

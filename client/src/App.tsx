@@ -16,7 +16,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { BackendProvider } from "@/contexts/BackendContext";
 import { UserProvider } from "@/contexts/UserContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { CookiesProvider } from "react-cookie";
 import {
   Navigate,
@@ -31,7 +31,8 @@ const queryClient = new QueryClient();
 const AppRoutes = () => {
   const location = useLocation();
   return (
-    <motion.div
+    <AnimatePresence mode="wait">
+    <motion.main
       key={location.pathname}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -119,7 +120,8 @@ const AppRoutes = () => {
                   element={<ProtectedRoute element={<CatchAll />} />}
                 />
       </Routes>
-    </motion.div>
+    </motion.main>
+    </AnimatePresence>
   );
 };
 
