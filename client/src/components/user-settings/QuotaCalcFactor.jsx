@@ -32,23 +32,24 @@ export default function QuotaCalcFactor() {
   }, [dbUser, setFactor]);
 
   const handleSave = async () => {
-    if (!dbUser?.id) return false;
+  if (!dbUser?.id) return false;
 
-    const numericFactor = parseFloat(factor);
-    if (isNaN(numericFactor)) return false;
+  const numericFactor = factor === "" ? 0 : parseFloat(factor);
 
-    try {
-      await updateUser({
-        id: dbUser.id,
-        data: { apptCalcFactor: numericFactor },
-      });
-      await refetch();
-      setIsEditMode(false);
-      return true;
-    } catch (_error) {
-      return false;
-    }
-  };
+  if (isNaN(numericFactor)) return false;
+
+  try {
+    await updateUser({
+      id: dbUser.id,
+      data: { apptCalcFactor: numericFactor },
+    });
+    await refetch();
+    setIsEditMode(false);
+    return true;
+  } catch (_error) {
+    return false;
+  }
+};
 
   const handleToggle = () => {
     if (isEditMode) {

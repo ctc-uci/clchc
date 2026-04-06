@@ -22,6 +22,13 @@ import { MdEdit } from "react-icons/md";
 
 import ConfirmationModal from "./ConfirmationModal";
 
+const ROLE_LABELS = {
+    viewer: "Viewer",
+    ccm: "CCM",
+    ccs: "CCS",
+    master: "Master",
+  };
+
 export default function PersonalInfo() {
   const userData = useUserContext();
   const { mutateAsync: update } = useUpdateUser();
@@ -29,12 +36,6 @@ export default function PersonalInfo() {
   const refetch = userData?.refetch;
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [pendingKey, setPendingKey] = useState(null);
-  const ROLE_LABELS = {
-    viewer: "Viewer",
-    ccm: "CCM",
-    ccs: "CCS",
-    master: "Master",
-  };
 
   const [userInfo, setUserInfo] = useState({
     firstName: "",

@@ -11,17 +11,18 @@ import { useUserContext } from "@/contexts/hooks/useUserContext";
 
 import ConfirmationModal from "./ConfirmationModal";
 
-export default function SignOutSection() {
-  const { logout } = useAuthContext();
-  const userData = useUserContext();
-  const dbUser = userData?.dbUser;
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const ROLE_LABELS = {
+const ROLE_LABELS = {
     viewer: "Viewer",
     ccm: "CCM",
     ccs: "CCS",
     master: "Master",
   };
+
+export default function SignOutSection() {
+  const { logout } = useAuthContext();
+  const userData = useUserContext();
+  const dbUser = userData?.dbUser;
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const handleConfirmSignOut = async () => {
     try {
