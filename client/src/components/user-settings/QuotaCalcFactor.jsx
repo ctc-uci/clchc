@@ -32,10 +32,16 @@ export default function QuotaCalcFactor() {
   }, [dbUser]);
 
   const handleSave = async () => {
-    if (!dbUser?.id) return;
-    await updateUser({ id: dbUser.id, data: { apptCalcFactor: factor } });
-    await refetch();
-    setIsEditMode(false);
+    if (!dbUser?.id) return false;
+
+    try {
+      await updateUser({ id: dbUser.id, data: { apptCalcFactor: factor } });
+      await refetch();
+      setIsEditMode(false);
+      return true;
+    } catch (_error) {
+      return false;
+    }
   };
 
   const handleToggle = () => {
@@ -89,7 +95,7 @@ export default function QuotaCalcFactor() {
           />
           <IconButton
             icon={isEditMode ? <CheckIcon /> : <EditIcon />}
-            size="s"
+            size="sm"
             variant="ghost"
             colorScheme="gray"
             aria-label={

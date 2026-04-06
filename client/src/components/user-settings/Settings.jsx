@@ -90,7 +90,7 @@ export function Settings() {
           <PersonalInfo />
         </GridItem>
 
-        {dbUser.role === "master" || dbUser.role === "ccm" ? (
+        {dbUser?.role === "master" || dbUser?.role === "ccm" ? (
           <>
             <GridItem
               bg="white"

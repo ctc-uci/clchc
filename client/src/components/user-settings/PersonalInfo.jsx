@@ -66,6 +66,8 @@ export default function PersonalInfo() {
     setUserInfo((prev) => ({ ...prev, [key]: value }));
 
   const handleSave = async () => {
+    if (!dbUser?.id) return false;
+
     try {
       await update({
         id: dbUser.id,
@@ -77,8 +79,9 @@ export default function PersonalInfo() {
       });
       await refetch();
       setEditing((prev) => ({ ...prev, [pendingKey]: false }));
-    } catch (e) {
-      console.error("Failed to update user:", e);
+      return true;
+    } catch (_error) {
+      return false;
     }
   };
 
@@ -177,7 +180,7 @@ export default function PersonalInfo() {
                         />
                       )
                     }
-                    size="s"
+                    size="sm"
                     variant="ghost"
                     colorScheme="gray"
                     aria-label={isEditMode ? `Save ${label}` : `Edit ${label}`}

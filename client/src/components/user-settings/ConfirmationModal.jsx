@@ -1,4 +1,14 @@
-import { Box, Button, Flex, Modal, ModalBody, ModalContent, ModalOverlay, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Flex,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalOverlay,
+  Text,
+  useToast,
+} from "@chakra-ui/react";
 
 
 
@@ -10,6 +20,8 @@ export default function ConfirmationModal({
   onConfirm,
   preview,
 }) {
+  const toast = useToast();
+
   return (
     <Modal
       isOpen={isOpen}
@@ -68,9 +80,33 @@ export default function ConfirmationModal({
               borderRadius="xl"
               px={8}
               _hover={{ bg: "blue.900" }}
-              onClick={() => {
-                onConfirm();
-                onClose();
+              onClick={async () => {
+                try {
+                  const didSave = await onConfirm();
+
+                  if (didSave === false) {
+                    toast({
+                      title: "Save failed",
+                      description: "Please try again.",
+                      status: "error",
+                      duration: 4000,
+                      isClosable: true,
+                      position: "top-right",
+                    });
+                    return;
+                  }
+
+                  onClose();
+                } catch (_error) {
+                  toast({
+                    title: "Save failed",
+                    description: "Please try again.",
+                    status: "error",
+                    duration: 4000,
+                    isClosable: true,
+                    position: "top-right",
+                  });
+                }
               }}
             >
               Save Changes
