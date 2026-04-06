@@ -8,7 +8,6 @@ import {
   CardBody,
   CardHeader,
   Flex,
-  HStack,
   Input,
   InputGroup,
   InputLeftElement,
@@ -171,15 +170,11 @@ export const QuotaTracking = () => {
         />
       </Box>
 
-      <Box
-        overflowX="auto"
+      <Flex
+        gap={4}
         py={4}
         mb={6}
       >
-        <HStack
-          spacing={4}
-          minW="min-content"
-        >
           {isLoading ? (
             <>
               <SkeletonCard />
@@ -193,33 +188,32 @@ export const QuotaTracking = () => {
                 title="Total Progress"
                 body={`${stats.totalProgress}/${stats.totalQuota}`}
                 height="172.826px"
-                width="332px"
+                flex={1}
               />
               <CustomCard
                 title="Completion Rate"
                 body={`${stats.rate}%`}
                 footer="Overall Progress"
                 height="172.826px"
-                width="332px"
+                flex={1}
               />
               <CustomCard
                 title="Active Providers"
                 body={stats.activeProviders.toString()}
                 footer={`${stats.differentLocations} different locations`}
                 height="172.826px"
-                width="332px"
+                flex={1}
               />
               <CustomCard
                 title="Needs Attention"
                 body={stats.needsAttention.toString()}
                 footer=""
                 height="172.826px"
-                width="332px"
+                flex={1}
               />
             </>
           )}
-        </HStack>
-      </Box>
+      </Flex>
 
 
       <Flex gap={"6px"}>

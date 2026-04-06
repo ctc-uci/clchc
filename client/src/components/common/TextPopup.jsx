@@ -36,7 +36,7 @@ const TextPopup = ({ text = "", alwaysShowPopup = false, truncateAt }) => {
           bg="blackAlpha.900"
           maxW="300px"
         >
-          <PopoverArrow bg="blackAlpha.500" />
+          <PopoverArrow bg="blackAlpha.900" />
           <PopoverBody>
             <Text
               whiteSpace="pre-wrap"
