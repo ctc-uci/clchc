@@ -82,7 +82,7 @@ export default function QuotaCalcFactor() {
       <FormControl maxW="300px">
         <FormLabel
           fontWeight="semibold"
-          fontSize="sm"
+          fontSize="16px"
         >
           Calculation Factor
         </FormLabel>

@@ -59,7 +59,7 @@ export function Settings() {
             {dbUser?.firstName} {dbUser?.lastName}
           </Text>
           <Text
-            fontWeight="bold"
+            fontWeight="semibold"
             fontSize="24px"
             textAlign="center"
             paddingTop="32px"
@@ -76,12 +76,12 @@ export function Settings() {
         >
           <Text
             fontWeight="bold"
-            fontSize="lg"
+            fontSize="22px"
           >
             Personal Information
           </Text>
           <Text
-            fontSize="sm"
+            fontSize="14px"
             color="gray.600"
             mt="0.5em"
           >
@@ -92,6 +92,7 @@ export function Settings() {
           bg="white"
           p="1.5em"
           borderColor="gray.200"
+          marginBottom="60px"
         >
           <PersonalInfo />
         </GridItem>
@@ -103,15 +104,16 @@ export function Settings() {
               p="1.5em"
               borderColor="gray.200"
               ml="80px"
+              marginBottom="60px"
             >
               <Text
                 fontWeight="bold"
-                fontSize="lg"
+                fontSize="22px"
               >
                 Quota Calculation Factor
               </Text>
               <Text
-                fontSize="sm"
+                fontSize="14px"
                 color="gray.600"
                 mt="0.5em"
               >
@@ -138,12 +140,12 @@ export function Settings() {
         >
           <Text
             fontWeight="bold"
-            fontSize="lg"
+            fontSize="22px"
           >
             Sign Out
           </Text>
           <Text
-            fontSize="sm"
+            fontSize="14px"
             color="gray.600"
             mt="0.5em"
           >

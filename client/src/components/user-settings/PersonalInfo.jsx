@@ -158,7 +158,7 @@ export default function PersonalInfo() {
             <FormControl key={key}>
               <FormLabel
                 fontWeight="semibold"
-                fontSize="sm"
+                fontSize="16px"
               >
                 {label}
               </FormLabel>
