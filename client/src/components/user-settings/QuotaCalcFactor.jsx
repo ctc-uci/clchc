@@ -24,18 +24,24 @@ export default function QuotaCalcFactor() {
   const refetch = userData?.refetch;
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const [factor, setFactor] = useState(0);
+  const [factor, setFactor] = useState(dbUser?.apptCalcFactor?.toString() || "");
   const [isEditMode, setIsEditMode] = useState(false);
 
   useEffect(() => {
-    setFactor(dbUser?.apptCalcFactor ?? 0);
-  }, [dbUser]);
+    setFactor(dbUser?.apptCalcFactor?.toString() || "");
+  }, [dbUser, setFactor]);
 
   const handleSave = async () => {
     if (!dbUser?.id) return false;
 
+    const numericFactor = parseFloat(factor);
+    if (isNaN(numericFactor)) return false;
+
     try {
-      await updateUser({ id: dbUser.id, data: { apptCalcFactor: factor } });
+      await updateUser({
+        id: dbUser.id,
+        data: { apptCalcFactor: numericFactor },
+      });
       await refetch();
       setIsEditMode(false);
       return true;
@@ -65,7 +71,7 @@ export default function QuotaCalcFactor() {
         px={2}
         py={0.5}
       >
-        <Text fontSize="sm">{Number.isFinite(factor) ? factor : 0}</Text>
+        <Text fontSize="sm">{factor || "0"}</Text>
       </Box>
     </Flex>
   );
@@ -85,8 +91,8 @@ export default function QuotaCalcFactor() {
         >
           <Input
             type="number"
-            value={Number.isFinite(factor) ? factor : 0}
-            onChange={(e) => setFactor(parseFloat(e.target.value) || 0)}
+            value={factor}
+            onChange={(e) => setFactor(e.target.value)}
             isReadOnly={!isEditMode}
             bg={isEditMode ? "white" : "gray.100"}
             color={isEditMode ? "black" : "#586771"}
