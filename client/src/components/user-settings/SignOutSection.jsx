@@ -1,5 +1,11 @@
 import React from "react";
-import { HStack, Text, Button } from "@chakra-ui/react";
+
+
+
+import { Button, HStack, Text } from "@chakra-ui/react";
+
+
+
 import { useAuthContext } from "@/contexts/hooks/useAuthContext";
 import { useUserContext } from "@/contexts/hooks/useUserContext";
 
@@ -9,14 +15,23 @@ export default function SignOutSection() {
   const dbUser = userData?.dbUser;
 
   return (
-    <HStack spacing="2em" align="center">
+    <HStack
+      spacing="2em"
+      align="center"
+    >
       <Text fontSize="sm">
         You are currently signed in as{" "}
-        <Text as="span" fontWeight="bold">
+        <Text
+          as="span"
+          fontWeight="bold"
+          display="block"
+        >
           {dbUser?.firstName} {dbUser?.lastName}
         </Text>
       </Text>
       <Button
+        bg="#113D64"
+        color="white"
         onClick={logout}
         px="2em"
       >

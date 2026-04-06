@@ -1,13 +1,8 @@
-import {
-  Box,
-  Button,
-  Flex,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalOverlay,
-  Text,
-} from "@chakra-ui/react";
+import { Box, Button, Flex, Modal, ModalBody, ModalContent, ModalOverlay, Text } from "@chakra-ui/react";
+
+
+
+
 
 export default function ConfirmationModal({
   isOpen,
@@ -25,7 +20,7 @@ export default function ConfirmationModal({
       <ModalContent
         borderRadius="2xl"
         p={6}
-        maxW="420px"
+        maxW="340px"
       >
         <ModalBody p={0}>
           <Text
@@ -46,6 +41,8 @@ export default function ConfirmationModal({
           <Box
             bg="gray.50"
             borderRadius="xl"
+            border="1px solid"
+            borderColor="gray.200"
             p={4}
             mb={6}
           >
@@ -59,13 +56,14 @@ export default function ConfirmationModal({
             <Button
               variant="outline"
               borderRadius="xl"
+              borderColor="gray.300"
               px={8}
               onClick={onClose}
             >
               Cancel
             </Button>
             <Button
-              bg="navy"
+              bg="#113D64"
               color="white"
               borderRadius="xl"
               px={8}

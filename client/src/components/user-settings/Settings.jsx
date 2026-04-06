@@ -1,16 +1,15 @@
-import {
-  Avatar,
-  Box,
-  Grid,
-  GridItem,
-  Text,
-} from "@chakra-ui/react";
+import { Avatar, Box, Grid, GridItem, Text } from "@chakra-ui/react";
+
+
 
 import { useUserContext } from "@/contexts/hooks/useUserContext";
+
+
 
 import PersonalInfo from "./PersonalInfo.jsx";
 import QuotaCalcFactor from "./QuotaCalcFactor.jsx";
 import SignOutSection from "./SignOutSection.jsx";
+
 
 export const PERSONAL_INFO = "personal-info";
 export const DELETE_ACCOUNT = "delete-account";
@@ -22,16 +21,16 @@ export function Settings() {
 
   return (
     <Box
-      paddingTop="5%"
+      paddingTop="60px"
       paddingX="50px"
     >
       <Grid
-        templateColumns="220px 260px 1fr"
+        templateColumns="220px 400px 500px"
         templateRows="auto auto auto"
         minH="520px"
       >
         <GridItem
-          rowSpan={3}
+          rowSpan={dbUser?.role === "master" || dbUser?.role === "ccm" ? 3 : 2}
           bg="white"
           p="2em"
           display="flex"
@@ -142,7 +141,7 @@ export function Settings() {
             color="gray.600"
             mt="0.5em"
           >
-            Sign out of your account
+            Sign out of your account.
           </Text>
         </GridItem>
         <GridItem
