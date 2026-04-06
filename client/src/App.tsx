@@ -88,10 +88,6 @@ const App = () => {
                     element={<ProtectedRoute element={<Dashboard />} />}
                   />
                   <Route
-                    path="/provider-directory"
-                    element={<ProviderDirectoryPage />}
-                  />
-                  <Route
                     path="/version-log"
                     element={<VersionLogPage />}
                   />

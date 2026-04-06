@@ -112,11 +112,7 @@ export const DenyRequestModal = ({ isOpen, onClose, user }) => {
                     <Avatar
                       w="58px"
                       h="58px"
-                      bg="#FFFFFF"
                       borderRadius="xl"
-                      align="center"
-                      justify="center"
-                      fontSize="lg"
                       src={user.photoUrl ?? undefined}
                       name={`${user.firstName ?? ""} ${user.lastName ?? ""}`}
                     ></Avatar>

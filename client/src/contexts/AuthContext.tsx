@@ -118,9 +118,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
       } else {
         // Sync photoURL in case the user updated their Google profile picture
-        await backend.put(`/users/firebase/${result.user.uid}`, {
-          photoURL: result.user.photoURL ?? null,
-        });
+        try {
+          await backend.put(`/users/firebase/${result.user.uid}`, {
+            photoURL: result.user.photoURL ?? null,
+          });
+        } catch (e) {
+          console.error("Failed to sync photoURL:", e);
+        }
+ 
       }
 
       const data = response.data;

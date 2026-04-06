@@ -35,6 +35,14 @@ export default function UserEditModal({ isOpen, onClose, user, onUpdated }) {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [deleteInput, setDeleteInput] = useState("");
 
+  useEffect(() => {
+    if (isOpen) {
+      setIsDeleteOpen(false);
+      setDeleteInput("");
+      setSelectedRole(user?.role ?? "viewer");
+    }
+  }, [isOpen, user]);
+
   const roleOptions = [
     { value: "ccm", label: "Call Center Manager" },
     { value: "ccs", label: "Call Center Staff" },
