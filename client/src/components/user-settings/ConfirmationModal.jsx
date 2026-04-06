@@ -21,6 +21,8 @@ export default function ConfirmationModal({
   onClose,
   onConfirm,
   preview,
+  customText = "You are saving the following information",
+  customButtonText = "Save Changes"
 }) {
   const toast = useToast();
   const [isSaving, setIsSaving] = useState(false);
@@ -50,7 +52,7 @@ export default function ConfirmationModal({
             color="gray.500"
             mb={4}
           >
-            You are saving the following information
+            {customText}
           </Text>
 
           <Box
@@ -120,7 +122,7 @@ export default function ConfirmationModal({
                 }
               }}
             >
-              Save Changes
+              {customButtonText}
             </Button>
           </Flex>
         </ModalBody>

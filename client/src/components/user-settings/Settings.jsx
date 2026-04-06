@@ -21,12 +21,16 @@ export function Settings() {
 
   return (
     <Box
-      paddingTop="60px"
-      paddingX="50px"
+      display="flex"
+      alignItems="center"
+      justifyContent="center"
+      py="80px"
     >
       <Grid
-        templateColumns="220px 400px 500px"
+        templateColumns="300px 1fr 1fr"
+        maxW="1400px"
         templateRows="auto auto auto"
+        mx="auto"
         minH="520px"
       >
         <GridItem
@@ -39,24 +43,26 @@ export function Settings() {
           justifyContent="flex-start"
           pt="3em"
           gap="1em"
-          width="278px"
+          width="300px"
         >
           <Avatar
-            w="200px"
-            h="200px"
+            w="270px"
+            h="270px"
             name={`${dbUser?.firstName} ${dbUser?.lastName}`}
           />
           <Text
             fontWeight="bold"
-            fontSize="xl"
+            fontSize="32px"
             textAlign="center"
+            paddingTop="50px"
           >
             {dbUser?.firstName} {dbUser?.lastName}
           </Text>
           <Text
-            color="gray.600"
-            fontSize="sm"
+            fontWeight="bold"
+            fontSize="24px"
             textAlign="center"
+            paddingTop="32px"
           >
             {dbUser?.email}
           </Text>
