@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
 
-
-
 import { CheckIcon } from "@chakra-ui/icons";
 import {
   Avatar,
@@ -13,21 +11,16 @@ import {
   Icon,
   IconButton,
   Input,
+  Tag,
   Text,
   useDisclosure,
-  Tag
 } from "@chakra-ui/react";
-
-
 
 import { useUpdateUser } from "@/contexts/hooks/data-fetching/useUsers";
 import { useUserContext } from "@/contexts/hooks/useUserContext";
 import { MdEdit } from "react-icons/md";
 
-
-
 import ConfirmationModal from "./ConfirmationModal";
-
 
 export default function PersonalInfo() {
   const userData = useUserContext();
@@ -36,6 +29,12 @@ export default function PersonalInfo() {
   const refetch = userData?.refetch;
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [pendingKey, setPendingKey] = useState(null);
+  const ROLE_LABELS = {
+    viewer: "Viewer",
+    ccm: "CCM",
+    ccs: "CCS",
+    master: "Master",
+  };
 
   const [userInfo, setUserInfo] = useState({
     firstName: "",
@@ -103,7 +102,10 @@ export default function PersonalInfo() {
   ];
 
   const modalPreview = (
-    <Flex align="center" gap={3}>
+    <Flex
+      align="center"
+      gap={3}
+    >
       <Avatar
         name={`${userInfo?.firstName} ${userInfo?.lastName}`}
         size="sm"
@@ -114,16 +116,22 @@ export default function PersonalInfo() {
         h="36px"
         fontSize="14px"
       />
-  
+
       <Box flex={1}>
-        <Text fontWeight="600" fontSize="14px">
+        <Text
+          fontWeight="600"
+          fontSize="14px"
+        >
           {userInfo?.firstName} {userInfo?.lastName}
         </Text>
-        <Text fontSize="12px" color="gray.500">
+        <Text
+          fontSize="12px"
+          color="gray.500"
+        >
           {userInfo?.email}
         </Text>
       </Box>
-  
+
       <Tag
         border="1px solid #D1D5DB"
         borderRadius="8px"
@@ -132,7 +140,7 @@ export default function PersonalInfo() {
         fontSize="12px"
         bg="#F5F5F5"
       >
-        {userInfo?.role}
+        {ROLE_LABELS[userInfo?.role] || userInfo?.role}
       </Tag>
     </Flex>
   );
@@ -158,7 +166,11 @@ export default function PersonalInfo() {
                 gap={2}
               >
                 <Input
-                  value={userInfo[key]}
+                  value={
+                    key === "role"
+                      ? ROLE_LABELS[userInfo[key]] || userInfo[key]
+                      : userInfo[key]
+                  }
                   onChange={(e) => updateUserProp(key, e.target.value)}
                   isReadOnly={!isEditMode}
                   bg={isEditMode ? "white" : "gray.100"}

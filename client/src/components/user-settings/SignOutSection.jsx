@@ -16,6 +16,12 @@ export default function SignOutSection() {
   const userData = useUserContext();
   const dbUser = userData?.dbUser;
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const ROLE_LABELS = {
+    viewer: "Viewer",
+    ccm: "CCM",
+    ccs: "CCS",
+    master: "Master",
+  };
 
   const handleConfirmSignOut = async () => {
     try {
@@ -56,7 +62,7 @@ export default function SignOutSection() {
       fontSize="12px"
       bg="#F5F5F5"
     >
-      {dbUser?.role}
+      {ROLE_LABELS[dbUser?.role] || dbUser?.role}
     </Tag>
   </Flex>
 );
