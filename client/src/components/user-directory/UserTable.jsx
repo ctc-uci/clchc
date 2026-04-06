@@ -156,7 +156,7 @@ export default function UserTable({
                   <Td textAlign="center">
                     <Badge
                       bg={roleColors[user.role]?.bg || "gray.200"}
-                      color={"white"}
+                      color={roleColors[user.role]?.color || "white"}
                       borderRadius="full"
                       px={2}
                       py={0.5}

@@ -105,7 +105,7 @@ export const UserDirectory = () => {
         <Heading
           color="#00000080"
           fontSize="14px"
-          fontWeight="500px"
+          fontWeight="medium"
         >
           PENDING REQUESTS
         </Heading>

@@ -197,10 +197,10 @@ export const UserPendingStatusList = ({ showAll = false }) => {
                   width={113.347}
                   height={41}
                   padding={0}
-                  justify-content="center"
-                  align-items="center"
+                  justifyContent="center"
+                  alignItems="center"
                   gap={15}
-                  border-radius="6px"
+                  borderRadius="6px"
                   fontSize={14}
                   fontStyle="normal"
                   fontWeight="400"
