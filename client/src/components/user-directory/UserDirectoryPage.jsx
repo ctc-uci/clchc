@@ -92,7 +92,6 @@ export const UserDirectory = () => {
       >
         <PageHeader
           title="User Directory"
-          subheading="Manage user accounts and permissions"
           role={role}
           isLoading={roleLoading}
         />
@@ -140,7 +139,7 @@ export const UserDirectory = () => {
           </InputLeftElement>
           <Input
             placeholder="Search Providers"
-            borderRadius="2xl"
+            borderRadius="10px"
             value={searchInput}
             onChange={handleSearchChange}
             fontWeight="normal"

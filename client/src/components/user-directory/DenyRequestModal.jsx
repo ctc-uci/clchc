@@ -95,7 +95,6 @@ export const DenyRequestModal = ({ isOpen, onClose, user }) => {
         <ModalBody>
           {user && (
             <>
-              {/* User Info */}
               <Box
                 borderRadius="lg"
                 border="0.5px solid #00000026"
@@ -158,7 +157,6 @@ export const DenyRequestModal = ({ isOpen, onClose, user }) => {
                 </Flex>
               </Box>
 
-              {/* Reason */}
               <Text
                 mt={5}
                 mb={2}
@@ -174,7 +172,6 @@ export const DenyRequestModal = ({ isOpen, onClose, user }) => {
                 onChange={(e) => setReason(e.target.value)}
               />
 
-              {/* Notify */}
               <Checkbox
                 mt={4}
                 isChecked={notifyUser}

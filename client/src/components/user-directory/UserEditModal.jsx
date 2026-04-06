@@ -103,7 +103,7 @@ export default function UserEditModal({ isOpen, onClose, user, onUpdated }) {
     >
       <ModalOverlay />
       <ModalContent
-        borderRadius="16px"
+        borderRadius="15px"
         maxW="560px"
         maxH="80vh"
         px={3}
@@ -123,7 +123,6 @@ export default function UserEditModal({ isOpen, onClose, user, onUpdated }) {
                 fontWeight="normal"
                 fontSize="15px"
                 color="#00000080"
-                mt={1}
               >
                 You are removing this individuals access to CLCHC
               </Text>
@@ -140,7 +139,6 @@ export default function UserEditModal({ isOpen, onClose, user, onUpdated }) {
                 fontWeight="normal"
                 fontSize="15px"
                 color="#00000080"
-                mt={1}
               >
                 Change role and permissions
               </Text>
@@ -155,8 +153,7 @@ export default function UserEditModal({ isOpen, onClose, user, onUpdated }) {
             border="0.5px solid rgba(0, 0, 0, 0.15)"
             borderRadius="8px"
             px={4}
-            py={4}
-            mb={6}
+            py={2}
             gap={3}
           >
             <Box

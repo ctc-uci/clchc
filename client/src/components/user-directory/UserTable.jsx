@@ -102,7 +102,7 @@ export default function UserTable({
       <TableContainer
         borderWidth="1px"
         borderColor="blackAlpha.100"
-        borderRadius="lg"
+        borderRadius="sm"
         maxHeight="60vh"
         overflowY="auto"
         css={{ scrollbarWidth: "none", "&::-webkit-scrollbar": { display: "none" } }}
