@@ -29,6 +29,8 @@ export default function ConfirmationModal({
       isOpen={isOpen}
       onClose={onClose}
       isCentered
+      closeOnOverlayClick={!isSaving}
+      closeOnEsc={!isSaving}
     >
       <ModalOverlay bg="blackAlpha.300" />
       <ModalContent
@@ -88,6 +90,7 @@ export default function ConfirmationModal({
               height="40px"
               minH="40px"
               minW="110px"
+              isDisabled={isSaving}
               onClick={onClose}
             >
               Cancel

@@ -27,47 +27,39 @@ export default function SignOutSection() {
   };
 
   const modalPreview = (
-    <Flex
-          align="center"
-          gap={3}
-        >
-          <Avatar
-            name={`${dbUser?.firstName} ${dbUser?.lastName}`}
-            size="sm"
-            bg="#FFF"
-            color="gray.700"
-            borderRadius="10px"
-            w="40px"
-            h="40px"
-          />
-          <Box flex={1} bg="#F9F9F9" w="340px">
-            <Text
-              fontWeight="semibold"
-              fontSize="sm"
-            >
-              {dbUser?.firstName} {dbUser?.lastName}
-            </Text>
-            <Text
-              fontSize="xs"
-              color="gray.500"
-            >
-              {dbUser?.email}
-            </Text>
-          </Box>
-          <Tag
-            border="1px solid"
-            borderColor="gray.300"
-            borderRadius="md"
-            paddingY="0"
-            paddingX="8px"
-            h="20px"
-            px={2}
-            py={0.5}
-          >
-            <Text fontSize="sm">{dbUser?.role}</Text>
-          </Tag>
-        </Flex>
-  );
+  <Flex align="center" gap={3}>
+    <Avatar
+      name={`${dbUser?.firstName} ${dbUser?.lastName}`}
+      size="sm"
+      bg="#FFF"
+      color="black"
+      borderRadius="10px"
+      w="36px"
+      h="36px"
+      fontSize="14px"
+    />
+
+    <Box flex={1}>
+      <Text fontWeight="600" fontSize="14px">
+        {dbUser?.firstName} {dbUser?.lastName}
+      </Text>
+      <Text fontSize="12px" color="gray.500">
+        {dbUser?.email}
+      </Text>
+    </Box>
+
+    <Tag
+      border="1px solid #D1D5DB"
+      borderRadius="8px"
+      px={2}
+      py="2px"
+      fontSize="12px"
+      bg="#F5F5F5"
+    >
+      {dbUser?.role}
+    </Tag>
+  </Flex>
+);
 
   return (
     <>
@@ -102,6 +94,7 @@ export default function SignOutSection() {
         preview={modalPreview}
         customText="You are signing out this account"
         customButtonText="Sign Out"
+        customButtonColor="#90080F"
       />
     </>
   );
