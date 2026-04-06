@@ -15,6 +15,7 @@ import {
   Input,
   Text,
   useDisclosure,
+  Tag
 } from "@chakra-ui/react";
 
 
@@ -102,39 +103,37 @@ export default function PersonalInfo() {
   ];
 
   const modalPreview = (
-    <Flex
-      align="center"
-      gap={3}
-    >
+    <Flex align="center" gap={3}>
       <Avatar
-        name={`${userInfo.firstName} ${userInfo.lastName}`}
+        name={`${userInfo?.firstName} ${userInfo?.lastName}`}
         size="sm"
-        bg="gray.300"
-        color="gray.700"
+        bg="#FFF"
+        color="black"
+        borderRadius="10px"
+        w="36px"
+        h="36px"
+        fontSize="14px"
       />
+  
       <Box flex={1}>
-        <Text
-          fontWeight="semibold"
-          fontSize="sm"
-        >
-          {userInfo.firstName} {userInfo.lastName}
+        <Text fontWeight="600" fontSize="14px">
+          {userInfo?.firstName} {userInfo?.lastName}
         </Text>
-        <Text
-          fontSize="xs"
-          color="gray.500"
-        >
-          {userInfo.email}
+        <Text fontSize="12px" color="gray.500">
+          {userInfo?.email}
         </Text>
       </Box>
-      <Box
-        border="1px solid"
-        borderColor="gray.300"
-        borderRadius="md"
+  
+      <Tag
+        border="1px solid #D1D5DB"
+        borderRadius="8px"
         px={2}
-        py={0.5}
+        py="2px"
+        fontSize="12px"
+        bg="#F5F5F5"
       >
-        <Text fontSize="sm">{userInfo.role}</Text>
-      </Box>
+        {userInfo?.role}
+      </Tag>
     </Flex>
   );
 
@@ -163,6 +162,7 @@ export default function PersonalInfo() {
                   onChange={(e) => updateUserProp(key, e.target.value)}
                   isReadOnly={!isEditMode}
                   bg={isEditMode ? "white" : "gray.100"}
+                  color={isEditMode ? "black" : "#586771"}
                   border={isEditMode ? "1px solid" : "none"}
                   borderColor={isEditMode ? "blue.400" : "transparent"}
                   transition="all 0.15s"

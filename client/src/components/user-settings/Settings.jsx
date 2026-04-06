@@ -46,8 +46,8 @@ export function Settings() {
           width="300px"
         >
           <Avatar
-            w="270px"
-            h="270px"
+            w="260px"
+            h="260px"
             name={`${dbUser?.firstName} ${dbUser?.lastName}`}
           />
           <Text

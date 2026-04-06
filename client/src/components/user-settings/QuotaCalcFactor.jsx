@@ -89,6 +89,7 @@ export default function QuotaCalcFactor() {
             onChange={(e) => setFactor(parseFloat(e.target.value) || 0)}
             isReadOnly={!isEditMode}
             bg={isEditMode ? "white" : "gray.100"}
+            color={isEditMode ? "black" : "#586771"}
             border={isEditMode ? "1px solid" : "none"}
             borderColor={isEditMode ? "blue.400" : "transparent"}
             transition="all 0.15s"
