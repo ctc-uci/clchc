@@ -605,21 +605,9 @@ const ProviderDrawer = ({
               {activeMode === "edit" && !showConfirmation ? (
                 <>
                   <Button
-<<<<<<< HEAD
                     bg="red.700"
                     color="white"
                     _hover={{ bg: "red.800" }}
-=======
-                    bg="#FFF"
-                    color="red"
-                    borderColor="#90080F"
-                    borderWidth="2px"
-                    _hover={{
-                      bg: "#90080F",
-                      color: "#FFF",
-                      borderColor: "#FFF",
-                    }}
->>>>>>> 1bb3079 (feat: changed button color in edit provider drawer)
                     flex={1}
                     onClick={() => {
                       setActiveMode("delete");
