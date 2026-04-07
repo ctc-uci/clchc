@@ -1,7 +1,7 @@
 import { createContext, ReactNode, useEffect, useState } from "react";
 
 import { CreateToastFnReturn } from "@chakra-ui/react";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { LoadingScreen } from "../components/common/LoadingScreen";
 
 import { AxiosInstance } from "axios";
@@ -156,7 +156,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }}
     >
       <AnimatePresence>{loading && <LoadingScreen key="loading" />}</AnimatePresence>
-      {!loading && children}
+      {!loading && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
+          {children}
+        </motion.div>
+      )}
     </AuthContext.Provider>
   );
 };

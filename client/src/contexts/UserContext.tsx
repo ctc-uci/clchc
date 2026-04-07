@@ -6,7 +6,7 @@ import {
   useState,
 } from "react";
 
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { LoadingScreen } from "../components/common/LoadingScreen";
 
 import type { User as DbUser } from "../types/user";
@@ -86,7 +86,11 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   return (
     <UserContext.Provider value={value}>
       <AnimatePresence>{loading && <LoadingScreen key="loading" />}</AnimatePresence>
-      {!loading && children}
+      {!loading && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
+          {children}
+        </motion.div>
+      )}
     </UserContext.Provider>
   );
 };
