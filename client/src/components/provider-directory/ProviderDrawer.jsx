@@ -573,16 +573,17 @@ const ProviderDrawer = ({
         ) : (
           <>
             <DrawerBody
-              display="flex"
               flexDir="column"
               gap="32px"
               overflowX="hidden"
             >
               {showConfirmation && (
-                <ConfirmationBanner
-                  mode={activeMode}
-                  pendingTagDeletes={pendingTagDeletes}
-                />
+                <Box mb={4}>
+                  <ConfirmationBanner
+                    mode={activeMode}
+                    pendingTagDeletes={pendingTagDeletes}
+                  />
+                </Box>
               )}
 
               <ProviderFormFields
@@ -605,9 +606,11 @@ const ProviderDrawer = ({
               {activeMode === "edit" && !showConfirmation ? (
                 <>
                   <Button
-                    bg="red.700"
-                    color="white"
-                    _hover={{ bg: "red.800" }}
+                    // bg="#FFF"
+                    variant="outline"
+                    color="#90080F"
+                    borderColor="#90080F"
+                    _hover={{ bg: "red.800", color: "#FFF" }}
                     flex={1}
                     onClick={() => {
                       setActiveMode("delete");
