@@ -133,7 +133,8 @@ export const Login = () => {
         <Image
           src="/clchc-logo.png"
           alt="Celebrating Life Community Health Center"
-          maxW="600px"
+          maxW="705px"
+          maxH="266px"
           mb={14}
         />
 
@@ -144,7 +145,8 @@ export const Login = () => {
           boxShadow="lg"
           onClick={handleGoogleLogin}
           w="306px"
-          h="34px"
+          h="auto"
+          minH="34.33px"
           borderRadius="6.36px"
           px="9.54px"
           gap="9.54px"
@@ -156,9 +158,9 @@ export const Login = () => {
             boxSize="16px"
           />
           <Text
-            fontSize="sm"
-            fontWeight="medium"
-            color="#3C4043"
+            fontSize="12.71px"
+            fontWeight="500"
+            color="#0000008A"
           >
             Sign in with Google
           </Text>
