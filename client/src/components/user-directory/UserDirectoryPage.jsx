@@ -139,12 +139,14 @@ export const UserDirectory = () => {
           </InputLeftElement>
           <Input
             placeholder="Search Providers"
+            border="0.811px solid #E3E3E3"
             borderRadius="10px"
             value={searchInput}
             onChange={handleSearchChange}
-            fontWeight="normal"
-            fontSize="sm"
+            fontWeight="400"
+            fontSize="14px"
             py={5}
+            h="44px"
             display="flex"
             //             display: flex;
             // width="1230px"

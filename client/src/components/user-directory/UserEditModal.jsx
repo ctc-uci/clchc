@@ -61,10 +61,10 @@ export default function UserEditModal({ isOpen, onClose, user, onUpdated }) {
   const currentFirebaseUid = user.firebaseUid;
   const username = user.firstName + " " + user.lastName;
   const roleColors = {
-    master: "red",
-    ccm: "green",
-    ccs: "blue",
-    viewer: "yellow",
+    master: { bg: "#573D59", color: "white" },
+    ccm: { bg: "#07B8AC", color: "white" },
+    ccs: { bg: "#3498DB", color: "white" },
+    viewer: { bg: "#C8D4E6", color: "gray.800" },
   };
 
   const onApprove = async () => {
@@ -118,12 +118,13 @@ export default function UserEditModal({ isOpen, onClose, user, onUpdated }) {
         py={6}
         boxShadow="0 4px 14px rgba(0, 0, 0, 0.1)"
       >
-        <ModalHeader>
+        <ModalHeader py={0}>
           {isDeleteOpen ? (
             <>
               <Text
-                fontWeight="600"
-                fontSize="28px"
+                py={0}
+                fontWeight="500"
+                fontSize="25px"
               >
                 Are you Sure?
               </Text>
@@ -138,6 +139,7 @@ export default function UserEditModal({ isOpen, onClose, user, onUpdated }) {
           ) : (
             <>
               <Text
+                py={0}
                 fontWeight="500"
                 fontSize="25px"
               >
@@ -202,12 +204,21 @@ export default function UserEditModal({ isOpen, onClose, user, onUpdated }) {
               </VStack>
             </Flex>
             <Badge
-              colorScheme={roleColors[user.role] || "gray"}
-              ml="auto"
-              borderRadius="7.2px"
-              px={2}
-              py={0.5}
-              fontSize="xs"
+              bg={roleColors[user.role]?.bg || "gray.200"}
+              color={roleColors[user.role]?.color || "white"}
+              borderRadius="6px"
+              px="2px"
+              py="6px"
+              fontSize="14px"
+              fontStyle="normal"
+              fontWeight="400"
+              lineHeight="16px"
+              p="2px 6px"
+              textTransform={
+                user.role === "viewer" || user.role === "master"
+                  ? "capitalize"
+                  : "uppercase"
+              }
             >
               {user.role}
             </Badge>
@@ -219,6 +230,7 @@ export default function UserEditModal({ isOpen, onClose, user, onUpdated }) {
               fontWeight="400"
               fontSize="16px"
               fontStyle="italic"
+              mt={1}
               cursor="pointer"
               onClick={() => setIsDeleteOpen(true)}
             >
@@ -258,12 +270,12 @@ export default function UserEditModal({ isOpen, onClose, user, onUpdated }) {
                 Change Role
               </Text>
               <Box mb={48}>
-                <Menu>
+                <Menu matchWidth>
                   <MenuButton
                     as={Button}
                     rightIcon={<ChevronDownIcon />}
                     bg="#F9FAFB"
-                    borderRadius="12px"
+                    borderRadius="6px"
                     h="56px"
                     px="16px"
                     w="100%"
@@ -277,18 +289,19 @@ export default function UserEditModal({ isOpen, onClose, user, onUpdated }) {
                   </MenuButton>
 
                   <MenuList
-                    borderRadius="16px"
-                    boxShadow="0px 10px 25px rgba(0,0,0,0.1)"
+                    bg="#F9FAFB"
+                    border="none"
+                    borderRadius="6px"
                     p="8px"
-                    bg="white"
                   >
                     {roleOptions.map((role) => (
                       <MenuItem
                         key={role.value}
+                        bg="#F9FAFB"
                         onClick={() => setSelectedRole(role.value)}
-                        borderRadius="10px"
+                        borderRadius="8px"
                         px="12px"
-                        py="10px"
+                        py="12px"
                         _hover={{ bg: "#F3F4F6" }}
                       >
                         {role.label}

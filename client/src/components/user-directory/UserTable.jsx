@@ -1,7 +1,6 @@
 import { useState } from "react";
 
 import { Icon, SearchIcon } from "@chakra-ui/icons";
-import { MdCreate } from "react-icons/md";
 import {
   Badge,
   HStack,
@@ -17,6 +16,8 @@ import {
   Tr,
   useDisclosure,
 } from "@chakra-ui/react";
+
+import { MdCreate } from "react-icons/md";
 
 import UserEditModal from "./UserEditModal";
 
@@ -105,7 +106,10 @@ export default function UserTable({
         borderRadius="sm"
         maxHeight="60vh"
         overflowY="auto"
-        css={{ scrollbarWidth: "none", "&::-webkit-scrollbar": { display: "none" } }}
+        css={{
+          scrollbarWidth: "none",
+          "&::-webkit-scrollbar": { display: "none" },
+        }}
       >
         <Table
           colorScheme="gray"
@@ -138,8 +142,16 @@ export default function UserTable({
             <Tr>
               <Th width="42.5%">Users</Th>
               <Th width="42.5%">Email</Th>
-              <Th width="10%" textAlign="center">Role</Th>
-              <Th width="5%" align="center"></Th>
+              <Th
+                width="10%"
+                textAlign="center"
+              >
+                Role
+              </Th>
+              <Th
+                width="5%"
+                align="center"
+              ></Th>
             </Tr>
           </Thead>
 
@@ -157,17 +169,20 @@ export default function UserTable({
                     <Badge
                       bg={roleColors[user.role]?.bg || "gray.200"}
                       color={roleColors[user.role]?.color || "white"}
-                      borderRadius="full"
-                      px={2}
-                      py={0.5}
+                      borderRadius="6px"
+                      px="2px"
+                      py="6px"
                       fontSize="14px"
                       fontStyle="normal"
-                      fontWeight={400}
+                      fontWeight="400"
                       lineHeight="16px"
                       p="2px 6px"
-                      textTransform={user.role === "viewer" || user.role === "master" ? "capitalize" : "uppercase"}
+                      textTransform={
+                        user.role === "viewer" || user.role === "master"
+                          ? "capitalize"
+                          : "uppercase"
+                      }
                     >
-                      
                       {user.role}
                     </Badge>
                   </Td>
@@ -177,7 +192,12 @@ export default function UserTable({
                         aria-label="Edit"
                         variant="ghost"
                         borderRadius="16px"
-                        icon={<MdCreate size={24} color="#00000040" />}
+                        icon={
+                          <MdCreate
+                            size={24}
+                            color="#00000040"
+                          />
+                        }
                         onClick={() => handleEditClick(user)}
                       />
                       {/* {onDelete && (
