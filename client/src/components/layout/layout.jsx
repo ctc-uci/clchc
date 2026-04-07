@@ -14,15 +14,15 @@ const Layout = () => {
                 width="100%"
                 padding="9px 40px"
                 alignItems="center"
-                gap="452px"
+                justifyContent="space-between"
             >
                 <Image
                     src="clchc-logo.svg"
                     width="250px"
                     height="94px"
-                    padding-right="40px"
-                    padding-top="9px"
-                    padding-bottom="9px"
+                    pr="40px"
+                    pt="9px"
+                    pb="9px"
                 />
                 <Navbar/>
             </Box>
