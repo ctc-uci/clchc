@@ -538,7 +538,7 @@ const ProviderDrawer = ({
           <Text
             sx={{
               color: "#113D64",
-              fontSize: "23.4px",
+              fontSize: "24px",
               fontStyle: "normal",
               fontWeight: "500",
               lineHeight: "normal",
@@ -605,26 +605,38 @@ const ProviderDrawer = ({
               {activeMode === "edit" && !showConfirmation ? (
                 <>
                   <Button
+<<<<<<< HEAD
                     bg="red.700"
                     color="white"
                     _hover={{ bg: "red.800" }}
+=======
+                    bg="#FFF"
+                    color="red"
+                    borderColor="#90080F"
+                    borderWidth="2px"
+                    _hover={{
+                      bg: "#90080F",
+                      color: "#FFF",
+                      borderColor: "#FFF",
+                    }}
+>>>>>>> 1bb3079 (feat: changed button color in edit provider drawer)
                     flex={1}
                     onClick={() => {
                       setActiveMode("delete");
                       setShowConfirmation(true);
                     }}
                   >
-                    Delete Provider
+                    Delete
                   </Button>
 
                   <Button
-                    bg="#113D64"
+                    bg="#929292"
                     color="white"
                     _hover={{ bg: "#1a4f7a" }}
                     onClick={handleSubmit}
                     flex={1}
                   >
-                    Save Changes
+                    Confirm Changes
                   </Button>
                 </>
               ) : (
