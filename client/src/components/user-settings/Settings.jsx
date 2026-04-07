@@ -46,8 +46,8 @@ export function Settings() {
           width="300px"
         >
           <Avatar
-            w="260px"
-            h="260px"
+            w="280px"
+            h="280px"
             name={`${dbUser?.firstName} ${dbUser?.lastName}`}
           />
           <Text
@@ -147,7 +147,7 @@ export function Settings() {
           <Text
             fontSize="14px"
             color="gray.600"
-            mt="0.5em"
+            mt="12px"
           >
             Sign out of your account.
           </Text>

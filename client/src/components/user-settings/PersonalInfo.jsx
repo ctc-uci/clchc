@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import { CheckIcon, EditIcon } from "@chakra-ui/icons";
+import { CheckIcon } from "@chakra-ui/icons";
 import {
   Avatar,
   Box,
@@ -8,6 +8,7 @@ import {
   FormControl,
   FormLabel,
   Grid,
+  Icon,
   IconButton,
   Input,
   Tag,
@@ -17,15 +18,16 @@ import {
 
 import { useUpdateUser } from "@/contexts/hooks/data-fetching/useUsers";
 import { useUserContext } from "@/contexts/hooks/useUserContext";
+import { MdEdit } from "react-icons/md";
 
 import ConfirmationModal from "./ConfirmationModal";
 
 const ROLE_LABELS = {
-    viewer: "Viewer",
-    ccm: "CCM",
-    ccs: "CCS",
-    master: "Master",
-  };
+  viewer: "Viewer",
+  ccm: "CCM",
+  ccs: "CCS",
+  master: "Master",
+};
 
 export default function PersonalInfo() {
   const userData = useUserContext();
@@ -185,7 +187,10 @@ export default function PersonalInfo() {
                       isEditMode ? (
                         <CheckIcon boxSize={3.5} />
                       ) : (
-                        <EditIcon />
+                        <Icon
+                          as={MdEdit}
+                          boxSize={4}
+                        />
                       )
                     }
                     size="sm"

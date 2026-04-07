@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 
-import { CheckIcon, EditIcon } from "@chakra-ui/icons";
+import { CheckIcon } from "@chakra-ui/icons";
 import {
   Box,
   Flex,
   FormControl,
   FormLabel,
+  Icon,
   IconButton,
   Input,
   Text,
@@ -14,6 +15,7 @@ import {
 
 import { useUpdateUser } from "@/contexts/hooks/data-fetching/useUsers";
 import { useUserContext } from "@/contexts/hooks/useUserContext";
+import { MdEdit } from "react-icons/md";
 
 import ConfirmationModal from "./ConfirmationModal";
 
@@ -24,7 +26,9 @@ export default function QuotaCalcFactor() {
   const refetch = userData?.refetch;
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const [factor, setFactor] = useState(dbUser?.apptCalcFactor?.toString() || "");
+  const [factor, setFactor] = useState(
+    dbUser?.apptCalcFactor?.toString() || ""
+  );
   const [isEditMode, setIsEditMode] = useState(false);
 
   useEffect(() => {
@@ -32,24 +36,24 @@ export default function QuotaCalcFactor() {
   }, [dbUser, setFactor]);
 
   const handleSave = async () => {
-  if (!dbUser?.id) return false;
+    if (!dbUser?.id) return false;
 
-  const numericFactor = factor === "" ? 0 : parseFloat(factor);
+    const numericFactor = factor === "" ? 0 : parseFloat(factor);
 
-  if (isNaN(numericFactor)) return false;
+    if (isNaN(numericFactor)) return false;
 
-  try {
-    await updateUser({
-      id: dbUser.id,
-      data: { apptCalcFactor: numericFactor },
-    });
-    await refetch();
-    setIsEditMode(false);
-    return true;
-  } catch (_error) {
-    return false;
-  }
-};
+    try {
+      await updateUser({
+        id: dbUser.id,
+        data: { apptCalcFactor: numericFactor },
+      });
+      await refetch();
+      setIsEditMode(false);
+      return true;
+    } catch (_error) {
+      return false;
+    }
+  };
 
   const handleToggle = () => {
     if (isEditMode) {
@@ -102,7 +106,16 @@ export default function QuotaCalcFactor() {
             transition="all 0.15s"
           />
           <IconButton
-            icon={isEditMode ? <CheckIcon /> : <EditIcon />}
+            icon={
+              isEditMode ? (
+                <CheckIcon />
+              ) : (
+                <Icon
+                  as={MdEdit}
+                  boxSize={4}
+                />
+              )
+            }
             size="sm"
             variant="ghost"
             colorScheme="gray"

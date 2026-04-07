@@ -81,6 +81,7 @@ export default function SignOutSection() {
             fontWeight="bold"
             display="block"
             fontSize="22px"
+            mt="5px"
           >
             {dbUser?.firstName} {dbUser?.lastName}
           </Text>
@@ -91,6 +92,7 @@ export default function SignOutSection() {
           onClick={onOpen}
           px="2em"
           justifyContent="center"
+          display="flex"
         >
           Sign Out
         </Button>
