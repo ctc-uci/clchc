@@ -2,16 +2,14 @@ import { useState, useEffect } from "react";
 import { SearchIcon } from "@chakra-ui/icons";
 import {
   Box,
-  Flex,
+  Badge,
+  Heading,
   Input,
   InputGroup,
   InputLeftElement,
-  Stack,
   HStack,
 } from "@chakra-ui/react";
 
-import { PageHeader } from "@/components/common/PageHeader";
-import Navbar from "@/components/layout/Navbar";
 import VersionLogTable from "@/components/version-log/VersionLogTable";
 import { useVersionLogs } from "@/contexts/hooks/data-fetching/useVersionLogs";
 import { useUserContext } from "@/contexts/hooks/useUserContext";
@@ -21,29 +19,26 @@ import CalendarCard from "../common/CalendarCard";
 
 
 export const VersionLogPage = () => {
-  // const [logs, setLogs] = useState([]);
-  // const { backend } = useBackendContext();
   const navigate = useNavigate();
-  const { dateParam } = useParams();
+  const { date } = useParams();
   const [inputValue, setInputValue] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const today = new Date().toLocaleDateString("en-CA");
   const [selectedDate, setSelectedDate] = useState(
-    dateParam || sessionStorage.getItem("logDate") || today
+    date || sessionStorage.getItem("logDate") || today
   );
   const debouncedSearchQuery = useDebounce(
     (value) => setSearchQuery(value),
     300
   );
-  const { role, loading: roleLoading } = useUserContext();
-  // const [loading, setLoading] = useState(true);
+  const { role } = useUserContext();
 
   useEffect(() => {
-    if (dateParam && dateParam !== selectedDate) {
-      setSelectedDate(dateParam);
-      sessionStorage.setItem("logDate", dateParam);
+    if (date && date !== selectedDate) {
+      setSelectedDate(date);
+      sessionStorage.setItem("logDate", date);
     }
-  }, [dateParam]);
+  }, [date, selectedDate]);
 
   useEffect(() => {
     sessionStorage.setItem("logDate", selectedDate);
@@ -56,7 +51,6 @@ export const VersionLogPage = () => {
     q: searchQuery,
   });
 
-  // handleChange
   const handleChange = (e) => {
     setInputValue(e.target.value);
     debouncedSearchQuery(e.target.value);
@@ -69,32 +63,68 @@ export const VersionLogPage = () => {
 
   return (
     <Box
-      p={6}
-      maxW="1200px"
+      px={{ base: 4, md: 10 }}
+      py={{ base: 4, md: 6 }}
+      maxW="1440px"
       mx="auto"
     >
-      <Flex
-        justify="space-between"
-        align="flex-start"
+      <HStack
+        spacing={3}
+        align="center"
         mb={6}
       >
-        <Box
-          flex="1"
-          display="flex"
-          justifyContent="flex-end"
+        <Heading
+          as="h1"
+          size="lg"
+          fontWeight="500"
+          color="#111111"
         >
-        </Box>
-      </Flex>
+          Audit Log
+        </Heading>
+        {role && (
+          <Badge
+            bg="#5B4761"
+            color="white"
+            borderRadius="8px"
+            px={3}
+            py={1}
+            fontSize="18px"
+            fontWeight="500"
+            textTransform="capitalize"
+          >
+            {role}
+          </Badge>
+        )}
+      </HStack>
 
-      <HStack paddingBottom="12px">
-        <InputGroup paddingRight="15px">
+      <HStack
+        spacing={{ base: 3, md: 6 }}
+        align="stretch"
+        mb={3}
+      >
+        <InputGroup flex="1">
           <InputLeftElement pointerEvents="none">
-            <SearchIcon color="gray.400" />
+            <SearchIcon
+              color="#111111"
+              boxSize={5}
+            />
           </InputLeftElement>
           <Input
-            placeholder="Dr. Sarah Chen"
-            borderRadius="md"
-            value={inputValue}  
+            placeholder="Search Providers"
+            h={{ base: "56px", md: "64px" }}
+            borderRadius="12px"
+            border="1.5px solid"
+            borderColor="#E2E8F0"
+            bg="white"
+            fontSize={{ base: "16px", md: "18px" }}
+            color="#2D3748"
+            _placeholder={{ color: "#A0AEC0" }}
+            _hover={{ borderColor: "#CBD5E0" }}
+            _focusVisible={{
+              borderColor: "#A0AEC0",
+              boxShadow: "none",
+            }}
+            value={inputValue}
             onChange={handleChange}
           />
         </InputGroup>

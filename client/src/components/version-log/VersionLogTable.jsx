@@ -13,8 +13,9 @@ import {
   VStack,
 } from "@chakra-ui/react";
 
-const CELL_BORDER_COLOR = "#E2E8F0";
-const HEADER_BG = "#CBD7E8";
+const CELL_BORDER_COLOR = "#E7EDF5";
+const VERTICAL_BORDER_COLOR = "#EDF2F7";
+const HEADER_BG = "#C7D5E8";
 const COLUMN_WIDTH = "25%";
 
 const SkeletonRows = () => {
@@ -29,14 +30,20 @@ const SkeletonRows = () => {
           <Td
             w={COLUMN_WIDTH}
             py="18px"
+            px="26px"
             borderColor={CELL_BORDER_COLOR}
+            borderRight="1px solid"
+            borderRightColor={VERTICAL_BORDER_COLOR}
           >
             <Skeleton height="24px" />
           </Td>
           <Td
             w={COLUMN_WIDTH}
             py="18px"
+            px="26px"
             borderColor={CELL_BORDER_COLOR}
+            borderRight="1px solid"
+            borderRightColor={VERTICAL_BORDER_COLOR}
           >
             <Skeleton
               height="24px"
@@ -46,7 +53,10 @@ const SkeletonRows = () => {
           <Td
             w={COLUMN_WIDTH}
             py="18px"
+            px="26px"
             borderColor={CELL_BORDER_COLOR}
+            borderRight="1px solid"
+            borderRightColor={VERTICAL_BORDER_COLOR}
           >
             <Skeleton
               height="24px"
@@ -70,26 +80,31 @@ const SkeletonRows = () => {
 
 const headerCellProps = () => ({
   w: COLUMN_WIDTH,
-  h: "48px",
-  px: "28px",
+  h: "44px",
+  px: "26px",
   py: "12px",
-  color: "#4A5568",
-  fontSize: "16px",
+  color: "#1f4672",
+  fontSize: "15px",
   fontWeight: "700",
-  textTransform: "none",
-  borderBottom: "1.5px solid",
+  letterSpacing: "0.06em",
+  textTransform: "uppercase",
+  borderBottom: "1px solid",
+  borderRight: "1px solid",
   borderColor: CELL_BORDER_COLOR,
+  borderRightColor: VERTICAL_BORDER_COLOR,
   bg: HEADER_BG,
 });
 
-const bodyCellProps = () => ({
+const bodyCellProps = (withRightBorder = true) => ({
   w: COLUMN_WIDTH,
-  px: "28px",
-  py: "18px",
-  fontSize: "16px",
+  px: "26px",
+  py: "30px",
+  fontSize: "15px",
   color: "#2D3748",
-  borderBottom: "1.5px solid",
+  borderBottom: "1px solid",
   borderColor: CELL_BORDER_COLOR,
+  borderRight: withRightBorder ? "1px solid" : "none",
+  borderRightColor: VERTICAL_BORDER_COLOR,
   verticalAlign: "middle",
 });
 
@@ -102,11 +117,11 @@ const VersionLogTable = ({ loading, logs }) => {
       <TableContainer
         w="100%"
         maxW="1360px"
-        minH="818px"
+        minH="720px"
         borderRadius="6px"
-        border="1.5px solid"
+        border="1px solid"
         borderColor={CELL_BORDER_COLOR}
-        p="12px"
+        p="0"
         bg="white"
         overflowX="auto"
         overflowY="auto"
@@ -120,7 +135,12 @@ const VersionLogTable = ({ loading, logs }) => {
               <Th {...headerCellProps()}>Editor</Th>
               <Th {...headerCellProps()}>Action</Th>
               <Th {...headerCellProps()}>Date & Time</Th>
-              <Th {...headerCellProps()}>Provider</Th>
+              <Th
+                {...headerCellProps()}
+                borderRight="none"
+              >
+                Provider
+              </Th>
             </Tr>
           </Thead>
 
@@ -131,8 +151,8 @@ const VersionLogTable = ({ loading, logs }) => {
                   colSpan={4}
                   py="40px"
                   textAlign="center"
-                  color="gray.500"
-                  fontSize="16px"
+                  color="#718096"
+                  fontSize="15px"
                 >
                   No version history available
                 </Td>
@@ -142,7 +162,7 @@ const VersionLogTable = ({ loading, logs }) => {
             {loading ? (
               <SkeletonRows />
             ) : (
-              logs.map((entry) => {
+              logs.map((entry, index) => {
                 const logDate = new Date(entry.timestamp);
 
                 const formattedDate = logDate.toLocaleDateString("en-US", {
@@ -161,6 +181,7 @@ const VersionLogTable = ({ loading, logs }) => {
                 return (
                   <Tr
                     key={entry.id}
+                    bg={index % 2 === 0 ? "white" : "#FAFBFC"}
                     _hover={{ bg: "#F8FAFC" }}
                   >
                     <Td {...bodyCellProps()}>
@@ -173,8 +194,8 @@ const VersionLogTable = ({ loading, logs }) => {
                           Quota{" "}
                           <Text
                             as="span"
-                            color="#38A169"
-                            fontWeight="500"
+                            color="#2F9E5B"
+                            fontWeight="600"
                           >
                             +{entry.delta}
                           </Text>
@@ -186,8 +207,8 @@ const VersionLogTable = ({ loading, logs }) => {
                           Quota{" "}
                           <Text
                             as="span"
-                            color="#E53E3E"
-                            fontWeight="500"
+                            color="#D64545"
+                            fontWeight="600"
                           >
                             {entry.delta}
                           </Text>
@@ -199,7 +220,7 @@ const VersionLogTable = ({ loading, logs }) => {
                       {formattedDate} {formattedTime}
                     </Td>
 
-                    <Td {...bodyCellProps()}>
+                    <Td {...bodyCellProps(false)}>
                       {entry.providerData["Name"]}
                     </Td>
                   </Tr>

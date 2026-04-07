@@ -86,9 +86,19 @@ const CalendarCard = ({ value, onChange }) => {
           variant="outline"
           rightIcon={<ChevronDownIcon />}
           onClick={handleOpen}
-          fontWeight="normal"
-          fontSize="sm"
-          borderRadius="md"
+          h={{ base: "56px", md: "64px" }}
+          minW={{ base: "180px", md: "196px" }}
+          px={6}
+          justifyContent="space-between"
+          fontWeight="400"
+          fontSize={{ base: "16px", md: "18px" }}
+          color="#111111"
+          bg="white"
+          borderRadius="12px"
+          border="1.5px solid"
+          borderColor="#E2E8F0"
+          _hover={{ bg: "white", borderColor: "#CBD5E0" }}
+          _active={{ bg: "white" }}
         >
           {displayValue}
         </Button>
