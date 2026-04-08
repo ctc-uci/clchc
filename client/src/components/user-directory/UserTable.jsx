@@ -170,8 +170,8 @@ export default function UserTable({
                       bg={roleColors[user.role]?.bg || "gray.200"}
                       color={roleColors[user.role]?.color || "white"}
                       borderRadius="6px"
-                      px="2px"
-                      py="6px"
+                      px="6px"
+                      py="2px"
                       fontSize="14px"
                       fontStyle="normal"
                       fontWeight="400"

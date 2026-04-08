@@ -168,7 +168,7 @@ export const DenyRequestModal = ({ isOpen, onClose, user }) => {
               />
 
               <Checkbox
-                mt={4}
+                my={4}
                 isChecked={notifyUser}
                 onChange={(e) => setNotifyUser(e.target.checked)}
                 color="#00000080"
@@ -179,11 +179,11 @@ export const DenyRequestModal = ({ isOpen, onClose, user }) => {
           )}
         </ModalBody>
 
-        <ModalFooter>
+        <ModalFooter py={0}>
           <Flex w="75%">
             <Button
               fontWeight="400"
-              fontSize="20px"
+              fontSize="14px"
               variant="outline"
               border="1px"
               borderRadius="6px"
@@ -192,23 +192,25 @@ export const DenyRequestModal = ({ isOpen, onClose, user }) => {
               onClick={onClose}
               flex="1"
               maxW="181px"
-              py={3}
-              h="auto"
+              px="30px"
+              py="15px"
+              h="41px"
               bg="#F9FAFB"
             >
               Cancel
             </Button>
             <Button
               fontWeight="400"
-              fontSize="20px"
+              fontSize="14px"
               colorScheme="blackAlpha"
               bg="#90080F"
               color="white"
               borderRadius="6px"
               flex="1"
               maxW="181px"
-              py={3}
-              h="auto"
+              px="30px"
+              py="15px"
+              h="41px"
               onClick={handleDeny}
               _hover={{ bg: "#A50F15" }}
             >

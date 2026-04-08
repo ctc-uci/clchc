@@ -113,14 +113,14 @@ export default function UserEditModal({ isOpen, onClose, userId, onUpdated }) {
       isCentered
       motionPreset="scale"
     >
+
       <ModalOverlay />
       <ModalContent
-        borderRadius="15px"
-        maxW="560px"
-        maxH="80vh"
         px={3}
         py={6}
-        boxShadow="0 4px 14px rgba(0, 0, 0, 0.1)"
+        width="394px"
+        minH="490px"
+        borderRadius="15px"
       >
         <ModalHeader py={0}>
           {isDeleteOpen ? (
@@ -133,9 +133,11 @@ export default function UserEditModal({ isOpen, onClose, userId, onUpdated }) {
                 Are you Sure?
               </Text>
               <Text
-                fontWeight="normal"
-                fontSize="15px"
+                fontSize="14px"
                 color="#00000080"
+                fontWeight="400"
+                mt={-1}
+                mb={1}
               >
                 You are removing this individuals access to CLCHC
               </Text>
@@ -171,18 +173,24 @@ export default function UserEditModal({ isOpen, onClose, userId, onUpdated }) {
             gap={3}
           >
             <Box
-              size="xl"
               bg="white"
               color="black"
               borderRadius="10px"
+              minW="40px"
+              minH="38px"
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              p={1}
             >
               <Avatar
                 name={username}
-                size="lg"
+                size="sm"
                 bg="white"
                 src={user.photoUrl ?? undefined}
                 color="black"
               />
+              {/* width: 40.50943374633789; */}
             </Box>
             <Flex
               justify="space-between"
@@ -195,12 +203,12 @@ export default function UserEditModal({ isOpen, onClose, userId, onUpdated }) {
               >
                 <Text
                   fontWeight="400"
-                  fontSize="20px"
+                  fontSize="14px"
                 >
                   {user.firstName} {user.lastName}
                 </Text>
                 <Text
-                  fontSize="xs"
+                  fontSize="12px"
                   color="gray"
                 >
                   {user.email}
@@ -211,13 +219,12 @@ export default function UserEditModal({ isOpen, onClose, userId, onUpdated }) {
               bg={roleColors[user.role]?.bg || "gray.200"}
               color={roleColors[user.role]?.color || "white"}
               borderRadius="6px"
-              px="2px"
-              py="6px"
+              px="6px"
+              py="2px"
               fontSize="14px"
               fontStyle="normal"
               fontWeight="400"
               lineHeight="16px"
-              p="2px 6px"
               textTransform={
                 user.role === "viewer" || user.role === "master"
                   ? "capitalize"
@@ -229,21 +236,21 @@ export default function UserEditModal({ isOpen, onClose, userId, onUpdated }) {
           </Flex>
 
           <Flex justify="flex-end">
+            {!isDeleteOpen && (
             <Text
               color="#90080F"
               fontWeight="400"
-              fontSize="16px"
-              fontStyle="italic"
+              fontSize="14px"
               mt={1}
               cursor="pointer"
               onClick={() => setIsDeleteOpen(true)}
             >
               Delete User
-            </Text>
+            </Text>)}
           </Flex>
           {isDeleteOpen ? (
-            <Box mb={48}>
-              <Text mb={2}>
+            <Box my={4}>
+              <Text fontSize="14px">
                 Type{" "}
                 <Text
                   as="span"
@@ -260,35 +267,45 @@ export default function UserEditModal({ isOpen, onClose, userId, onUpdated }) {
                 onChange={(e) => setDeleteInput(e.target.value)}
                 bg="#F9FAFB"
                 borderRadius="12px"
-                h="56px"
+                h="41px"
+                mt={2}
               />
+
             </Box>
           ) : (
             <>
               <Text
                 color="rgba(0, 0, 0, 0.50)"
                 fontWeight="400"
-                fontSize="16px"
+                fontSize="14px"
                 mb={2}
               >
                 Change Role
               </Text>
-              <Box mb={48}>
+              <Box mb={36}>
                 <Menu matchWidth>
                   <MenuButton
                     as={Button}
                     rightIcon={<ChevronDownIcon />}
                     bg="#F9FAFB"
+                    border="none"
+                    borderWidth="0"
+                    outline="none"
+                    boxShadow="none"
                     borderRadius="6px"
-                    h="56px"
-                    px="16px"
-                    w="100%"
+                    h="50px"
+                    px="16px" 
+                    w="343px"
                     fontWeight="400"
-                    fontSize="16px"
+                    fontStyle="normal"
+                    fontSize="12px"
+                    lineHeight="100%"
+                    letterSpacing="-0.04em"
                     textAlign="left"
                     _hover={{ bg: "#F9FAFB" }}
                     _active={{ bg: "#F9FAFB" }}
-                  >
+                  > 
+
                     {selectedRoleLabel}
                   </MenuButton>
 
@@ -304,8 +321,13 @@ export default function UserEditModal({ isOpen, onClose, userId, onUpdated }) {
                         bg="#F9FAFB"
                         onClick={() => setSelectedRole(role.value)}
                         borderRadius="8px"
-                        px="12px"
+                        px="12px" 
                         py="12px"
+                        fontWeight="400"
+                        fontStyle="normal"
+                        fontSize="12px"
+                        lineHeight="100%"
+                        letterSpacing="-0.04em"
                         _hover={{ bg: "#F3F4F6" }}
                       >
                         {role.label}
@@ -334,25 +356,25 @@ export default function UserEditModal({ isOpen, onClose, userId, onUpdated }) {
           )}
         </ModalBody>
 
-        <ModalFooter>
+        <ModalFooter py={0}>
           <Flex
             width="75%"
-            px={2}
           >
             <Button
               fontWeight="400"
-              fontSize="20px"
+              fontSize="14px"
               variant="outline"
               border="1px"
-              borderRadius="14px"
+              borderRadius="6px"
               borderColor="#00000026"
               mr={3}
               onClick={onClose}
               flex="1"
               maxW="181px"
-              py={4}
-              h="auto"
-              bg="#F9FAFB"
+              px="30px"
+              py="10px"
+              h="41px"
+              bg="#FFFFFF"
             >
               Cancel
             </Button>
@@ -360,15 +382,16 @@ export default function UserEditModal({ isOpen, onClose, userId, onUpdated }) {
               <>
                 <Button
                   fontWeight="400"
-                  fontSize="20px"
+                  fontSize="14px"
                   colorScheme="blackAlpha"
                   bg="#90080F"
                   color="white"
-                  borderRadius="14px"
+                  borderRadius="6px"
                   flex="1"
                   maxW="181px"
-                  py={4}
-                  h="auto"
+                  px="30px"
+                  py="10px"
+                  h="41px"
                   onClick={async () => {
                     onDelete();
                   }}
@@ -382,15 +405,16 @@ export default function UserEditModal({ isOpen, onClose, userId, onUpdated }) {
               <>
                 <Button
                   fontWeight="400"
-                  fontSize="20px"
+                  fontSize="14px"
                   colorScheme="blackAlpha"
-                  bg="#6ECA65"
+                  bg="#0C824D"
                   color="white"
-                  borderRadius="14px"
+                  borderRadius="6px"
                   flex="1"
                   maxW="181px"
-                  py={4}
-                  h="auto"
+                  px="30px"
+                  py="10px"
+                  h="41px"
                   onClick={async () => {
                     onApprove();
                   }}
