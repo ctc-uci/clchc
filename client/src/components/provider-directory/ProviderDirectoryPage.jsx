@@ -121,10 +121,10 @@ export const ProviderDirectoryPage = () => {
                 Manage
               </MenuButton>
               <MenuList
-                bg="#0D1F3C" // Dark navy background
-                border="none" // Remove default border
-                p={0} // Remove padding so items hit the edges
-                minW="200px" // Adjust width as needed
+                bg="#0D1F3C"
+                border="none"
+                p={0}
+                minW="200px"
               >
                 <MenuItem isDisabled>Tags</MenuItem>
                 <MenuItem onClick={onCategoryDrawerOpen}>Categories</MenuItem>

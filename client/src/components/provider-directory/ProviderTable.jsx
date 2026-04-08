@@ -250,7 +250,16 @@ export default function ProviderTable({
       maxHeight="60vh"
       overflowY="auto"
     >
-      <Table>
+      <Table
+        sx={{
+          "tbody tr:nth-of-type(even)": {
+            bg: "#F9F9F9", // Your custom stripe color
+          },
+          "tbody tr:nth-of-type(odd)": {
+            bg: "white", // Ensures the other rows are solid white
+          },
+        }}
+      >
         {/**Subcomps to simplify structure */}
         {loading ? (
           <>
