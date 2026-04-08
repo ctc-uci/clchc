@@ -13,8 +13,8 @@ import {
   WrapItem,
 } from "@chakra-ui/react";
 
-import { useTags } from "@/contexts/hooks/data-fetching/useTags";
 import TextPopup from "@/components/common/TextPopup";
+import { useTags } from "@/contexts/hooks/data-fetching/useTags";
 
 const SkeletonHeader = () => {
   return (
@@ -79,12 +79,23 @@ export default function ProviderTable({
    * Making table header by mapping categories from providerCategories
    * @returns <Thead> with each category as a cell in the header row.
    */
+  const fixedThProps = {
+    fontFamily: "Inter",
+    fontSize: "12px",
+    fontStyle: "normal",
+    fontWeight: "700",
+    lineHeight: "16px",
+    letterSpacing: "0.6px",
+    padding: "15px 25px 15px 25px",
+    backgroundColor: "#C8D4E6",
+    color: "#113D64",
+  };
+
   const Header = () => {
-    const columns = sortedCategories.map((cat) => (
+    const dynamicColumns = sortedCategories.map((cat) => (
       <Th
         key={cat.name}
-        fontWeight="bold"
-        color="#2D3748"
+        {...fixedThProps}
       >
         {cat.name}
       </Th>
@@ -93,12 +104,17 @@ export default function ProviderTable({
     return (
       <Thead
         bg="#EBEBEB"
-        h="60px"
+        h="40px"
         position="sticky"
         top={0}
         zIndex={1}
       >
-        <Tr>{columns}</Tr>
+        <Tr>
+          <Th {...fixedThProps}>Provider</Th>
+          <Th {...fixedThProps}>NPI/License</Th>
+          {dynamicColumns}
+          <Th {...fixedThProps}>Long Term Notes</Th>
+        </Tr>
       </Thead>
     );
   };
@@ -117,13 +133,29 @@ export default function ProviderTable({
     const isMissing =
       raw === undefined ||
       raw === null ||
-      (typeof raw === "string" && raw.trim() === "");
+      (typeof raw === "string" && raw.trim() === "") ||
+      (Array.isArray(raw) && raw.length === 0);
 
     if (isMissing) {
       // Defaults per inputType
       if (cat.inputType === "tag")
-        return <Text color="gray.400">NO TAGS SELECTED</Text>;
-      return <Text color="gray.400"></Text>;
+        return <Text 
+        color="gray.400" 
+        fontFamily={"Inter"} 
+        fontSize={"14px"} 
+        fontStyle={"normal"}
+        fontWeight={"400"}
+        lineHeight={"22px"}>
+          NO TAGS SELECTED
+        </Text>;
+      return <Text 
+        color="gray.400"
+        fontFamily={"Inter"} 
+        fontSize={"14px"} 
+        fontStyle={"normal"}
+        fontWeight={"400"}
+        lineHeight={"22px"}>
+      </Text>;
     }
 
     // Format per inputType
@@ -140,7 +172,22 @@ export default function ProviderTable({
         <Wrap>
           {tags.map((t) => (
             <WrapItem key={t}>
-              <Tag>{tagsMap[t]?.tagValue || t}</Tag>
+              <Tag
+                display="flex"
+                padding="2px 6px"
+                alignItems="center"
+                gap="6px"
+                borderRadius="6px"
+                backgroundColor="#35639D"
+                fontFamily="Lato"
+                fontSize="14px"
+                fontStyle="normal"
+                fontWeight="500"
+                lineHeight="normal"
+                color="#FFF"
+              >
+                {tagsMap[t]?.tagValue || t}
+              </Tag>
               {/* TODO: @xgraceyan Remove safeguard when we transition all the tags to IDs. */}
             </WrapItem>
           ))}
@@ -149,12 +196,28 @@ export default function ProviderTable({
     }
     if (cat.inputType === "text") {
       const text = String(raw);
-    
+
       if (text.length > 200) {
-        return <TextPopup text={text} truncateAt={200} />;
+        return (
+          <TextPopup
+            text={text}
+            truncateAt={200}
+          />
+        );
       }
-    
-      return <Text>{text}</Text>;
+
+      return (
+        <Text
+          fontFamily="Inter"
+          fontSize="14px"
+          fontStyle="normal"
+          fontWeight="400"
+          lineHeight="22px"
+          color="#113D64"
+        >
+          {text}
+        </Text>
+      );
     }
 
     // Default rendering
@@ -164,16 +227,19 @@ export default function ProviderTable({
   const ProviderRow = ({ provider }) => {
     const isSelected = selectedProviderId === provider.id;
 
-    const getCells = () =>
-      providerCategories.map((cat) => (
-        <Td
-          key={cat.name}
-          borderRight="1px solid"
-          borderColor="gray.200"
-        >
-          {renderCellValue(provider, cat)}
-        </Td>
-      ));
+    const fixedTdProps = {
+      borderRight: "1px solid",
+      borderColor: "gray.200",
+    };
+
+    const dynamicCells = providerCategories.map((cat) => (
+      <Td
+        key={cat.name}
+        {...fixedTdProps}
+      >
+        {renderCellValue(provider, cat)}
+      </Td>
+    ));
 
     return (
       <Tr
@@ -187,7 +253,67 @@ export default function ProviderTable({
         onClick={() => onProviderSelect?.(provider)}
         onDoubleClick={() => onProviderDoubleClick?.(provider)}
       >
-        {getCells()}
+        <Td {...fixedTdProps}>
+          <Text
+            fontFamily="Inter"
+            fontSize="14px"
+            fontStyle="normal"
+            fontWeight="400"
+            lineHeight="22px"
+            color="#113D64"
+          >
+            {provider.name ?? ""}{provider.degree ? `, ${provider.degree}` : ""}
+          </Text>
+          {provider.phoneNumber && (
+            <Text
+              fontFamily="Inter"
+              fontSize="12px"
+              fontStyle="normal"
+              fontWeight="400"
+              lineHeight="18px"
+              color="gray.500"
+            >
+              {provider.phoneNumber}
+            </Text>
+          )}
+          {provider.dea && (
+            <Text
+              fontFamily="Inter"
+              fontSize="12px"
+              fontStyle="normal"
+              fontWeight="400"
+              lineHeight="18px"
+              color="gray.500"
+            >
+              DEA: {provider.dea}
+            </Text>
+          )}
+        </Td>
+        <Td {...fixedTdProps}>
+          <Text
+            fontFamily="Inter"
+            fontSize="14px"
+            fontStyle="normal"
+            fontWeight="400"
+            lineHeight="22px"
+            color="#113D64"
+          >
+            {provider.license ?? ""}
+          </Text>
+        </Td>
+        {dynamicCells}
+        <Td {...fixedTdProps}>
+          <Text
+            fontFamily="Inter"
+            fontSize="14px"
+            fontStyle="normal"
+            fontWeight="400"
+            lineHeight="22px"
+            color="#113D64"
+          >
+            {provider.notes ?? ""}
+          </Text>
+        </Td>
       </Tr>
     );
   };
@@ -212,9 +338,18 @@ export default function ProviderTable({
       borderColor="gray.200"
       borderRadius="lg"
       maxHeight="60vh"
-      overflowY = "auto"
+      overflowY="auto"
     >
-      <Table>
+      <Table
+        sx={{
+          "tbody tr:nth-of-type(even)": {
+            bg: "#F9F9F9", // Your custom stripe color
+          },
+          "tbody tr:nth-of-type(odd)": {
+            bg: "white", // Ensures the other rows are solid white
+          },
+        }}
+      >
         {/**Subcomps to simplify structure */}
         {loading ? (
           <>
