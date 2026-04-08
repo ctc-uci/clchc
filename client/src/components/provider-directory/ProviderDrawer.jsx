@@ -580,7 +580,9 @@ const ProviderDrawer = ({
           >
             {activeMode === "edit"
               ? "Provider Profile"
-              : "Please provide basic info about the provider."}
+              : activeMode === "delete"
+                ? "Please confirm you would like to delete this provider."
+                : "Please provide basic info about the provider."}
           </Text>
         </DrawerHeader>
         <Divider my={6} />
