@@ -84,10 +84,12 @@ export default function ProviderTable({
       <Th
         key={cat.name}
         fontFamily="Inter"
-        fontSize="16px"
+        fontSize="12px"
         fontStyle="normal"
         fontWeight="700"
-        lineHeight="24px"
+        lineHeight="16px"
+        letterSpacing={"0.6px"}
+        padding={"15px 25px 15px 25px"}
         backgroundColor="#C8D4E6"
         color="#113D64"
       >
@@ -98,7 +100,7 @@ export default function ProviderTable({
     return (
       <Thead
         bg="#EBEBEB"
-        h="60px"
+        h="40px"
         position="sticky"
         top={0}
         zIndex={1}
@@ -128,8 +130,23 @@ export default function ProviderTable({
     if (isMissing) {
       // Defaults per inputType
       if (cat.inputType === "tag")
-        return <Text color="gray.400">NO TAGS SELECTED</Text>;
-      return <Text color="gray.400"></Text>;
+        return <Text 
+        color="gray.400" 
+        fontFamily={"Inter"} 
+        fontSize={"14px"} 
+        fontStyle={"normal"}
+        fontWeight={"400"}
+        lineHeight={"22px"}>
+          NO TAGS SELECTED
+        </Text>;
+      return <Text 
+        color="gray.400"
+        fontFamily={"Inter"} 
+        fontSize={"14px"} 
+        fontStyle={"normal"}
+        fontWeight={"400"}
+        lineHeight={"22px"}>
+      </Text>;
     }
 
     // Format per inputType
@@ -151,13 +168,13 @@ export default function ProviderTable({
                 padding="2px 6px"
                 alignItems="center"
                 gap="6px"
-                border-radius="6px"
+                borderRadius="6px"
                 backgroundColor="#35639D"
-                font-family="Lato"
-                font-size="14px"
-                font-style="normal"
-                font-weight="500"
-                line-height="normal"
+                fontFamily="Lato"
+                fontSize="14px"
+                fontStyle="normal"
+                fontWeight="500"
+                lineHeight="normal"
                 color="#FFF"
               >
                 {tagsMap[t]?.tagValue || t}
@@ -182,11 +199,11 @@ export default function ProviderTable({
 
       return (
         <Text
-          font-family="Inter"
-          font-size="14px"
-          font-style="normal"
-          font-weight="400"
-          line-height="20px"
+          fontFamily="Inter"
+          fontSize="14px"
+          fontStyle="normal"
+          fontWeight="400"
+          lineHeight="22px"
           color="#113D64"
         >
           {text}

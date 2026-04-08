@@ -33,6 +33,7 @@ export const ProviderDirectoryPage = () => {
   const [drawerMode, setDrawerMode] = useState("create");
   const [selectedProvider, setSelectedProvider] = useState(null);
   const [highlightedProviderId, setHighlightedProviderId] = useState(null);
+  const [manageOpen, setManageOpen] = useState(false);
 
   const debouncedProviderQuery = useDebounce(
     (value) => setProviderQuery(value),
@@ -109,32 +110,73 @@ export const ProviderDirectoryPage = () => {
         >
           {/* TOP ROW: Menu Button */}
           <Flex gap={3}>
-            <Menu>
-              <MenuButton
-                as={Button}
-                bg="black"
+            <Box position="relative">
+              <Button
+                bg="var(--Primary-1, #022442)"
                 color="white"
-                _hover={{ bg: "gray.800" }}
-                _active={{ bg: "gray.800" }}
-                leftIcon={<HamburgerIcon />}
+                h={"45px"}
+                w={"135px"}
+                padding={"8px 12px"}
+                fontFamily={"Inter"}
+                fontSize={"18px"}
+                fontStyle={"normal"}
+                fontWeight={"600"}
+                lineHeight={"28px"}
+                _hover={{ bg: "#022442" }}
+                _active={{ bg: "#022442" }}
+                leftIcon={<HamburgerIcon size={"24px"}/>}
+                borderRadius={manageOpen ? "4px 4px 0 0" : "4px"}
+                onClick={() => setManageOpen(o => !o)}
               >
                 Manage
-              </MenuButton>
-              <MenuList
-                bg="#0D1F3C"
-                border="none"
-                p={0}
-                minW="200px"
-              >
-                <MenuItem isDisabled>Tags</MenuItem>
-                <MenuItem onClick={onCategoryDrawerOpen}>Categories</MenuItem>
-                <MenuItem onClick={openCreateProviderDrawer}>
-                  Providers
-                </MenuItem>
-              </MenuList>
-            </Menu>
+              </Button>
+              {manageOpen && (
+                <Box
+                  position="absolute"
+                  top="100%"
+                  right={0}
+                  borderRadius="0 0 4px 4px"
+                  w="100%"
+                  zIndex={10}
+                  bg="var(--Primary-1, #022442)"
+                  color="white"
+                  minH={"45px"}
+                  fontFamily={"Inter"}
+                  fontSize={"18px"}
+                  fontStyle={"normal"}
+                  fontWeight={"600"}
+                  lineHeight={"28px"}
+                >
+                  <Box
+                    w="100%"
+                    px={4}
+                    py={3}
+                    color="white"
+                    fontWeight="500"
+                    borderBottom="1px solid"
+                    borderColor="whiteAlpha.200"
+                    cursor="pointer"
+                    _hover={{ bg: "whiteAlpha.100" }}
+                    onClick={() => { onCategoryDrawerOpen(); setManageOpen(false); }}
+                  >
+                    Categories
+                  </Box>
+                  <Box
+                    w="100%"
+                    px={4}
+                    py={3}
+                    color="white"
+                    fontWeight="500"
+                    cursor="pointer"
+                    _hover={{ bg: "whiteAlpha.100" }}
+                    onClick={() => { openCreateProviderDrawer(); setManageOpen(false); }}
+                  >
+                    Providers
+                  </Box>
+                </Box>
+              )}
+            </Box>
           </Flex>
-
           {/* BOTTOM ROW: Search Bar */}
           <InputGroup width="100%">
             <InputLeftElement pointerEvents="none">

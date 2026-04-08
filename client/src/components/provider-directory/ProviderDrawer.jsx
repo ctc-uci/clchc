@@ -246,6 +246,7 @@ const ProviderFormFields = ({
               >
                 <FormLabel
                   color="#113D64"
+                  fontFamily={"Inter"}
                   fontSize="14px"
                   fontStyle="normal"
                   fontWeight={400}
@@ -261,6 +262,22 @@ const ProviderFormFields = ({
                     isReadOnly={readOnly}
                     bg={readOnly ? "gray.50" : "white"}
                     color="gray.700"
+                    display={"flex"}
+                    // minW={"100px"}
+                    w={"100%"}
+                    // minH={"30x"}
+                    padding={"5px 10px"}
+                    justifyContent={"center"}
+                    alignItems={"center"}
+                    gap={"10px"}
+                    borderRadius={"2px"}
+                    border={"1px solid var(--gray-200, #E2E8F0)"}
+                    background={"var(--white, #FFF);"}
+                    fontFamily={"Lato"}
+                    fontStyle={"normal"}
+                    fontSize={"14px"}
+                    fontWeight={"400"}
+                    lineHeight={"normal"}
                   />
                 )}
 
@@ -549,7 +566,7 @@ const ProviderDrawer = ({
               : activeMode === "create"
                 ? "Create Provider"
                 : activeMode === "edit"
-                  ? "Edit Provider"
+                  ? (provider.data["Name"] ?? "Edit Provider")
                   : "Delete Provider"}
           </Text>
           <Text
