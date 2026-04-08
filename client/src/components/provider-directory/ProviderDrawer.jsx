@@ -20,6 +20,7 @@ import {
   Input,
   Skeleton,
   Text,
+  Textarea,
   useToast,
 } from "@chakra-ui/react";
 
@@ -193,36 +194,6 @@ const ProviderFormFields = ({
     [tags, pendingTagDeleteIds]
   );
 
-  // const fieldProps = (displayLabel) => {
-  //   const key = catNames[displayLabel] || displayLabel;
-  //   return {
-  //     value: formValues[key] || "",
-  //     onChange: (e) => onChange(key, e.target.value),
-  //     isReadOnly: readOnly,
-  //     bg: readOnly ? "gray.50" : "white",
-  //   };
-  // };
-
-  // const formattedFieldProps = (displayLabel, formatter) => {
-  //   const key = catNames[displayLabel] || displayLabel;
-  //   return {
-  //     value: formValues[key] || "",
-  //     onChange: (e) => onChange(key, formatter(e.target.value)),
-  //     isReadOnly: readOnly,
-  //     bg: readOnly ? "gray.50" : "white",
-  //   };
-  // };
-
-  // const selectProps = (displayLabel) => {
-  //   const key = catNames[displayLabel] || displayLabel;
-  //   return {
-  //     value: formValues[key] || "",
-  //     onChange: (e) => onChange(key, e.target.value),
-  //     isDisabled: readOnly,
-  //     bg: readOnly ? "gray.50" : "white",
-  //   };
-  // };
-
   const fixedInputProps = {
     isReadOnly: readOnly,
     bg: readOnly ? "gray.50" : "white",
@@ -293,13 +264,19 @@ const ProviderFormFields = ({
         </Box>
 
         <Box maxW="172px">
-          <FormControl>
+          <FormControl
+            isRequired
+            isInvalid={!!errors["license"]}
+          >
             <FormLabel {...fixedLabelProps}>NPI/License</FormLabel>
             <Input
               value={formValues["license"] || ""}
               onChange={(e) => onChange("license", e.target.value)}
               {...fixedInputProps}
             />
+            {errors["license"] && (
+              <Text color="red.500" fontSize="sm" mt={1}>{errors["license"]}</Text>
+            )}
           </FormControl>
         </Box>
 
@@ -407,6 +384,26 @@ const ProviderFormFields = ({
           );
         })}
       </Grid>
+
+      <FormControl>
+        <FormLabel {...fixedLabelProps}>Long Term Notes</FormLabel>
+        <Textarea
+          value={formValues["notes"] || ""}
+          onChange={(e) => onChange("notes", e.target.value)}
+          isReadOnly={readOnly}
+          bg={readOnly ? "gray.50" : "white"}
+          fontFamily="Lato"
+          fontSize="14px"
+          fontWeight="400"
+          color="gray.700"
+          borderRadius="6px"
+          border="1px solid var(--gray-200, #E2E8F0)"
+          background="var(--white, #FFF)"
+          resize="vertical"
+          rows={4}
+          h={"80px"}
+        />
+      </FormControl>
     </Flex>
   );
 };
@@ -452,6 +449,7 @@ const ProviderDrawer = ({
             license: provider.license ?? "",
             dea: provider.dea ?? "",
             phoneNumber: provider.phoneNumber ?? "",
+            notes: provider.notes ?? "",
           };
 
           categories.forEach((cat) => {
@@ -623,6 +621,10 @@ const ProviderDrawer = ({
       newErrors["name"] = "Name is required";
     }
 
+    if (!formValues["license"] || formValues["license"].trim() === "") {
+      newErrors["license"] = "NPI/License is required";
+    }
+
     categories.forEach((cat) => {
       if (cat.isRequired) {
         const value = formValues[cat.id];
@@ -679,7 +681,7 @@ const ProviderDrawer = ({
               : activeMode === "create"
                 ? "Create Provider"
                 : activeMode === "edit"
-                  ? (provider.data["Name"] ?? "Edit Provider")
+                  ? (provider?.name ?? "Edit Provider")
                   : "Delete Provider"}
           </Text>
           <Text
@@ -748,6 +750,8 @@ const ProviderDrawer = ({
                       setActiveMode("delete");
                       setShowConfirmation(true);
                     }}
+                    borderRadius={"4px"}
+                    border={"1px solid"}
                   >
                     Delete
                   </Button>
@@ -758,6 +762,8 @@ const ProviderDrawer = ({
                     _hover={{ bg: "#1a4f7a" }}
                     onClick={handleSubmit}
                     flex={1}
+                    borderRadius={"4px"}
+                    border={"1px solid"}
                   >
                     Confirm Changes
                   </Button>

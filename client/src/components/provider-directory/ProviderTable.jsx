@@ -113,7 +113,7 @@ export default function ProviderTable({
           <Th {...fixedThProps}>Provider</Th>
           <Th {...fixedThProps}>NPI/License</Th>
           {dynamicColumns}
-          <Th {...fixedThProps}>Notes</Th>
+          <Th {...fixedThProps}>Long Term Notes</Th>
         </Tr>
       </Thead>
     );

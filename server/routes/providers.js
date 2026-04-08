@@ -95,4 +95,20 @@ providersRouter.put("/:id", verifyRole("ccm"), async (req, res) => {
   }
 });
 
+providersRouter.delete("/:id", verifyRole("ccm"), async (req, res) => {
+  try {
+    const result = await db.oneOrNone(
+      `DELETE FROM providers WHERE id = $1 RETURNING *`,
+      [req.params.id]
+    );
+
+    if (!result) return res.status(404).send("Provider not found");
+
+    res.status(200).json(keysToCamel(result));
+  } catch (err) {
+    console.error(err);
+    res.status(500).send(err.message);
+  }
+});
+
 export { providersRouter };
