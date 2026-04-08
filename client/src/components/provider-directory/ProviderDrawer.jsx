@@ -223,11 +223,109 @@ const ProviderFormFields = ({
   //   };
   // };
 
+  const fixedInputProps = {
+    isReadOnly: readOnly,
+    bg: readOnly ? "gray.50" : "white",
+    color: "gray.700",
+    display: "flex",
+    w: "100%",
+    padding: "5px 8px",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: "10px",
+    borderRadius: "2px",
+    border: "1px solid var(--gray-200, #E2E8F0)",
+    background: "var(--white, #FFF)",
+    fontFamily: "Lato",
+    fontStyle: "normal",
+    fontSize: "14px",
+    fontWeight: "400",
+    lineHeight: "normal",
+  };
+
+  const fixedLabelProps = {
+    color: "#113D64",
+    fontFamily: "Inter",
+    fontSize: "14px",
+    fontStyle: "normal",
+    fontWeight: 400,
+    lineHeight: "normal",
+  };
+
   return (
     <Flex
       direction="column"
       gap="20px"
     >
+      <Grid
+        templateColumns="repeat(2, minmax(0, 1fr))"
+        gap={6}
+        alignItems="end"
+      >
+        <Box maxW="172px">
+          <FormLabel {...fixedLabelProps}>Provider Name</FormLabel>
+          <Flex gap={2}>
+            <FormControl
+              isRequired
+              isInvalid={!!errors["name"]}
+            >
+              <Input
+                value={formValues["name"] || ""}
+                onChange={(e) => onChange("name", e.target.value)}
+                {...fixedInputProps}
+                fontSize="12px"
+              />
+              {errors["name"] && (
+                <Text color="red.500" fontSize="sm" mt={1}>{errors["name"]}</Text>
+              )}
+            </FormControl>
+            <FormControl maxW="40px">
+              <Input
+                value={formValues["degree"] || ""}
+                onChange={(e) => onChange("degree", e.target.value)}
+                {...fixedInputProps}
+                // fontSize="12px"
+                placeholder="Deg."
+                padding={"6px"}
+              />
+            </FormControl>
+          </Flex>
+        </Box>
+
+        <Box maxW="172px">
+          <FormControl>
+            <FormLabel {...fixedLabelProps}>NPI/License</FormLabel>
+            <Input
+              value={formValues["license"] || ""}
+              onChange={(e) => onChange("license", e.target.value)}
+              {...fixedInputProps}
+            />
+          </FormControl>
+        </Box>
+
+        <Box maxW="172px">
+          <FormControl>
+            <FormLabel {...fixedLabelProps}>DEA</FormLabel>
+            <Input
+              value={formValues["dea"] || ""}
+              onChange={(e) => onChange("dea", e.target.value)}
+              {...fixedInputProps}
+            />
+          </FormControl>
+        </Box>
+
+        <Box maxW="172px">
+          <FormControl>
+            <FormLabel {...fixedLabelProps}>Phone Number</FormLabel>
+            <Input
+              value={formValues["phoneNumber"] || ""}
+              onChange={(e) => onChange("phoneNumber", e.target.value)}
+              {...fixedInputProps}
+            />
+          </FormControl>
+        </Box>
+      </Grid>
+
       <Grid
         templateColumns="repeat(2, minmax(0, 1fr))"
         gap={6}
@@ -348,7 +446,13 @@ const ProviderDrawer = ({
     const init = async () => {
       try {
         if ((mode === "edit" || mode === "delete") && provider) {
-          const converted = {};
+          const converted = {
+            name: provider.name ?? "",
+            degree: provider.degree ?? "",
+            license: provider.license ?? "",
+            dea: provider.dea ?? "",
+            phoneNumber: provider.phoneNumber ?? "",
+          };
 
           categories.forEach((cat) => {
             const existingValue = provider.data?.[cat.name];
@@ -401,8 +505,13 @@ const ProviderDrawer = ({
     });
 
     return {
+      name: formState.name || "",
+      degree: formState.degree || "",
+      license: formState.license || "",
+      dea: formState.dea || "",
+      phoneNumber: formState.phoneNumber || "",
       data: dataPayload,
-      note: formState.note || "",
+      notes: formState.notes || "",
     };
   };
 
@@ -509,6 +618,10 @@ const ProviderDrawer = ({
 
   const validateForm = () => {
     const newErrors = {};
+
+    if (!formValues["name"] || formValues["name"].trim() === "") {
+      newErrors["name"] = "Name is required";
+    }
 
     categories.forEach((cat) => {
       if (cat.isRequired) {

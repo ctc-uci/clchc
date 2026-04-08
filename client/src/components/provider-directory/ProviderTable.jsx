@@ -79,19 +79,23 @@ export default function ProviderTable({
    * Making table header by mapping categories from providerCategories
    * @returns <Thead> with each category as a cell in the header row.
    */
+  const fixedThProps = {
+    fontFamily: "Inter",
+    fontSize: "12px",
+    fontStyle: "normal",
+    fontWeight: "700",
+    lineHeight: "16px",
+    letterSpacing: "0.6px",
+    padding: "15px 25px 15px 25px",
+    backgroundColor: "#C8D4E6",
+    color: "#113D64",
+  };
+
   const Header = () => {
-    const columns = sortedCategories.map((cat) => (
+    const dynamicColumns = sortedCategories.map((cat) => (
       <Th
         key={cat.name}
-        fontFamily="Inter"
-        fontSize="12px"
-        fontStyle="normal"
-        fontWeight="700"
-        lineHeight="16px"
-        letterSpacing={"0.6px"}
-        padding={"15px 25px 15px 25px"}
-        backgroundColor="#C8D4E6"
-        color="#113D64"
+        {...fixedThProps}
       >
         {cat.name}
       </Th>
@@ -105,7 +109,12 @@ export default function ProviderTable({
         top={0}
         zIndex={1}
       >
-        <Tr>{columns}</Tr>
+        <Tr>
+          <Th {...fixedThProps}>Provider</Th>
+          <Th {...fixedThProps}>NPI/License</Th>
+          {dynamicColumns}
+          <Th {...fixedThProps}>Notes</Th>
+        </Tr>
       </Thead>
     );
   };
@@ -218,16 +227,19 @@ export default function ProviderTable({
   const ProviderRow = ({ provider }) => {
     const isSelected = selectedProviderId === provider.id;
 
-    const getCells = () =>
-      providerCategories.map((cat) => (
-        <Td
-          key={cat.name}
-          borderRight="1px solid"
-          borderColor="gray.200"
-        >
-          {renderCellValue(provider, cat)}
-        </Td>
-      ));
+    const fixedTdProps = {
+      borderRight: "1px solid",
+      borderColor: "gray.200",
+    };
+
+    const dynamicCells = providerCategories.map((cat) => (
+      <Td
+        key={cat.name}
+        {...fixedTdProps}
+      >
+        {renderCellValue(provider, cat)}
+      </Td>
+    ));
 
     return (
       <Tr
@@ -241,7 +253,67 @@ export default function ProviderTable({
         onClick={() => onProviderSelect?.(provider)}
         onDoubleClick={() => onProviderDoubleClick?.(provider)}
       >
-        {getCells()}
+        <Td {...fixedTdProps}>
+          <Text
+            fontFamily="Inter"
+            fontSize="14px"
+            fontStyle="normal"
+            fontWeight="400"
+            lineHeight="22px"
+            color="#113D64"
+          >
+            {provider.name ?? ""}{provider.degree ? `, ${provider.degree}` : ""}
+          </Text>
+          {provider.phoneNumber && (
+            <Text
+              fontFamily="Inter"
+              fontSize="12px"
+              fontStyle="normal"
+              fontWeight="400"
+              lineHeight="18px"
+              color="gray.500"
+            >
+              {provider.phoneNumber}
+            </Text>
+          )}
+          {provider.dea && (
+            <Text
+              fontFamily="Inter"
+              fontSize="12px"
+              fontStyle="normal"
+              fontWeight="400"
+              lineHeight="18px"
+              color="gray.500"
+            >
+              DEA: {provider.dea}
+            </Text>
+          )}
+        </Td>
+        <Td {...fixedTdProps}>
+          <Text
+            fontFamily="Inter"
+            fontSize="14px"
+            fontStyle="normal"
+            fontWeight="400"
+            lineHeight="22px"
+            color="#113D64"
+          >
+            {provider.license ?? ""}
+          </Text>
+        </Td>
+        {dynamicCells}
+        <Td {...fixedTdProps}>
+          <Text
+            fontFamily="Inter"
+            fontSize="14px"
+            fontStyle="normal"
+            fontWeight="400"
+            lineHeight="22px"
+            color="#113D64"
+          >
+            {provider.notes ?? ""}
+          </Text>
+        </Td>
       </Tr>
     );
   };
