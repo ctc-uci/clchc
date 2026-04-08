@@ -105,7 +105,6 @@ export default function SignOutSection() {
         preview={modalPreview}
         customText="You are signing out this account"
         customButtonText="Sign Out"
-        customButtonColor="#90080F"
       />
     </>
   );
