@@ -23,9 +23,8 @@ const TextPopup = ({ text = "", alwaysShowPopup = false, truncateAt }) => {
           <Text
             isTruncated
             textDecoration="underline"
-            textUnderlineOffset="3px"
-            color="gray.600"
             noOfLines={1}
+            color="#718096"
           >
             {text}
           </Text>

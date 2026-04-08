@@ -1,4 +1,4 @@
-import { Box, FormControl, FormLabel, Input } from "@chakra-ui/react";
+import { Box, FormControl, FormLabel, Textarea } from "@chakra-ui/react";
 
 import { inputStyles } from "../tools/constants";
 
@@ -20,7 +20,7 @@ export const DailyNoteInput = ({ note, setNote, isLocked }) => {
           {note ?? ""}
         </Box>
       ) : (
-        <Input
+        <Textarea
           placeholder="Start typing..."
           size="md"
           {...inputStyles}

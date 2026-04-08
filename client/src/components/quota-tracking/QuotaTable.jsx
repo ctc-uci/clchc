@@ -220,7 +220,7 @@ const QuotaTable = ({ rows, loading, onRowsUpdate, role }) => {
                 {/* Notes */}
                 <Td padding="16px 24px" border="1.5px solid rgba(0, 0, 0, 0.06)">
                   {!row.notes ? (
-                    <Text color="#718096" fontSize="14px" fontWeight="400" lineHeight="30px" textDecoration="underline">Lorem ipsum lorem ipsum...</Text>
+                    <Text color="#718096" fontSize="14px" fontWeight="400" lineHeight="30px">No notes.</Text>
                   ) : row.notes.length > 200 ? (
                     <TextPopup
                       text={row.notes}
