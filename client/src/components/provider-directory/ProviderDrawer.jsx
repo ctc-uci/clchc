@@ -206,7 +206,7 @@ const ProviderFormFields = ({
     gap: "10px",
     borderRadius: "2px",
     border: "1px solid var(--gray-200, #E2E8F0)",
-    background: "var(--white, #FFF)",
+    background: readOnly ? "var(--gray-50, #F7FAFC)" : "var(--white, #FFF)",
     fontFamily: "Lato",
     fontStyle: "normal",
     fontSize: "14px",
