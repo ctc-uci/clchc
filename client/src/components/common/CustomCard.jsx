@@ -1,12 +1,11 @@
 import { Card, CardBody, CardHeader, Text } from "@chakra-ui/react";
 
-export const CustomCard = ({ title, body, footer, footerUnderline, height, width, flex }) => {
+export const CustomCard = ({ title, body, footer, footerUnderline, footerColor, height, width }) => {
   return (
     <Card
       w={width}
       h={height}
-      flex={flex}
-      flexShrink={1}
+      flexShrink={0}
       borderWidth="1px"
       borderColor="gray.200"
       borderRadius="lg"
@@ -14,11 +13,12 @@ export const CustomCard = ({ title, body, footer, footerUnderline, height, width
       _hover={{ boxShadow: "md" }}
       transition="box-shadow 0.2s ease"
     >
-      <CardHeader pb={0}>
+      <CardHeader pb="9px">
         <Text
           fontSize="16px"
-          color="gray.500"
+          color="rgba(0,0,0,0.5)"
           fontWeight="normal"
+          lineHeight="1"
         >
           {title}
         </Text>
@@ -26,17 +26,20 @@ export const CustomCard = ({ title, body, footer, footerUnderline, height, width
 
       <CardBody py={0}>
         <Text
-          fontSize="30.679px"
-          fontWeight="semibold"
+          fontSize="30.68px"
+          fontWeight="medium"
           color="gray.900"
+          lineHeight="1"
+          letterSpacing="-0.04em"
         >
           {body}
         </Text>
         {footer && (
           <Text
-            fontSize="sm"
-            color="gray.500"
+            fontSize="15.34px"
+            color={footerColor ?? "rgba(0,0,0,0.5)"}
             mt={1}
+            lineHeight="1"
             textDecoration={footerUnderline ? "underline" : "none"}
           >
             {footer}

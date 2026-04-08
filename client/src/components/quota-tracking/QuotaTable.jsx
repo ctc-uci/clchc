@@ -74,7 +74,8 @@ const SkeletonRows = () => {
   );
 };
 
-const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
+const QuotaTable = ({ rows, loading, onRowsUpdate, role }) => {
+  const isViewer = role === "viewer";
   const [editingQuotaId, setEditingQuotaId] = useState(null);
   const [selectedRowId, setSelectedRowId] = useState(null);
   const tableRef = useRef(null);
@@ -113,7 +114,7 @@ const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
   return (
     <TableContainer
       ref={tableRef}
-      borderRadius="4px 0 0 0"
+      borderRadius="5px"
       maxHeight="60vh"
       overflowY="auto"
     >
@@ -147,6 +148,7 @@ const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
                 bg={selectedRowId === row.id ? SELECTED_BG : index % 2 === 0 ? "#FFF" : "#F9F9F9"}
                 border="1.5px solid rgba(0, 0, 0, 0.06)"
                 onClick={() => {
+                  if (isViewer) return;
                   if (selectedRowId === row.id) {
                     // Second click - open drawer
                     setEditingQuotaId(row.id);
@@ -156,7 +158,7 @@ const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
                     setSelectedRowId(row.id);
                   }
                 }}
-                cursor="pointer"
+                cursor={isViewer ? "default" : "pointer"}
                 transition="background-color 0.2s"
                 _hover={{
                   bg: selectedRowId === row.id ? SELECTED_BG : "gray.50",
@@ -177,8 +179,8 @@ const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
                     fontWeight={0}
                     fontSize={"14px"}
                     textTransform="none"
-                    bgColor={"#35639D"}
-                    textColor={"white"}
+                    bgColor={"#E2E8F0"}
+                    textColor={"#1A202C"}
                     borderRadius="6px"
                   >
                     {row.locationName}
@@ -193,8 +195,8 @@ const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
                     fontWeight={0}
                     fontSize={"14px"}
                     textTransform="none"
-                    bgColor={"#35639D"}
-                    textColor={"white"}
+                    bgColor={"#E2E8F0"}
+                    textColor={"#1A202C"}
                     borderRadius="6px"
                   >
                     <Text textTransform="capitalize">
@@ -217,7 +219,9 @@ const QuotaTable = ({ rows, loading, onRowsUpdate }) => {
 
                 {/* Notes */}
                 <Td padding="16px 24px" border="1.5px solid rgba(0, 0, 0, 0.06)">
-                  {row.notes && row.notes.length > 200 ? (
+                  {!row.notes ? (
+                    <Text color="#718096" fontSize="14px" fontWeight="400" lineHeight="30px" textDecoration="underline">Lorem ipsum lorem ipsum...</Text>
+                  ) : row.notes.length > 200 ? (
                     <TextPopup
                       text={row.notes}
                       alwaysShowPopup={true}

@@ -158,7 +158,7 @@ export const QuotaTracking = () => {
   return (
     <Box
       p={6}
-      maxW="1200px"
+      maxW="1440px"
       mx="auto"
     >
       <Box mb={6}>
@@ -171,8 +171,9 @@ export const QuotaTracking = () => {
       </Box>
 
       <Flex
-        gap={4}
-        py={4}
+        gap="13px"
+        h="195px"
+        alignItems="center"
         mb={6}
       >
           {isLoading ? (
@@ -187,29 +188,31 @@ export const QuotaTracking = () => {
               <CustomCard
                 title="Total Progress"
                 body={`${stats.totalProgress}/${stats.totalQuota}`}
-                height="172.826px"
-                flex={1}
+                height="172.83px"
+                width="344.37px"
               />
               <CustomCard
                 title="Completion Rate"
                 body={`${stats.rate}%`}
-                footer="Overall Progress"
-                height="172.826px"
-                flex={1}
+                footer="Overall progress"
+                height="172.83px"
+                width="327.24px"
               />
               <CustomCard
                 title="Active Providers"
                 body={stats.activeProviders.toString()}
-                footer={`${stats.differentLocations} different locations`}
-                height="172.826px"
-                flex={1}
+                footer={`${stats.differentLocations} locations`}
+                footerUnderline
+                footerColor="#808080"
+                height="172.83px"
+                width="327.24px"
               />
               <CustomCard
                 title="Needs Attention"
                 body={stats.needsAttention.toString()}
                 footer=""
-                height="172.826px"
-                flex={1}
+                height="172.83px"
+                width="327.24px"
               />
             </>
           )}
@@ -222,12 +225,13 @@ export const QuotaTracking = () => {
           pb={6}
         >
           <InputLeftElement pointerEvents="none">
-            <SearchIcon color="gray.400" />
+            <SearchIcon color="rgba(0,0,0,0.5)" />
           </InputLeftElement>
           <Input
             placeholder="Search Providers"
             borderRadius="md"
             onChange={handleChange}
+            _placeholder={{ color: "rgba(0,0,0,0.5)" }}
           />
         </InputGroup>
         
@@ -242,24 +246,30 @@ export const QuotaTracking = () => {
           />
         </Box>
 
-        <Button
-          rightIcon={<AddIcon boxSize={3} />}
-          padding={"0 24px"}
-          background="#113D64"
-          borderRadius="4px"
-          onClick={onCreateDrawerOpen}
-          textColor={"white"}
-          fontSize="14px"
-          fontWeight="normal"
-          _hover={{ background: "#485365" }}
-        >
-          Create Quota
-        </Button>
+        {role !== "viewer" && (
+          <Button
+            rightIcon={<AddIcon boxSize={3} />}
+            px="24px"
+            h="44px"
+            background="#113D64"
+            borderRadius="6px"
+            gap="2px"
+            onClick={onCreateDrawerOpen}
+            color="white"
+            fontSize="12px"
+            fontWeight="600"
+            lineHeight="28px"
+            _hover={{ background: "#485365" }}
+          >
+            Create Quota
+          </Button>
+        )}
       </Flex>
 
       <QuotaTable
         rows={quotas}
         loading={isLoading}
+        role={role}
       />
 
       <QuotaDrawer

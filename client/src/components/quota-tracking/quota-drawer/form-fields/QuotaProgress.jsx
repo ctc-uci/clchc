@@ -66,7 +66,7 @@ export function QuotaProgress({
           >
             <Box
               position="relative"
-              w="80px"
+              w="109px"
             >
               <NumberInput
                 value={progress}
@@ -78,7 +78,7 @@ export function QuotaProgress({
                 borderColor="gray.300"
                 borderRadius="6px"
                 size="lg"
-                w="80px"
+                w="109px"
               >
                 <NumberInputField
                   textAlign="center"
@@ -88,22 +88,26 @@ export function QuotaProgress({
                   placeholder=" "
                   bg="white"
                   borderRadius="6px"
-                  h="64px"
+                  h="72px"
                 />
               </NumberInput>
             </Box>
 
             <Text
+              w="56px"
+              h="60px"
               fontSize="4xl"
               fontWeight="bold"
               color="black"
+              textAlign="center"
+              lineHeight="60px"
             >
               /
             </Text>
 
             <Box
               position="relative"
-              w="80px"
+              w="109px"
             >
               <NumberInput
                 value={quota}
@@ -115,7 +119,7 @@ export function QuotaProgress({
                 border="1px"
                 borderColor="gray.300"
                 borderRadius="6px"
-                w="80px"
+                w="109px"
               >
                 <NumberInputField
                   textAlign="center"
@@ -124,7 +128,7 @@ export function QuotaProgress({
                   color="black"
                   bg="white"
                   borderRadius="6px"
-                  h="64px"
+                  h="72px"
                 />
               </NumberInput>
             </Box>
