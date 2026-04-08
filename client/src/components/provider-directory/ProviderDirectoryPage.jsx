@@ -90,11 +90,7 @@ export const ProviderDirectoryPage = () => {
   };
 
   return (
-    <Box
-      p={6}
-      maxW="1200px"
-      mx="auto"
-    >
+    <Box p={6}>
       <Box mb={5}>
         <PageHeader
           title="Provider Directory"
@@ -106,12 +102,41 @@ export const ProviderDirectoryPage = () => {
 
       {role === "ccm" || role === "master" ? (
         <Flex
-          justifyContent="space-between"
-          alignItems="center"
+          flexDirection="column"
+          alignItems="flex-end"
           mb={5}
-          gap={4}
+          gap={3}
         >
-          <InputGroup maxW="600px">
+          {/* TOP ROW: Menu Button */}
+          <Flex gap={3}>
+            <Menu>
+              <MenuButton
+                as={Button}
+                bg="black"
+                color="white"
+                _hover={{ bg: "gray.800" }}
+                _active={{ bg: "gray.800" }}
+                leftIcon={<HamburgerIcon />}
+              >
+                Manage
+              </MenuButton>
+              <MenuList
+                bg="#0D1F3C" // Dark navy background
+                border="none" // Remove default border
+                p={0} // Remove padding so items hit the edges
+                minW="200px" // Adjust width as needed
+              >
+                <MenuItem isDisabled>Tags</MenuItem>
+                <MenuItem onClick={onCategoryDrawerOpen}>Categories</MenuItem>
+                <MenuItem onClick={openCreateProviderDrawer}>
+                  Providers
+                </MenuItem>
+              </MenuList>
+            </Menu>
+          </Flex>
+
+          {/* BOTTOM ROW: Search Bar */}
+          <InputGroup width="100%">
             <InputLeftElement pointerEvents="none">
               <SearchIcon color="gray.400" />
             </InputLeftElement>
@@ -121,28 +146,6 @@ export const ProviderDirectoryPage = () => {
               onChange={handleChange}
             />
           </InputGroup>
-
-          <Flex gap={3}>
-            <Menu>
-              <MenuButton
-                as={Button}
-                bg="black"
-                color="white"
-                _hover={{ bg: "gray.800" }}
-                _active={{ bg: "gray.800" }}
-                rightIcon={<HamburgerIcon />}
-              >
-                Manage
-              </MenuButton>
-              <MenuList>
-                <MenuItem isDisabled>Tags</MenuItem>
-                <MenuItem onClick={onCategoryDrawerOpen}>Categories</MenuItem>
-                <MenuItem onClick={openCreateProviderDrawer}>
-                  Providers
-                </MenuItem>
-              </MenuList>
-            </Menu>
-          </Flex>
         </Flex>
       ) : (
         <></>
