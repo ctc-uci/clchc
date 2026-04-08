@@ -40,7 +40,10 @@ export function QuotaProgress({
       isRequired
       isDisabled={isLocked}
     >
-      <FormLabel>Appointment Quota</FormLabel>
+      <FormLabel
+        fontSize="14px"
+        color="#113D64"
+      >Appointment Quota</FormLabel>
       <>
         <Progress
           value={percent}
@@ -82,7 +85,7 @@ export function QuotaProgress({
               >
                 <NumberInputField
                   textAlign="center"
-                  fontSize="4xl"
+                  fontSize="30px"
                   p={0}
                   color="black"
                   placeholder=" "
@@ -96,7 +99,7 @@ export function QuotaProgress({
             <Text
               w="56px"
               h="60px"
-              fontSize="4xl"
+              fontSize="40px"
               fontWeight="bold"
               color="black"
               textAlign="center"
@@ -123,7 +126,7 @@ export function QuotaProgress({
               >
                 <NumberInputField
                   textAlign="center"
-                  fontSize="4xl"
+                  fontSize="30px"
                   p={0}
                   color="black"
                   bg="white"

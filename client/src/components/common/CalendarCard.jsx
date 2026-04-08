@@ -79,11 +79,12 @@ const CalendarCard = ({ value, onChange }) => {
       <PopoverTrigger>
         <Button
           variant="outline"
+          height="44px"
+          borderRadius="4px"
           leftIcon={<CalendarIcon />}
           onClick={handleOpen}
           fontWeight="normal"
-          fontSize="sm"
-          borderRadius="md"
+          fontSize="14px"
         >
           {displayValue}
         </Button>

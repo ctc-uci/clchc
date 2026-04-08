@@ -179,8 +179,8 @@ const QuotaTable = ({ rows, loading, onRowsUpdate, role }) => {
                     fontWeight={0}
                     fontSize={"14px"}
                     textTransform="none"
-                    bgColor={"#E2E8F0"}
-                    textColor={"#1A202C"}
+                    bgColor={"#35639D"}
+                    textColor={"white"}
                     borderRadius="6px"
                   >
                     {row.locationName}
@@ -195,8 +195,8 @@ const QuotaTable = ({ rows, loading, onRowsUpdate, role }) => {
                     fontWeight={0}
                     fontSize={"14px"}
                     textTransform="none"
-                    bgColor={"#E2E8F0"}
-                    textColor={"#1A202C"}
+                    bgColor={"#35639D"}
+                    textColor={"white"}
                     borderRadius="6px"
                   >
                     <Text textTransform="capitalize">

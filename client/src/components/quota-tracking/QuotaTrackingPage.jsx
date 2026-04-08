@@ -161,17 +161,50 @@ export const QuotaTracking = () => {
       maxW="1440px"
       mx="auto"
     >
-      <Box mb={6}>
+      <Flex
+        mb={6}
+        alignItems="flex-start"
+        justifyContent="space-between"
+      >
         <PageHeader
           title="Quota Tracking"
           subheading="Monitor daily appointment progress across all providers"
           role={role}
           isLoading={roleLoading}
         />
-      </Box>
+        <Flex
+          gap="6px"
+          alignItems="center"
+          mt={1}
+        >
+          <CalendarCard
+            value={selectedDate}
+            onChange={handleDateChange}
+          />
+          {role !== "viewer" && (
+            <Button
+              rightIcon={<AddIcon boxSize={3} />}
+              px="24px"
+              height="44px"
+              width="156.112px"
+              background="#113D64"
+              borderRadius="4px"
+              gap="2px"
+              onClick={onCreateDrawerOpen}
+              color="white"
+              fontSize="14px"
+              fontWeight="normal"
+              lineHeight="28px"
+              _hover={{ background: "#485365" }}
+            >
+              Create Quota
+            </Button>
+          )}
+        </Flex>
+      </Flex>
 
       <Flex
-        gap="13px"
+        gap="15px"
         h="195px"
         alignItems="center"
         mb={6}
@@ -189,41 +222,36 @@ export const QuotaTracking = () => {
                 title="Total Progress"
                 body={`${stats.totalProgress}/${stats.totalQuota}`}
                 height="172.83px"
-                width="344.37px"
+                width="337px"
               />
               <CustomCard
                 title="Completion Rate"
                 body={`${stats.rate}%`}
                 footer="Overall progress"
                 height="172.83px"
-                width="327.24px"
+                width="337px"
               />
               <CustomCard
                 title="Active Providers"
                 body={stats.activeProviders.toString()}
                 footer={`${stats.differentLocations} locations`}
-                footerUnderline
-                footerColor="#808080"
                 height="172.83px"
-                width="327.24px"
+                width="337px"
               />
               <CustomCard
                 title="Needs Attention"
                 body={stats.needsAttention.toString()}
                 footer=""
                 height="172.83px"
-                width="327.24px"
+                width="337px"
               />
             </>
           )}
       </Flex>
 
 
-      <Flex gap={"6px"}>
-        <InputGroup
-          maxW="auto"
-          pb={6}
-        >
+      <Box pb={6}>
+        <InputGroup maxW="auto">
           <InputLeftElement pointerEvents="none">
             <SearchIcon color="rgba(0,0,0,0.5)" />
           </InputLeftElement>
@@ -234,37 +262,7 @@ export const QuotaTracking = () => {
             _placeholder={{ color: "rgba(0,0,0,0.5)" }}
           />
         </InputGroup>
-        
-        <Box
-          flex="1"
-          display="flex"
-          justifyContent="flex-end"
-        >
-          <CalendarCard
-            value={selectedDate}
-            onChange={handleDateChange}
-          />
-        </Box>
-
-        {role !== "viewer" && (
-          <Button
-            rightIcon={<AddIcon boxSize={3} />}
-            px="24px"
-            h="44px"
-            background="#113D64"
-            borderRadius="6px"
-            gap="2px"
-            onClick={onCreateDrawerOpen}
-            color="white"
-            fontSize="12px"
-            fontWeight="600"
-            lineHeight="28px"
-            _hover={{ background: "#485365" }}
-          >
-            Create Quota
-          </Button>
-        )}
-      </Flex>
+      </Box>
 
       <QuotaTable
         rows={quotas}
