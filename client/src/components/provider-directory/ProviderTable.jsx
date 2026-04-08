@@ -122,7 +122,8 @@ export default function ProviderTable({
     const isMissing =
       raw === undefined ||
       raw === null ||
-      (typeof raw === "string" && raw.trim() === "");
+      (typeof raw === "string" && raw.trim() === "") ||
+      (Array.isArray(raw) && raw.length === 0);
 
     if (isMissing) {
       // Defaults per inputType
