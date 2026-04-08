@@ -26,9 +26,13 @@ import {
 import {
   useDeleteUserByFirebaseUid,
   useUpdateUserByFirebaseUid,
+  useUsers,
 } from "@/contexts/hooks/data-fetching/useUsers";
 
-export default function UserEditModal({ isOpen, onClose, user, onUpdated }) {
+export default function UserEditModal({ isOpen, onClose, userId, onUpdated }) {
+  const { data: users = [] } = useUsers({ status: "approved" });
+  const user = users.find((u) => u.id === userId) ?? null;
+
   const [selectedRole, setSelectedRole] = useState(user?.role ?? "viewer");
   const { mutateAsync: updateUser } = useUpdateUserByFirebaseUid();
   const { mutateAsync: deleteUser } = useDeleteUserByFirebaseUid();
@@ -53,7 +57,7 @@ export default function UserEditModal({ isOpen, onClose, user, onUpdated }) {
     roleOptions.find((r) => r.value === selectedRole)?.label || "Select Role";
 
   useEffect(() => {
-    setSelectedRole(user?.role ?? "viewer");
+    if (user) setSelectedRole(user.role ?? "viewer");
   }, [user]);
 
   if (!user) return null;

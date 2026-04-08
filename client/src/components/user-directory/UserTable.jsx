@@ -84,10 +84,10 @@ export default function UserTable({
   onUpdated,
 }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedUserId, setSelectedUserId] = useState(null);
 
   const handleEditClick = (user) => {
-    setSelectedUser(user);
+    setSelectedUserId(user.id);
     onOpen();
   };
 
@@ -218,14 +218,14 @@ export default function UserTable({
         </Table>
       </TableContainer>
 
-      {selectedUser && (
+      {selectedUserId && (
         <UserEditModal
           isOpen={isOpen}
           onClose={() => {
-            setSelectedUser(null);
+            setSelectedUserId(null);
             onClose();
           }}
-          user={selectedUser}
+          userId={selectedUserId}
           onUpdated={onUpdated}
         />
       )}
