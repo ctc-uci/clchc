@@ -33,6 +33,7 @@ export const ProviderDirectoryPage = () => {
   const [drawerMode, setDrawerMode] = useState("create");
   const [selectedProvider, setSelectedProvider] = useState(null);
   const [highlightedProviderId, setHighlightedProviderId] = useState(null);
+  const [manageOpen, setManageOpen] = useState(false);
 
   const debouncedProviderQuery = useDebounce(
     (value) => setProviderQuery(value),
@@ -90,11 +91,7 @@ export const ProviderDirectoryPage = () => {
   };
 
   return (
-    <Box
-      p={6}
-      maxW="1200px"
-      mx="auto"
-    >
+    <Box p={6}>
       <Box mb={5}>
         <PageHeader
           title="Provider Directory"
@@ -106,12 +103,82 @@ export const ProviderDirectoryPage = () => {
 
       {role === "ccm" || role === "master" ? (
         <Flex
-          justifyContent="space-between"
-          alignItems="center"
+          flexDirection="column"
+          alignItems="flex-end"
           mb={5}
-          gap={4}
+          gap={3}
         >
-          <InputGroup maxW="600px">
+          {/* TOP ROW: Menu Button */}
+          <Flex gap={3}>
+            <Box position="relative">
+              <Button
+                bg="var(--Primary-1, #022442)"
+                color="white"
+                h={"45px"}
+                w={"135px"}
+                padding={"8px 12px"}
+                fontFamily={"Inter"}
+                fontSize={"18px"}
+                fontStyle={"normal"}
+                fontWeight={"600"}
+                lineHeight={"28px"}
+                _hover={{ bg: "#022442" }}
+                _active={{ bg: "#022442" }}
+                leftIcon={<HamburgerIcon size={"24px"}/>}
+                borderRadius={manageOpen ? "4px 4px 0 0" : "4px"}
+                onClick={() => setManageOpen(o => !o)}
+              >
+                Manage
+              </Button>
+              {manageOpen && (
+                <Box
+                  position="absolute"
+                  top="100%"
+                  right={0}
+                  borderRadius="0 0 4px 4px"
+                  w="100%"
+                  zIndex={10}
+                  bg="var(--Primary-1, #022442)"
+                  color="white"
+                  minH={"45px"}
+                  fontFamily={"Inter"}
+                  fontSize={"18px"}
+                  fontStyle={"normal"}
+                  fontWeight={"600"}
+                  lineHeight={"28px"}
+                >
+                  <Box
+                    w="100%"
+                    px={4}
+                    py={3}
+                    color="white"
+                    fontWeight="500"
+                    borderBottom="1px solid"
+                    borderColor="whiteAlpha.200"
+                    cursor="pointer"
+                    _hover={{ bg: "whiteAlpha.100" }}
+                    onClick={() => { onCategoryDrawerOpen(); setManageOpen(false); }}
+                  >
+                    Categories
+                  </Box>
+                  <Box
+                    w="100%"
+                    px={4}
+                    py={3}
+                    color="white"
+                    fontWeight="500"
+                    cursor="pointer"
+                    _hover={{ bg: "whiteAlpha.100" }}
+                    onClick={() => { openCreateProviderDrawer(); setManageOpen(false); }}
+                  >
+                    Providers
+                  </Box>
+                </Box>
+              )}
+            </Box>
+          </Flex>
+          {/* BOTTOM ROW: Search Bar */}
+          <InputGroup width="100%">
             <InputLeftElement pointerEvents="none">
               <SearchIcon color="gray.400" />
             </InputLeftElement>
@@ -121,28 +188,6 @@ export const ProviderDirectoryPage = () => {
               onChange={handleChange}
             />
           </InputGroup>
-
-          <Flex gap={3}>
-            <Menu>
-              <MenuButton
-                as={Button}
-                bg="black"
-                color="white"
-                _hover={{ bg: "gray.800" }}
-                _active={{ bg: "gray.800" }}
-                rightIcon={<HamburgerIcon />}
-              >
-                Manage
-              </MenuButton>
-              <MenuList>
-                <MenuItem isDisabled>Tags</MenuItem>
-                <MenuItem onClick={onCategoryDrawerOpen}>Categories</MenuItem>
-                <MenuItem onClick={openCreateProviderDrawer}>
-                  Providers
-                </MenuItem>
-              </MenuList>
-            </Menu>
-          </Flex>
         </Flex>
       ) : (
         <></>
