@@ -2,15 +2,14 @@ import { useState, useEffect } from "react";
 import { SearchIcon } from "@chakra-ui/icons";
 import {
   Box,
-  Flex,
+  Badge,
+  Heading,
   Input,
   InputGroup,
   InputLeftElement,
-  Stack,
+  HStack,
 } from "@chakra-ui/react";
 
-import { PageHeader } from "@/components/common/PageHeader";
-import Navbar from "@/components/layout/Navbar";
 import VersionLogTable from "@/components/version-log/VersionLogTable";
 import { useVersionLogs } from "@/contexts/hooks/data-fetching/useVersionLogs";
 import { useUserContext } from "@/contexts/hooks/useUserContext";
@@ -20,29 +19,26 @@ import CalendarCard from "../common/CalendarCard";
 
 
 export const VersionLogPage = () => {
-  // const [logs, setLogs] = useState([]);
-  // const { backend } = useBackendContext();
   const navigate = useNavigate();
-  const { dateParam } = useParams();
+  const { date } = useParams();
   const [inputValue, setInputValue] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const today = new Date().toLocaleDateString("en-CA");
   const [selectedDate, setSelectedDate] = useState(
-    dateParam || sessionStorage.getItem("logDate") || today
+    date || sessionStorage.getItem("logDate") || today
   );
   const debouncedSearchQuery = useDebounce(
     (value) => setSearchQuery(value),
     300
   );
-  const { role, loading: roleLoading } = useUserContext();
-  // const [loading, setLoading] = useState(true);
+  const { role } = useUserContext();
 
   useEffect(() => {
-    if (dateParam && dateParam !== selectedDate) {
-      setSelectedDate(dateParam);
-      sessionStorage.setItem("logDate", dateParam);
+    if (date && date !== selectedDate) {
+      setSelectedDate(date);
+      sessionStorage.setItem("logDate", date);
     }
-  }, [dateParam]);
+  }, [date, selectedDate]);
 
   useEffect(() => {
     sessionStorage.setItem("logDate", selectedDate);
@@ -55,7 +51,6 @@ export const VersionLogPage = () => {
     q: searchQuery,
   });
 
-  // handleChange
   const handleChange = (e) => {
     setInputValue(e.target.value);
     debouncedSearchQuery(e.target.value);
@@ -65,55 +60,71 @@ export const VersionLogPage = () => {
     setSelectedDate(newDate);
     navigate(`/version-log/${newDate}`);
   };
-  // console.log("Selected Date:", selectedDate);
+
   return (
     <Box
-      p={6}
-      maxW="1200px"
+      px={{ base: 4, md: 10 }}
+      py={{ base: 4, md: 6 }}
+      maxW="1440px"
       mx="auto"
     >
-      <Flex
-        justify="space-between"
-        align="flex-start"
+      {/* <HStack
+        spacing={3}
+        align="center"
         mb={6}
       >
-        <PageHeader
-          title="Version Log"
-          subheading="View action history over given day"
-          role={role}
-          isLoading={roleLoading}
-        />
-        <Box
-          flex="1"
-          display="flex"
-          justifyContent="flex-end"
+        <Heading
+          as="h1"
+          size="lg"
+          fontWeight="500"
+          color="#111111"
         >
-          <CalendarCard
-            value={selectedDate}
-            onChange={handleDateChange}
-          />
-        </Box>
-      </Flex>
+          Audit Log
+        </Heading>
+        {role && (
+          <Badge
+            bg="#5B4761"
+            color="white"
+            borderRadius="8px"
+            px={3}
+            py={1}
+            fontSize="18px"
+            fontWeight="500"
+            textTransform="capitalize"
+          >
+            {role}
+          </Badge>
+        )}
+      </HStack> */}
 
-      <Stack gap={2}>
-        <InputGroup>
+      <HStack
+        spacing={{ base: 3, md: 6 }}
+        align="stretch"
+        mb={3}
+      >
+        <InputGroup flex="1">
           <InputLeftElement pointerEvents="none">
             <SearchIcon color="gray.400" />
           </InputLeftElement>
           <Input
-            placeholder="Search Version Log"
+            placeholder="Search Providers"
             borderRadius="md"
-            value={inputValue}  
+            h="45px"
+            value={inputValue}
             onChange={handleChange}
           />
         </InputGroup>
-        <VersionLogTable
-          loading={isLoading}
-          logs={logs}
-          selectedDate={selectedDate}
+
+        <CalendarCard
+          value={selectedDate}
+          onChange={handleDateChange}
         />
-      </Stack>
-      <Navbar />
+      </HStack>
+      <VersionLogTable
+        loading={isLoading}
+        logs={logs}
+        selectedDate={selectedDate}
+      />
     </Box>
   );
 };
