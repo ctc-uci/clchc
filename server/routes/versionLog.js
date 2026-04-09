@@ -54,7 +54,7 @@ versionLogRouter.get("/details", verifyRole("ccm"), async (req, res) => {
         (
           "users".first_name ILIKE $${values.length} OR
           "users".last_name ILIKE $${values.length} OR
-          providers.data->>'Name' ILIKE $${values.length}
+          providers.name ILIKE $${values.length}
         )
       `);
     }
@@ -83,7 +83,7 @@ versionLogRouter.get("/details", verifyRole("ccm"), async (req, res) => {
         quota.end_time AS time,
         "users".first_name,
         "users".last_name,
-        providers.data AS provider_data
+        providers.name AS provider_name
       FROM version_log
       JOIN quota ON version_log.quota_id = quota.id
       JOIN "users" ON version_log.user_id = "users".id

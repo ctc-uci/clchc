@@ -68,7 +68,7 @@ export const VersionLogPage = () => {
       maxW="1440px"
       mx="auto"
     >
-      <HStack
+      {/* <HStack
         spacing={3}
         align="center"
         mb={6}
@@ -95,7 +95,7 @@ export const VersionLogPage = () => {
             {role}
           </Badge>
         )}
-      </HStack>
+      </HStack> */}
 
       <HStack
         spacing={{ base: 3, md: 6 }}
@@ -104,26 +104,12 @@ export const VersionLogPage = () => {
       >
         <InputGroup flex="1">
           <InputLeftElement pointerEvents="none">
-            <SearchIcon
-              color="#111111"
-              boxSize={5}
-            />
+            <SearchIcon color="gray.400" />
           </InputLeftElement>
           <Input
             placeholder="Search Providers"
-            h={{ base: "56px", md: "64px" }}
-            borderRadius="12px"
-            border="1.5px solid"
-            borderColor="#E2E8F0"
-            bg="white"
-            fontSize={{ base: "16px", md: "18px" }}
-            color="#2D3748"
-            _placeholder={{ color: "#A0AEC0" }}
-            _hover={{ borderColor: "#CBD5E0" }}
-            _focusVisible={{
-              borderColor: "#A0AEC0",
-              boxShadow: "none",
-            }}
+            borderRadius="md"
+            h="45px"
             value={inputValue}
             onChange={handleChange}
           />

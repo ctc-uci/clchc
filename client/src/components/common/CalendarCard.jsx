@@ -70,9 +70,12 @@ const CalendarCard = ({ value, onChange }) => {
   });
 
   const today = new Date();
-  const displayValue = value
-    ? new Date(value + "T00:00:00").toLocaleDateString("en-US")
-    : "Select date";
+  const todayStr = today.toLocaleDateString("en-CA");
+  const displayValue = value === todayStr
+    ? "Today"
+    : value
+      ? new Date(value + "T00:00:00").toLocaleDateString("en-US")
+      : "Select date";
 
   return (
     <Popover
@@ -86,17 +89,19 @@ const CalendarCard = ({ value, onChange }) => {
           variant="outline"
           rightIcon={<ChevronDownIcon />}
           onClick={handleOpen}
-          h={{ base: "56px", md: "64px" }}
-          minW={{ base: "180px", md: "196px" }}
-          px={6}
+          h="45px"
+          w="110px"
+          px={3}
           justifyContent="space-between"
-          fontWeight="400"
-          fontSize={{ base: "16px", md: "18px" }}
-          color="#111111"
-          bg="white"
-          borderRadius="12px"
-          border="1.5px solid"
-          borderColor="#E2E8F0"
+          fontFamily="Lato"
+          fontWeight="500"
+          fontSize="14px"
+          fontStyle="normal"
+          lineHeight="28px"
+          color="#000"
+          bg="var(--white, #FFF)"
+          borderRadius="4px"
+          border="0.84px solid #E3E3E3"
           _hover={{ bg: "white", borderColor: "#CBD5E0" }}
           _active={{ bg: "white" }}
         >

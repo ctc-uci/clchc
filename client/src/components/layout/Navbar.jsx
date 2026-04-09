@@ -22,27 +22,27 @@ export const Navbar = () => {
   const isSettingsActive = useIsActive("/settings");
 
   const getLinkProps = (isActive) => ({
-    color: isActive ? "#1f4672" : "#111111",
+    color: isActive ? "#113D64" : "#000",
+    fontFamily: "Lato",
+    fontSize: "16px",
+    fontStyle: "normal",
+    fontWeight: isActive ? "700" : "400",
+    lineHeight: "normal",
     px: 2,
     py: 1,
     borderRadius: "md",
-    fontSize: { base: "12px", sm: "16px", md: "18px" },
-
-    fontWeight: isActive ? "700" : "400",
     textDecoration: "none",
     whiteSpace: "nowrap",
     _hover: {
-      color: "#1f4672",
       textDecoration: "none",
-    },
-    _active: {
-      color: "#1f4672",
+      color: "#113D64",
     },
   });
 
   return (
     <Flex
       w="100%"
+      h="90px"
       align="center"
       justify="flex-end"
       gap={{ base: 4, md: 8 }}

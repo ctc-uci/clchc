@@ -13,100 +13,50 @@ import {
   VStack,
 } from "@chakra-ui/react";
 
-const CELL_BORDER_COLOR = "#E7EDF5";
-const VERTICAL_BORDER_COLOR = "#EDF2F7";
-const HEADER_BG = "#C7D5E8";
-const COLUMN_WIDTH = "25%";
-
 const SkeletonRows = () => {
   return (
     <>
       {Array.from({ length: 5 }, (_, i) => (
         <Tr
           key={i}
-          borderBottom="1.5px solid"
-          borderColor={CELL_BORDER_COLOR}
+          borderBottom="1px solid"
+          borderColor="gray.200"
         >
-          <Td
-            w={COLUMN_WIDTH}
-            py="18px"
-            px="26px"
-            borderColor={CELL_BORDER_COLOR}
-            borderRight="1px solid"
-            borderRightColor={VERTICAL_BORDER_COLOR}
-          >
-            <Skeleton height="24px" />
-          </Td>
-          <Td
-            w={COLUMN_WIDTH}
-            py="18px"
-            px="26px"
-            borderColor={CELL_BORDER_COLOR}
-            borderRight="1px solid"
-            borderRightColor={VERTICAL_BORDER_COLOR}
-          >
-            <Skeleton
-              height="24px"
-              width="90px"
-            />
-          </Td>
-          <Td
-            w={COLUMN_WIDTH}
-            py="18px"
-            px="26px"
-            borderColor={CELL_BORDER_COLOR}
-            borderRight="1px solid"
-            borderRightColor={VERTICAL_BORDER_COLOR}
-          >
-            <Skeleton
-              height="24px"
-              width="140px"
-            />
-          </Td>
-          <Td
-            w={COLUMN_WIDTH}
-            py="18px"
-          >
-            <Skeleton
-              height="24px"
-              width="220px"
-            />
-          </Td>
+          {Array.from({ length: 4 }, (_, j) => (
+            <Td
+              key={j}
+              borderRight="1px solid"
+              borderColor="gray.200"
+            >
+              <Skeleton height="40px" />
+            </Td>
+          ))}
         </Tr>
       ))}
     </>
   );
 };
 
-const headerCellProps = () => ({
-  w: COLUMN_WIDTH,
-  h: "44px",
-  px: "26px",
-  py: "12px",
-  color: "#1f4672",
-  fontSize: "15px",
+const thProps = {
+  fontFamily: "Inter",
+  fontSize: "12px",
+  fontStyle: "normal",
   fontWeight: "700",
-  letterSpacing: "0.06em",
-  textTransform: "uppercase",
-  borderBottom: "1px solid",
-  borderRight: "1px solid",
-  borderColor: CELL_BORDER_COLOR,
-  borderRightColor: VERTICAL_BORDER_COLOR,
-  bg: HEADER_BG,
-});
+  lineHeight: "16px",
+  letterSpacing: "0.6px",
+  padding: "15px 25px 15px 25px",
+  backgroundColor: "#C8D4E6",
+  color: "#113D64",
+};
 
-const bodyCellProps = (withRightBorder = true) => ({
-  w: COLUMN_WIDTH,
-  px: "26px",
-  py: "30px",
-  fontSize: "15px",
-  color: "#2D3748",
-  borderBottom: "1px solid",
-  borderColor: CELL_BORDER_COLOR,
-  borderRight: withRightBorder ? "1px solid" : "none",
-  borderRightColor: VERTICAL_BORDER_COLOR,
-  verticalAlign: "middle",
-});
+const tdTextProps = {
+  fontFamily: "Inter",
+  fontSize: "14px",
+  fontStyle: "normal",
+  fontWeight: "400",
+  lineHeight: "22px",
+  color: "#113D64",
+};
 
 const VersionLogTable = ({ loading, logs }) => {
   return (
@@ -115,32 +65,29 @@ const VersionLogTable = ({ loading, logs }) => {
       align="stretch"
     >
       <TableContainer
-        w="100%"
-        maxW="1360px"
-        minH="720px"
-        borderRadius="6px"
         border="1px solid"
-        borderColor={CELL_BORDER_COLOR}
-        p="0"
-        bg="white"
-        overflowX="auto"
+        borderColor="gray.200"
+        borderRadius="lg"
+        maxHeight="60vh"
         overflowY="auto"
       >
         <Table
-          variant="unstyled"
-          sx={{ tableLayout: "fixed" }}
+          sx={{
+            "tbody tr:nth-of-type(even)": { bg: "#F9F9F9" },
+            "tbody tr:nth-of-type(odd)": { bg: "white" },
+          }}
         >
-          <Thead>
+          <Thead
+            position="sticky"
+            top={0}
+            zIndex={1}
+            h="40px"
+          >
             <Tr>
-              <Th {...headerCellProps()}>Editor</Th>
-              <Th {...headerCellProps()}>Action</Th>
-              <Th {...headerCellProps()}>Date & Time</Th>
-              <Th
-                {...headerCellProps()}
-                borderRight="none"
-              >
-                Provider
-              </Th>
+              <Th {...thProps}>Editor</Th>
+              <Th {...thProps}>Action</Th>
+              <Th {...thProps}>Date & Time</Th>
+              <Th {...thProps}>Provider</Th>
             </Tr>
           </Thead>
 
@@ -151,8 +98,9 @@ const VersionLogTable = ({ loading, logs }) => {
                   colSpan={4}
                   py="40px"
                   textAlign="center"
-                  color="#718096"
-                  fontSize="15px"
+                  color="gray.400"
+                  fontFamily="Inter"
+                  fontSize="14px"
                 >
                   No version history available
                 </Td>
@@ -162,13 +110,13 @@ const VersionLogTable = ({ loading, logs }) => {
             {loading ? (
               <SkeletonRows />
             ) : (
-              logs.map((entry, index) => {
+              logs.map((entry) => {
                 const logDate = new Date(entry.timestamp);
 
                 const formattedDate = logDate.toLocaleDateString("en-US", {
                   month: "2-digit",
                   day: "2-digit",
-                  year: "numeric"
+                  year: "numeric",
                 });
 
                 const formattedTime = logDate
@@ -182,16 +130,25 @@ const VersionLogTable = ({ loading, logs }) => {
                 return (
                   <Tr
                     key={entry.id}
-                    bg={index % 2 === 0 ? "white" : "#FAFBFC"}
-                    _hover={{ bg: "#F8FAFC" }}
+                    borderBottom="1px solid"
+                    borderColor="gray.200"
+                    cursor="default"
                   >
-                    <Td {...bodyCellProps()}>
-                      {entry.firstName} {entry.lastName}
+                    <Td
+                      borderRight="1px solid"
+                      borderColor="gray.200"
+                    >
+                      <Text {...tdTextProps}>
+                        {entry.firstName} {entry.lastName}
+                      </Text>
                     </Td>
 
-                    <Td {...bodyCellProps()}>
+                    <Td
+                      borderRight="1px solid"
+                      borderColor="gray.200"
+                    >
                       {entry.action === "increment" && (
-                        <>
+                        <Text {...tdTextProps}>
                           Quota{" "}
                           <Text
                             as="span"
@@ -200,11 +157,10 @@ const VersionLogTable = ({ loading, logs }) => {
                           >
                             +{entry.delta}
                           </Text>
-                        </>
+                        </Text>
                       )}
-
                       {entry.action === "decrement" && (
-                        <>
+                        <Text {...tdTextProps}>
                           Quota{" "}
                           <Text
                             as="span"
@@ -213,16 +169,23 @@ const VersionLogTable = ({ loading, logs }) => {
                           >
                             {entry.delta}
                           </Text>
-                        </>
+                        </Text>
                       )}
                     </Td>
 
-                    <Td {...bodyCellProps()}>
-                      {formattedDate} {formattedTime}
+                    <Td
+                      borderRight="1px solid"
+                      borderColor="gray.200"
+                    >
+                      <Text {...tdTextProps}>
+                        {formattedDate} {formattedTime}
+                      </Text>
                     </Td>
 
-                    <Td {...bodyCellProps(false)}>
-                      {entry.providerData["Name"]}
+                    <Td borderRight="1px solid" borderColor="gray.200">
+                      <Text {...tdTextProps}>
+                        {entry.providerName}
+                      </Text>
                     </Td>
                   </Tr>
                 );
