@@ -11,7 +11,7 @@ import { QuotaTracking } from "@/components/quota-tracking/QuotaTrackingPage";
 import { Signup } from "@/components/signup/Signup";
 import { UserDirectory } from "@/components/user-directory/UserDirectoryPage";
 import { PendingRequestsPage } from "@/components/user-directory/PendingRequestsPage";
-import { PERSONAL_INFO, Settings } from "@/components/user-settings/Settings";
+import { Settings } from "@/components/user-settings/Settings";
 import { VersionLogPage } from "@/components/version-log/VersionLogPage";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { BackendProvider } from "@/contexts/BackendContext";
@@ -50,7 +50,7 @@ const App = () => {
                       path="/settings"
                       element={
                         <ProtectedRoute
-                          element={<Settings view={PERSONAL_INFO} />}
+                          element={<Settings />}
                         />
                       }
                     />

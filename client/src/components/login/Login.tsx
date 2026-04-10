@@ -22,6 +22,11 @@ export const Login = () => {
   const { handleRedirectResult } = useAuthContext();
   const { backend } = useBackendContext();
 
+  useForm<SigninFormValues>({
+    resolver: zodResolver(signinSchema),
+    mode: "onBlur",
+  });
+
   // const toastLoginError = useCallback(
   //   (msg: string) => {
   //     toast({

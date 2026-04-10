@@ -35,7 +35,7 @@ export const RoleSelect = ({ user, disabled = true }: RoleSelectProps) => {
           firebaseUid: user.firebaseUid,
         });
 
-        setRole(updatedRole);
+        setRole(updatedRole as User["role"]);
 
         toast({
           title: "Role Updated",
