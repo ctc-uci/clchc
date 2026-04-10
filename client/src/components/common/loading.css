@@ -1,0 +1,46 @@
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #f7f7f7;
+  z-index: 9999;
+}
+
+.ring-container {
+  position: relative;
+  width: min(420px, 100vw);
+  height: 165px;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.dot-wrap {
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  transform: translate(var(--x), var(--y));
+}
+
+.dot {
+  display: block;
+  width: 48px;
+  height: 48px;
+  margin: -24px;
+  border-radius: 50%;
+  background: #1b3a5c;
+}
+
+.loading-label {
+  margin-top: 24px;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: #1b3a5c;
+}
