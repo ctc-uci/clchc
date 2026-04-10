@@ -37,7 +37,10 @@ export function ProviderDropdown({ providerId, setProviderId, isLocked }) {
       isRequired
       isDisabled={isLocked}
     >
-      <FormLabel>Provider</FormLabel>
+      <FormLabel
+        fontSize="14px"
+        color="#113D64"
+      >Provider</FormLabel>
       {isLocked ? (
         <InputGroup>
           <Box
@@ -59,6 +62,7 @@ export function ProviderDropdown({ providerId, setProviderId, isLocked }) {
         <InputGroup>
           <Select
             {...selectStyles}
+            fontSize="14px"
             placeholder=" "
             pr={isLocked ? "2.25rem" : undefined}
             value={providerId === "" ? "" : String(providerId)}

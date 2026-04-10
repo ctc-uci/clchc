@@ -49,13 +49,20 @@ const thProps = {
   color: "#113D64",
 };
 
+const tdProps = {
+  borderRight: "1px solid",
+  borderColor: "gray.200",
+  padding: "16px 24px",
+  gap: "10px",
+};
+
 const tdTextProps = {
-  fontFamily: "Inter",
+  fontFamily: "Lato",
   fontSize: "14px",
   fontStyle: "normal",
-  fontWeight: "400",
-  lineHeight: "22px",
-  color: "#113D64",
+  fontWeight: "500",
+  lineHeight: "20px",
+  color: "#2D3748",
 };
 
 const VersionLogTable = ({ loading, logs }) => {
@@ -134,27 +141,16 @@ const VersionLogTable = ({ loading, logs }) => {
                     borderColor="gray.200"
                     cursor="default"
                   >
-                    <Td
-                      borderRight="1px solid"
-                      borderColor="gray.200"
-                    >
+                    <Td {...tdProps}>
                       <Text {...tdTextProps}>
                         {entry.firstName} {entry.lastName}
                       </Text>
                     </Td>
-
-                    <Td
-                      borderRight="1px solid"
-                      borderColor="gray.200"
-                    >
+                    <Td {...tdProps}>
                       {entry.action === "increment" && (
                         <Text {...tdTextProps}>
                           Quota{" "}
-                          <Text
-                            as="span"
-                            color="#2F9E5B"
-                            fontWeight="600"
-                          >
+                          <Text as="span" color="#2F9E5B" fontWeight="600">
                             +{entry.delta}
                           </Text>
                         </Text>
@@ -162,30 +158,20 @@ const VersionLogTable = ({ loading, logs }) => {
                       {entry.action === "decrement" && (
                         <Text {...tdTextProps}>
                           Quota{" "}
-                          <Text
-                            as="span"
-                            color="#D64545"
-                            fontWeight="600"
-                          >
+                          <Text as="span" color="#D64545" fontWeight="600">
                             {entry.delta}
                           </Text>
                         </Text>
                       )}
                     </Td>
-
-                    <Td
-                      borderRight="1px solid"
-                      borderColor="gray.200"
-                    >
+                    <Td {...tdProps}>
                       <Text {...tdTextProps}>
                         {formattedDate} {formattedTime}
                       </Text>
                     </Td>
+                    <Td {...tdProps}>
+                      <Text {...tdTextProps}>{entry.providerName}</Text>
 
-                    <Td borderRight="1px solid" borderColor="gray.200">
-                      <Text {...tdTextProps}>
-                        {entry.providerName}
-                      </Text>
                     </Td>
                   </Tr>
                 );

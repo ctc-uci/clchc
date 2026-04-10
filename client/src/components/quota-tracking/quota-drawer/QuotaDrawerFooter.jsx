@@ -75,14 +75,14 @@ export const QuotaDrawerFooter = ({
             <Button
               px={10}
               width="50%"
-              bg="black"
+              bg="#113D64"
               color="white"
               borderRadius="4px"
               onClick={(e) => {
                 handleSubmit(e, "save");
               }}
             >
-              {!quotaID ? "Save" : "Save Changes"}
+              {!quotaID ? "Create" : "Save Changes"}
             </Button>
           </>
         )}

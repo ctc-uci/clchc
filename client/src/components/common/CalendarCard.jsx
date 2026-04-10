@@ -92,7 +92,7 @@ const CalendarCard = ({ value, onChange }) => {
           h="45px"
           w="110px"
           px={3}
-          justifyContent="space-between"
+          justifyContent="center"
           fontFamily="Lato"
           fontWeight="500"
           fontSize="14px"

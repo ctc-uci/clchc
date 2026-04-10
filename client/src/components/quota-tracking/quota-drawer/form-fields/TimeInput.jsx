@@ -42,7 +42,10 @@ export const TimeInput = ({
         isRequired
         isDisabled={isLocked}
       >
-        <FormLabel>Hours</FormLabel>
+        <FormLabel
+          fontSize="14px"
+          color="#113D64"
+        >Hours</FormLabel>
         <Flex
           gap={2}
           minW={0}
@@ -60,6 +63,7 @@ export const TimeInput = ({
                   borderRadius="6px"
                   px={3}
                   py={2}
+                  fontSize="14px"
                   bg="gray.50"
                   color="gray.500"
                 >
@@ -91,9 +95,9 @@ export const TimeInput = ({
                 minW={0}
               >
                 <Input
+                  fontSize="14px"
                   size="md"
                   type="time"
-                  fontSize="sm"
                   px={3}
                   {...inputStyles}
                   w="100%"
@@ -117,9 +121,8 @@ export const TimeInput = ({
                 minW={0}
               >
                 <Input
-                  size="md"
+                  fontSize="14px"
                   type="time"
-                  fontSize="sm"
                   px={3}
                   {...inputStyles}
                   w="100%"

@@ -6,15 +6,12 @@ import {
   Button,
   Card,
   CardBody,
-  CardFooter,
   CardHeader,
   Flex,
-  HStack,
   Input,
   InputGroup,
   InputLeftElement,
   Skeleton,
-  Text,
   useDisclosure,
 } from "@chakra-ui/react";
 
@@ -159,53 +156,44 @@ export const QuotaTracking = () => {
   };
 
   return (
-    <Box
-      p={6}
-      maxW="1200px"
-      mx="auto"
-    >
-      <Flex
-        justify="space-between"
-        align="flex-start"
-        mb={6}
-      >
+    <Box p={6}>
+      <Flex align="center" justify="space-between" mb={6}>
         <PageHeader
           title="Quota Tracking"
-          subheading="Monitor daily appointment progress across all providers"
           role={role}
           isLoading={roleLoading}
         />
-
-        <Box
-          flex="1"
-          display="flex"
-          justifyContent="flex-end"
-        >
+        <Flex align="center" gap={3}>
           <CalendarCard
             value={selectedDate}
             onChange={handleDateChange}
           />
-        </Box>
-
-        <Button
-          leftIcon={<AddIcon />}
-          colorScheme="blue"
-          ml={4}
-          onClick={onCreateDrawerOpen}
-        >
-          Create Quota
-        </Button>
+          <Button
+            rightIcon={<AddIcon boxSize={3} />}
+            h="45px"
+            w="160px"
+            padding="0 24px"
+            borderRadius="4px"
+            background="#113D64"
+            justifyContent="center"
+            alignItems="center"
+            gap="8px"
+            onClick={onCreateDrawerOpen}
+            textColor="white"
+            fontSize="14px"
+            fontWeight="normal"
+            _hover={{ background: "#485365" }}
+          >
+            Create Quota
+          </Button>
+        </Flex>
       </Flex>
 
-      <Box
-        overflowX="auto"
-        py={4}
+      <Flex
+        gap={4}
         mb={6}
+        w="100%"
       >
-        <HStack
-          spacing={4}
-          minW="min-content"
-        >
           {isLoading ? (
             <>
               <SkeletonCard />
@@ -218,45 +206,41 @@ export const QuotaTracking = () => {
               <CustomCard
                 title="Total Progress"
                 body={`${stats.totalProgress}/${stats.totalQuota}`}
-                height="12rem"
-                width="14rem"
+                height="172.826px"
+                flex={1}
               />
               <CustomCard
                 title="Completion Rate"
                 body={`${stats.rate}%`}
-                footer="Overall Progress"
-                height="12rem"
-                width="14rem"
+                footer="Overall progress"
+                height="172.826px"
+                flex={1}
               />
               <CustomCard
                 title="Active Providers"
                 body={stats.activeProviders.toString()}
-                footer={`${stats.differentLocations} different locations`}
-                height="12rem"
-                width="14rem"
+                footer={`${stats.differentLocations} locations`}
+                height="172.826px"
+                flex={1}
               />
               <CustomCard
                 title="Needs Attention"
                 body={stats.needsAttention.toString()}
-                footer="Below 40% Progress"
-                height="12rem"
-                width="14rem"
+                footer=""
+                height="172.826px"
+                flex={1}
               />
             </>
           )}
-        </HStack>
-      </Box>
-
-      <InputGroup
-        maxW="400px"
-        pb={6}
-      >
+      </Flex>
+      <InputGroup mb={6}>
         <InputLeftElement pointerEvents="none">
           <SearchIcon color="gray.400" />
         </InputLeftElement>
         <Input
           placeholder="Search Providers"
           borderRadius="md"
+          h="45px"
           onChange={handleChange}
         />
       </InputGroup>
@@ -264,6 +248,7 @@ export const QuotaTracking = () => {
       <QuotaTable
         rows={quotas}
         loading={isLoading}
+        role={role}
       />
 
       <QuotaDrawer
@@ -274,7 +259,6 @@ export const QuotaTracking = () => {
         defaultDate={selectedDate}
       />
 
-      <Navbar />
     </Box>
   );
 };

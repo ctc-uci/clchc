@@ -92,24 +92,19 @@ export const ProviderDirectoryPage = () => {
 
   return (
     <Box p={6}>
-      <Box mb={5}>
-        {/* <PageHeader
-          title="Provider Directory"
-          subheading="All current active providers in network"
-          role={role}
-          isLoading={roleLoading}
-        /> */}
-      </Box>
-
       {role === "ccm" || role === "master" ? (
         <Flex
           flexDirection="column"
-          alignItems="flex-end"
           mb={5}
-          gap={3}
+          gap={6}
         >
-          {/* TOP ROW: Menu Button */}
-          <Flex gap={3}>
+          {/* TOP ROW: PageHeader + Manage Button */}
+          <Flex justify="space-between" align="center">
+            <PageHeader
+              title="Provider Directory"
+              role={role}
+              isLoading={roleLoading}
+            />
             <Box position="relative">
               <Button
                 bg="var(--Primary-1, #022442)"

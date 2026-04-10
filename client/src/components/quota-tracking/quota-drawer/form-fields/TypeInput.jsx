@@ -15,7 +15,10 @@ export const TypeInput = ({ type, setType, isLocked }) => {
       w="43%"
       isDisabled={isLocked}
     >
-      <FormLabel>Type</FormLabel>
+      <FormLabel
+        fontSize="14px"
+        color="#113D64"
+      >Type</FormLabel>
       {isLocked ? (
         <InputGroup>
           <Box
@@ -37,6 +40,7 @@ export const TypeInput = ({ type, setType, isLocked }) => {
         <InputGroup>
           <Select
             {...selectStyles}
+            fontSize="14px"
             placeholder=" "
             pr={isLocked ? "2.25rem" : undefined}
             value={type ?? ""}
