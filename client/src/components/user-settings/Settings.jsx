@@ -3,7 +3,7 @@ import { Avatar, Box, Grid, GridItem, Text } from "@chakra-ui/react";
 
 
 import { useUserContext } from "@/contexts/hooks/useUserContext";
-
+import { useAuthContext } from "@/contexts/hooks/useAuthContext";
 
 
 import PersonalInfo from "./PersonalInfo.jsx";
@@ -18,6 +18,7 @@ export const CALCULATION_FACTOR = "calculation-factor";
 export function Settings() {
   const userData = useUserContext();
   const dbUser = userData?.dbUser;
+  const { currentUser } = useAuthContext();
 
   return (
     <Box
@@ -48,7 +49,8 @@ export function Settings() {
           <Avatar
             w="280px"
             h="280px"
-            name={`${dbUser?.firstName} ${dbUser?.lastName}`}
+            // name={`${dbUser?.firstName} ${dbUser?.lastName}`}
+            src={currentUser?.photoURL}
           />
           <Text
             fontWeight="bold"
