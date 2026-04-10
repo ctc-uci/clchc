@@ -1,11 +1,11 @@
-import { Card, CardBody, CardFooter, CardHeader, Text } from "@chakra-ui/react";
+import { Card, CardBody, CardHeader, Text } from "@chakra-ui/react";
 
-export const CustomCard = ({ title, body, footer, height, width }) => {
+export const CustomCard = ({ title, body, footer, footerUnderline, footerColor, height, width, flex }) => {
   return (
     <Card
       w={width}
       h={height}
-      flexShrink={1}
+      flex={flex}
       borderWidth="1px"
       borderColor="gray.200"
       borderRadius="lg"
@@ -13,34 +13,45 @@ export const CustomCard = ({ title, body, footer, height, width }) => {
       _hover={{ boxShadow: "md" }}
       transition="box-shadow 0.2s ease"
     >
-      <CardHeader pb={1}>
+      <CardHeader pb="9px">
         <Text
-          fontSize="sm"
-          color="gray.500"
-          fontWeight="medium"
+          fontSize="16px"
+          fontFamily={"Lato"}
+          fontStyle={"normal"}
+          fontWeight={"400"}
+          lineHeight={"normal"}
+          color={"rgba(0, 0, 0, 0.50)"}
         >
           {title}
         </Text>
       </CardHeader>
 
-      <CardBody py={2}>
+      <CardBody py={0}>
         <Text
-          fontSize="3xl"
-          fontWeight="semibold"
-          color="gray.900"
+          fontSize="30.68px"
+          fontWeight="500"
+          color="#000"
+          lineHeight="normal"
+          fontStyle={"normal"}
+          letterSpacing="-1.23px"
         >
           {body}
         </Text>
+        {footer && (
+          <Text
+            fontSize="16px"
+            fontFamily={"Lato"}
+            fontStyle={"normal"}
+            fontWeight={"400"}
+            lineHeight={"normal"}
+            color={"rgba(0, 0, 0, 0.50)"}
+            mt={1}
+            textDecoration={footerUnderline ? "underline" : "none"}
+          >
+            {footer}
+          </Text>
+        )}
       </CardBody>
-
-      <CardFooter pt={1}>
-        <Text
-          fontSize="sm"
-          color="gray.500"
-        >
-          {footer}
-        </Text>
-      </CardFooter>
     </Card>
   );
 };

@@ -168,8 +168,6 @@ export const UserDirectory = () => {
         onDelete={handleDelete}
         onUpdated={refetch}
       />
-
-      <Navbar />
     </Box>
   );
 };

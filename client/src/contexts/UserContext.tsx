@@ -6,7 +6,8 @@ import {
   useState,
 } from "react";
 
-import { Spinner } from "@chakra-ui/react";
+import { AnimatePresence, motion } from "framer-motion";
+import { LoadingScreen } from "../components/common/LoadingScreen";
 
 import type { User as DbUser } from "../types/user";
 import { auth } from "../utils/auth/firebase";
@@ -84,7 +85,12 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <UserContext.Provider value={value}>
-      {loading ? <Spinner /> : children}
+      <AnimatePresence>{loading && <LoadingScreen key="loading" />}</AnimatePresence>
+      {!loading && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
+          {children}
+        </motion.div>
+      )}
     </UserContext.Provider>
   );
 };

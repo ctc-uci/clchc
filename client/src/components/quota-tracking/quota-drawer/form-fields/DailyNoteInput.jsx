@@ -5,7 +5,10 @@ import { inputStyles } from "../tools/constants";
 export const DailyNoteInput = ({ note, setNote, isLocked }) => {
   return (
     <FormControl isDisabled={isLocked}>
-      <FormLabel>Daily Notes</FormLabel>
+      <FormLabel
+        fontSize="14px"
+        color="#113D64"
+      >Daily Notes</FormLabel>
       {isLocked ? (
         <Box
           w="100%"
@@ -14,10 +17,9 @@ export const DailyNoteInput = ({ note, setNote, isLocked }) => {
           borderRadius="6px"
           px={3}
           py={2}
-          minH="70px"
+          fontSize="14px"
           bg="gray.50"
           color="gray.500"
-          whiteSpace="pre-wrap"
         >
           {note ?? ""}
         </Box>
@@ -25,8 +27,7 @@ export const DailyNoteInput = ({ note, setNote, isLocked }) => {
         <Textarea
           placeholder="Start typing..."
           size="md"
-          minH="70px"
-          resize="vertical"
+          fontSize="14px"
           {...inputStyles}
           value={note ?? ""}
           onChange={(e) => setNote(e.target.value)}

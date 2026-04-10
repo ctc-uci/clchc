@@ -63,7 +63,7 @@ quotaRouter.get("/details", verifyRole("viewer"), async (req, res) => {
     const conditions = [];
 
     if (provider) {
-      conditions.push(`p.data->>'Name' ILIKE $${values.length + 1}`);
+      conditions.push(`p.name ILIKE $${values.length + 1}`);
       values.push(`%${provider}%`);
     }
 
@@ -78,7 +78,7 @@ quotaRouter.get("/details", verifyRole("viewer"), async (req, res) => {
 
     const results = await db.query(
       `
-        SELECT q.*, p.data->>'Name' AS provider_name, l.tag_value AS location_name 
+        SELECT q.*, p.name AS provider_name, l.tag_value AS location_name
         FROM quota q 
         JOIN providers p ON q.provider_id = p.id 
         JOIN location l ON q.location_id = l.id

@@ -17,7 +17,10 @@ export const DateInput = ({ date, setDate, isLocked }) => {
       w="45%"
       isDisabled={isLocked}
     >
-      <FormLabel>Date</FormLabel>
+      <FormLabel
+        fontSize="14px"
+        color="#113D64"
+      >Date</FormLabel>
       {isLocked ? (
         <InputGroup>
           <Box
@@ -27,6 +30,7 @@ export const DateInput = ({ date, setDate, isLocked }) => {
             borderRadius="6px"
             px={3}
             py={2}
+            fontSize="14px"
             pr="2.25rem"
             bg="gray.50"
             color="gray.500"
@@ -39,6 +43,7 @@ export const DateInput = ({ date, setDate, isLocked }) => {
         <Input
           size="md"
           type="date"
+          fontSize="14px"
           {...inputStyles}
           pr={isLocked ? "2.25rem" : undefined}
           value={date ?? ""}

@@ -9,6 +9,7 @@ import {
   DrawerOverlay,
   Flex,
   Stack,
+  Text,
   useDisclosure,
 } from "@chakra-ui/react";
 
@@ -268,20 +269,33 @@ export default function QuotaDrawer({
       size="sm"
     >
       <DrawerOverlay />
-      <DrawerContent>
+      <DrawerContent
+        width="432px"
+      >
         <DrawerCloseButton />
         <DrawerHeader
+          padding="38px 31px 37px 30px"
           borderBottom="1px"
           borderColor="#E6E6E6"
+          fontSize="23.4px"
+          color="#113D64"
         >
           {currentDrawerTitle}
+          <Text
+            color="#586771"
+            fontSize="16px"
+            fontWeight="400">
+              Provide information to create a new quota.
+          </Text>
         </DrawerHeader>
 
         {isLoading ? (
           <SkeletonBody />
         ) : (
           <form onSubmit={handleSubmit}>
-            <DrawerBody pb={24}>
+            <DrawerBody
+              padding="30px 24px 30px 24px"
+              >
               <Stack gap={4}>
                 {isLocked && <NotificationBanner action={action} />}
                 <ProviderDropdown

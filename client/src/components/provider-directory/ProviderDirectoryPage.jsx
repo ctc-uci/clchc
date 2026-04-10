@@ -8,17 +8,11 @@ import {
   Input,
   InputGroup,
   InputLeftElement,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Tag,
   Text,
   useDisclosure,
 } from "@chakra-ui/react";
 
 import { PageHeader } from "@/components/common/PageHeader";
-import { Navbar } from "@/components/layout/Navbar";
 import CategoryDrawer from "@/components/provider-directory/CategoryDrawer";
 import ProviderDrawer from "@/components/provider-directory/ProviderDrawer";
 import ProviderTable from "@/components/provider-directory/ProviderTable";
@@ -33,6 +27,7 @@ export const ProviderDirectoryPage = () => {
   const [drawerMode, setDrawerMode] = useState("create");
   const [selectedProvider, setSelectedProvider] = useState(null);
   const [highlightedProviderId, setHighlightedProviderId] = useState(null);
+  const [manageOpen, setManageOpen] = useState(false);
 
   const debouncedProviderQuery = useDebounce(
     (value) => setProviderQuery(value),
@@ -90,59 +85,100 @@ export const ProviderDirectoryPage = () => {
   };
 
   return (
-    <Box
-      p={6}
-      maxW="1200px"
-      mx="auto"
-    >
-      <Box mb={5}>
-        <PageHeader
-          title="Provider Directory"
-          subheading="All current active providers in network"
-          role={role}
-          isLoading={roleLoading}
-        />
-      </Box>
-
+    <Box p={6}>
       {role === "ccm" || role === "master" ? (
         <Flex
-          justifyContent="space-between"
-          alignItems="center"
+          flexDirection="column"
           mb={5}
-          gap={4}
+          gap={6}
         >
-          <InputGroup maxW="600px">
+          {/* TOP ROW: PageHeader + Manage Button */}
+          <Flex justify="space-between" align="center">
+            <PageHeader
+              title="Provider Directory"
+              role={role}
+              isLoading={roleLoading}
+            />
+            <Box position="relative">
+              <Button
+                bg="var(--Primary-1, #022442)"
+                color="white"
+                h={"45px"}
+                w={"135px"}
+                padding={"8px 12px"}
+                fontFamily={"Inter"}
+                fontSize={"18px"}
+                fontStyle={"normal"}
+                fontWeight={"600"}
+                lineHeight={"28px"}
+                _hover={{ bg: "#022442" }}
+                _active={{ bg: "#022442" }}
+                leftIcon={<HamburgerIcon size={"24px"}/>}
+                borderRadius={manageOpen ? "4px 4px 0 0" : "4px"}
+                onClick={() => setManageOpen(o => !o)}
+              >
+                Manage
+              </Button>
+              {manageOpen && (
+                <Box
+                  position="absolute"
+                  top="100%"
+                  right={0}
+                  borderRadius="0 0 4px 4px"
+                  w="100%"
+                  zIndex={10}
+                  bg="var(--Primary-1, #022442)"
+                  color="white"
+                  minH={"45px"}
+                  fontFamily={"Inter"}
+                  fontSize={"18px"}
+                  fontStyle={"normal"}
+                  fontWeight={"600"}
+                  lineHeight={"28px"}
+                >
+                  <Box
+                    w="100%"
+                    px={4}
+                    py={3}
+                    color="white"
+                    fontWeight="500"
+                    borderBottom="1px solid"
+                    borderColor="whiteAlpha.200"
+                    cursor="pointer"
+                    _hover={{ bg: "whiteAlpha.100" }}
+                    onClick={() => { onCategoryDrawerOpen(); setManageOpen(false); }}
+                  >
+                    Categories
+                  </Box>
+                  <Box
+                    w="100%"
+                    px={4}
+                    py={3}
+                    color="white"
+                    fontWeight="500"
+                    cursor="pointer"
+                    _hover={{ bg: "whiteAlpha.100" }}
+                    onClick={() => { openCreateProviderDrawer(); setManageOpen(false); }}
+                  >
+                    Providers
+                  </Box>
+                </Box>
+              )}
+            </Box>
+          </Flex>
+          {/* BOTTOM ROW: Search Bar */}
+          <InputGroup width="100%">
             <InputLeftElement pointerEvents="none">
               <SearchIcon color="gray.400" />
             </InputLeftElement>
             <Input
+              bg="white"
               placeholder="Search Providers"
               borderRadius="md"
+              h="45px"
               onChange={handleChange}
             />
           </InputGroup>
-
-          <Flex gap={3}>
-            <Menu>
-              <MenuButton
-                as={Button}
-                bg="black"
-                color="white"
-                _hover={{ bg: "gray.800" }}
-                _active={{ bg: "gray.800" }}
-                rightIcon={<HamburgerIcon />}
-              >
-                Manage
-              </MenuButton>
-              <MenuList>
-                <MenuItem isDisabled>Tags</MenuItem>
-                <MenuItem onClick={onCategoryDrawerOpen}>Categories</MenuItem>
-                <MenuItem onClick={openCreateProviderDrawer}>
-                  Providers
-                </MenuItem>
-              </MenuList>
-            </Menu>
-          </Flex>
         </Flex>
       ) : (
         <></>
@@ -184,7 +220,6 @@ export const ProviderDirectoryPage = () => {
         onClose={onProviderDrawerClose}
         onSaved={handleDrawerSaved}
       />
-      <Navbar />
     </Box>
   );
 };

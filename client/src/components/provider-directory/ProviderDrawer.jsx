@@ -2,9 +2,10 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
   Alert,
-  AlertIcon,
+  // AlertIcon,
   Box,
   Button,
+  Divider,
   Drawer,
   DrawerBody,
   DrawerCloseButton,
@@ -15,9 +16,11 @@ import {
   Flex,
   FormControl,
   FormLabel,
+  Grid,
   Input,
   Skeleton,
   Text,
+  Textarea,
   useToast,
 } from "@chakra-ui/react";
 
@@ -31,6 +34,7 @@ import {
 import { useTags } from "@/contexts/hooks/data-fetching/useTags";
 import { errorToString } from "@/utils/utils";
 import { useQueryClient } from "@tanstack/react-query";
+import { PiWarningCircle } from "react-icons/pi";
 
 const SkeletonBody = () => {
   return (
@@ -47,60 +51,94 @@ const SkeletonBody = () => {
 };
 
 const ConfirmationBanner = ({ mode, pendingTagDeletes = [] }) => {
-  const messages = {
-    create:
-      "Please confirm you would like to create a new provider with the following information",
-    edit: "Please confirm you would like to save the changes to the provider with the following information",
-    delete:
-      "Please confirm you would like to delete the provider with the following information",
+  const bannerModes = {
+    create: {
+      message: (
+        <>
+          Please confirm you would like to <strong>create</strong> a new
+          provider with the following information
+        </>
+      ),
+      primary: "#0052CE",
+      bg: "#92CAFD",
+    },
+    edit: {
+      message: (
+        <>
+          Please confirm you would like to <strong>save</strong> the changes to
+          the provider with the following information
+        </>
+      ),
+      primary: "#0052CE",
+      bg: "#92CAFD",
+    },
+    delete: {
+      message: (
+        <>
+          Please confirm you would like to <strong>delete</strong> the provider
+          with the following information
+        </>
+      ),
+      primary: "#CE0000",
+      bg: "#FFD2D2",
+    },
   };
 
   return (
     <Alert
       status="error"
       variant="subtle"
-      borderRadius="md"
-      border="1px solid"
-      borderColor="red.200"
-      bg="red.50"
-      flexDirection="column"
-      alignItems="flex-start"
-      p={4}
-      mb={4}
+      borderRadius="8px"
+      border="2px solid"
+      borderColor={bannerModes[mode].primary}
+      bg={bannerModes[mode].bg}
+      display="flex"
+      height="175px"
     >
       <Box
         display="flex"
-        alignItems="center"
-        mb={1}
+        gap="19px"
+        flexDirection="column"
+        alignItems="flex-start"
       >
-        <AlertIcon
-          color="red.500"
-          mr={2}
-        />
-        <Text
-          fontWeight="bold"
-          color="red.500"
+        <Box
+          display="flex"
+          alignItems="center"
+          mb={1}
+          gap="10px"
         >
-          Notification
+          <PiWarningCircle
+            color={bannerModes[mode].primary}
+            size={32}
+          />
+          <Text
+            fontSize="20px"
+            fontWeight={500}
+            color={bannerModes[mode].primary}
+          >
+            Notification
+          </Text>
+        </Box>
+
+        <Text
+          color={bannerModes[mode].primary}
+          fontSize="18px"
+          fontWeight={400}
+        >
+          {bannerModes[mode].message}
         </Text>
+        {pendingTagDeletes.length > 0 && (
+          <Text
+            color="red.600"
+            fontSize="sm"
+            mt={2}
+          >
+            {pendingTagDeletes.length} tag(s) will be deleted:{" "}
+            {pendingTagDeletes.map((t) => t.tagValue).join(", ")}. This will
+            remove them from all providers.
+          </Text>
+        )}
       </Box>
-      <Text
-        color="red.500"
-        fontSize="sm"
-      >
-        {messages[mode]}
-      </Text>
-      {pendingTagDeletes.length > 0 && (
-        <Text
-          color="red.600"
-          fontSize="sm"
-          mt={2}
-        >
-          {pendingTagDeletes.length} tag(s) will be deleted:{" "}
-          {pendingTagDeletes.map((t) => t.tagValue).join(", ")}. This will
-          remove them from all providers.
-        </Text>
-      )}
     </Alert>
   );
 };
@@ -156,58 +194,141 @@ const ProviderFormFields = ({
     [tags, pendingTagDeleteIds]
   );
 
-  // const fieldProps = (displayLabel) => {
-  //   const key = catNames[displayLabel] || displayLabel;
-  //   return {
-  //     value: formValues[key] || "",
-  //     onChange: (e) => onChange(key, e.target.value),
-  //     isReadOnly: readOnly,
-  //     bg: readOnly ? "gray.50" : "white",
-  //   };
-  // };
+  const fixedInputProps = {
+    isReadOnly: readOnly,
+    bg: readOnly ? "gray.50" : "white",
+    color: "gray.700",
+    display: "flex",
+    w: "100%",
+    padding: "5px 8px",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: "10px",
+    borderRadius: "2px",
+    border: "1px solid var(--gray-200, #E2E8F0)",
+    background: readOnly ? "var(--gray-50, #F7FAFC)" : "var(--white, #FFF)",
+    fontFamily: "Lato",
+    fontStyle: "normal",
+    fontSize: "14px",
+    fontWeight: "400",
+    lineHeight: "normal",
+  };
 
-  // const formattedFieldProps = (displayLabel, formatter) => {
-  //   const key = catNames[displayLabel] || displayLabel;
-  //   return {
-  //     value: formValues[key] || "",
-  //     onChange: (e) => onChange(key, formatter(e.target.value)),
-  //     isReadOnly: readOnly,
-  //     bg: readOnly ? "gray.50" : "white",
-  //   };
-  // };
-
-  // const selectProps = (displayLabel) => {
-  //   const key = catNames[displayLabel] || displayLabel;
-  //   return {
-  //     value: formValues[key] || "",
-  //     onChange: (e) => onChange(key, e.target.value),
-  //     isDisabled: readOnly,
-  //     bg: readOnly ? "gray.50" : "white",
-  //   };
-  // };
+  const fixedLabelProps = {
+    color: "#113D64",
+    fontFamily: "Inter",
+    fontSize: "14px",
+    fontStyle: "normal",
+    fontWeight: 400,
+    lineHeight: "normal",
+  };
 
   return (
     <Flex
       direction="column"
-      gap={6}
+      gap="20px"
     >
-      <Flex
-        wrap="wrap"
+      <Grid
+        templateColumns="repeat(2, minmax(0, 1fr))"
         gap={6}
+        alignItems="end"
+      >
+        <Box maxW="172px">
+          <FormLabel {...fixedLabelProps}>Provider Name</FormLabel>
+          <Flex gap={2}>
+            <FormControl
+              isRequired
+              isInvalid={!!errors["name"]}
+            >
+              <Input
+                value={formValues["name"] || ""}
+                onChange={(e) => onChange("name", e.target.value)}
+                {...fixedInputProps}
+                fontSize="12px"
+              />
+              {errors["name"] && (
+                <Text color="red.500" fontSize="sm" mt={1}>{errors["name"]}</Text>
+              )}
+            </FormControl>
+            <FormControl maxW="40px">
+              <Input
+                value={formValues["degree"] || ""}
+                onChange={(e) => onChange("degree", e.target.value)}
+                {...fixedInputProps}
+                // fontSize="12px"
+                placeholder="Deg."
+                padding={"6px"}
+              />
+            </FormControl>
+          </Flex>
+        </Box>
+
+        <Box maxW="172px">
+          <FormControl
+            isRequired
+            isInvalid={!!errors["license"]}
+          >
+            <FormLabel {...fixedLabelProps}>NPI/License</FormLabel>
+            <Input
+              value={formValues["license"] || ""}
+              onChange={(e) => onChange("license", e.target.value)}
+              {...fixedInputProps}
+            />
+            {errors["license"] && (
+              <Text color="red.500" fontSize="sm" mt={1}>{errors["license"]}</Text>
+            )}
+          </FormControl>
+        </Box>
+
+        <Box maxW="172px">
+          <FormControl>
+            <FormLabel {...fixedLabelProps}>DEA</FormLabel>
+            <Input
+              value={formValues["dea"] || ""}
+              onChange={(e) => onChange("dea", e.target.value)}
+              {...fixedInputProps}
+            />
+          </FormControl>
+        </Box>
+
+        <Box maxW="172px">
+          <FormControl>
+            <FormLabel {...fixedLabelProps}>Phone Number</FormLabel>
+            <Input
+              value={formValues["phoneNumber"] || ""}
+              onChange={(e) => onChange("phoneNumber", e.target.value)}
+              {...fixedInputProps}
+            />
+          </FormControl>
+        </Box>
+      </Grid>
+
+      <Grid
+        templateColumns="repeat(2, minmax(0, 1fr))"
+        gap={6}
+        alignItems="end"
       >
         {categories.map((cat) => {
           return (
             <Box
               key={cat.id}
-              flex="1 1 48%"
+              maxW="172px"
             >
               <FormControl
                 key={cat.id}
-                mb={4}
                 isRequired={cat.isRequired}
                 isInvalid={!!errors[cat.id]}
               >
-                <FormLabel fontWeight={600}>{cat.name}</FormLabel>
+                <FormLabel
+                  color="#113D64"
+                  fontFamily={"Inter"}
+                  fontSize="14px"
+                  fontStyle="normal"
+                  fontWeight={400}
+                  lineHeight="normal"
+                >
+                  {cat.name}
+                </FormLabel>
 
                 {cat.inputType === "text" && (
                   <Input
@@ -215,6 +336,23 @@ const ProviderFormFields = ({
                     onChange={(e) => onChange(cat.id, e.target.value)}
                     isReadOnly={readOnly}
                     bg={readOnly ? "gray.50" : "white"}
+                    color="gray.700"
+                    display={"flex"}
+                    // minW={"100px"}
+                    w={"100%"}
+                    // minH={"30x"}
+                    padding={"5px 10px"}
+                    justifyContent={"center"}
+                    alignItems={"center"}
+                    gap={"10px"}
+                    borderRadius={"2px"}
+                    border={"1px solid var(--gray-200, #E2E8F0)"}
+                    background={"var(--white, #FFF);"}
+                    fontFamily={"Lato"}
+                    fontStyle={"normal"}
+                    fontSize={"14px"}
+                    fontWeight={"400"}
+                    lineHeight={"normal"}
                   />
                 )}
 
@@ -245,7 +383,27 @@ const ProviderFormFields = ({
             </Box>
           );
         })}
-      </Flex>
+      </Grid>
+
+      <FormControl>
+        <FormLabel {...fixedLabelProps}>Long Term Notes</FormLabel>
+        <Textarea
+          value={formValues["notes"] || ""}
+          onChange={(e) => onChange("notes", e.target.value)}
+          isReadOnly={readOnly}
+          bg={readOnly ? "gray.50" : "white"}
+          fontFamily="Lato"
+          fontSize="14px"
+          fontWeight="400"
+          color="gray.700"
+          borderRadius="6px"
+          border="1px solid var(--gray-200, #E2E8F0)"
+          background="var(--white, #FFF)"
+          resize="vertical"
+          rows={4}
+          h={"80px"}
+        />
+      </FormControl>
     </Flex>
   );
 };
@@ -285,11 +443,17 @@ const ProviderDrawer = ({
     const init = async () => {
       try {
         if ((mode === "edit" || mode === "delete") && provider) {
-          const converted = {};
+          const converted = {
+            name: provider.name ?? "",
+            degree: provider.degree ?? "",
+            license: provider.license ?? "",
+            dea: provider.dea ?? "",
+            phoneNumber: provider.phoneNumber ?? "",
+            notes: provider.notes ?? "",
+          };
 
           categories.forEach((cat) => {
             const existingValue = provider.data?.[cat.name];
-
             if (existingValue === undefined) {
               return;
             }
@@ -339,8 +503,13 @@ const ProviderDrawer = ({
     });
 
     return {
+      name: formState.name || "",
+      degree: formState.degree || "",
+      license: formState.license || "",
+      dea: formState.dea || "",
+      phoneNumber: formState.phoneNumber || "",
       data: dataPayload,
-      note: formState.note || "",
+      notes: formState.notes || "",
     };
   };
 
@@ -394,6 +563,15 @@ const ProviderDrawer = ({
         });
       } else if (activeMode === "delete") {
         await deleteProvider(provider.id);
+        toast({
+          title: "Provider Deletion",
+          description: "You have deleted a provider from the directory.",
+          status: "error", // This is a successful delete, but the toast should be red according to Hi-Fi.
+          position: "bottom-right",
+          variant: "top-accent",
+          duration: 5000,
+          isClosable: true,
+        });
       }
 
       handleClose();
@@ -439,6 +617,14 @@ const ProviderDrawer = ({
   const validateForm = () => {
     const newErrors = {};
 
+    if (!formValues["name"] || formValues["name"].trim() === "") {
+      newErrors["name"] = "Name is required";
+    }
+
+    if (!formValues["license"] || formValues["license"].trim() === "") {
+      newErrors["license"] = "NPI/License is required";
+    }
+
     categories.forEach((cat) => {
       if (cat.isRequired) {
         const value = formValues[cat.id];
@@ -466,30 +652,72 @@ const ProviderDrawer = ({
       size="md"
     >
       <DrawerOverlay />
-      <DrawerContent>
-        <DrawerCloseButton />
+      <DrawerContent maxW="432px">
+        <DrawerCloseButton
+          top="38px"
+          color="#113D64"
+        />
         <DrawerHeader
-          fontWeight="bold"
-          fontSize="xl"
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "flex-start",
+            gap: "3px",
+            flexShrink: 0,
+            paddingTop: "38px",
+          }}
         >
-          {showConfirmation && activeMode === "edit"
-            ? "Confirm Changes"
-            : activeMode === "create"
-              ? "Create Provider"
-              : activeMode === "edit"
-                ? "Edit Provider"
-                : "Delete Provider"}
+          <Text
+            sx={{
+              color: "#113D64",
+              fontSize: "24px",
+              fontStyle: "normal",
+              fontWeight: "500",
+              lineHeight: "normal",
+            }}
+          >
+            {showConfirmation && activeMode === "edit"
+              ? "Confirm Changes"
+              : activeMode === "create"
+                ? "Create Provider"
+                : activeMode === "edit"
+                  ? (provider?.name ?? "Edit Provider")
+                  : "Delete Provider"}
+          </Text>
+          <Text
+            sx={{
+              color: "#586771",
+              fontSize: "16px",
+              fontStyle: "normal",
+              fontWeight: "400",
+              lineHeight: "normal",
+            }}
+          >
+            {activeMode === "edit"
+              ? "Provider Profile"
+              : activeMode === "delete"
+                ? "Please confirm you would like to delete this provider."
+                : "Please provide basic info about the provider."}
+          </Text>
         </DrawerHeader>
+        <Divider my={6} />
+
         {loadingTags ? (
           <SkeletonBody />
         ) : (
           <>
-            <DrawerBody>
+            <DrawerBody
+              flexDir="column"
+              gap="32px"
+              overflowX="hidden"
+            >
               {showConfirmation && (
-                <ConfirmationBanner
-                  mode={activeMode}
-                  pendingTagDeletes={pendingTagDeletes}
-                />
+                <Box mb={4}>
+                  <ConfirmationBanner
+                    mode={activeMode}
+                    pendingTagDeletes={pendingTagDeletes}
+                  />
+                </Box>
               )}
 
               <ProviderFormFields
@@ -504,28 +732,40 @@ const ProviderDrawer = ({
               />
             </DrawerBody>
 
-            <DrawerFooter justifyContent="space-between">
+            <DrawerFooter
+              justifyContent="space-between"
+              gap={4}
+              // px={6}
+            >
               {activeMode === "edit" && !showConfirmation ? (
                 <>
                   <Button
-                    bg="red.600"
-                    color="white"
-                    _hover={{ bg: "red.700" }}
+                    // bg="#FFF"
+                    variant="outline"
+                    color="#90080F"
+                    borderColor="#90080F"
+                    _hover={{ bg: "red.800", color: "#FFF" }}
+                    flex={1}
                     onClick={() => {
                       setActiveMode("delete");
                       setShowConfirmation(true);
                     }}
+                    borderRadius={"4px"}
+                    border={"1px solid"}
                   >
-                    Delete Provider
+                    Delete
                   </Button>
 
                   <Button
-                    bg="black"
+                    bg="#929292"
                     color="white"
-                    _hover={{ bg: "gray.800" }}
+                    _hover={{ bg: "#1a4f7a" }}
                     onClick={handleSubmit}
+                    flex={1}
+                    borderRadius={"4px"}
+                    border={"1px solid"}
                   >
-                    Save Changes
+                    Confirm Changes
                   </Button>
                 </>
               ) : (
@@ -533,20 +773,26 @@ const ProviderDrawer = ({
                   <Button
                     variant="outline"
                     onClick={handleClose}
+                    flex={1}
+                    color="#022442"
+                    fontWeight={600}
                   >
-                    Cancel
+                    Back to Editing
                   </Button>
 
                   <Button
-                    bg={activeMode === "delete" ? "red.600" : "black"}
+                    flex={1}
+                    bg={activeMode === "delete" ? "red.700" : "#113D64"}
                     color="white"
                     _hover={{
-                      bg: activeMode === "delete" ? "red.700" : "gray.800",
+                      bg: activeMode === "delete" ? "red.800" : "#1a4f7a",
                     }}
                     onClick={handleSubmit}
                   >
                     {showConfirmation
-                      ? "Confirm"
+                      ? activeMode === "delete"
+                        ? "Delete"
+                        : "Confirm"
                       : activeMode === "create"
                         ? "Create"
                         : "Confirm"}

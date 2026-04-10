@@ -40,7 +40,10 @@ export function QuotaProgress({
       isRequired
       isDisabled={isLocked}
     >
-      <FormLabel>Appointment Quota</FormLabel>
+      <FormLabel
+        fontSize="14px"
+        color="#113D64"
+      >Appointment Quota</FormLabel>
       <>
         <Progress
           value={percent}
@@ -66,7 +69,7 @@ export function QuotaProgress({
           >
             <Box
               position="relative"
-              w="80px"
+              w="109px"
             >
               <NumberInput
                 value={progress}
@@ -78,32 +81,36 @@ export function QuotaProgress({
                 borderColor="gray.300"
                 borderRadius="6px"
                 size="lg"
-                w="80px"
+                w="109px"
               >
                 <NumberInputField
                   textAlign="center"
-                  fontSize="4xl"
+                  fontSize="30px"
                   p={0}
                   color="black"
                   placeholder=" "
                   bg="white"
                   borderRadius="6px"
-                  h="64px"
+                  h="72px"
                 />
               </NumberInput>
             </Box>
 
             <Text
-              fontSize="4xl"
+              w="56px"
+              h="60px"
+              fontSize="40px"
               fontWeight="bold"
               color="black"
+              textAlign="center"
+              lineHeight="60px"
             >
               /
             </Text>
 
             <Box
               position="relative"
-              w="80px"
+              w="109px"
             >
               <NumberInput
                 value={quota}
@@ -115,16 +122,16 @@ export function QuotaProgress({
                 border="1px"
                 borderColor="gray.300"
                 borderRadius="6px"
-                w="80px"
+                w="109px"
               >
                 <NumberInputField
                   textAlign="center"
-                  fontSize="4xl"
+                  fontSize="30px"
                   p={0}
                   color="black"
                   bg="white"
                   borderRadius="6px"
-                  h="64px"
+                  h="72px"
                 />
               </NumberInput>
             </Box>
