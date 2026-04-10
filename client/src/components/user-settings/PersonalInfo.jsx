@@ -18,6 +18,7 @@ import {
 
 import { useUpdateUser } from "@/contexts/hooks/data-fetching/useUsers";
 import { useUserContext } from "@/contexts/hooks/useUserContext";
+import { useAuthContext } from "@/contexts/hooks/useAuthContext";
 import { MdEdit } from "react-icons/md";
 
 import ConfirmationModal from "./ConfirmationModal";
@@ -31,6 +32,7 @@ const ROLE_LABELS = {
 
 export default function PersonalInfo() {
   const userData = useUserContext();
+  const { currentUser } = useAuthContext();
   const { mutateAsync: update } = useUpdateUser();
   const dbUser = userData?.dbUser;
   const refetch = userData?.refetch;
@@ -109,6 +111,7 @@ export default function PersonalInfo() {
     >
       <Avatar
         name={`${userInfo?.firstName} ${userInfo?.lastName}`}
+        src={currentUser?.photoURL}
         size="sm"
         bg="#FFF"
         color="black"

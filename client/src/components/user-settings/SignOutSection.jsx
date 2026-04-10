@@ -19,7 +19,7 @@ const ROLE_LABELS = {
   };
 
 export default function SignOutSection() {
-  const { logout } = useAuthContext();
+  const { currentUser, logout } = useAuthContext();
   const userData = useUserContext();
   const dbUser = userData?.dbUser;
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -37,6 +37,7 @@ export default function SignOutSection() {
   <Flex align="center" gap={3}>
     <Avatar
       name={`${dbUser?.firstName} ${dbUser?.lastName}`}
+      src={currentUser?.photoURL}
       size="sm"
       bg="#FFF"
       color="black"
