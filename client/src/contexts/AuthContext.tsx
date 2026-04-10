@@ -17,6 +17,7 @@ import {
 import { NavigateFunction } from "react-router-dom";
 
 import { auth } from "../utils/auth/firebase";
+import { cookieKeys, setCookie } from "../utils/auth/cookie";
 import { useBackendContext } from "./hooks/useBackendContext";
 
 interface AuthContextProps {
@@ -96,6 +97,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       
       
       if (!result?.user) return;
+
+      const idToken = await result.user.getIdToken();
+      setCookie({ key: cookieKeys.ACCESS_TOKEN, value: idToken });
+
       let response = await backend.get(`/users/firebase/${result.user.uid}`);
 
       if (response.data.length === 0) {
