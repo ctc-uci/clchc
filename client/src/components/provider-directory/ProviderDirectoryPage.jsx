@@ -8,17 +8,11 @@ import {
   Input,
   InputGroup,
   InputLeftElement,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Tag,
   Text,
   useDisclosure,
 } from "@chakra-ui/react";
 
 import { PageHeader } from "@/components/common/PageHeader";
-import { Navbar } from "@/components/layout/Navbar";
 import CategoryDrawer from "@/components/provider-directory/CategoryDrawer";
 import ProviderDrawer from "@/components/provider-directory/ProviderDrawer";
 import ProviderTable from "@/components/provider-directory/ProviderTable";
@@ -178,6 +172,7 @@ export const ProviderDirectoryPage = () => {
               <SearchIcon color="gray.400" />
             </InputLeftElement>
             <Input
+              bg="white"
               placeholder="Search Providers"
               borderRadius="md"
               h="45px"

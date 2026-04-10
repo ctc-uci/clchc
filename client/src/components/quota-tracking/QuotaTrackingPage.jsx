@@ -238,6 +238,7 @@ export const QuotaTracking = () => {
           <SearchIcon color="gray.400" />
         </InputLeftElement>
         <Input
+          bg="white"
           placeholder="Search Providers"
           borderRadius="md"
           h="45px"
