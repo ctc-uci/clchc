@@ -1,0 +1,31 @@
+client/src/components/dashboard/RoleSelect.tsx
+  c1c6d4cec0f6fe0a 32
+client/src/App.tsx
+  c1c6d4cec0f6fe0a 14,53
+client/src/components/ProtectedRoute.tsx
+  c1c6d4cec0f6fe0a 24
+client/src/components/dashboard/Dashboard.tsx
+  c1c6d4cec0f6fe0a 57,60,96
+client/src/components/login/Login.tsx
+  c1c6d4cec0f6fe0a 35
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "ab8e7387390648fe604724e3702f5a920e542786",
+  "prompts": {
+    "c1c6d4cec0f6fe0a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a2af3caf-e14c-43d0-a3ec-3e3de772d557",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Brendan Lieu",
+      "messages": [],
+      "total_additions": 550,
+      "total_deletions": 16,
+      "accepted_lines": 8,
+      "overriden_lines": 0
+    }
+  }
+}
