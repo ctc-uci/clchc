@@ -232,9 +232,6 @@ export const QuotaTracking = () => {
             </>
           )}
       </Flex>
-
-
-
       <InputGroup mb={6}>
         <InputLeftElement pointerEvents="none">
           <SearchIcon color="gray.400" />
