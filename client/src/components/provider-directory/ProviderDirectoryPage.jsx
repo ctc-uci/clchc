@@ -93,12 +93,12 @@ export const ProviderDirectoryPage = () => {
   return (
     <Box p={6}>
       <Box mb={5}>
-        <PageHeader
+        {/* <PageHeader
           title="Provider Directory"
           subheading="All current active providers in network"
           role={role}
           isLoading={roleLoading}
-        />
+        /> */}
       </Box>
 
       {role === "ccm" || role === "master" ? (
@@ -185,6 +185,7 @@ export const ProviderDirectoryPage = () => {
             <Input
               placeholder="Search Providers"
               borderRadius="md"
+              h="45px"
               onChange={handleChange}
             />
           </InputGroup>
@@ -229,7 +230,6 @@ export const ProviderDirectoryPage = () => {
         onClose={onProviderDrawerClose}
         onSaved={handleDrawerSaved}
       />
-      <Navbar />
     </Box>
   );
 };
