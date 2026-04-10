@@ -84,6 +84,8 @@ const QuotaTable = ({ rows, loading, onRowsUpdate, role }) => {
     padding: "15px 25px",
     backgroundColor: "#C8D4E6",
     color: "#113D64",
+    borderRight: "1px solid",
+    borderColor: "gray.200",
   };
 
   const tdProps = {
@@ -128,7 +130,7 @@ const QuotaTable = ({ rows, loading, onRowsUpdate, role }) => {
             <Th {...thProps}>Location</Th>
             <Th {...thProps}>Type</Th>
             <Th {...thProps}>Progress</Th>
-            <Th {...thProps}>Notes</Th>
+            <Th {...thProps} borderRight="none">Notes</Th>
           </Tr>
         </Thead>
 

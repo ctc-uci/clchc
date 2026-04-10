@@ -19,6 +19,7 @@ import {
 } from "@/contexts/hooks/data-fetching/useUsers";
 import { useUserContext } from "@/contexts/hooks/useUserContext";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useNavigate } from "react-router-dom";
 
 import { UserPendingStatusList } from "./UserPendingStatusList";
 import UserRoleFilter from "./UserRoleFilter";
@@ -29,6 +30,7 @@ export const UserDirectory = () => {
   const [searchInput, setSearchInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRole, setSelectedRole] = useState("all");
+  const navigate = useNavigate();
 
   const debouncedSetSearchQuery = useDebounce((value) => {
     setSearchQuery(value);
@@ -78,19 +80,10 @@ export const UserDirectory = () => {
   }, [users, searchQuery, selectedRole]);
 
   return (
-    <Box
-      p={6}
-      maxW="1200px"
-      mx="auto"
-    >
-      <Flex
-        justify="space-between"
-        align="flex-start"
-        mb={6}
-      >
+    <Box p={6}>
+      <Flex align="center" justify="space-between" mb={6} h="45px">
         <PageHeader
           title="User Directory"
-          subheading="Manage user accounts and permissions"
           role={role}
           isLoading={roleLoading}
         />
@@ -101,22 +94,31 @@ export const UserDirectory = () => {
         gap={1}
         mb={2}
       >
-        <Box
-          w="8px"
-          h="8px"
-          bg="red.500"
-          borderRadius="full"
-        />
         <Heading
           color="#00000080"
-          fontSize="xs"
-          fontWeight="semibold"
+          fontSize="14px"
+          fontWeight="500px"
         >
           PENDING REQUESTS
         </Heading>
       </Flex>
-      <Box mb={8}>
+      <Box mb={4}>
         <UserPendingStatusList />
+        <Flex
+          justify="flex-end"
+          mt={2}
+        >
+          <Box
+            as="button"
+            fontSize="14px"
+            fontStyle="italic"
+            color="gray.500"
+            _hover={{ color: "gray.700" }}
+            onClick={() => navigate("/pending-requests")}
+          >
+          View All
+          </Box>
+        </Flex>
       </Box>
       <Flex
         gap={4}
@@ -128,13 +130,12 @@ export const UserDirectory = () => {
             <SearchIcon color="gray.400" />
           </InputLeftElement>
           <Input
+            bg="white"
             placeholder="Search Providers"
-            borderRadius="2xl"
+            borderRadius="md"
+            h="45px"
             value={searchInput}
             onChange={handleSearchChange}
-            fontWeight="normal"
-            fontSize="sm"
-            py={5}
           />
         </InputGroup>
 

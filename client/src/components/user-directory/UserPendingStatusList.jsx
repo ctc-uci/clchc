@@ -1,10 +1,12 @@
-import { WarningIcon } from "@chakra-ui/icons";
 import { useState } from "react";
 
+import { WarningIcon } from "@chakra-ui/icons";
 import {
+  Avatar,
   Box,
   Button,
   Flex,
+  Grid,
   HStack,
   Skeleton,
   SkeletonCircle,
@@ -22,28 +24,61 @@ import { DenyRequestModal } from "./DenyRequestModal";
 
 const RequestSkeleton = () => {
   return (
-    <Flex align="center" justify="space-between">
-      <HStack spacing={3} ml={5} minW="260px">
+    <Flex
+      align="center"
+      justify="space-between"
+    >
+      <HStack
+        spacing={3}
+        ml={5}
+        minW="260px"
+      >
         <SkeletonCircle size="14" />
-        <VStack alignItems="start" spacing={2}>
-          <Skeleton height="18px" width="160px" />
-          <Skeleton height="12px" width="220px" />
+        <VStack
+          alignItems="start"
+          spacing={2}
+        >
+          <Skeleton
+            height="18px"
+            width="160px"
+          />
+          <Skeleton
+            height="12px"
+            width="220px"
+          />
         </VStack>
       </HStack>
 
       <HStack spacing={5}>
-        <Skeleton height="14px" width="110px" />
-        <Skeleton height="32px" width="110px" borderRadius="md" />
-        <Skeleton height="32px" width="110px" borderRadius="md" />
+        <Skeleton
+          height="14px"
+          width="110px"
+        />
+        <Skeleton
+          height="32px"
+          width="110px"
+          borderRadius="md"
+        />
+        <Skeleton
+          height="32px"
+          width="110px"
+          borderRadius="md"
+        />
       </HStack>
     </Flex>
   );
 };
 
-export const UserPendingStatusList = () => {
-  const { data: pendingUsers = [], isLoading, error } = useUsers({
+export const UserPendingStatusList = ({ showAll = false }) => {
+  const {
+    data: pendingUsers = [],
+    isLoading,
+    error,
+  } = useUsers({
     status: "pending",
   });
+
+  const displayUsers = showAll ? pendingUsers : pendingUsers.slice(0, 2);
 
   const { mutate: updateUser } = useUpdateUser();
 
@@ -76,9 +111,11 @@ export const UserPendingStatusList = () => {
       borderRadius="lg"
       border="0.5px solid #00000026"
       boxShadow="sm"
-      p={4}
     >
-      <VStack align="stretch">
+      <Grid
+        templateColumns="1fr"
+        gap={0}
+      >
         {isLoading ? (
           <>
             <RequestSkeleton />
@@ -88,29 +125,59 @@ export const UserPendingStatusList = () => {
         ) : error ? (
           <Text color="red.500">Failed to load pending requests.</Text>
         ) : (
-          pendingUsers.map((req) => (
-            <Flex key={req.id} align="center" justify="space-between">
+          displayUsers.map((req) => (
+            <Flex
+              key={req.id}
+              align="center"
+              borderTop="1px solid #E2E8F0"
+              borderRadius="md"
+              p={3}
+              // mb={2}
+              justify="space-between"
+            >
               {/* Left */}
-              <HStack spacing={3} ml={5} minW="260px">
-                <Flex
+              <HStack
+                spacing={3}
+                ml={5}
+                minW="260px"
+              >
+                <Avatar
                   w="58px"
                   h="58px"
-                  bg="#F9FAFB"
                   borderRadius="xl"
-                  align="center"
-                  justify="center"
-                  fontWeight="normal"
-                  fontSize="xl"
-                  color="black"
-                >
-                  {`${req.firstName?.[0] ?? ""}${req.lastName?.[0] ?? ""}`}
-                </Flex>
+                  src={req.photoUrl ?? undefined}
+                  name={`${req.firstName ?? ""} ${req.lastName ?? ""}`}
+                  bg={req.photoUrl ? undefined : "#F9FAFB"}
+                  color="#000"
+                  fontFamily={"Lato"}
+                  fontSize={"20px"}
+                  fontStyle={"normal"}
+                  fontWeight={"400"}
+                  lineHeight={"normal"}
+                  letterSpacing={"-0.8px"}
+                />
 
                 <Box>
-                  <Text fontSize="xl" fontWeight="normal">
+                  <Text
+                    fontSize="16px"
+                    fontFamily={"Lato"}
+                    fontStyle="normal"
+                    fontWeight={"400"}
+                    lineHeight="normal"
+                    letterSpacing={-0.64}
+                  >
                     {req.firstName} {req.lastName}
                   </Text>
-                  <Text fontSize="xs" fontWeight="normal" color="gray.500">
+                  <Text
+                    fontSize="14px"
+                    fontWeight="400"
+                    color="rgba(0, 0, 0, 0.50)"
+                    fontFamily={"Lato"}
+                    fontStyle={"normal"}
+                    lineHeight={"normal"}
+                    letterSpacing={"-0.56px"}
+                    mt={1}
+                  >
                     {req.email}
                   </Text>
                 </Box>
@@ -118,7 +185,14 @@ export const UserPendingStatusList = () => {
 
               <HStack spacing={5}>
                 {/* Date */}
-                <Text fontSize="sm" color="gray.500">
+                <Text
+                  fontSize="14px"
+                  color="rgba(0, 0, 0, 0.50)"
+                  fontStyle={"normal"}
+                  fontWeight={"400"}
+                  lineHeight={"normal"}
+                  letterSpacing={"-0.56px"}
+                >
                   {req.userSignupDate
                     ? new Date(req.userSignupDate).toLocaleDateString("en-US", {
                         month: "short",
@@ -131,32 +205,55 @@ export const UserPendingStatusList = () => {
                 {/* Actions */}
                 <Button
                   size="sm"
-                  bg="blackAlpha.400"
-                  color="white"
-                  py={1}
-                  px={8}
-                  _hover={{ bg: "blackAlpha.500" }}
-                  onClick={() => handleDeny(req)}
+                  bg="#113D64"
+                  color="#FFF"
+                  _hover={{ bg: "blue.600" }}
+                  onClick={() => handleApprove(req.id)}
+                  display="flex"
+                  width={113.347}
+                  height={41}
+                  padding={0}
+                  justifyContent="center"
+                  alignItems="center"
+                  gap={15}
+                  borderRadius="6px"
+                  fontFamily="Lato"
+                  fontSize="14px"
+                  fontStyle="normal"
+                  fontWeight="400"
+                  lineHeight="20px"
                 >
-                  Deny
+                  Approve
                 </Button>
 
                 <Button
                   size="sm"
-                  bg="blue.500"
-                  color="white"
-                  py={1}
-                  px={8}
-                  _hover={{ bg: "blue.600" }}
-                  onClick={() => handleApprove(req.id)}
+                  bg="white"
+                  color="#1A202C"
+                  _hover={{ bg: "gray.100" }}
+                  onClick={() => handleDeny(req)}
+                  display="flex"
+                  width={113.347}
+                  height={41}
+                  padding={0}
+                  justifyContent="center"
+                  alignItems="center"
+                  gap={15}
+                  borderRadius="6px"
+                  border="1px solid #E2E8F0"
+                  fontFamily="Lato"
+                  fontSize="14px"
+                  fontStyle="normal"
+                  fontWeight="400"
+                  lineHeight="20px"
                 >
-                  Approve
+                  Deny
                 </Button>
               </HStack>
             </Flex>
           ))
         )}
-      </VStack>
+      </Grid>
 
       <DenyRequestModal
         isOpen={isOpen}

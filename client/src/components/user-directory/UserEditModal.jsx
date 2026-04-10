@@ -1,11 +1,17 @@
 import { useEffect, useState } from "react";
 
+import { ChevronDownIcon } from "@chakra-ui/icons";
 import {
   Avatar,
   Badge,
   Box,
   Button,
   Flex,
+  Input,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
   Modal,
   ModalBody,
   ModalContent,
@@ -17,14 +23,41 @@ import {
   VStack,
 } from "@chakra-ui/react";
 
-import { useUpdateUserByFirebaseUid } from "@/contexts/hooks/data-fetching/useUsers";
+import {
+  useDeleteUserByFirebaseUid,
+  useUpdateUserByFirebaseUid,
+  useUsers,
+} from "@/contexts/hooks/data-fetching/useUsers";
 
-export default function UserEditModal({ isOpen, onClose, user, onUpdated }) {
+export default function UserEditModal({ isOpen, onClose, userId, onUpdated }) {
+  const { data: users = [] } = useUsers({ status: "approved" });
+  const user = users.find((u) => u.id === userId) ?? null;
+
   const [selectedRole, setSelectedRole] = useState(user?.role ?? "viewer");
   const { mutateAsync: updateUser } = useUpdateUserByFirebaseUid();
+  const { mutateAsync: deleteUser } = useDeleteUserByFirebaseUid();
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [deleteInput, setDeleteInput] = useState("");
 
   useEffect(() => {
-    setSelectedRole(user?.role ?? "viewer");
+    if (isOpen) {
+      setIsDeleteOpen(false);
+      setDeleteInput("");
+      setSelectedRole(user?.role ?? "viewer");
+    }
+  }, [isOpen, user]);
+
+  const roleOptions = [
+    { value: "ccm", label: "Call Center Manager" },
+    { value: "ccs", label: "Call Center Staff" },
+    { value: "viewer", label: "Viewer" },
+  ];
+
+  const selectedRoleLabel =
+    roleOptions.find((r) => r.value === selectedRole)?.label || "Select Role";
+
+  useEffect(() => {
+    if (user) setSelectedRole(user.role ?? "viewer");
   }, [user]);
 
   if (!user) return null;
@@ -32,10 +65,10 @@ export default function UserEditModal({ isOpen, onClose, user, onUpdated }) {
   const currentFirebaseUid = user.firebaseUid;
   const username = user.firstName + " " + user.lastName;
   const roleColors = {
-    master: "red",
-    ccm: "green",
-    ccs: "blue",
-    viewer: "yellow",
+    master: { bg: "#573D59", color: "white" },
+    ccm: { bg: "#07B8AC", color: "white" },
+    ccs: { bg: "#3498DB", color: "white" },
+    viewer: { bg: "#C8D4E6", color: "gray.800" },
   };
 
   const onApprove = async () => {
@@ -58,6 +91,21 @@ export default function UserEditModal({ isOpen, onClose, user, onUpdated }) {
     }
   };
 
+  const onDelete = async () => {
+    if (!currentFirebaseUid) {
+      console.error("Deletion failed: missing firebaseUid");
+      return;
+    }
+
+    try {
+      await deleteUser({ uid: currentFirebaseUid });
+      if (onUpdated) await onUpdated();
+      onClose();
+    } catch (err) {
+      console.error("Deletion failed: ", err);
+    }
+  };
+
   return (
     <Modal
       isOpen={isOpen}
@@ -65,53 +113,84 @@ export default function UserEditModal({ isOpen, onClose, user, onUpdated }) {
       isCentered
       motionPreset="scale"
     >
+
       <ModalOverlay />
       <ModalContent
-        borderRadius="16px"
-        maxW="560px"
-        maxH="480px"
-        px={6}
-        py={8}
-        boxShadow="0 4px 14px rgba(0, 0, 0, 0.1)"
+        px={3}
+        py={6}
+        width="394px"
+        minH="490px"
+        borderRadius="15px"
       >
-        <ModalHeader
-          fontWeight="500"
-          fontSize="25px"
-          pb={2}
-        >
-          Edit User
-          <Text
-            fontWeight="normal"
-            fontSize="15px"
-            color="#00000080"
-            mt={1}
-          >
-            Change role and permissions
-          </Text>
+        <ModalHeader py={0}>
+          {isDeleteOpen ? (
+            <>
+              <Text
+                py={0}
+                fontWeight="500"
+                fontSize="25px"
+              >
+                Are you Sure?
+              </Text>
+              <Text
+                fontSize="14px"
+                color="#00000080"
+                fontWeight="400"
+                mt={-1}
+                mb={1}
+              >
+                You are removing this individuals access to CLCHC
+              </Text>
+            </>
+          ) : (
+            <>
+              <Text
+                py={0}
+                fontWeight="500"
+                fontSize="25px"
+              >
+                Edit User
+              </Text>
+              <Text
+                fontWeight="normal"
+                fontSize="15px"
+                color="#00000080"
+              >
+                Change role and permissions
+              </Text>
+            </>
+          )}
         </ModalHeader>
 
         <ModalBody>
           <Flex
             align="center"
-            bg="gray.50"
-            borderRadius="12px"
+            bg="#F9F9F9"
+            border="0.5px solid rgba(0, 0, 0, 0.15)"
+            borderRadius="8px"
             px={4}
-            py={4}
-            mb={6}
+            py={2}
             gap={3}
           >
             <Box
-              size="xl"
               bg="white"
               color="black"
               borderRadius="10px"
+              minW="40px"
+              minH="38px"
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              p={1}
             >
               <Avatar
                 name={username}
-                size="lg"
+                size="sm"
                 bg="white"
+                src={user.photoUrl ?? undefined}
                 color="black"
               />
+              {/* width: 40.50943374633789; */}
             </Box>
             <Flex
               justify="space-between"
@@ -124,12 +203,12 @@ export default function UserEditModal({ isOpen, onClose, user, onUpdated }) {
               >
                 <Text
                   fontWeight="400"
-                  fontSize="20px"
+                  fontSize="14px"
                 >
                   {user.firstName} {user.lastName}
                 </Text>
                 <Text
-                  fontSize="xs"
+                  fontSize="12px"
                   color="gray"
                 >
                   {user.email}
@@ -137,83 +216,214 @@ export default function UserEditModal({ isOpen, onClose, user, onUpdated }) {
               </VStack>
             </Flex>
             <Badge
-              colorScheme={roleColors[user.role] || "gray"}
-              ml="auto"
-              borderRadius="7.2px"
-              px={2}
-              py={0.5}
-              fontSize="xs"
+              bg={roleColors[user.role]?.bg || "gray.200"}
+              color={roleColors[user.role]?.color || "white"}
+              borderRadius="6px"
+              px="6px"
+              py="2px"
+              fontSize="14px"
+              fontStyle="normal"
+              fontWeight="400"
+              lineHeight="16px"
+              textTransform={
+                user.role === "viewer" || user.role === "master"
+                  ? "capitalize"
+                  : "uppercase"
+              }
             >
               {user.role}
             </Badge>
           </Flex>
 
-          <Text
-            fontWeight="500"
-            fontSize="25px"
-            mb={2}
-          >
-            New Role
-          </Text>
-          <Select
-            borderRadius="14px"
-            bg="#F9FAFB"
-            value={selectedRole}
-            _focus={{ borderColor: "gray.300" }}
-            onChange={(e) => setSelectedRole(e.target.value)}
-            size="lg"
-            fontSize="20px"
-            fontWeight="400"
-            // maxW="450px"
-            maxH="64px"
-          >
-            <option value="viewer">Viewer - View Only</option>
-            <option value="ccs">Call Center Staff - Book appointments</option>
-            <option value="ccm">Call Center Manager - Full Access</option>
-          </Select>
+          <Flex justify="flex-end">
+            {!isDeleteOpen && (
+            <Text
+              color="#90080F"
+              fontWeight="400"
+              fontSize="14px"
+              mt={1}
+              cursor="pointer"
+              onClick={() => setIsDeleteOpen(true)}
+            >
+              Delete User
+            </Text>)}
+          </Flex>
+          {isDeleteOpen ? (
+            <Box my={4}>
+              <Text fontSize="14px">
+                Type{" "}
+                <Text
+                  as="span"
+                  color="#90080F"
+                >
+                  ‘Delete’
+                </Text>{" "}
+                to confirm
+              </Text>
+
+              <Input
+                placeholder="type ‘Delete’"
+                value={deleteInput}
+                onChange={(e) => setDeleteInput(e.target.value)}
+                bg="#F9FAFB"
+                borderRadius="12px"
+                h="41px"
+                mt={2}
+              />
+
+            </Box>
+          ) : (
+            <>
+              <Text
+                color="rgba(0, 0, 0, 0.50)"
+                fontWeight="400"
+                fontSize="14px"
+                mb={2}
+              >
+                Change Role
+              </Text>
+              <Box mb={36}>
+                <Menu matchWidth>
+                  <MenuButton
+                    as={Button}
+                    rightIcon={<ChevronDownIcon />}
+                    bg="#F9FAFB"
+                    border="none"
+                    borderWidth="0"
+                    outline="none"
+                    boxShadow="none"
+                    borderRadius="6px"
+                    h="50px"
+                    px="16px" 
+                    w="343px"
+                    fontWeight="400"
+                    fontStyle="normal"
+                    fontSize="12px"
+                    lineHeight="100%"
+                    letterSpacing="-0.04em"
+                    textAlign="left"
+                    _hover={{ bg: "#F9FAFB" }}
+                    _active={{ bg: "#F9FAFB" }}
+                  > 
+
+                    {selectedRoleLabel}
+                  </MenuButton>
+
+                  <MenuList
+                    bg="#F9FAFB"
+                    border="none"
+                    borderRadius="6px"
+                    p="8px"
+                  >
+                    {roleOptions.map((role) => (
+                      <MenuItem
+                        key={role.value}
+                        bg="#F9FAFB"
+                        onClick={() => setSelectedRole(role.value)}
+                        borderRadius="8px"
+                        px="12px" 
+                        py="12px"
+                        fontWeight="400"
+                        fontStyle="normal"
+                        fontSize="12px"
+                        lineHeight="100%"
+                        letterSpacing="-0.04em"
+                        _hover={{ bg: "#F3F4F6" }}
+                      >
+                        {role.label}
+                      </MenuItem>
+                    ))}
+                  </MenuList>
+                </Menu>
+              </Box>
+
+              <Flex
+                align="center"
+                mt={5}
+              >
+                <input
+                  type="checkbox"
+                  defaultChecked
+                />
+                <Text
+                  ml={2}
+                  color="#00000080"
+                >
+                  Notify user via email
+                </Text>
+              </Flex>
+            </>
+          )}
         </ModalBody>
 
-        <ModalFooter px={4}>
+        <ModalFooter py={0}>
           <Flex
             width="75%"
-            px={2}
           >
             <Button
               fontWeight="400"
-              fontSize="20px"
+              fontSize="14px"
               variant="outline"
               border="1px"
-              borderRadius="14px"
+              borderRadius="6px"
               borderColor="#00000026"
               mr={3}
               onClick={onClose}
               flex="1"
               maxW="181px"
-              py={4}
-              h="auto"
-              bg="#F9FAFB"
+              px="30px"
+              py="10px"
+              h="41px"
+              bg="#FFFFFF"
             >
               Cancel
             </Button>
-
-            <Button
-              fontWeight="400"
-              fontSize="20px"
-              colorScheme="blackAlpha"
-              bg="black"
-              color="white"
-              borderRadius="14px"
-              flex="1"
-              maxW="181px"
-              py={4}
-              h="auto"
-              onClick={async () => {
-                onApprove();
-              }}
-              _hover={{ bg: "gray.800" }}
-            >
-              Approve
-            </Button>
+            {isDeleteOpen ? (
+              <>
+                <Button
+                  fontWeight="400"
+                  fontSize="14px"
+                  colorScheme="blackAlpha"
+                  bg="#90080F"
+                  color="white"
+                  borderRadius="6px"
+                  flex="1"
+                  maxW="181px"
+                  px="30px"
+                  py="10px"
+                  h="41px"
+                  onClick={async () => {
+                    onDelete();
+                  }}
+                  _hover={{ bg: "#A50F15" }}
+                  isDisabled={deleteInput !== "Delete"}
+                >
+                  Delete
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  fontWeight="400"
+                  fontSize="14px"
+                  colorScheme="blackAlpha"
+                  bg="#0C824D"
+                  color="white"
+                  borderRadius="6px"
+                  flex="1"
+                  maxW="181px"
+                  px="30px"
+                  py="10px"
+                  h="41px"
+                  onClick={async () => {
+                    onApprove();
+                  }}
+                  _hover={{ bg: "#0C824D" }}
+                >
+                  Confirm
+                </Button>
+              </>
+            )}
           </Flex>
         </ModalFooter>
       </ModalContent>
