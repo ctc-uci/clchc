@@ -51,6 +51,9 @@ export function Settings() {
             h="280px"
             // name={`${dbUser?.firstName} ${dbUser?.lastName}`}
             src={currentUser?.photoURL}
+            css={{
+            imageRendering: "-webkit-optimize-contrast",
+          }}
           />
           <Text
             fontWeight="bold"
@@ -64,7 +67,7 @@ export function Settings() {
             fontWeight="semibold"
             fontSize="24px"
             textAlign="center"
-            paddingTop="32px"
+            paddingTop="15px"
           >
             {dbUser?.email}
           </Text>
@@ -92,9 +95,10 @@ export function Settings() {
         </GridItem>
         <GridItem
           bg="white"
-          p="1.5em"
+          p="1em"
+          ml="45px"
           borderColor="gray.200"
-          marginBottom="60px"
+          marginBottom="30px"
         >
           <PersonalInfo />
         </GridItem>
@@ -103,10 +107,10 @@ export function Settings() {
           <>
             <GridItem
               bg="white"
-              p="1.5em"
+              p="1em"
               borderColor="gray.200"
               ml="80px"
-              marginBottom="60px"
+              marginBottom="30px"
             >
               <Text
                 fontWeight="bold"
@@ -125,7 +129,8 @@ export function Settings() {
             </GridItem>
             <GridItem
               bg="white"
-              p="1.5em"
+              p="1em"
+              ml="45px"
               borderColor="gray.200"
             >
               <QuotaCalcFactor />
@@ -137,7 +142,7 @@ export function Settings() {
 
         <GridItem
           bg="white"
-          p="1.5em"
+          p="1em"
           ml="80px"
         >
           <Text
@@ -156,7 +161,8 @@ export function Settings() {
         </GridItem>
         <GridItem
           bg="white"
-          p="1.5em"
+          p="1em"
+          ml="45px"
         >
           <SignOutSection />
         </GridItem>

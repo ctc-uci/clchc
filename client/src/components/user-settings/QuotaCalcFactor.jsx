@@ -83,7 +83,7 @@ export default function QuotaCalcFactor() {
 
   return (
     <>
-      <FormControl maxW="300px">
+      <FormControl>
         <FormLabel
           fontWeight="semibold"
           fontSize="16px"
@@ -104,6 +104,7 @@ export default function QuotaCalcFactor() {
             border={isEditMode ? "1px solid" : "none"}
             borderColor={isEditMode ? "blue.400" : "transparent"}
             transition="all 0.15s"
+            width="275px"
           />
           <IconButton
             icon={
