@@ -1,11 +1,11 @@
 import { Card, CardBody, CardHeader, Text } from "@chakra-ui/react";
 
-export const CustomCard = ({ title, body, footer, footerUnderline, footerColor, height, width }) => {
+export const CustomCard = ({ title, body, footer, footerUnderline, footerColor, height, width, flex }) => {
   return (
     <Card
       w={width}
       h={height}
-      flexShrink={0}
+      flex={flex}
       borderWidth="1px"
       borderColor="gray.200"
       borderRadius="lg"
@@ -29,10 +29,11 @@ export const CustomCard = ({ title, body, footer, footerUnderline, footerColor, 
       <CardBody py={0}>
         <Text
           fontSize="30.68px"
-          fontWeight="medium"
-          color="gray.900"
-          lineHeight="1"
-          letterSpacing="-0.04em"
+          fontWeight="500"
+          color="#000"
+          lineHeight="normal"
+          fontStyle={"normal"}
+          letterSpacing="-1.23px"
         >
           {body}
         </Text>

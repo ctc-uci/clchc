@@ -62,40 +62,14 @@ export const VersionLogPage = () => {
   };
 
   return (
-    <Box
-      px={{ base: 4, md: 10 }}
-      py={{ base: 4, md: 6 }}
-      maxW="1440px"
-      mx="auto"
-    >
-      {/* <HStack
-        spacing={3}
-        align="center"
-        mb={6}
-      >
-        <Heading
-          as="h1"
-          size="lg"
-          fontWeight="500"
-          color="#111111"
-        >
-          Audit Log
-        </Heading>
-        {role && (
-          <Badge
-            bg="#5B4761"
-            color="white"
-            borderRadius="8px"
-            px={3}
-            py={1}
-            fontSize="18px"
-            fontWeight="500"
-            textTransform="capitalize"
-          >
-            {role}
-          </Badge>
-        )}
-      </HStack> */}
+    <Box p={6}>
+      <Flex align="center" justify="space-between" mb={6} h="45px">
+        <PageHeader
+          title="Audit Log"
+          role={role}
+          isLoading={roleLoading}
+        />
+      </Flex>
 
       <HStack
         spacing={{ base: 3, md: 6 }}

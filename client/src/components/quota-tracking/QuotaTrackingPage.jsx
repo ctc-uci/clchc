@@ -192,6 +192,7 @@ export const QuotaTracking = () => {
       <Flex
         gap={4}
         mb={6}
+        w="100%"
       >
           {isLoading ? (
             <>
@@ -205,29 +206,29 @@ export const QuotaTracking = () => {
               <CustomCard
                 title="Total Progress"
                 body={`${stats.totalProgress}/${stats.totalQuota}`}
-                height="172.83px"
-                width="337px"
+                height="172.826px"
+                flex={1}
               />
               <CustomCard
                 title="Completion Rate"
                 body={`${stats.rate}%`}
                 footer="Overall progress"
-                height="172.83px"
-                width="337px"
+                height="172.826px"
+                flex={1}
               />
               <CustomCard
                 title="Active Providers"
                 body={stats.activeProviders.toString()}
                 footer={`${stats.differentLocations} locations`}
-                height="172.83px"
-                width="337px"
+                height="172.826px"
+                flex={1}
               />
               <CustomCard
                 title="Needs Attention"
                 body={stats.needsAttention.toString()}
                 footer=""
-                height="172.83px"
-                width="337px"
+                height="172.826px"
+                flex={1}
               />
             </>
           )}
