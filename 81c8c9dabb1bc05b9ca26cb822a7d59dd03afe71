@@ -1,0 +1,25 @@
+client/src/contexts/BackendContext.tsx
+  a1dc5e9c5bfa0c61 6,22-28
+server/src/middleware.ts
+  a1dc5e9c5bfa0c61 17-21,25,67-71,77
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "81c8c9dabb1bc05b9ca26cb822a7d59dd03afe71",
+  "prompts": {
+    "a1dc5e9c5bfa0c61": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9ebd58c9-ef30-49dd-842d-97383eb039f6",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Brendan Lieu",
+      "messages": [],
+      "total_additions": 22,
+      "total_deletions": 4,
+      "accepted_lines": 22,
+      "overriden_lines": 0
+    }
+  }
+}
