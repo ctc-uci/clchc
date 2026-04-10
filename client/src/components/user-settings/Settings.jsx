@@ -25,7 +25,8 @@ export function Settings() {
       display="flex"
       alignItems="center"
       justifyContent="center"
-      py="80px"
+      py="40px"
+      px="40px"
     >
       <Grid
         templateColumns="300px 1fr 1fr"
