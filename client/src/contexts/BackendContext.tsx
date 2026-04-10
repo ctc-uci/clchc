@@ -3,6 +3,7 @@ import { createContext, ReactNode } from "react";
 import axios, { AxiosInstance } from "axios";
 
 import { authInterceptor } from "../utils/auth/authInterceptor";
+import { auth } from "../utils/auth/firebase";
 
 const baseURL = import.meta.env.VITE_BACKEND_HOSTNAME;
 
@@ -16,6 +17,15 @@ export const BackendProvider = ({ children }: { children: ReactNode }) => {
   const backend = axios.create({
     baseURL,
     withCredentials: true,
+  });
+
+  backend.interceptors.request.use(async (config) => {
+    const user = auth.currentUser;
+    if (user) {
+      const token = await user.getIdToken();
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
   });
 
   authInterceptor(backend);

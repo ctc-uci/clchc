@@ -14,11 +14,15 @@ export const verifyToken = async (
   try {
     const { cookies } = req;
 
-    if (!cookies.accessToken) {
+    const token =
+      cookies.accessToken ??
+      req.headers.authorization?.replace("Bearer ", "");
+
+    if (!token) {
       return res.status(400).send("@verifyToken invalid access token");
     }
 
-    const decodedToken = await admin.auth().verifyIdToken(cookies.accessToken);
+    const decodedToken = await admin.auth().verifyIdToken(token);
 
     // this should not happen!
     if (!decodedToken) {
@@ -60,13 +64,17 @@ export const verifyRole = (requiredRole: string | string[]) => {
       const { cookies } = req;
       const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
 
-      if (!cookies.accessToken) {
+      const token =
+        cookies.accessToken ??
+        req.headers.authorization?.replace("Bearer ", "");
+
+      if (!token) {
         return res.status(400).send("@verifyToken invalid access token");
       }
 
       const decodedToken: DecodedIdToken =
         res.locals.decodedToken ??
-        (await admin.auth().verifyIdToken(cookies.accessToken));
+        (await admin.auth().verifyIdToken(token));
 
       const users = await db.query(
         "SELECT * FROM users WHERE firebase_uid = $1 LIMIT 1",
