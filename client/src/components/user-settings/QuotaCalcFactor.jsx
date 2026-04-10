@@ -105,6 +105,7 @@ export default function QuotaCalcFactor() {
             borderColor={isEditMode ? "blue.400" : "transparent"}
             transition="all 0.15s"
             width="275px"
+            borderRadius="4px"
           />
           <IconButton
             icon={

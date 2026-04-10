@@ -94,6 +94,7 @@ export default function SignOutSection() {
           px="2em"
           justifyContent="center"
           display="flex"
+          borderRadius="6px"
         >
           Sign Out
         </Button>

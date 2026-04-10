@@ -40,7 +40,10 @@ export function LocationDropdown({ locationId, setLocationId, isLocked }) {
       w="50%"
       isDisabled={isLocked}
     >
-      <FormLabel>Location</FormLabel>
+      <FormLabel
+        fontSize="14px"
+        color="#113D64"
+      >Location</FormLabel>
       {isLocked ? (
         <InputGroup>
           <Box
@@ -50,6 +53,7 @@ export function LocationDropdown({ locationId, setLocationId, isLocked }) {
             borderRadius="6px"
             px={3}
             py={2}
+            fontSize="14px"
             pr="2.25rem"
             bg="gray.50"
             color="gray.500"

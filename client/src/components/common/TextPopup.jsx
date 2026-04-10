@@ -23,9 +23,8 @@ const TextPopup = ({ text = "", alwaysShowPopup = false, truncateAt }) => {
           <Text
             isTruncated
             textDecoration="underline"
-            textUnderlineOffset="3px"
-            color="gray.600"
             noOfLines={1}
+            color="#718096"
           >
             {text}
           </Text>
@@ -33,10 +32,10 @@ const TextPopup = ({ text = "", alwaysShowPopup = false, truncateAt }) => {
       </PopoverTrigger>
       <Portal>
         <PopoverContent
-          bg="blackAlpha.500"
+          bg="blackAlpha.900"
           maxW="300px"
         >
-          <PopoverArrow bg="blackAlpha.500" />
+          <PopoverArrow bg="blackAlpha.900" />
           <PopoverBody>
             <Text
               whiteSpace="pre-wrap"

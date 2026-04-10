@@ -27,6 +27,7 @@ export function Settings() {
       justifyContent="center"
       py="40px"
       px="40px"
+      backgroundColor="#F9F9F9"
     >
       <Grid
         templateColumns="300px 1fr 1fr"
@@ -34,10 +35,10 @@ export function Settings() {
         templateRows="auto auto auto"
         mx="auto"
         minH="520px"
+        backgroundColor="#F9F9F9"
       >
         <GridItem
           rowSpan={dbUser?.role === "master" || dbUser?.role === "ccm" ? 3 : 2}
-          bg="white"
           p="2em"
           display="flex"
           flexDirection="column"
@@ -75,7 +76,6 @@ export function Settings() {
         </GridItem>
 
         <GridItem
-          bg="white"
           p="1.5em"
           borderColor="gray.200"
           ml="80px"
@@ -95,7 +95,6 @@ export function Settings() {
           </Text>
         </GridItem>
         <GridItem
-          bg="white"
           p="1em"
           ml="45px"
           borderColor="gray.200"
@@ -107,7 +106,6 @@ export function Settings() {
         {dbUser?.role === "master" || dbUser?.role === "ccm" ? (
           <>
             <GridItem
-              bg="white"
               p="1em"
               borderColor="gray.200"
               ml="80px"
@@ -129,7 +127,6 @@ export function Settings() {
               </Text>
             </GridItem>
             <GridItem
-              bg="white"
               p="1em"
               ml="45px"
               borderColor="gray.200"
@@ -142,7 +139,6 @@ export function Settings() {
         )}
 
         <GridItem
-          bg="white"
           p="1em"
           ml="80px"
         >
@@ -161,7 +157,6 @@ export function Settings() {
           </Text>
         </GridItem>
         <GridItem
-          bg="white"
           p="1em"
           ml="45px"
         >
