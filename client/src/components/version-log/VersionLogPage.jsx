@@ -2,14 +2,17 @@ import { useState, useEffect } from "react";
 import { SearchIcon } from "@chakra-ui/icons";
 import {
   Box,
-  Flex,
+  Badge,
+  Heading,
   Input,
   InputGroup,
   InputLeftElement,
   HStack,
 } from "@chakra-ui/react";
 
+ HEAD
 import { PageHeader } from "@/components/common/PageHeader";
+
 import VersionLogTable from "@/components/version-log/VersionLogTable";
 import { useVersionLogs } from "@/contexts/hooks/data-fetching/useVersionLogs";
 import { useUserContext } from "@/contexts/hooks/useUserContext";
@@ -70,11 +73,10 @@ export const VersionLogPage = () => {
           isLoading={roleLoading}
         />
       </Flex>
-
       <HStack
         spacing={{ base: 3, md: 6 }}
         align="stretch"
-        mb={5}
+        mb={3}
       >
         <InputGroup flex="1">
           <InputLeftElement pointerEvents="none">
