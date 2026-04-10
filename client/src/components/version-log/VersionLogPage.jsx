@@ -81,6 +81,7 @@ export const VersionLogPage = () => {
             <SearchIcon color="gray.400" />
           </InputLeftElement>
           <Input
+            backgroundColor="white"
             placeholder="Search Providers"
             borderRadius="md"
             h="45px"

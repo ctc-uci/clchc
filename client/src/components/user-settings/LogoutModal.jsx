@@ -1,17 +1,13 @@
-import React, { useEffect, useState } from "react";
-
 import {
   Button,
   Grid,
   HStack,
   Modal,
   ModalBody,
-  ModalCloseButton,
   ModalContent,
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Text,
 } from "@chakra-ui/react";
 
 import { useAuthContext } from "@/contexts/hooks/useAuthContext";
@@ -20,7 +16,6 @@ import { useUserContext } from "@/contexts/hooks/useUserContext";
 export default function LogoutModal({ isOpen, onClose }) {
   const { role } = useUserContext();
   const { logout } = useAuthContext();
-  const [userInfo] = useState();
   const handleLogout = () => logout();
 
   return (
