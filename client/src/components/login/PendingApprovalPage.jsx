@@ -17,8 +17,11 @@ export const PendingApprovalPage = () => {
 
   return (
     <Box
-      my={64}
-      mx={12}
+      h="100vh"
+      overflow="hidden"
+      display="flex"
+      alignItems="center"
+      justifyContent="center"
     >
       <VStack
         spacing={6}
