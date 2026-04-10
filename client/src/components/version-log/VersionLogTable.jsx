@@ -1,7 +1,6 @@
 import React from "react";
 
 import {
-  Box,
   Skeleton,
   Table,
   TableContainer,
@@ -18,55 +17,54 @@ const SkeletonRows = () => {
   return (
     <>
       {Array.from({ length: 5 }, (_, i) => (
-        <Tr key={i}>
-          <Td>
-            <Skeleton height="30px" />
-          </Td>
-          <Td>
-            <Box
-              display="flex"
-              flexDirection="row"
-              gap={2}
+        <Tr
+          key={i}
+          borderBottom="1px solid"
+          borderColor="gray.200"
+        >
+          {Array.from({ length: 4 }, (_, j) => (
+            <Td
+              key={j}
+              borderRight="1px solid"
+              borderColor="gray.200"
             >
-              <Skeleton
-                height="30px"
-                width="40%"
-              />
-              <Skeleton
-                height="30px"
-                width="25%"
-              />
-            </Box>
-          </Td>
-          <Td>
-            <Skeleton height="30px" />
-          </Td>
-          <Td>
-            <Skeleton
-              height="30px"
-              width="50%"
-            />
-          </Td>
-          <Td>
-            <Box
-              display="flex"
-              flexDirection="column"
-              gap="2px"
-            >
-              <Skeleton height="15px" />
-              <Skeleton
-                height="10px"
-                width="80%"
-              />
-            </Box>
-          </Td>
-          <Td>
-            <Skeleton height="30px" />
-          </Td>
+              <Skeleton height="40px" />
+            </Td>
+          ))}
         </Tr>
       ))}
     </>
   );
+};
+
+const thProps = {
+  fontFamily: "Inter",
+  fontSize: "12px",
+  fontStyle: "normal",
+  fontWeight: "700",
+  lineHeight: "16px",
+  letterSpacing: "0.6px",
+  padding: "15px 25px 15px 25px",
+  backgroundColor: "#C8D4E6",
+  color: "#113D64",
+  borderRight: "1px solid",
+  borderColor: "gray.200",
+};
+
+const tdProps = {
+  borderRight: "1px solid",
+  borderColor: "gray.200",
+  padding: "16px 24px",
+  gap: "10px",
+};
+
+const tdTextProps = {
+  fontFamily: "Lato",
+  fontSize: "14px",
+  fontStyle: "normal",
+  fontWeight: "500",
+  lineHeight: "20px",
+  color: "#2D3748",
 };
 
 const VersionLogTable = ({ loading, logs }) => {
@@ -83,37 +81,37 @@ const VersionLogTable = ({ loading, logs }) => {
         overflowY="auto"
       >
         <Table
-          size="sm"
-          sx={{ tableLayout: "fixed" }}
+          sx={{
+            "tbody tr:nth-of-type(even)": { bg: "#F9F9F9" },
+            "tbody tr:nth-of-type(odd)": { bg: "white" },
+          }}
         >
           <Thead
-            bg="#EBEBEB"
             position="sticky"
             top={0}
-            h="60px"
             zIndex={1}
+            h="40px"
           >
             <Tr>
-              <Th width="20%">Editor</Th>
-              <Th width="15%">Action</Th>
-              <Th width="15%">Date</Th>
-              <Th width="15%">Time</Th>
-              <Th width="17.5%">Provider</Th>
-              <Th width="17.5%">Quota Created</Th>
+              <Th {...thProps}>Editor</Th>
+              <Th {...thProps}>Action</Th>
+              <Th {...thProps}>Date & Time</Th>
+              <Th {...thProps} borderRight="none">Provider</Th>
             </Tr>
           </Thead>
 
           <Tbody>
             {!loading && logs.length === 0 && (
               <Tr>
-                <Td colSpan={6}>
-                  <Text
-                    textAlign="center"
-                    py={6}
-                    color="gray.500"
-                  >
-                    No version history available
-                  </Text>
+                <Td
+                  colSpan={4}
+                  py="40px"
+                  textAlign="center"
+                  color="gray.400"
+                  fontFamily="Inter"
+                  fontSize="14px"
+                >
+                  No version history available
                 </Td>
               </Tr>
             )}
@@ -122,77 +120,61 @@ const VersionLogTable = ({ loading, logs }) => {
               <SkeletonRows />
             ) : (
               logs.map((entry) => {
-                const log_d = new Date(entry.timestamp);
+                const logDate = new Date(entry.timestamp);
 
-                const log_date = log_d.toLocaleDateString("en-US", {
+                const formattedDate = logDate.toLocaleDateString("en-US", {
                   month: "2-digit",
                   day: "2-digit",
                   year: "numeric",
                 });
 
-                const log_time = log_d.toLocaleTimeString("en-US", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  hour12: false,
-                });
-
-                const quota_d = new Date(entry.date);
-
-                const quota_date = quota_d.toLocaleDateString("en-US", {
-                  month: "2-digit",
-                  day: "2-digit",
-                  year: "numeric",
-                });
+                const formattedTime = logDate
+                  .toLocaleTimeString("en-US", {
+                    hour: "numeric",
+                    minute: "2-digit",
+                    hour12: true,
+                  })
+                  .toLowerCase();
 
                 return (
                   <Tr
                     key={entry.id}
-                    _hover={{ bg: "gray.50" }}
+                    borderBottom="1px solid"
+                    borderColor="gray.200"
+                    cursor="default"
                   >
-                    <Td>
-                      {entry.firstName} {entry.lastName}
+                    <Td {...tdProps}>
+                      <Text {...tdTextProps}>
+                        {entry.firstName} {entry.lastName}
+                      </Text>
                     </Td>
-
-                    <Td fontWeight="medium">
+                    <Td {...tdProps}>
                       {entry.action === "increment" && (
-                        <>
+                        <Text {...tdTextProps}>
                           Quota{" "}
-                          <Text
-                            as="span"
-                            color="green.500"
-                          >
+                          <Text as="span" color="#2F9E5B" fontWeight="600">
                             +{entry.delta}
                           </Text>
-                        </>
+                        </Text>
                       )}
                       {entry.action === "decrement" && (
-                        <>
+                        <Text {...tdTextProps}>
                           Quota{" "}
-                          <Text
-                            as="span"
-                            color="red.500"
-                          >
+                          <Text as="span" color="#D64545" fontWeight="600">
                             {entry.delta}
                           </Text>
-                        </>
+                        </Text>
                       )}
                     </Td>
-
-                    <Td color="gray.600">{log_date}</Td>
-                    <Td color="gray.600">{log_time}</Td>
-
-                    <Td fontWeight="medium">
-                      {entry.providerData["Name"]}
-                      <Text
-                        fontWeight="normal"
-                        color="gray.500"
-                      >
-                        {entry.providerData["Office Hours"]}
+                    <Td {...tdProps}>
+                      <Text {...tdTextProps}>
+                        {formattedDate} {formattedTime}
                       </Text>
-                      {/* TODO: We should really camel case the jsonb data keys. */}
                     </Td>
+                    <Td {...tdProps}>
+                      <Text {...tdTextProps}>{entry.providerName}</Text>
 
-                    <Td color="gray.600">{quota_date}</Td>
+                    </Td>
                   </Tr>
                 );
               })

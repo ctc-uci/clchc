@@ -1,10 +1,11 @@
 import { keysToCamel } from "@/common/utils";
 import { db } from "@/db/db-pgp";
 import { Router } from "express";
+import { verifyToken, verifyRole } from "@/middleware";
 
 export const versionLogRouter = Router();
 
-versionLogRouter.post("/", async (req, res) => {
+versionLogRouter.post("/", verifyRole("ccs"), async (req, res) => {
   try {
     const { userId, quotaId, action, delta } = req.body;
 
@@ -27,7 +28,7 @@ versionLogRouter.post("/", async (req, res) => {
   }
 });
 
-versionLogRouter.get("/", async (req, res) => {
+versionLogRouter.get("/", verifyRole("ccm"), async (req, res) => {
   try {
     const versionLogs = await db.query(
       `SELECT * FROM version_log ORDER BY id ASC`
@@ -39,7 +40,7 @@ versionLogRouter.get("/", async (req, res) => {
   }
 });
 
-versionLogRouter.get("/details", async (req, res) => {
+versionLogRouter.get("/details", verifyRole("ccm"), async (req, res) => {
   const { q, date } = req.query;
 
   try {
@@ -53,7 +54,7 @@ versionLogRouter.get("/details", async (req, res) => {
         (
           "users".first_name ILIKE $${values.length} OR
           "users".last_name ILIKE $${values.length} OR
-          providers.data->>'Name' ILIKE $${values.length}
+          providers.name ILIKE $${values.length}
         )
       `);
     }
@@ -82,7 +83,7 @@ versionLogRouter.get("/details", async (req, res) => {
         quota.end_time AS time,
         "users".first_name,
         "users".last_name,
-        providers.data AS provider_data
+        providers.name AS provider_name
       FROM version_log
       JOIN quota ON version_log.quota_id = quota.id
       JOIN "users" ON version_log.user_id = "users".id
@@ -99,7 +100,7 @@ versionLogRouter.get("/details", async (req, res) => {
   }
 });
 
-versionLogRouter.get("/:id", async (req, res) => {
+versionLogRouter.get("/:id", verifyRole("ccm"), async (req, res) => {
   try {
     const { id } = req.params;
     const versionLog = await db.query(
@@ -117,7 +118,7 @@ versionLogRouter.get("/:id", async (req, res) => {
   }
 });
 
-versionLogRouter.put("/:id", async (req, res) => {
+versionLogRouter.put("/:id", verifyRole("ccs"), async (req, res) => {
   try {
     const { id } = req.params;
     const { userId, quotaId, action } = req.body;
@@ -141,7 +142,7 @@ versionLogRouter.put("/:id", async (req, res) => {
   }
 });
 
-versionLogRouter.delete("/:id", async (req, res) => {
+versionLogRouter.delete("/:id", verifyRole("ccm"), async (req, res) => {
   try {
     const { id } = req.params;
 

@@ -24,7 +24,7 @@ const ROLE_ORDER = ["Managers", "Staff", "Viewers"];
 // Create new user
 usersRouter.post("/", async (req, res) => {
   try {
-    const { firebaseUid, firstName, lastName, email } = req.body;
+    const { firebaseUid, firstName, lastName, email, photoURL } = req.body;
 
     const existing = await db.query(
       "SELECT * FROM users WHERE firebase_uid = $1",
@@ -40,11 +40,12 @@ usersRouter.post("/", async (req, res) => {
         firebase_uid,
         first_name,
         last_name,
-        email
+        email,
+        photo_url
       )
-      VALUES ($1, $2, $3, $4)
+      VALUES ($1, $2, $3, $4, $5)
       RETURNING *`,
-      [firebaseUid, firstName, lastName, email]
+      [firebaseUid, firstName, lastName, email, photoURL ?? null]
     );
 
     notifyCcmNewUserRequest(`${firstName} ${lastName}`, email);
@@ -56,7 +57,7 @@ usersRouter.post("/", async (req, res) => {
 });
 
 // Get all users w/ optional status filter
-usersRouter.get("/", async (req, res) => {
+usersRouter.get("/", verifyRole("ccm"), async (req, res) => {
   try {
     const { status, user } = req.query;
 
@@ -104,43 +105,43 @@ usersRouter.get("/", async (req, res) => {
 });
 
 // Get statistics of all users
-usersRouter.get("/stats", async (req, res) => {
-  try {
-    const [roleCounts, totalCount] = await db.multi(`
-      SELECT role, COUNT(*)::int AS count
-      FROM users
-      GROUP BY role;
+// usersRouter.get("/stats", verifyToken, verifyRole("ccm"), async (req, res) => {
+//   try {
+//     const [roleCounts, totalCount] = await db.multi(`
+//       SELECT role, COUNT(*)::int AS count
+//       FROM users
+//       GROUP BY role;
 
-      SELECT COUNT(*)::int AS total
-      FROM users;
-    `);
+//       SELECT COUNT(*)::int AS total
+//       FROM users;
+//     `);
 
-    if (!roleCounts || !totalCount) {
-      return res.status(404).send("User stats not found");
-    }
+//     if (!roleCounts || !totalCount) {
+//       return res.status(404).send("User stats not found");
+//     }
 
-    const aggregated = {};
-    roleCounts.forEach(({ role, count }) => {
-      const displayRole = ROLE_MAP[role] || role;
-      aggregated[displayRole] = (aggregated[displayRole] || 0) + count;
-    });
+//     const aggregated = {};
+//     roleCounts.forEach(({ role, count }) => {
+//       const displayRole = ROLE_MAP[role] || role;
+//       aggregated[displayRole] = (aggregated[displayRole] || 0) + count;
+//     });
 
-    const byRole = ROLE_ORDER.map((role) => ({
-      role,
-      count: aggregated[role] || 0,
-    }));
+//     const byRole = ROLE_ORDER.map((role) => ({
+//       role,
+//       count: aggregated[role] || 0,
+//     }));
 
-    res.status(200).json({
-      total: totalCount[0].total,
-      byRole,
-    });
-  } catch (err) {
-    res.status(400).send(err.message);
-  }
-});
+//     res.status(200).json({
+//       total: totalCount[0].total,
+//       byRole,
+//     });
+//   } catch (err) {
+//     res.status(400).send(err.message);
+//   }
+// });
 
 // Get user by ID
-usersRouter.get("/:id", async (req, res) => {
+usersRouter.get("/:id", verifyRole("ccm"), async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -184,7 +185,7 @@ usersRouter.get("/firebase/:firebaseUid", async (req, res) => {
 });
 
 // Delete a user by ID, both in Firebase and NPO DB
-usersRouter.delete("/:id", async (req, res) => {
+usersRouter.delete("/:id", verifyRole("ccm"), async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -213,7 +214,7 @@ usersRouter.delete("/:id", async (req, res) => {
 });
 
 // Delete a user by Firebase ID, both in Firebase and NPO DB
-usersRouter.delete("/firebase/:firebaseUid", async (req, res) => {
+usersRouter.delete("/firebase/:firebaseUid", verifyRole("viewer"), async (req, res) => {
   try {
     const { firebaseUid } = req.params;
 
@@ -249,11 +250,8 @@ usersRouter.put(
       status !== undefined ||
       apptCalcFactor !== undefined;
 
-    if (isSensitiveUpdate) {
-      return verifyRole("ccm")(req, res, next);
-    }
-
-    return next();
+    const requiredRole = isSensitiveUpdate ? "ccm" : "viewer";
+    return verifyRole(requiredRole)(req, res, next);
   },
   async (req, res) => {
     try {
@@ -266,6 +264,7 @@ usersRouter.put(
         email,
         status,
         apptCalcFactor,
+        photoURL,
       } = req.body;
 
       const result = await db.query(
@@ -277,8 +276,9 @@ usersRouter.put(
            last_name = COALESCE($4, last_name),
            email = COALESCE($5, email),
            status = COALESCE($6, status),
-           appt_calc_factor = COALESCE($7, appt_calc_factor)
-         WHERE id = $8
+           appt_calc_factor = COALESCE($7, appt_calc_factor),
+           photo_url = COALESCE($8, photo_url)
+         WHERE id = $9
          RETURNING *`,
         [
           firebaseUid,
@@ -288,6 +288,7 @@ usersRouter.put(
           email,
           status,
           apptCalcFactor,
+          photoURL,
           id,
         ]
       );
@@ -319,17 +320,13 @@ usersRouter.put(
       status !== undefined ||
       apptCalcFactor !== undefined;
 
-    if (isSensitiveUpdate) {
-      // run your existing middleware only when needed
-      return verifyRole("ccm")(req, res, next);
-    }
-
-    return next();
+    const requiredRole = isSensitiveUpdate ? "ccm" : "viewer";
+    return verifyRole(requiredRole)(req, res, next);
   },
   async (req, res) => {
     try {
       const { firebaseUid } = req.params;
-      const { role, firstName, lastName, email, status, apptCalcFactor } =
+      const { role, firstName, lastName, email, status, apptCalcFactor, photoURL } =
         req.body;
 
       const result = await db.query(
@@ -340,10 +337,11 @@ usersRouter.put(
            last_name = COALESCE($3, last_name),
            email = COALESCE($4, email),
            status = COALESCE($5, status),
-           appt_calc_factor = COALESCE($6, appt_calc_factor)
-         WHERE firebase_uid = $7
+           appt_calc_factor = COALESCE($6, appt_calc_factor),
+           photo_url = COALESCE($7, photo_url)
+         WHERE firebase_uid = $8
          RETURNING *`,
-        [role, firstName, lastName, email, status, apptCalcFactor, firebaseUid]
+        [role, firstName, lastName, email, status, apptCalcFactor, photoURL ?? null, firebaseUid]
       );
 
       if (!result || result.length === 0) {
@@ -368,17 +366,17 @@ usersRouter.get("/admin/all", verifyRole("ccm"), async (req, res) => {
   }
 });
 
-usersRouter.put("/update/set-role", verifyRole("ccm"), async (req, res) => {
-  try {
-    const { role, firebaseUid } = req.body;
+// usersRouter.put("/update/set-role", verifyRole("ccm"), async (req, res) => {
+//   try {
+//     const { role, firebaseUid } = req.body;
 
-    const user = await db.query(
-      "UPDATE users SET role = $1 WHERE firebase_uid = $2 RETURNING *",
-      [role, firebaseUid]
-    );
+//     const user = await db.query(
+//       "UPDATE users SET role = $1 WHERE firebase_uid = $2 RETURNING *",
+//       [role, firebaseUid]
+//     );
 
-    res.status(200).json(keysToCamel(user));
-  } catch (err) {
-    res.status(400).send(err.message);
-  }
-});
+//     res.status(200).json(keysToCamel(user));
+//   } catch (err) {
+//     res.status(400).send(err.message);
+//   }
+// });

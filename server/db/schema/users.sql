@@ -11,5 +11,6 @@ CREATE TABLE users (
   last_name TEXT NOT NULL,
   email TEXT NOT NULL UNIQUE,
   status status NOT NULL,
-  appt_calc_factor FLOAT
+  appt_calc_factor FLOAT,
+  photo_url TEXT
 );

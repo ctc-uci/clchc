@@ -1,84 +1,141 @@
 import React, { useEffect, useState } from "react";
 
+import { CheckIcon } from "@chakra-ui/icons";
 import {
-  Button,
-  NumberDecrementStepper,
-  NumberIncrementStepper,
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
+  Box,
+  Flex,
+  FormControl,
+  FormLabel,
+  Icon,
+  IconButton,
+  Input,
   Text,
-  VStack,
+  useDisclosure,
 } from "@chakra-ui/react";
 
-import { useAuthContext } from "@/contexts/hooks/useAuthContext";
-import { useBackendContext } from "@/contexts/hooks/useBackendContext";
+import { useUpdateUser } from "@/contexts/hooks/data-fetching/useUsers";
 import { useUserContext } from "@/contexts/hooks/useUserContext";
+import { MdEdit } from "react-icons/md";
+
+import ConfirmationModal from "./ConfirmationModal";
 
 export default function QuotaCalcFactor() {
-  const { backend } = useBackendContext();
-  const { currentUser } = useAuthContext();
-  const { dbUser, refetch } = useUserContext();
+  const userData = useUserContext();
+  const { mutateAsync: updateUser } = useUpdateUser();
+  const dbUser = userData?.dbUser;
+  const refetch = userData?.refetch;
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const [factor, setFactor] = useState(0);
+  const [factor, setFactor] = useState(
+    dbUser?.apptCalcFactor?.toString() || ""
+  );
+  const [isEditMode, setIsEditMode] = useState(false);
 
   useEffect(() => {
-    setFactor(dbUser?.apptCalcFactor ?? 0);
-  }, [dbUser]);
+    setFactor(dbUser?.apptCalcFactor?.toString() || "");
+  }, [dbUser, setFactor]);
 
-  const updateQuota = async (newQuota) => {
-    if (!currentUser?.uid) return;
-    await backend.put(`/users/firebase/${currentUser.uid}`, {
-      apptCalcFactor: newQuota,
-    });
-    await refetch();
+  const handleSave = async () => {
+    if (!dbUser?.id) return false;
+
+    const numericFactor = factor === "" ? 0 : parseFloat(factor);
+
+    if (isNaN(numericFactor)) return false;
+
+    try {
+      await updateUser({
+        id: dbUser.id,
+        data: { apptCalcFactor: numericFactor },
+      });
+      await refetch();
+      setIsEditMode(false);
+      return true;
+    } catch (_error) {
+      return false;
+    }
   };
 
-  const handleClick = async () => {
-    await updateQuota(factor);
+  const handleToggle = () => {
+    if (isEditMode) {
+      onOpen();
+    } else {
+      setIsEditMode(true);
+    }
   };
+
+  const modalPreview = (
+    <Flex
+      align="center"
+      justify="space-between"
+    >
+      <Text fontSize="sm">Quota Calculation Factor</Text>
+      <Box
+        border="1px solid"
+        borderColor="gray.300"
+        borderRadius="md"
+        px={2}
+        py={0.5}
+      >
+        <Text fontSize="sm">{factor || "0"}</Text>
+      </Box>
+    </Flex>
+  );
 
   return (
-    <VStack
-      align="stretch"
-      spacing="2em"
-      backgroundColor="#ddd"
-      borderRadius="1em"
-      padding="1.5em"
-      margin="1.5em"
-    >
-      <Text
-        fontSize={20}
-        fontWeight={"bold"}
-      >
-        Quota Calculation Factor
-      </Text>
+    <>
+      <FormControl>
+        <FormLabel
+          fontWeight="semibold"
+          fontSize="16px"
+        >
+          Calculation Factor
+        </FormLabel>
+        <Flex
+          align="center"
+          gap={2}
+        >
+          <Input
+            type="number"
+            value={factor}
+            onChange={(e) => setFactor(e.target.value)}
+            isReadOnly={!isEditMode}
+            bg={isEditMode ? "white" : "gray.100"}
+            color={isEditMode ? "black" : "#586771"}
+            border={isEditMode ? "1px solid" : "none"}
+            borderColor={isEditMode ? "blue.400" : "transparent"}
+            transition="all 0.15s"
+            width="275px"
+            borderRadius="4px"
+          />
+          <IconButton
+            icon={
+              isEditMode ? (
+                <CheckIcon />
+              ) : (
+                <Icon
+                  as={MdEdit}
+                  boxSize={4}
+                />
+              )
+            }
+            size="sm"
+            variant="ghost"
+            colorScheme="gray"
+            aria-label={
+              isEditMode ? "Save Calculation Factor" : "Edit Calculation Factor"
+            }
+            onClick={handleToggle}
+            flexShrink={0}
+          />
+        </Flex>
+      </FormControl>
 
-      <Text>
-        This value is used to automatically calculate appointment quotas when
-        creating new schedules. Individual quotas can still be overridden.
-      </Text>
-
-      <NumberInput
-        value={Number.isFinite(factor) ? factor : 0}
-        onChange={(_, valueAsNumber) => {
-          setFactor(Number.isFinite(valueAsNumber) ? valueAsNumber : 0);
-        }}
-        bg="gray.100"
-      >
-        <NumberInputField />
-        <NumberInputStepper>
-          <NumberIncrementStepper />
-          <NumberDecrementStepper />
-        </NumberInputStepper>
-      </NumberInput>
-
-      <Button
-        onClick={handleClick}
-        isDisabled={!currentUser?.uid}
-      >
-        Save Changes
-      </Button>
-    </VStack>
+      <ConfirmationModal
+        isOpen={isOpen}
+        onClose={onClose}
+        onConfirm={handleSave}
+        preview={modalPreview}
+      />
+    </>
   );
 }

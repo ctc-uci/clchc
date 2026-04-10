@@ -1,28 +1,55 @@
 import React, { useEffect, useState } from "react";
 
+import { CheckIcon } from "@chakra-ui/icons";
 import {
-  Button,
+  Avatar,
+  Box,
+  Flex,
   FormControl,
   FormLabel,
   Grid,
+  Icon,
+  IconButton,
   Input,
+  Tag,
   Text,
-  VStack,
+  useDisclosure,
 } from "@chakra-ui/react";
 
-import { useAuthContext } from "@/contexts/hooks/useAuthContext";
-import { useBackendContext } from "@/contexts/hooks/useBackendContext";
+import { useUpdateUser } from "@/contexts/hooks/data-fetching/useUsers";
 import { useUserContext } from "@/contexts/hooks/useUserContext";
+import { useAuthContext } from "@/contexts/hooks/useAuthContext";
+import { MdEdit } from "react-icons/md";
+
+import ConfirmationModal from "./ConfirmationModal";
+
+const ROLE_LABELS = {
+  viewer: "Viewer",
+  ccm: "CCM",
+  ccs: "CCS",
+  master: "Master",
+};
 
 export default function PersonalInfo() {
-  const { backend } = useBackendContext();
+  const userData = useUserContext();
   const { currentUser } = useAuthContext();
-  const { dbUser, refetch } = useUserContext();
+  const { mutateAsync: update } = useUpdateUser();
+  const dbUser = userData?.dbUser;
+  const refetch = userData?.refetch;
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [pendingKey, setPendingKey] = useState(null);
 
   const [userInfo, setUserInfo] = useState({
-    firstName: dbUser?.firstName ?? "",
-    lastName: dbUser?.lastName ?? "",
-    email: dbUser?.email ?? "",
+    firstName: "",
+    lastName: "",
+    email: "",
+    role: "",
+  });
+  const [editing, setEditing] = useState({
+    firstName: false,
+    lastName: false,
+    email: false,
+    role: false,
   });
 
   useEffect(() => {
@@ -31,91 +58,165 @@ export default function PersonalInfo() {
         firstName: dbUser.firstName ?? "",
         lastName: dbUser.lastName ?? "",
         email: dbUser.email ?? "",
+        role: dbUser.role ?? "",
       });
     }
   }, [dbUser]);
 
   if (!dbUser) return null;
 
-  const updateUserProp = (key, value) => {
+  const updateUserProp = (key, value) =>
     setUserInfo((prev) => ({ ...prev, [key]: value }));
-  };
 
-  const updateUser = async () => {
+  const handleSave = async () => {
+    if (!dbUser?.id) return false;
+
     try {
-      await backend.put(`/users/firebase/${currentUser.uid}`, {
-        firstName: userInfo.firstName,
-        lastName: userInfo.lastName,
-        email: userInfo.email,
+      await update({
+        id: dbUser.id,
+        data: {
+          firstName: userInfo.firstName,
+          lastName: userInfo.lastName,
+          email: userInfo.email,
+        },
       });
       await refetch();
-      alert("Changes saved successfully.");
-    } catch (e) {
-      console.error("Failed to update user:", e);
+      setEditing((prev) => ({ ...prev, [pendingKey]: false }));
+      return true;
+    } catch (_error) {
+      return false;
     }
   };
 
-  return (
-    <VStack
-      align="stretch"
-      spacing="2em"
-      backgroundColor="#ddd"
-      borderRadius="1em"
-      padding="1.5em"
-      margin="1.5em"
-      h="auto"
+  const toggleEdit = (key) => {
+    if (editing[key]) {
+      setPendingKey(key);
+      onOpen();
+    } else {
+      setEditing((prev) => ({ ...prev, [key]: true }));
+    }
+  };
+
+  const fields = [
+    { label: "First Name", key: "firstName", editable: true },
+    { label: "Last Name", key: "lastName", editable: true },
+    { label: "Email Address", key: "email", editable: false },
+    { label: "Role", key: "role", editable: false },
+  ];
+
+  const modalPreview = (
+    <Flex
+      align="center"
+      gap={3}
     >
-      <FormControl>
+      <Avatar
+        name={`${userInfo?.firstName} ${userInfo?.lastName}`}
+        src={currentUser?.photoURL}
+        size="sm"
+        bg="#FFF"
+        color="black"
+        borderRadius="10px"
+        w="36px"
+        h="36px"
+        fontSize="14px"
+      />
+
+      <Box flex={1}>
         <Text
-          fontSize={20}
-          fontWeight="bold"
+          fontWeight="600"
+          fontSize="14px"
         >
-          Personal Information
+          {userInfo?.firstName} {userInfo?.lastName}
         </Text>
-        <Grid>
-          <FormLabel>First Name</FormLabel>
-          <Input
-            value={userInfo.firstName ?? ""}
-            onChange={(e) => updateUserProp("firstName", e.target.value)}
-            bg="gray.100"
-          />
-        </Grid>
-      </FormControl>
+        <Text
+          fontSize="12px"
+          color="gray.500"
+        >
+          {userInfo?.email}
+        </Text>
+      </Box>
 
-      <FormControl>
-        <Grid>
-          <FormLabel>Last Name</FormLabel>
-          <Input
-            value={userInfo.lastName ?? ""}
-            onChange={(e) => updateUserProp("lastName", e.target.value)}
-            bg="gray.100"
-          />
-        </Grid>
-      </FormControl>
+      <Tag
+        border="1px solid #D1D5DB"
+        borderRadius="8px"
+        px={2}
+        py="2px"
+        fontSize="12px"
+        bg="#F5F5F5"
+      >
+        {ROLE_LABELS[userInfo?.role] || userInfo?.role}
+      </Tag>
+    </Flex>
+  );
 
-      <FormControl>
-        <Grid>
-          <FormLabel>Email Address</FormLabel>
-          <Input
-            value={userInfo.email ?? ""}
-            onChange={(e) => updateUserProp("email", e.target.value)}
-            bg="gray.100"
-          />
-        </Grid>
-      </FormControl>
+  return (
+    <>
+      <Grid
+        templateColumns="1fr 1fr"
+        gap="1em"
+      >
+        {fields.map(({ label, key, editable }) => {
+          const isEditMode = editing[key];
+          return (
+            <FormControl key={key}>
+              <FormLabel
+                fontWeight="semibold"
+                fontSize="16px"
+              >
+                {label}
+              </FormLabel>
+              <Flex
+                align="center"
+                gap={2}
+              >
+                <Input
+                  value={
+                    key === "role"
+                      ? ROLE_LABELS[userInfo[key]] || userInfo[key]
+                      : userInfo[key]
+                  }
+                  onChange={(e) => updateUserProp(key, e.target.value)}
+                  isReadOnly={!isEditMode}
+                  bg={isEditMode ? "white" : "gray.100"}
+                  color={isEditMode ? "black" : "#586771"}
+                  border={isEditMode ? "1px solid" : "none"}
+                  borderColor={isEditMode ? "blue.400" : "transparent"}
+                  transition="all 0.15s"
+                  width="275px"
+                  borderRadius="4px"
+                />
+                {editable && (
+                  <IconButton
+                    icon={
+                      isEditMode ? (
+                        <CheckIcon boxSize={3.5} />
+                      ) : (
+                        <Icon
+                          as={MdEdit}
+                          boxSize={4}
+                        />
+                      )
+                    }
+                    size="sm"
+                    variant="ghost"
+                    colorScheme="gray"
+                    aria-label={isEditMode ? `Save ${label}` : `Edit ${label}`}
+                    onClick={() => toggleEdit(key)}
+                    flexShrink={0}
+                  />
+                )}
+              </Flex>
+            </FormControl>
+          );
+        })}
+      </Grid>
 
-      <FormControl>
-        <Grid>
-          <FormLabel>Role</FormLabel>
-          <Input
-            value={userInfo.role ?? ""}
-            readOnly
-            bg="gray.100"
-          />
-        </Grid>
-      </FormControl>
-
-      <Button onClick={updateUser}>Apply changes</Button>
-    </VStack>
+      <ConfirmationModal
+        isOpen={isOpen}
+        onClose={onClose}
+        onConfirm={handleSave}
+        preview={modalPreview}
+      />
+    </>
   );
 }

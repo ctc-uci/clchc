@@ -112,10 +112,11 @@ export const Login = () => {
         sx={{ width: 500, marginX: "auto" }}
       >
         <Image
-          src="/clchc-logo.webp"
+          src="/clchc-logo.png"
           alt="Celebrating Life Community Health Center"
-          maxW="600px"
-          mb={16}
+          maxW="705px"
+          maxH="266px"
+          mb={14}
         />
 
         <Button
@@ -123,29 +124,32 @@ export const Login = () => {
           bg="white"
           border="1px solid #DADCE0"
           boxShadow="lg"
-          size={"lg"}
           onClick={handleGoogleLogin}
-          w="50%"
+          w="306px"
+          h="auto"
+          minH="34.33px"
+          borderRadius="6.36px"
+          px="9.54px"
+          gap="9.54px"
           justifyContent="flex-start"
         >
           <Image
             src="/google.svg"
             alt="Google"
-            boxSize="18px"
-            mr={4}
+            boxSize="16px"
           />
           <Text
-            fontSize="md"
-            fontWeight="medium"
-            color="#3C4043"
+            fontSize="12.71px"
+            fontWeight="500"
+            color="#0000008A"
           >
             Sign in with Google
           </Text>
         </Button>
         <Text
-          fontSize="sm"
+          fontSize="16px"
           color="#696969"
-          fontWeight="semibold"
+          fontWeight="700"
           textAlign="center"
         >
           Please use your @clchc.org email address to sign in

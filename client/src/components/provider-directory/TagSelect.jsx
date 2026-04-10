@@ -225,29 +225,34 @@ const TagSelect = ({
       spacing={2}
       align="stretch"
     >
-      <HStack
-        spacing={1}
-        wrap="wrap"
-      >
-        {Array.isArray(selectedTags) &&
-          selectedTags.map((tagId) => {
+      {Array.isArray(selectedTags) && selectedTags.length > 0 && (
+        <HStack spacing={1} wrap="wrap">
+          {selectedTags.map((tagId) => {
             if (!tagId) return null;
             return (
-              <Tag
-                size="md"
-                key={tagId}
-                borderRadius="full"
-                variant="solid"
-                backgroundColor="black"
+              <Tag 
+                size="md" 
+                key={tagId} 
+                variant="solid" 
+                backgroundColor="black" 
+                borderRadius={"4px"}
+                gap={"6px"}
+                padding={"5px 8px"}
+                // minH={"30px"}
+                color={"#FFF"}
+                fontFamily={"Inter"}
+                fontSize={"14px"}
+                fontStyle={"normal"}
+                fontWeight={"500"}
+                lineHeight={"16px"}
               >
                 <TagLabel>{tagsMap[tagId]?.tagValue || ""}</TagLabel>
-                {!readOnly && (
-                  <TagCloseButton onClick={handleRemoveTag(tagId)} />
-                )}
+                {!readOnly && <TagCloseButton onClick={handleRemoveTag(tagId)} />}
               </Tag>
             );
           })}
-      </HStack>
+        </HStack>
+      )}
 
       <Menu
         closeOnSelect={false}
@@ -257,13 +262,22 @@ const TagSelect = ({
           as={Button}
           variant="outline"
           w="100%"
+          // w="172px"
           justifyContent="flex-start"
           textAlign="left"
-          fontWeight="normal"
-          rightIcon={<ChevronDown />}
+          rightIcon={<ChevronDown size={(20)}/>}
           isDisabled={readOnly}
+          color={"var(--gray-700, #2D3748)"}
+          fontFamily={"Inter"}
+          fontSize={"14px"}
+          fontWeight={"400"}
+          lineHeight={"20px"}
+          fontStyle={"normal"}
+          borderRadius={"4px"}
+          border={"1px solid var(--gray-200, #E2E8F0)"}
+          background={"var(--white, #FFF)"}
         >
-          Select Tags
+          Select
         </MenuButton>
 
         <MenuList

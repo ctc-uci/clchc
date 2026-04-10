@@ -19,7 +19,7 @@
     "preview": "vite preview --host 0.0.0.0",
     "test": "vitest --run",
     "test:watch": "vitest",
-    "postinstall": "patch-package"
+    "postinstall": "node -e \"const {spawnSync}=require('child_process');const script=require.resolve('patch-package/dist/index.js');const result=spawnSync(process.execPath,[script],{stdio:'inherit'});process.exit(result.status ?? 1);\""
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.2.4",

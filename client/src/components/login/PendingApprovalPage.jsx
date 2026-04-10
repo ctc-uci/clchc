@@ -17,8 +17,11 @@ export const PendingApprovalPage = () => {
 
   return (
     <Box
-      my={64}
-      mx={12}
+      h="100vh"
+      overflow="hidden"
+      display="flex"
+      alignItems="center"
+      justifyContent="center"
     >
       <VStack
         spacing={6}
@@ -27,44 +30,43 @@ export const PendingApprovalPage = () => {
         <Image
           src="/hourglass.svg"
           alt="Hourglass Icon"
-          boxSize={20}
+          w="220px"
+          h="220px"
         />
 
         <Heading
-          size="xl"
-          fontWeight="semibold"
+          fontSize="32px"
+          fontWeight="bold"
+          color="#000"
         >
           You are almost there!
         </Heading>
 
         <Text
-          maxW={420}
-          fontSize="lg"
+          maxW="580px"
+          fontSize="16px"
           color="#5B5B5B"
-          fontWeight="semibold"
-          align="left"
-          lineHeight="tall"
+          fontWeight="normal"
+          textAlign="center"
         >
-          Thanks for signing in. Your account is currently waiting for
-          administrator approval.
+          Thanks for signing in.
+          <br />
+          Your account is currently waiting for administrator approval.
           <br />
           We’ve notified the team, and you’ll get an email confirmation as soon
           as your account is ready.
         </Text>
 
         <Button
-          size="lg"
-          variant="solid"
-          bg="#DDDDDD"
-          rounded="10px"
+          bg="#022442"
+          color="white"
+          h="40px"
+          px="16px"
+          borderRadius="6px"
           onClick={() => navigate("/login")}
+          _hover={{ bg: "#033a6b" }}
         >
-          <Text
-            fontSize="xl"
-            fontWeight="normal"
-          >
-            Return Login Page
-          </Text>
+          Return Login Page
         </Button>
       </VStack>
     </Box>

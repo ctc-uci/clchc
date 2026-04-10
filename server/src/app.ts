@@ -3,7 +3,7 @@ import { directoryCategoriesRouter } from "@/routes/directory_categories";
 import { locationRouter } from "@/routes/location";
 import { providersRouter } from "@/routes/providers";
 import { quotaRouter } from "@/routes/quota";
-import { sampleRouter } from "@/routes/sample"; // TODO: delete sample router
+// import { sampleRouter } from "@/routes/sample"; // TODO: delete sample router
 
 import { tagsRouter } from "@/routes/tags";
 import { usersRouter } from "@/routes/users";
@@ -37,7 +37,7 @@ app.use(express.json());
 //   app.use(verifyToken);
 // }
 
-app.use("/", sampleRouter); // TODO: delete sample endpoint
+// app.use("/", sampleRouter); // TODO: delete sample endpoint
 app.use("/users", usersRouter);
 app.use("/versionLog", versionLogRouter);
 app.use("/tags", tagsRouter);

@@ -1,6 +1,7 @@
 import { keysToCamel } from "@/common/utils";
 import { db } from "@/db/db-pgp";
 import { Router } from "express";
+import { verifyToken, verifyRole } from "@/middleware";
 
 export const tagsRouter = Router();
 
@@ -43,7 +44,7 @@ async function removeTagFromProviders(tagId) {
 }
 
 // Get all Tags
-tagsRouter.get("/", async (req, res) => {
+tagsRouter.get("/", verifyRole("viewer"), async (req, res) => {
   try {
     const tags = await db.query("SELECT * FROM tags ORDER BY id ASC");
 
@@ -54,7 +55,7 @@ tagsRouter.get("/", async (req, res) => {
 });
 
 //Get Tag by ID
-tagsRouter.get("/:id", async (req, res) => {
+tagsRouter.get("/:id", verifyRole("viewer"), async (req, res) => {
   try {
     const { id } = req.params;
     const tags = await db.query("SELECT * FROM tags where id = $1", [id]);
@@ -70,7 +71,7 @@ tagsRouter.get("/:id", async (req, res) => {
 });
 
 //Delete Tag by ID
-tagsRouter.delete("/:id", async (req, res) => {
+tagsRouter.delete("/:id", verifyRole("ccm"), async (req, res) => {
   try {
     const { id } = req.params;
     const tag = await db.query("DELETE FROM tags WHERE id = $1 RETURNING *", [
@@ -95,7 +96,7 @@ tagsRouter.delete("/:id", async (req, res) => {
 });
 
 // Create Tag
-tagsRouter.post("/", async (req, res) => {
+tagsRouter.post("/", verifyRole("ccm"), async (req, res) => {
   try {
     const { categoryId, tagValue } = req.body;
     if (!categoryId || !tagValue) {
@@ -115,7 +116,7 @@ tagsRouter.post("/", async (req, res) => {
 });
 
 // Update Tag
-tagsRouter.put("/:id", async (req, res) => {
+tagsRouter.put("/:id", verifyRole("ccm"), async (req, res) => {
   try {
     const { id } = req.params;
     const { categoryId, tagValue } = req.body;

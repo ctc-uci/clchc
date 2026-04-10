@@ -6,11 +6,10 @@ import {
   Input,
   InputGroup,
   InputLeftElement,
-  Stack,
+  HStack,
 } from "@chakra-ui/react";
 
 import { PageHeader } from "@/components/common/PageHeader";
-import Navbar from "@/components/layout/Navbar";
 import VersionLogTable from "@/components/version-log/VersionLogTable";
 import { useVersionLogs } from "@/contexts/hooks/data-fetching/useVersionLogs";
 import { useUserContext } from "@/contexts/hooks/useUserContext";
@@ -20,29 +19,26 @@ import CalendarCard from "../common/CalendarCard";
 
 
 export const VersionLogPage = () => {
-  // const [logs, setLogs] = useState([]);
-  // const { backend } = useBackendContext();
   const navigate = useNavigate();
-  const { dateParam } = useParams();
+  const { date } = useParams();
   const [inputValue, setInputValue] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const today = new Date().toLocaleDateString("en-CA");
   const [selectedDate, setSelectedDate] = useState(
-    dateParam || sessionStorage.getItem("logDate") || today
+    date || sessionStorage.getItem("logDate") || today
   );
   const debouncedSearchQuery = useDebounce(
     (value) => setSearchQuery(value),
     300
   );
   const { role, loading: roleLoading } = useUserContext();
-  // const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (dateParam && dateParam !== selectedDate) {
-      setSelectedDate(dateParam);
-      sessionStorage.setItem("logDate", dateParam);
+    if (date && date !== selectedDate) {
+      setSelectedDate(date);
+      sessionStorage.setItem("logDate", date);
     }
-  }, [dateParam]);
+  }, [date, selectedDate]);
 
   useEffect(() => {
     sessionStorage.setItem("logDate", selectedDate);
@@ -55,7 +51,6 @@ export const VersionLogPage = () => {
     q: searchQuery,
   });
 
-  // handleChange
   const handleChange = (e) => {
     setInputValue(e.target.value);
     debouncedSearchQuery(e.target.value);
@@ -65,55 +60,46 @@ export const VersionLogPage = () => {
     setSelectedDate(newDate);
     navigate(`/version-log/${newDate}`);
   };
-  // console.log("Selected Date:", selectedDate);
+
   return (
-    <Box
-      p={6}
-      maxW="1200px"
-      mx="auto"
-    >
-      <Flex
-        justify="space-between"
-        align="flex-start"
-        mb={6}
-      >
+    <Box p={6}>
+      <Flex align="center" justify="space-between" mb={6} h="45px">
         <PageHeader
-          title="Version Log"
-          subheading="View action history over given day"
+          title="Audit Log"
           role={role}
           isLoading={roleLoading}
         />
-        <Box
-          flex="1"
-          display="flex"
-          justifyContent="flex-end"
-        >
-          <CalendarCard
-            value={selectedDate}
-            onChange={handleDateChange}
-          />
-        </Box>
       </Flex>
 
-      <Stack gap={2}>
-        <InputGroup>
+      <HStack
+        spacing={{ base: 3, md: 6 }}
+        align="stretch"
+        mb={5}
+      >
+        <InputGroup flex="1">
           <InputLeftElement pointerEvents="none">
             <SearchIcon color="gray.400" />
           </InputLeftElement>
           <Input
-            placeholder="Search Version Log"
+            backgroundColor="white"
+            placeholder="Search Providers"
             borderRadius="md"
-            value={inputValue}  
+            h="45px"
+            value={inputValue}
             onChange={handleChange}
           />
         </InputGroup>
-        <VersionLogTable
-          loading={isLoading}
-          logs={logs}
-          selectedDate={selectedDate}
+
+        <CalendarCard
+          value={selectedDate}
+          onChange={handleDateChange}
         />
-      </Stack>
-      <Navbar />
+      </HStack>
+      <VersionLogTable
+        loading={isLoading}
+        logs={logs}
+        selectedDate={selectedDate}
+      />
     </Box>
   );
 };

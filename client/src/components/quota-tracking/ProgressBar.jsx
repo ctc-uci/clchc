@@ -1,77 +1,107 @@
+
 import React, { useEffect, useRef, useState } from "react";
 
-import {
-  Button,
-  Flex,
-  Icon,
-  Progress,
-  Text,
-} from "@chakra-ui/react";
+import { Button, Flex, Icon, Progress, Text, useToast } from "@chakra-ui/react";
 
-import {
-  useUpdateQuota,
-} from "@/contexts/hooks/data-fetching/useQuotas";
+import { useDebounce } from "@/hooks/useDebounce";
+import { useUpdateQuota } from "@/contexts/hooks/data-fetching/useQuotas";
 import { useCreateLog } from "@/contexts/hooks/data-fetching/useVersionLogs";
 import { useUserContext } from "@/contexts/hooks/useUserContext";
-import { ArrowDown, ArrowUp } from "lucide-react";
+import { MinusIcon, Plus} from "lucide-react";
 
 export default function ProgressBar({ quota }) {
   const quotaRef = useRef(null);
-  const { mutate: updateQuota } = useUpdateQuota();
-  const { mutate: createLog } = useCreateLog();
-  const maxProgress = quota?.quota ?? 0;
-  const current = quota?.progress ?? 0;
-  const [currentProgress, setCurrentProgress] = useState(current);
-  const [originalProgress, setOriginalProgress] = useState(null);
+  const deltaQueueRef = useRef([]); // buffers +1 / -1 clicks
+  const confirmedRef = useRef(null); // last server-confirmed value
+
+  const { mutateAsync: updateQuota } = useUpdateQuota();
+  const { mutateAsync: createLog } = useCreateLog();
   const { dbUser } = useUserContext();
+  const toast = useToast();
+
+  const maxProgress = quota?.quota ?? 0;
+  const serverValue = quota?.progress ?? 0;
+
+  const [currentProgress, setCurrentProgress] = useState(serverValue);
 
   useEffect(() => {
-    if (quota) {
-      quotaRef.current = quota;
+    if (!quota) return;
+    quotaRef.current = quota;
+
+    if (deltaQueueRef.current.length === 0) {
       setCurrentProgress(quota.progress ?? 0);
-      setOriginalProgress(quota.progress ?? 0);
+      confirmedRef.current = quota.progress ?? 0;
     }
   }, [quota]);
 
-  //update progress in DB
-  const updateProgress = async (next) => {
-    const currentQuota = quota ?? quotaRef.current;
-    if (!currentQuota) return;
-
-    try {
-      await updateQuota({ id: quota.id, data: { progress: next } });
-    } catch (err) {
-      console.error("Error updating progress:", err);
-    }
-
-    try {
-      await createLog({
-        userId: dbUser?.id,
-        quotaId: quota.id,
-        action: next > originalProgress ? "increment" : "decrement",
-        delta: next - originalProgress,
-      });
-      setOriginalProgress(next);
-    } catch (err) {
-      console.error("Error logging quota change to version log:", err);
-    }
-  };
-
   const clamp = (n) => Math.max(0, Math.min(n, maxProgress));
 
-  //handlers for buttons
-  const handleDecrease = async () => {
-    const next = clamp(currentProgress - 1);
-    if (next === currentProgress) return;
-    setCurrentProgress(next);
-    await updateProgress(next);
+  const rollback = () => {
+    const baseline = confirmedRef.current ?? quotaRef.current?.progress ?? 0;
+    setCurrentProgress(baseline);
+    toast({
+      title: "Update failed",
+      description:
+        "Your changes couldn't be saved. Progress has been restored.",
+      status: "error",
+      duration: 4000,
+      isClosable: true,
+      position: "bottom-right",
+    });
   };
 
-  const handleIncrease = async () => {
-    const next = clamp(currentProgress + 1);
-    if (next === currentProgress) return;
-    setCurrentProgress(next);
-    await updateProgress(next);
+  const flushQueue = async () => {
+    const queue = [...deltaQueueRef.current];
+    if (queue.length === 0) return;
+
+    deltaQueueRef.current = [];
+
+    const baseline = confirmedRef.current ?? quotaRef.current?.progress ?? 0;
+    const netDelta = queue.reduce((sum, d) => sum + d, 0);
+    const nextValue = clamp(baseline + netDelta);
+
+    try {
+      await updateQuota({
+        id: quotaRef.current.id,
+        data: {
+          progress: nextValue,
+          deltas: queue,
+        },
+      });
+
+      for (const delta of queue) {
+        await createLog({
+          userId: dbUser?.id,
+          quotaId: quotaRef.current.id,
+          action: delta > 0 ? "increment" : "decrement",
+          delta,
+        });
+      }
+
+      confirmedRef.current = nextValue;
+    } catch (err) {
+      console.error("Batch quota update failed — rolling back:", err);
+      rollback();
+    }
+  };
+
+  const debouncedFlush = useDebounce(flushQueue, 500);
+
+  useEffect(() => {
+    return () => {
+      debouncedFlush.cancel();
+      flushQueue();
+    };
+  }, []);
+
+  const handleClick = (delta) => {
+    setCurrentProgress((prev) => {
+      const next = clamp(prev + delta);
+      if (next === prev) return prev;
+      return next;
+    });
+    deltaQueueRef.current.push(delta);
+    debouncedFlush();
   };
 
   return (
@@ -82,25 +112,30 @@ export default function ProgressBar({ quota }) {
     >
       <Flex
         alignItems="center"
-        gap="6px"
+        gap="9px"
         flex="1"
         maxWidth="calc(100% - 39px)"
       >
         <Button
-          onClick={handleDecrease}
+          onClick={() => handleClick(-1)}
           isDisabled={currentProgress <= 0}
-          minW="24px"
-          height="33px"
-          padding="0"
-          borderRadius="4px"
-          bg="black"
+          width="24px"
+          minW="0"
+          height="21px"
+          minH="0"
+          padding="0 0px"
+          bg="white"
+          borderRadius={"4px"}
+          border="1px solid rgba(0, 0, 0, 0.15)"
+          background="#FFF"
           flexShrink={0}
         >
           <Icon
-            color="white"
-            boxSize={4}
+            color="black"
+            width="12px"
+            height="12px"
           >
-            <ArrowDown />
+            <MinusIcon />
           </Icon>
         </Button>
 
@@ -111,40 +146,41 @@ export default function ProgressBar({ quota }) {
           width="141px"
           height="12px"
           borderRadius="4px"
-          background="rgba(0, 0, 0, 0.06)"
+          background="rgba(0,0,0,0.06)"
           marginx="6px"
-          sx={{
-            "& > div": {
-              backgroundColor: "#38A169",
-            },
-          }}
+          sx={{ "& > div": { backgroundColor: "#38A169" } }}
         />
 
         <Button
-          onClick={handleIncrease}
+          onClick={() => handleClick(+1)}
           isDisabled={currentProgress >= maxProgress}
-          minW="24px"
-          height="33px"
-          padding="0"
-          borderRadius="4px"
-          bg="black"
+          width="24px"
+          minW="0"
+          height="21px"
+          minH="0"
+          padding="0 0px"
+          bg="white"
+          borderRadius={"4px"}
+          border="1px solid rgba(0, 0, 0, 0.15)"
+          background="#FFF"
           flexShrink={0}
         >
           <Icon
-            color="white"
-            boxSize={4}
+            color="black"
+            width="12px"
+            height="12px"
           >
-            <ArrowUp />
+            <Plus />
           </Icon>
         </Button>
       </Flex>
       <Text
         color="black"
-        fontSize="16px"
-        fontWeight="600"
+        fontSize="14px"
+        fontWeight="normal"
         lineHeight="24px"
         flexShrink={0}
-        marginLeft="6px"
+        marginLeft="12px"
         minWidth="40px"
       >
         {currentProgress}/{maxProgress}

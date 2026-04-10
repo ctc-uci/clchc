@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import { CheckCircleIcon } from "@chakra-ui/icons";
 import {
+  Avatar,
   Box,
   Button,
   Checkbox,
@@ -94,7 +95,6 @@ export const DenyRequestModal = ({ isOpen, onClose, user }) => {
         <ModalBody>
           {user && (
             <>
-              {/* User Info */}
               <Box
                 borderRadius="lg"
                 border="0.5px solid #00000026"
@@ -109,17 +109,13 @@ export const DenyRequestModal = ({ isOpen, onClose, user }) => {
                     gap={3}
                     p={2}
                   >
-                    <Flex
+                    <Avatar
                       w="58px"
                       h="58px"
-                      bg="#FFFFFF"
                       borderRadius="xl"
-                      align="center"
-                      justify="center"
-                      fontSize="lg"
-                    >
-                      {`${user.firstName?.[0] ?? ""}${user.lastName?.[0] ?? ""}`}
-                    </Flex>
+                      src={user.photoUrl ?? undefined}
+                      name={`${user.firstName ?? ""} ${user.lastName ?? ""}`}
+                    ></Avatar>
 
                     <Box>
                       <Text
@@ -142,12 +138,20 @@ export const DenyRequestModal = ({ isOpen, onClose, user }) => {
                     color="#00000080"
                     p={4}
                   >
-                    Request Date
+                    {user.userSignupDate
+                      ? new Date(user.userSignupDate).toLocaleDateString(
+                          "en-US",
+                          {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          }
+                        )
+                      : "—"}
                   </Text>
                 </Flex>
               </Box>
 
-              {/* Reason */}
               <Text
                 mt={5}
                 mb={2}
@@ -163,9 +167,8 @@ export const DenyRequestModal = ({ isOpen, onClose, user }) => {
                 onChange={(e) => setReason(e.target.value)}
               />
 
-              {/* Notify */}
               <Checkbox
-                mt={4}
+                my={4}
                 isChecked={notifyUser}
                 onChange={(e) => setNotifyUser(e.target.checked)}
                 color="#00000080"
@@ -176,26 +179,44 @@ export const DenyRequestModal = ({ isOpen, onClose, user }) => {
           )}
         </ModalBody>
 
-        <ModalFooter
-          gap={3}
-          px={8}
-        >
-          <Button
-            bg="#D9D9D9"
-            _hover={{ bg: "#CFCFCF" }}
-            px={7}
-            onClick={onClose}
-          >
-            Cancel
-          </Button>
-          <Button
-            bg="#CE3131"
-            _hover={{ bg: "#B92B2B" }}
-            color="white"
-            onClick={handleDeny}
-          >
-            Deny Request
-          </Button>
+        <ModalFooter py={0}>
+          <Flex w="75%">
+            <Button
+              fontWeight="400"
+              fontSize="14px"
+              variant="outline"
+              border="1px"
+              borderRadius="6px"
+              borderColor="#00000026"
+              mr={3}
+              onClick={onClose}
+              flex="1"
+              maxW="181px"
+              px="30px"
+              py="15px"
+              h="41px"
+              bg="#F9FAFB"
+            >
+              Cancel
+            </Button>
+            <Button
+              fontWeight="400"
+              fontSize="14px"
+              colorScheme="blackAlpha"
+              bg="#90080F"
+              color="white"
+              borderRadius="6px"
+              flex="1"
+              maxW="181px"
+              px="30px"
+              py="15px"
+              h="41px"
+              onClick={handleDeny}
+              _hover={{ bg: "#A50F15" }}
+            >
+              Deny
+            </Button>
+          </Flex>
         </ModalFooter>
       </ModalContent>
     </Modal>
