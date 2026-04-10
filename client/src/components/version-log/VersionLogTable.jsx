@@ -146,7 +146,6 @@ const VersionLogTable = ({ loading, logs }) => {
                         {entry.firstName} {entry.lastName}
                       </Text>
                     </Td>
-
                     <Td {...tdProps}>
                       {entry.action === "increment" && (
                         <Text {...tdTextProps}>
@@ -165,15 +164,14 @@ const VersionLogTable = ({ loading, logs }) => {
                         </Text>
                       )}
                     </Td>
-
                     <Td {...tdProps}>
                       <Text {...tdTextProps}>
                         {formattedDate} {formattedTime}
                       </Text>
                     </Td>
-
                     <Td {...tdProps}>
                       <Text {...tdTextProps}>{entry.providerName}</Text>
+
                     </Td>
                   </Tr>
                 );
