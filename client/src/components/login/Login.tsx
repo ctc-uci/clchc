@@ -166,9 +166,9 @@ export const Login = () => {
           </Text>
         </Button>
         <Text
-          fontSize="sm"
+          fontSize="16px"
           color="#696969"
-          fontWeight="semibold"
+          fontWeight="700"
           textAlign="center"
         >
           Please use your @clchc.org email address to sign in

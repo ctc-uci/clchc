@@ -27,8 +27,8 @@ export const PendingApprovalPage = () => {
         <Image
           src="/hourglass.svg"
           alt="Hourglass Icon"
-          w="190px"
-          h="263px"
+          w="220px"
+          h="220px"
         />
 
         <Heading
