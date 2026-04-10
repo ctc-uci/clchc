@@ -42,7 +42,7 @@ export const Navbar = () => {
   return (
     <Flex
       w="100%"
-      h="90px"
+      h="100px"
       align="center"
       justify="flex-end"
       gap={{ base: 4, md: 8 }}

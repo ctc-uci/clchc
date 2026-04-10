@@ -16,9 +16,11 @@ export const CustomCard = ({ title, body, footer, footerUnderline, footerColor, 
       <CardHeader pb="9px">
         <Text
           fontSize="16px"
-          color="rgba(0,0,0,0.5)"
-          fontWeight="normal"
-          lineHeight="1"
+          fontFamily={"Lato"}
+          fontStyle={"normal"}
+          fontWeight={"400"}
+          lineHeight={"normal"}
+          color={"rgba(0, 0, 0, 0.50)"}
         >
           {title}
         </Text>
@@ -36,8 +38,17 @@ export const CustomCard = ({ title, body, footer, footerUnderline, footerColor, 
         </Text>
         {footer && (
           <Text
+<<<<<<< HEAD
             fontSize="15.34px"
             color={footerColor ?? "rgba(0,0,0,0.5)"}
+=======
+            fontSize="16px"
+            fontFamily={"Lato"}
+            fontStyle={"normal"}
+            fontWeight={"400"}
+            lineHeight={"normal"}
+            color={"rgba(0, 0, 0, 0.50)"}
+>>>>>>> f623f99 (RAHHHHHHH)
             mt={1}
             lineHeight="1"
             textDecoration={footerUnderline ? "underline" : "none"}

@@ -156,57 +156,41 @@ export const QuotaTracking = () => {
   };
 
   return (
-    <Box
-      p={6}
-      maxW="1440px"
-      mx="auto"
-    >
-      <Flex
-        mb={6}
-        alignItems="flex-start"
-        justifyContent="space-between"
-      >
+    <Box p={6}>
+      <Flex align="center" justify="space-between" mb={6}>
         <PageHeader
           title="Quota Tracking"
-          subheading="Monitor daily appointment progress across all providers"
           role={role}
           isLoading={roleLoading}
         />
-        <Flex
-          gap="6px"
-          alignItems="center"
-          mt={1}
-        >
+        <Flex align="center" gap={3}>
           <CalendarCard
             value={selectedDate}
             onChange={handleDateChange}
           />
-          {role !== "viewer" && (
-            <Button
-              rightIcon={<AddIcon boxSize={3} />}
-              px="24px"
-              height="44px"
-              width="156.112px"
-              background="#113D64"
-              borderRadius="4px"
-              gap="2px"
-              onClick={onCreateDrawerOpen}
-              color="white"
-              fontSize="14px"
-              fontWeight="normal"
-              lineHeight="28px"
-              _hover={{ background: "#485365" }}
-            >
-              Create Quota
-            </Button>
-          )}
+          <Button
+            rightIcon={<AddIcon boxSize={3} />}
+            h="45px"
+            w="160px"
+            padding="0 24px"
+            borderRadius="4px"
+            background="#113D64"
+            justifyContent="center"
+            alignItems="center"
+            gap="8px"
+            onClick={onCreateDrawerOpen}
+            textColor="white"
+            fontSize="14px"
+            fontWeight="normal"
+            _hover={{ background: "#485365" }}
+          >
+            Create Quota
+          </Button>
         </Flex>
       </Flex>
 
       <Flex
-        gap="15px"
-        h="195px"
-        alignItems="center"
+        gap={4}
         mb={6}
       >
           {isLoading ? (
@@ -250,19 +234,18 @@ export const QuotaTracking = () => {
       </Flex>
 
 
-      <Box pb={6}>
-        <InputGroup maxW="auto">
-          <InputLeftElement pointerEvents="none">
-            <SearchIcon color="rgba(0,0,0,0.5)" />
-          </InputLeftElement>
-          <Input
-            placeholder="Search Providers"
-            borderRadius="md"
-            onChange={handleChange}
-            _placeholder={{ color: "rgba(0,0,0,0.5)" }}
-          />
-        </InputGroup>
-      </Box>
+
+      <InputGroup mb={6}>
+        <InputLeftElement pointerEvents="none">
+          <SearchIcon color="gray.400" />
+        </InputLeftElement>
+        <Input
+          placeholder="Search Providers"
+          borderRadius="md"
+          h="45px"
+          onChange={handleChange}
+        />
+      </InputGroup>
 
       <QuotaTable
         rows={quotas}
@@ -278,7 +261,6 @@ export const QuotaTracking = () => {
         defaultDate={selectedDate}
       />
 
-      <Navbar />
     </Box>
   );
 };

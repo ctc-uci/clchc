@@ -25,49 +25,12 @@ const SkeletonRows = () => {
   return (
     <>
       {Array.from({ length: 5 }, (_, i) => (
-        <Tr key={i}>
-          <Td>
-            <Box
-              display="flex"
-              flexDirection="column"
-              gap="2px"
-            >
-              <Skeleton height="15px" />
-              <Skeleton
-                height="10px"
-                width="80%"
-              />
-            </Box>
-          </Td>
-          <Td>
-            <Skeleton height="30px" />
-          </Td>
-          <Td>
-            <Skeleton height="30px" />
-          </Td>
-          <Td>
-            <Box
-              display="flex"
-              flexDirection="row"
-              gap="2px"
-            >
-              <Skeleton
-                height="30px"
-                width="20%"
-              />
-              <Skeleton
-                height="30px"
-                width="60%"
-              />
-              <Skeleton
-                height="30px"
-                width="20%"
-              />
-            </Box>
-          </Td>
-          <Td>
-            <Skeleton height="30px" />
-          </Td>
+        <Tr key={i} borderBottom="1px solid" borderColor="gray.200">
+          {Array.from({ length: 5 }, (_, j) => (
+            <Td key={j} borderRight="1px solid" borderColor="gray.200">
+              <Skeleton height="40px" />
+            </Td>
+          ))}
         </Tr>
       ))}
     </>
@@ -111,30 +74,61 @@ const QuotaTable = ({ rows, loading, onRowsUpdate, role }) => {
     };
   }, [isDrawerOpen]);
 
+  const thProps = {
+    fontFamily: "Inter",
+    fontSize: "12px",
+    fontStyle: "normal",
+    fontWeight: "700",
+    lineHeight: "16px",
+    letterSpacing: "0.6px",
+    padding: "15px 25px",
+    backgroundColor: "#C8D4E6",
+    color: "#113D64",
+  };
+
+  const tdProps = {
+    borderRight: "1px solid",
+    borderColor: "gray.200",
+    padding: "16px 24px",
+    gap: "10px",
+  };
+
+  const tdTextProps = {
+    fontFamily: "Lato",
+    fontSize: "14px",
+    fontStyle: "normal",
+    fontWeight: "500",
+    lineHeight: "20px",
+    color: "#2D3748",
+  };
+
   return (
     <TableContainer
       ref={tableRef}
-      borderRadius="5px"
+      border="1px solid"
+      borderColor="gray.200"
+      borderRadius="lg"
       maxHeight="60vh"
       overflowY="auto"
     >
       <Table
-        variant="simple"
         sx={{
-          "td, th": { borderBottom: "none" },
+          "tbody tr:nth-of-type(even)": { bg: "#F9F9F9" },
+          "tbody tr:nth-of-type(odd)": { bg: "white" },
         }}
       >
-        <Thead bg="#C8D4E6"
-        position="sticky"
-        top={0}
-        h="40px"
-        zIndex={1}>
+        <Thead
+          position="sticky"
+          top={0}
+          h="40px"
+          zIndex={1}
+        >
           <Tr>
-            <Th textColor="#113D64">Providers</Th>
-            <Th textColor="#113D64">Location</Th>
-            <Th textColor="#113D64">Type</Th>
-            <Th textColor="#113D64">Progress</Th>
-            <Th textColor="#113D64">Notes</Th>
+            <Th {...thProps}>Providers</Th>
+            <Th {...thProps}>Location</Th>
+            <Th {...thProps}>Type</Th>
+            <Th {...thProps}>Progress</Th>
+            <Th {...thProps}>Notes</Th>
           </Tr>
         </Thead>
 
@@ -142,45 +136,39 @@ const QuotaTable = ({ rows, loading, onRowsUpdate, role }) => {
           {loading ? (
             <SkeletonRows />
           ) : (
-            rows.map((row, index) => (
+            rows.map((row) => (
               <Tr
                 key={row.id}
-                bg={selectedRowId === row.id ? SELECTED_BG : index % 2 === 0 ? "#FFF" : "#F9F9F9"}
-                border="1.5px solid rgba(0, 0, 0, 0.06)"
+                bg={selectedRowId === row.id ? SELECTED_BG : undefined}
+                borderBottom="1px solid"
+                borderColor="gray.200"
                 onClick={() => {
                   if (isViewer) return;
                   if (selectedRowId === row.id) {
-                    // Second click - open drawer
                     setEditingQuotaId(row.id);
                     onDrawerOpen();
                   } else {
-                    // First click - highlight
                     setSelectedRowId(row.id);
                   }
                 }}
-                cursor={isViewer ? "default" : "pointer"}
-                transition="background-color 0.2s"
-                _hover={{
-                  bg: selectedRowId === row.id ? SELECTED_BG : "gray.50",
-                }}
+                cursor="pointer"
+                _hover={{ bg: selectedRowId === row.id ? SELECTED_BG : "gray.50" }}
               >
                 {/* Provider */}
-                <Td border="1.5px solid rgba(0, 0, 0, 0.06)">
-                  <Box>
-                    <Text fontWeight="normal" fontSize={"14px"}>{row.providerName}</Text>
-                  </Box>
+                <Td {...tdProps}>
+                  <Text {...tdTextProps}>{row.providerName}</Text>
                 </Td>
 
                 {/* Location */}
-                <Td padding="16px 24px" border="1.5px solid rgba(0, 0, 0, 0.06)">
+                <Td {...tdProps}>
                   <Badge
                     px={3}
                     py={1}
                     fontWeight={0}
-                    fontSize={"14px"}
+                    fontSize="14px"
                     textTransform="none"
-                    bgColor={"#35639D"}
-                    textColor={"white"}
+                    bgColor="#35639D"
+                    textColor="white"
                     borderRadius="6px"
                   >
                     {row.locationName}
@@ -188,47 +176,38 @@ const QuotaTable = ({ rows, loading, onRowsUpdate, role }) => {
                 </Td>
 
                 {/* Type */}
-                <Td padding="16px 24px" border="1.5px solid rgba(0, 0, 0, 0.06)">
+                <Td {...tdProps}>
                   <Badge
                     px={3}
                     py={1}
                     fontWeight={0}
-                    fontSize={"14px"}
+                    fontSize="14px"
                     textTransform="none"
-                    bgColor={"#35639D"}
-                    textColor={"white"}
+                    bgColor="#35639D"
+                    textColor="white"
                     borderRadius="6px"
                   >
-                    <Text textTransform="capitalize">
-                      {row.appointmentType}
-                    </Text>
+                    <Text textTransform="capitalize">{row.appointmentType}</Text>
                   </Badge>
                 </Td>
 
                 {/* Progress */}
-                <Td
-                  px={2}
-                  py={34.5}
-                  border="1.5px solid rgba(0, 0, 0, 0.06)"
-                  padding="16px 24px" 
-                >
+                <Td {...tdProps} padding="16px 24px">
                   <Box onClick={(e) => e.stopPropagation()}>
                     <ProgressBar quota={row} />
                   </Box>
                 </Td>
 
                 {/* Notes */}
-                <Td padding="16px 24px" border="1.5px solid rgba(0, 0, 0, 0.06)">
-                  {!row.notes ? (
-                    <Text color="#718096" fontSize="14px" fontWeight="400" lineHeight="30px">No notes.</Text>
-                  ) : row.notes.length > 200 ? (
+                <Td {...tdProps}>
+                  {row.notes && row.notes.length > 200 ? (
                     <TextPopup
                       text={row.notes}
                       alwaysShowPopup={true}
                       truncateAt={200}
                     />
                   ) : (
-                    <Text textColor={"#718096"}>{row.notes}</Text>
+                    <Text {...tdTextProps}>{row.notes}</Text>
                   )}
                 </Td>
               </Tr>
