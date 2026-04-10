@@ -80,16 +80,8 @@ export const UserDirectory = () => {
   }, [users, searchQuery, selectedRole]);
 
   return (
-    <Box
-      py={6}
-      maxW="1200px"
-      mx="auto"
-    >
-      <Flex
-        justify="space-between"
-        align="flex-start"
-        mb={6}
-      >
+    <Box p={6}>
+      <Flex align="center" justify="space-between" mb={6} h="45px">
         <PageHeader
           title="User Directory"
           role={role}
@@ -122,7 +114,7 @@ export const UserDirectory = () => {
             fontStyle="italic"
             color="gray.500"
             _hover={{ color: "gray.700" }}
-            onClick={() => navigate("/user-requests")}
+            onClick={() => navigate("/pending-requests")}
           >
           View All
           </Box>
@@ -138,21 +130,12 @@ export const UserDirectory = () => {
             <SearchIcon color="gray.400" />
           </InputLeftElement>
           <Input
+            bg="white"
             placeholder="Search Providers"
-            border="1px solid #E3E3E3"
-            borderRadius="10px"
+            borderRadius="md"
+            h="45px"
             value={searchInput}
             onChange={handleSearchChange}
-            fontWeight="400"
-            fontSize="14px"
-            py={5}
-            h="44px"
-            display="flex"
-            //             display: flex;
-            // width="1230px"
-            // height: 44px;
-            // justify-content: center;
-            // align-items: center;
           />
         </InputGroup>
 

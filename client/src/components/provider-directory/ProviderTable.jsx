@@ -89,6 +89,8 @@ export default function ProviderTable({
     padding: "15px 25px 15px 25px",
     backgroundColor: "#C8D4E6",
     color: "#113D64",
+    borderRight: "1px solid",
+    borderColor: "gray.200",
   };
 
   const Header = () => {
@@ -113,7 +115,7 @@ export default function ProviderTable({
           <Th {...fixedThProps}>Provider</Th>
           <Th {...fixedThProps}>NPI/License</Th>
           {dynamicColumns}
-          <Th {...fixedThProps}>Long Term Notes</Th>
+          <Th {...fixedThProps} borderRight="none">Long Term Notes</Th>
         </Tr>
       </Thead>
     );

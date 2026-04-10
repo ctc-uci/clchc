@@ -11,22 +11,27 @@ export const PendingRequestsPage = () => {
   const navigate = useNavigate();
   return (
     <Box
-      p={10}
+      p={6}
     >
       <Flex
         align="center"
         mb={2}
       >
         <ArrowBackIcon
-          boxSize={5}
+          boxSize={6}
+          color="var(--Primary-2, #113D64)"
           cursor="pointer"
           onClick={() => navigate(-1)}
         />
       </Flex>
 
       <Text
-        fontSize="xs"
-        color="gray.500"
+        fontSize="12px"
+        color="rgba(0, 0, 0, 0.50)"
+        fontFamily={"Lato"}
+        fontStyle={"normal"}
+        fontWeight={"500"}
+        lineHeight={"normal"}
         mb={2}
       >
         ALL PENDING REQUESTS

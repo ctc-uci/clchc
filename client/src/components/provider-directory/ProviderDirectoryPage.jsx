@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+import { AnimatePresence, motion } from "framer-motion";
+
 import { HamburgerIcon, SearchIcon } from "@chakra-ui/icons";
 import {
   Box,
@@ -119,51 +121,62 @@ export const ProviderDirectoryPage = () => {
               >
                 Manage
               </Button>
-              {manageOpen && (
-                <Box
-                  position="absolute"
-                  top="100%"
-                  right={0}
-                  borderRadius="0 0 4px 4px"
-                  w="100%"
-                  zIndex={10}
-                  bg="var(--Primary-1, #022442)"
-                  color="white"
-                  minH={"45px"}
-                  fontFamily={"Inter"}
-                  fontSize={"18px"}
-                  fontStyle={"normal"}
-                  fontWeight={"600"}
-                  lineHeight={"28px"}
-                >
-                  <Box
-                    w="100%"
-                    px={4}
-                    py={3}
-                    color="white"
-                    fontWeight="500"
-                    borderBottom="1px solid"
-                    borderColor="whiteAlpha.200"
-                    cursor="pointer"
-                    _hover={{ bg: "whiteAlpha.100" }}
-                    onClick={() => { onCategoryDrawerOpen(); setManageOpen(false); }}
+              <AnimatePresence>
+                {manageOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, scaleY: 0.85, y: -4 }}
+                    animate={{ opacity: 1, scaleY: 1, y: 0 }}
+                    exit={{ opacity: 0, scaleY: 0.85, y: -4 }}
+                    transition={{ duration: 0.15, ease: "easeOut" }}
+                    style={{
+                      position: "absolute",
+                      top: "100%",
+                      right: 0,
+                      width: "100%",
+                      zIndex: 10,
+                      transformOrigin: "top",
+                      borderRadius: "0 0 4px 4px",
+                      overflow: "hidden",
+                      backgroundColor: "#022442",
+                    }}
                   >
-                    Categories
-                  </Box>
-                  <Box
-                    w="100%"
-                    px={4}
-                    py={3}
-                    color="white"
-                    fontWeight="500"
-                    cursor="pointer"
-                    _hover={{ bg: "whiteAlpha.100" }}
-                    onClick={() => { openCreateProviderDrawer(); setManageOpen(false); }}
-                  >
-                    Providers
-                  </Box>
-                </Box>
-              )}
+                    <Box
+                      w="100%"
+                      px={4}
+                      py={3}
+                      color="white"
+                      fontFamily="Inter"
+                      fontSize="18px"
+                      fontStyle="normal"
+                      fontWeight="600"
+                      lineHeight="28px"
+                      borderBottom="1px solid"
+                      borderColor="whiteAlpha.200"
+                      cursor="pointer"
+                      _hover={{ bg: "whiteAlpha.100" }}
+                      onClick={() => { onCategoryDrawerOpen(); setManageOpen(false); }}
+                    >
+                      Categories
+                    </Box>
+                    <Box
+                      w="100%"
+                      px={4}
+                      py={3}
+                      color="white"
+                      fontFamily="Inter"
+                      fontSize="18px"
+                      fontStyle="normal"
+                      fontWeight="600"
+                      lineHeight="28px"
+                      cursor="pointer"
+                      _hover={{ bg: "whiteAlpha.100" }}
+                      onClick={() => { openCreateProviderDrawer(); setManageOpen(false); }}
+                    >
+                      Providers
+                    </Box>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </Box>
           </Flex>
           {/* BOTTOM ROW: Search Bar */}

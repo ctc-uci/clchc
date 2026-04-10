@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { Icon, SearchIcon } from "@chakra-ui/icons";
+// import { Icon } from "@chakra-ui/icons";
 import {
   Badge,
   HStack,
@@ -11,6 +11,7 @@ import {
   TableContainer,
   Tbody,
   Td,
+  Text,
   Th,
   Thead,
   Tr,
@@ -34,42 +35,64 @@ import UserEditModal from "./UserEditModal";
 //   </Icon>
 // );
 
-const CustomDeleteIcon = (props) => (
-  <Icon
-    viewBox="0 0 24 24"
-    fill="none"
-    {...props}
-  >
-    <path
-      d="M9 3h6l1 2h5v2H3V5h5l1-2Zm1 7h2v9h-2v-9Zm4 0h2v9h-2v-9ZM7 10h2v9H7v-9Zm1-2h8l-1 13H9L8 8Z"
-      fill="currentColor"
-    />
-  </Icon>
-);
+// const CustomDeleteIcon = (props) => (
+//   <Icon
+//     viewBox="0 0 24 24"
+//     fill="none"
+//     {...props}
+//   >
+//     <path
+//       d="M9 3h6l1 2h5v2H3V5h5l1-2Zm1 7h2v9h-2v-9Zm4 0h2v9h-2v-9ZM7 10h2v9H7v-9Zm1-2h8l-1 13H9L8 8Z"
+//       fill="currentColor"
+//     />
+//   </Icon>
+// );
+
+const thProps = {
+  fontFamily: "Inter",
+  fontSize: "12px",
+  fontStyle: "normal",
+  fontWeight: "700",
+  lineHeight: "16px",
+  letterSpacing: "0.6px",
+  padding: "15px 25px",
+  backgroundColor: "#C8D4E6",
+  color: "#113D64",
+  borderRight: "1px solid",
+  borderColor: "gray.200",
+};
+
+const tdProps = {
+  borderRight: "1px solid",
+  borderColor: "gray.200",
+  padding: "16px 24px",
+};
+
+const tdTextProps = {
+  fontFamily: "Lato",
+  fontSize: "14px",
+  fontStyle: "normal",
+  fontWeight: "500",
+  lineHeight: "20px",
+  color: "#2D3748",
+};
 
 const SkeletonRows = () => (
   <>
     {Array.from({ length: 5 }, (_, i) => (
-      <Tr key={i}>
-        <Td>
+      <Tr key={i} borderBottom="1px solid" borderColor="gray.200">
+        <Td borderRight="1px solid" borderColor="gray.200">
           <Skeleton height="20px" />
         </Td>
-        <Td>
+        <Td borderRight="1px solid" borderColor="gray.200">
           <Skeleton height="20px" />
         </Td>
-        <Td>
+        <Td borderRight="1px solid" borderColor="gray.200">
           <Skeleton height="20px" />
         </Td>
         <Td>
           <HStack>
-            <Skeleton
-              boxSize="30px"
-              borderRadius="md"
-            />
-            <Skeleton
-              boxSize="30px"
-              borderRadius="md"
-            />
+            <Skeleton boxSize="30px" borderRadius="md" />
           </HStack>
         </Td>
       </Tr>
@@ -101,57 +124,24 @@ export default function UserTable({
   return (
     <>
       <TableContainer
-        borderWidth="1px"
-        borderColor="blackAlpha.100"
-        borderRadius="sm"
+        border="1px solid"
+        borderColor="gray.200"
+        borderRadius="lg"
         maxHeight="60vh"
         overflowY="auto"
-        css={{
-          scrollbarWidth: "none",
-          "&::-webkit-scrollbar": { display: "none" },
-        }}
       >
         <Table
-          colorScheme="gray"
           sx={{
-            "th, td": {
-              borderRight: "1px solid",
-              borderColor: "blackAlpha.100",
-              borderBottom: "none",
-            },
-            "th:last-child, td:last-child": {
-              borderRight: "none",
-            },
-            "tbody tr:nth-of-type(odd)": {
-              bg: "transparent",
-            },
-            "tbody tr:nth-of-type(even)": {
-              bg: "#F9F9F9",
-            },
+            "tbody tr:nth-of-type(odd)": { bg: "white" },
+            "tbody tr:nth-of-type(even)": { bg: "#F9F9F9" },
           }}
         >
-          <Thead
-            bg="#C8D4E6"
-            position="sticky"
-            top={0}
-            h="40px"
-            zIndex={1}
-            borderRadius="0 4px 0 0"
-            color="var(--gray-700, #2D3748);"
-          >
+          <Thead position="sticky" top={0} h="40px" zIndex={1}>
             <Tr>
-              <Th width="42.5%">Users</Th>
-              <Th width="42.5%">Email</Th>
-              <Th
-                width="10%"
-                textAlign="center"
-              >
-                Role
-              </Th>
-              <Th
-                width="5%"
-                align="center"
-              ></Th>
+              <Th {...thProps}>Users</Th>
+              <Th {...thProps}>Email</Th>
+              <Th {...thProps} textAlign="center">Role</Th>
+              <Th {...thProps} borderRight="none" w="90px"></Th>
             </Tr>
           </Thead>
 
@@ -160,12 +150,16 @@ export default function UserTable({
               <SkeletonRows />
             ) : (
               users.map((user) => (
-                <Tr key={user.id}>
-                  <Td>
-                    {user.firstName} {user.lastName}
+                <Tr key={user.id} borderBottom="1px solid" borderColor="gray.200">
+                  <Td {...tdProps}>
+                    <Text {...tdTextProps}>
+                      {user.firstName} {user.lastName}
+                    </Text>
                   </Td>
-                  <Td>{user.email}</Td>
-                  <Td textAlign="center">
+                  <Td {...tdProps}>
+                    <Text {...tdTextProps}>{user.email}</Text>
+                  </Td>
+                  <Td {...tdProps} textAlign="center">
                     <Badge
                       bg={roleColors[user.role]?.bg || "gray.200"}
                       color={roleColors[user.role]?.color || "white"}
@@ -176,7 +170,6 @@ export default function UserTable({
                       fontStyle="normal"
                       fontWeight="400"
                       lineHeight="16px"
-                      p="2px 6px"
                       textTransform={
                         user.role === "viewer" || user.role === "master"
                           ? "capitalize"
@@ -186,29 +179,16 @@ export default function UserTable({
                       {user.role}
                     </Badge>
                   </Td>
-                  <Td>
+                  <Td {...tdProps} borderRight="none">
                     <Stack direction="row">
                       <IconButton
                         aria-label="Edit"
                         variant="ghost"
+                        size="sm"
                         borderRadius="16px"
-                        icon={
-                          <MdCreate
-                            size={24}
-                            color="#00000040"
-                          />
-                        }
+                        icon={<MdCreate size={18} color="#00000040" />}
                         onClick={() => handleEditClick(user)}
                       />
-                      {/* {onDelete && (
-                        <IconButton
-                          aria-label="Delete"
-                          variant="ghost"
-                          borderRadius="16px"
-                          icon={<CustomDeleteIcon />}
-                          onClick={() => onDelete(user.id)}
-                        />
-                      )} */}
                     </Stack>
                   </Td>
                 </Tr>

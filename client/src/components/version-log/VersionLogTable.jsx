@@ -47,6 +47,8 @@ const thProps = {
   padding: "15px 25px 15px 25px",
   backgroundColor: "#C8D4E6",
   color: "#113D64",
+  borderRight: "1px solid",
+  borderColor: "gray.200",
 };
 
 const tdProps = {
@@ -94,7 +96,7 @@ const VersionLogTable = ({ loading, logs }) => {
               <Th {...thProps}>Editor</Th>
               <Th {...thProps}>Action</Th>
               <Th {...thProps}>Date & Time</Th>
-              <Th {...thProps}>Provider</Th>
+              <Th {...thProps} borderRight="none">Provider</Th>
             </Tr>
           </Thead>
 
