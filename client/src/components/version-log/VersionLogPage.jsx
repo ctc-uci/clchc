@@ -2,8 +2,7 @@ import { useState, useEffect } from "react";
 import { SearchIcon } from "@chakra-ui/icons";
 import {
   Box,
-  Badge,
-  Heading,
+  Flex,
   Input,
   InputGroup,
   InputLeftElement,
