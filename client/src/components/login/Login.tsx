@@ -32,11 +32,7 @@ export const Login = () => {
   const { handleRedirectResult } = useAuthContext();
   const { backend } = useBackendContext();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<SigninFormValues>({
+  useForm<SigninFormValues>({
     resolver: zodResolver(signinSchema),
     mode: "onBlur",
   });

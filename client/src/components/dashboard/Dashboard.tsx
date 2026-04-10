@@ -54,10 +54,10 @@ export const Dashboard = () => {
       <VStack>
         <Text>
           Signed in as {currentUser?.email} (
-          {role === "admin" ? "Admin" : "User"})
+          {role === "master" || role === "ccm" ? "Admin" : "User"})
         </Text>
 
-        {role === "admin" ? (
+        {role === "master" || role === "ccm" ? (
           <ChakraLink
             as={Link}
             to={"/admin"}
@@ -93,7 +93,7 @@ export const Dashboard = () => {
                     <Td>
                       <RoleSelect
                         user={user}
-                        disabled={role !== "admin"}
+                        disabled={role !== "master" && role !== "ccm"}
                       />
                     </Td>
                   </Tr>

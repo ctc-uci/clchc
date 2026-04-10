@@ -29,11 +29,7 @@ export const RoleSelect = ({ user, disabled = true }: RoleSelectProps) => {
           firebaseUid: user.firebaseUid,
         });
 
-        if (updatedRole !== "user" && updatedRole !== "admin") {
-          throw Error("Role is not valid");
-        }
-
-        setRole(updatedRole);
+        setRole(updatedRole as User["role"]);
 
         toast({
           title: "Role Updated",
