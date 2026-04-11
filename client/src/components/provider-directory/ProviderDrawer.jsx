@@ -247,7 +247,13 @@ const ProviderFormFields = ({
                 fontSize="12px"
               />
               {errors["name"] && (
-                <Text color="red.500" fontSize="sm" mt={1}>{errors["name"]}</Text>
+                <Text
+                  color="red.500"
+                  fontSize="sm"
+                  mt={1}
+                >
+                  {errors["name"]}
+                </Text>
               )}
             </FormControl>
             <FormControl maxW="40px">
@@ -275,7 +281,13 @@ const ProviderFormFields = ({
               {...fixedInputProps}
             />
             {errors["license"] && (
-              <Text color="red.500" fontSize="sm" mt={1}>{errors["license"]}</Text>
+              <Text
+                color="red.500"
+                fontSize="sm"
+                mt={1}
+              >
+                {errors["license"]}
+              </Text>
             )}
           </FormControl>
         </Box>
@@ -772,7 +784,10 @@ const ProviderDrawer = ({
                 <>
                   <Button
                     variant="outline"
-                    onClick={handleClose}
+                    onClick={() => {
+                      setShowConfirmation(false);
+                      setPendingTagDeletes([]);
+                    }}
                     flex={1}
                     color="#022442"
                     fontWeight={600}
