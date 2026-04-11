@@ -17,12 +17,10 @@ const Layout = () => {
                 justifyContent="space-between"
             >
                 <Image
-                    src="/clchc-logo.svg"
+                    src="/new-clchc-logo.svg"
                     width="250px"
                     height="94px"
-                    pr="40px"
-                    pt="9px"
-                    pb="9px"
+                    objectFit="contain"
                 />
                 <Navbar/>
             </Box>
