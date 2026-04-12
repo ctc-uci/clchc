@@ -339,7 +339,6 @@ export default function ProviderTable({
       border="1px solid"
       borderColor="gray.200"
       borderRadius="lg"
-      maxHeight="60vh"
       overflowY="auto"
     >
       <Table
