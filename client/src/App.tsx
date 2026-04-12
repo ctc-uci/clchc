@@ -56,15 +56,27 @@ const App = () => {
                     />
                     <Route
                       path="/quota-tracking/:date?"
-                      element={<QuotaTracking />}
+                      element={
+                        <ProtectedRoute
+                          element={<QuotaTracking />}
+                        />
+                      }
                     />
                     <Route
                       path="/provider-directory"
-                      element={<ProviderDirectoryPage />}
+                      element={
+                        <ProtectedRoute
+                          element={<ProviderDirectoryPage />}
+                        />
+                      }
                     />
                     <Route
                       path="/version-log/:date?"
-                      element={<VersionLogPage />}
+                      element={
+                        <ProtectedRoute
+                          element={<VersionLogPage />}
+                          />
+                      }
                     />
                   </Route>
                   <Route
@@ -85,11 +97,17 @@ const App = () => {
                   />
                   <Route
                     path="/dashboard"
-                    element={<ProtectedRoute element={<Dashboard />} />}
+                    element={<ProtectedRoute
+                      element={<Dashboard />}
+                    />}
                   />
                   <Route
                     path="/version-log"
-                    element={<VersionLogPage />}
+                    element={
+                    <ProtectedRoute
+                      element={<VersionLogPage />}
+                      />
+                    }
                   />
                   <Route
                     path="/admin"
@@ -103,10 +121,14 @@ const App = () => {
                   <Route
                     path="/"
                     element={
-                      <Navigate
-                        to="/login"
-                        replace
-                      />
+                    <ProtectedRoute
+                      element={
+                        <Navigate
+                          to="/login"
+                          replace
+                        />
+                      }
+                    />
                     }
                   />
                   <Route
