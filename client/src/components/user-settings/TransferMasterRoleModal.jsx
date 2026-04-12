@@ -70,7 +70,7 @@ export default function TransferMasterRoleModal({ isOpen, onClose }) {
       size="full"
     >
       <ModalOverlay />
-      <ModalContent>
+      <ModalContent padding="1em">
         <TransferModalHeader step={step} />
         <ModalBody>{stepMap[step]}</ModalBody>
       </ModalContent>
