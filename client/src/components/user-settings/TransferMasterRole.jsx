@@ -1,11 +1,13 @@
 import React from "react";
 
 import { Box, Button, HStack, Text, VStack } from "@chakra-ui/react";
+import TransferMasterRoleModal from "./TransferMasterRoleModal.jsx";
 
 import { AlertCircle } from "lucide-react";
 
-export default function TransferMasterRole() {
+export default function TransferMasterRole({isOpen, onOpen, onClose}) {
   return (
+    <>
     <Box
       w="100%"
       bg="#EDF2F7"
@@ -74,6 +76,7 @@ export default function TransferMasterRole() {
           bg="#113D64"
           color="white"
           borderRadius="6px"
+          onClick={onOpen}
         >
           <Text
             fontSize="18px"
@@ -84,5 +87,8 @@ export default function TransferMasterRole() {
         </Button>
       </HStack>
     </Box>
+
+    <TransferMasterRoleModal isOpen={isOpen} onClose={onClose} />
+    </>
   );
 }

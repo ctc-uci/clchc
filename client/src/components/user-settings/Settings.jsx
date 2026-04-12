@@ -1,4 +1,4 @@
-import { Avatar, Box, Grid, GridItem, Text } from "@chakra-ui/react";
+import { Avatar, Box, Grid, GridItem, Text, useDisclosure } from "@chakra-ui/react";
 
 import { useAuthContext } from "@/contexts/hooks/useAuthContext";
 import { useUserContext } from "@/contexts/hooks/useUserContext";
@@ -13,6 +13,7 @@ export const DELETE_ACCOUNT = "delete-account";
 export const CALCULATION_FACTOR = "calculation-factor";
 
 export function Settings() {
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const userData = useUserContext();
   const dbUser = userData?.dbUser;
   const { currentUser } = useAuthContext();
@@ -168,7 +169,7 @@ export function Settings() {
               ml="80px"
               colSpan={2}
             >
-              <TransferMasterRole />
+              <TransferMasterRole isOpen={isOpen} onOpen={onOpen} onClose={onClose} />
             </GridItem>
           </>
         ) : (
