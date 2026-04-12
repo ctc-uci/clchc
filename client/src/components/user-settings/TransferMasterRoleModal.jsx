@@ -74,11 +74,6 @@ export default function TransferMasterRoleModal({ isOpen, onClose }) {
         <TransferModalHeader step={step} />
         <ModalBody>{stepMap[step]}</ModalBody>
       </ModalContent>
-      <ModalFooter>
-        <Button onClick={onClose}>
-          <Text>Cancel</Text>
-        </Button>
-      </ModalFooter>
     </Modal>
   );
 }
