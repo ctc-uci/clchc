@@ -203,7 +203,7 @@ const QuotaTable = ({ rows, loading, onRowsUpdate, role }) => {
                 {/* Notes */}
                 <Td {...tdProps}>
                   {!row.notes ? (
-                    <Text {...tdTextProps} color="gray.400" fontStyle="italic">No notes.</Text>
+                    <Text {...tdTextProps} color="gray.500">No notes.</Text>
                   ) : row.notes.length > 200 ? (
                     <TextPopup
                       text={row.notes}
@@ -211,7 +211,7 @@ const QuotaTable = ({ rows, loading, onRowsUpdate, role }) => {
                       truncateAt={200}
                     />
                   ) : (
-                    <Text {...tdTextProps}>{row.notes}</Text>
+                    <Text {...tdTextProps} color="gray.500">{row.notes}</Text>
                   )}
                 </Td>
               </Tr>
