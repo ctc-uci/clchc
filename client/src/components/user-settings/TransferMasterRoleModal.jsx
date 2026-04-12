@@ -8,14 +8,15 @@ import {
   ModalBody,
   ModalContent,
   ModalFooter,
-  ModalHeader,
   ModalOverlay,
   Text,
+  VStack,
 } from "@chakra-ui/react";
 
-import StepFinalize from "./transfer-steps/StepFinalize.jsx";
-import StepReviewTransfer from "./transfer-steps/StepReviewTransfer.jsx";
-import StepSelectUser from "./transfer-steps/StepSelectUser.jsx";
+import StepFinalize from "./transfer-master/StepFinalize.jsx";
+import StepReviewTransfer from "./transfer-master/StepReviewTransfer.jsx";
+import StepSelectUser from "./transfer-master/StepSelectUser.jsx";
+import TransferModalHeader from "./transfer-master/TransferModalHeader.jsx";
 
 export default function TransferMasterRoleModal({ isOpen, onClose }) {
   const [step, setStep] = useState(1);
@@ -44,6 +45,10 @@ export default function TransferMasterRoleModal({ isOpen, onClose }) {
     ),
     3: (
       <StepFinalize
+        onClose={() => {
+          onClose();
+          setStep(1);
+        }}
         selected={selectedUser}
         onFinalize={() => {
           update();
@@ -66,40 +71,7 @@ export default function TransferMasterRoleModal({ isOpen, onClose }) {
     >
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>
-          <HStack>
-            <Box
-              w="40px"
-              h="40px"
-              bg={step === 1 ? "#113D64" : "gray"}
-              borderRadius="10000"
-            >
-              {" "}
-              <Text> 1 </Text>{" "}
-            </Box>{" "}
-            <Text>Select User</Text>
-            <Box
-              w="40px"
-              h="40px"
-              bg={step === 2 ? "#113D64" : "gray"}
-              borderRadius="10000"
-            >
-              {" "}
-              <Text> 2 </Text>{" "}
-            </Box>{" "}
-            <Text>Review</Text>
-            <Box
-              w="40px"
-              h="40px"
-              bg={step === 3 ? "#113D64" : "gray"}
-              borderRadius="10000"
-            >
-              {" "}
-              <Text> 3 </Text>{" "}
-            </Box>{" "}
-            <Text>Finalize</Text>
-          </HStack>
-        </ModalHeader>
+        <TransferModalHeader step={step} />
         <ModalBody>{stepMap[step]}</ModalBody>
       </ModalContent>
       <ModalFooter>
