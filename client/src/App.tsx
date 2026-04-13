@@ -121,14 +121,10 @@ const App = () => {
                   <Route
                     path="/"
                     element={
-                    <ProtectedRoute
-                      element={
-                        <Navigate
-                          to="/login"
-                          replace
-                        />
-                      }
-                    />
+                      <Navigate
+                        to="/login"
+                        replace
+                      />
                     }
                   />
                   <Route
