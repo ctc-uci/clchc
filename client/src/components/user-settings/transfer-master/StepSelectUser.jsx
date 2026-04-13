@@ -15,6 +15,7 @@ import {
   Tag,
   Text,
   VStack,
+  Skeleton
 } from "@chakra-ui/react";
 
 import { useUsers } from "@/contexts/hooks/data-fetching/useUsers";
@@ -42,6 +43,7 @@ export default function StepSelectUser({ onClose, onSelect, onNext }) {
   const qualifiedUsers = users.filter(
     (user) => user.role === "ccs" || user.role === "ccm"
   );
+  const [selectedUser, setSelectedUser] = useState(null);
 
   const debouncedSetSearchQuery = useDebounce((value) => {
     setSearchQuery(value);
@@ -88,8 +90,11 @@ export default function StepSelectUser({ onClose, onSelect, onNext }) {
           />
         </InputGroup>
 
-        {isLoading ? (
-          <Text>Loading users...</Text>
+        {isLoading ? ( <>
+          <Skeleton height="60px" width="100%"></Skeleton>
+          <Skeleton height="60px" width="100%"></Skeleton>
+          <Skeleton height="60px" width="100%"></Skeleton>
+          <Skeleton height="60px" width="100%"></Skeleton> </>
         ) : (
           <Grid
             templateColumns="1fr 1fr"
@@ -102,15 +107,19 @@ export default function StepSelectUser({ onClose, onSelect, onNext }) {
             {qualifiedUsers.map((user) => (
               <GridItem
                 key={user.id}
-                // w="100%"
               >
                 <Box
-                  bg="#F7F7F7"
+                  bg={user.firebaseUid===selectedUser ? "#e7e7e7" : "#F7F7F7"}
                   border="1px solid #E5E5E5"
                   borderRadius="12px"
                   px={4}
                   py={3}
                   w="100%"
+                  minH="60px"
+                  onClick={() => {
+                    setSelectedUser(user.firebaseUid);
+                    onSelect(user.firebaseUid);
+                  }}
                 >
                   <Flex
                     align="center"
@@ -188,6 +197,7 @@ export default function StepSelectUser({ onClose, onSelect, onNext }) {
           bg="#113D64"
           color="white"
           border="0.5px solid #D9D9D9"
+          isDisabled={!selectedUser}
         >
           Next
         </Button>

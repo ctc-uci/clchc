@@ -10,11 +10,13 @@ import {
   GridItem,
   HStack,
   Input,
+  Skeleton,
   Tag,
   Text,
   VStack,
 } from "@chakra-ui/react";
 
+import { useUserByFirebaseUid } from "@/contexts/hooks/data-fetching/useUsers";
 import { useUserContext } from "@/contexts/hooks/useUserContext";
 
 const ROLE_LABELS = {
@@ -30,18 +32,12 @@ const ROLE_COLORS = {
   master: "#573D59",
 };
 
-export default function StepReviewTransfer({ onClose, dummySelected, onNext }) {
+export default function StepReviewTransfer({ onClose, selectedUid, onNext }) {
   const userData = useUserContext();
   const dbUser = userData?.dbUser;
   const [input, setInput] = useState("");
   const isTransferEnabled = input === "TRANSFER";
-
-  const selected = {
-    firstName: "Jane",
-    lastName: "Smith",
-    role: "ccs",
-    email: "jane.smith@example.com",
-  };
+  const { data: selected, isLoading } = useUserByFirebaseUid(selectedUid);
 
   return (
     <>
@@ -59,258 +55,275 @@ export default function StepReviewTransfer({ onClose, dummySelected, onNext }) {
         >
           Confirm the details of this role transfer.
         </Text>
-        <Grid
-          templateColumns="1fr 1fr"
-          columnGap="20px"
-          rowGap="5px"
-          w="100%"
-          mx="auto"
-        >
-          <GridItem>
-            <Box
-              bg="#F7F7F7"
-              border="1px solid #E5E5E5"
-              borderRadius="12px"
-              px={4}
-              py={3}
-              w="100%"
-            >
-              <Flex
-                align="center"
-                gap={3}
+        {isLoading ? (
+          <>
+            <Skeleton
+              height="60px"
+              width="100%"
+            />
+            <Skeleton
+              height="60px"
+              width="100%"
+            />
+            <Skeleton
+              height="60px"
+              width="100%"
+            />{" "}
+          </>
+        ) : (
+          <Grid
+            templateColumns="1fr 1fr"
+            columnGap="20px"
+            rowGap="5px"
+            w="100%"
+            mx="auto"
+          >
+            <GridItem>
+              <Box
+                bg="#F7F7F7"
+                border="1px solid #E5E5E5"
+                borderRadius="12px"
+                px={4}
+                py={3}
+                w="100%"
               >
-                <Avatar
-                  name={`${dbUser?.firstName} ${dbUser?.lastName}`}
-                  src={dbUser?.photoURL}
-                  size="sm"
-                  bg="#FFF"
-                  color="black"
-                  borderRadius="10px"
-                  w="36px"
-                  h="36px"
-                  fontSize="14px"
-                />
-
-                <Box flex={1}>
-                  <Text
-                    fontWeight="600"
-                    fontSize="14px"
-                  >
-                    {dbUser?.firstName} {dbUser?.lastName}
-                  </Text>
-                  <Text
-                    fontSize="12px"
-                    color="gray.500"
-                  >
-                    {dbUser?.email}
-                  </Text>
-                </Box>
-
-                <Tag
-                  border="1px solid #D1D5DB"
-                  borderRadius="8px"
-                  px={2}
-                  py="2px"
-                  fontSize="12px"
-                  color="white"
-                  bg={ROLE_COLORS[dbUser?.role] || "#F5F5F5"}
+                <Flex
+                  align="center"
+                  gap={3}
                 >
-                  {ROLE_LABELS[dbUser?.role] || dbUser?.role}
-                </Tag>
-              </Flex>
-            </Box>
-          </GridItem>
-          <GridItem>
-            <Box
-              bg="#F7F7F7"
-              border="1px solid #E5E5E5"
-              borderRadius="12px"
-              px={4}
-              py={3}
-              w="100%"
-            >
-              <Flex
-                align="center"
-                gap={3}
+                  <Avatar
+                    name={`${dbUser?.firstName} ${dbUser?.lastName}`}
+                    src={dbUser?.photoURL}
+                    size="sm"
+                    bg="#FFF"
+                    color="black"
+                    borderRadius="10px"
+                    w="36px"
+                    h="36px"
+                    fontSize="14px"
+                  />
+
+                  <Box flex={1}>
+                    <Text
+                      fontWeight="600"
+                      fontSize="14px"
+                    >
+                      {dbUser?.firstName} {dbUser?.lastName}
+                    </Text>
+                    <Text
+                      fontSize="12px"
+                      color="gray.500"
+                    >
+                      {dbUser?.email}
+                    </Text>
+                  </Box>
+
+                  <Tag
+                    border="1px solid #D1D5DB"
+                    borderRadius="8px"
+                    px={2}
+                    py="2px"
+                    fontSize="12px"
+                    color="white"
+                    bg={ROLE_COLORS[dbUser?.role] || "#F5F5F5"}
+                  >
+                    {ROLE_LABELS[dbUser?.role] || dbUser?.role}
+                  </Tag>
+                </Flex>
+              </Box>
+            </GridItem>
+            <GridItem>
+              <Box
+                bg="#F7F7F7"
+                border="1px solid #E5E5E5"
+                borderRadius="12px"
+                px={4}
+                py={3}
+                w="100%"
               >
-                <Avatar
-                  name={`${selected?.firstName} ${selected?.lastName}`}
-                  src={selected?.photoURL}
-                  size="sm"
-                  bg="#FFF"
-                  color="black"
-                  borderRadius="10px"
-                  w="36px"
-                  h="36px"
-                  fontSize="14px"
-                />
-
-                <Box flex={1}>
-                  <Text
-                    fontWeight="600"
-                    fontSize="14px"
-                  >
-                    {selected?.firstName} {selected?.lastName}
-                  </Text>
-                  <Text
-                    fontSize="12px"
-                    color="gray.500"
-                  >
-                    {selected?.email}
-                  </Text>
-                </Box>
-
-                <Tag
-                  border="1px solid #D1D5DB"
-                  borderRadius="8px"
-                  px={2}
-                  py="2px"
-                  fontSize="12px"
-                  color="white"
-                  bg={ROLE_COLORS[selected?.role] || "#F5F5F5"}
+                <Flex
+                  align="center"
+                  gap={3}
                 >
-                  {ROLE_LABELS[selected?.role] || selected?.role}
-                </Tag>
-              </Flex>
-            </Box>
-          </GridItem>
-          <GridItem>
-            <VStack gap="0px">
-              <ChevronUpIcon
-                padding="0"
-                margin="0"
-                boxSize={6}
-                color="black"
-              />
-              <ChevronDownIcon
-                padding="0"
-                margin="0"
-                boxSize={6}
-                color="black"
-              />
-            </VStack>
-          </GridItem>
-          <GridItem>
-            <VStack gap="0px">
-              <ChevronUpIcon
-                boxSize={6}
-                color="black"
-              />
-              <ChevronDownIcon
-                boxSize={6}
-                color="black"
-              />
-            </VStack>
-          </GridItem>
-          <GridItem>
-            <Box
-              bg="#F7F7F7"
-              border="1px solid #E5E5E5"
-              borderRadius="12px"
-              px={4}
-              py={3}
-              w="100%"
-            >
-              <Flex
-                align="center"
-                gap={3}
+                  <Avatar
+                    name={`${selected[0]?.firstName} ${selected[0]?.lastName}`}
+                    src={selected[0]?.photoURL}
+                    size="sm"
+                    bg="#FFF"
+                    color="black"
+                    borderRadius="10px"
+                    w="36px"
+                    h="36px"
+                    fontSize="14px"
+                  />
+
+                  <Box flex={1}>
+                    <Text
+                      fontWeight="600"
+                      fontSize="14px"
+                    >
+                      {selected[0]?.firstName} {selected[0]?.lastName}
+                    </Text>
+                    <Text
+                      fontSize="12px"
+                      color="gray.500"
+                    >
+                      {selected[0]?.email}
+                    </Text>
+                  </Box>
+
+                  <Tag
+                    border="1px solid #D1D5DB"
+                    borderRadius="8px"
+                    px={2}
+                    py="2px"
+                    fontSize="12px"
+                    color="white"
+                    bg={ROLE_COLORS[selected[0]?.role] || "#F5F5F5"}
+                  >
+                    {ROLE_LABELS[selected[0]?.role] || selected[0]?.role}
+                  </Tag>
+                </Flex>
+              </Box>
+            </GridItem>
+            <GridItem>
+              <VStack gap="0px">
+                <ChevronUpIcon
+                  padding="0"
+                  margin="0"
+                  boxSize={6}
+                  color="black"
+                />
+                <ChevronDownIcon
+                  padding="0"
+                  margin="0"
+                  boxSize={6}
+                  color="black"
+                />
+              </VStack>
+            </GridItem>
+            <GridItem>
+              <VStack gap="0px">
+                <ChevronUpIcon
+                  boxSize={6}
+                  color="black"
+                />
+                <ChevronDownIcon
+                  boxSize={6}
+                  color="black"
+                />
+              </VStack>
+            </GridItem>
+            <GridItem>
+              <Box
+                bg="#F7F7F7"
+                border="1px solid #E5E5E5"
+                borderRadius="12px"
+                px={4}
+                py={3}
+                w="100%"
               >
-                <Avatar
-                  name={`${dbUser?.firstName} ${dbUser?.lastName}`}
-                  src={dbUser?.photoURL}
-                  size="sm"
-                  bg="#FFF"
-                  color="black"
-                  borderRadius="10px"
-                  w="36px"
-                  h="36px"
-                  fontSize="14px"
-                />
-
-                <Box flex={1}>
-                  <Text
-                    fontWeight="600"
-                    fontSize="14px"
-                  >
-                    {dbUser?.firstName} {dbUser?.lastName}
-                  </Text>
-                  <Text
-                    fontSize="12px"
-                    color="gray.500"
-                  >
-                    {dbUser?.email}
-                  </Text>
-                </Box>
-
-                <Tag
-                  border="1px solid #D1D5DB"
-                  borderRadius="8px"
-                  px={2}
-                  py="2px"
-                  fontSize="12px"
-                  color="white"
-                  bg={ROLE_COLORS[selected?.role] || "#F5F5F5"}
+                <Flex
+                  align="center"
+                  gap={3}
                 >
-                  {ROLE_LABELS[selected?.role] || selected?.role}
-                </Tag>
-              </Flex>
-            </Box>
-          </GridItem>
-          <GridItem>
-            <Box
-              bg="#F7F7F7"
-              border="1px solid #E5E5E5"
-              borderRadius="12px"
-              px={4}
-              py={3}
-              w="100%"
-            >
-              <Flex
-                align="center"
-                gap={3}
+                  <Avatar
+                    name={`${dbUser?.firstName} ${dbUser?.lastName}`}
+                    src={dbUser?.photoURL}
+                    size="sm"
+                    bg="#FFF"
+                    color="black"
+                    borderRadius="10px"
+                    w="36px"
+                    h="36px"
+                    fontSize="14px"
+                  />
+
+                  <Box flex={1}>
+                    <Text
+                      fontWeight="600"
+                      fontSize="14px"
+                    >
+                      {dbUser?.firstName} {dbUser?.lastName}
+                    </Text>
+                    <Text
+                      fontSize="12px"
+                      color="gray.500"
+                    >
+                      {dbUser?.email}
+                    </Text>
+                  </Box>
+
+                  <Tag
+                    border="1px solid #D1D5DB"
+                    borderRadius="8px"
+                    px={2}
+                    py="2px"
+                    fontSize="12px"
+                    color="white"
+                    bg={ROLE_COLORS[selected[0]?.role] || "#F5F5F5"}
+                  >
+                    {ROLE_LABELS[selected[0]?.role] || selected[0]?.role}
+                  </Tag>
+                </Flex>
+              </Box>
+            </GridItem>
+            <GridItem>
+              <Box
+                bg="#F7F7F7"
+                border="1px solid #E5E5E5"
+                borderRadius="12px"
+                px={4}
+                py={3}
+                w="100%"
               >
-                <Avatar
-                  name={`${selected?.firstName} ${selected?.lastName}`}
-                  src={selected?.photoURL}
-                  size="sm"
-                  bg="#FFF"
-                  color="black"
-                  borderRadius="10px"
-                  w="36px"
-                  h="36px"
-                  fontSize="14px"
-                />
-
-                <Box flex={1}>
-                  <Text
-                    fontWeight="600"
-                    fontSize="14px"
-                  >
-                    {selected?.firstName} {selected?.lastName}
-                  </Text>
-                  <Text
-                    fontSize="12px"
-                    color="gray.500"
-                  >
-                    {selected?.email}
-                  </Text>
-                </Box>
-
-                <Tag
-                  border="1px solid #D1D5DB"
-                  borderRadius="8px"
-                  px={2}
-                  py="2px"
-                  fontSize="12px"
-                  color="white"
-                  bg={ROLE_COLORS[dbUser?.role] || "#F5F5F5"}
+                <Flex
+                  align="center"
+                  gap={3}
                 >
-                  {ROLE_LABELS[dbUser?.role] || dbUser?.role}
-                </Tag>
-              </Flex>
-            </Box>
-          </GridItem>
-        </Grid>
+                  <Avatar
+                    name={`${selected[0]?.firstName} ${selected[0]?.lastName}`}
+                    src={selected[0]?.photoURL}
+                    size="sm"
+                    bg="#FFF"
+                    color="black"
+                    borderRadius="10px"
+                    w="36px"
+                    h="36px"
+                    fontSize="14px"
+                  />
+
+                  <Box flex={1}>
+                    <Text
+                      fontWeight="600"
+                      fontSize="14px"
+                    >
+                      {selected[0]?.firstName} {selected[0]?.lastName}
+                    </Text>
+                    <Text
+                      fontSize="12px"
+                      color="gray.500"
+                    >
+                      {selected[0]?.email}
+                    </Text>
+                  </Box>
+
+                  <Tag
+                    border="1px solid #D1D5DB"
+                    borderRadius="8px"
+                    px={2}
+                    py="2px"
+                    fontSize="12px"
+                    color="white"
+                    bg={ROLE_COLORS[dbUser?.role] || "#F5F5F5"}
+                  >
+                    {ROLE_LABELS[dbUser?.role] || dbUser?.role}
+                  </Tag>
+                </Flex>
+              </Box>
+            </GridItem>
+          </Grid>
+        )}
 
         <Text
           fontSize="14px"

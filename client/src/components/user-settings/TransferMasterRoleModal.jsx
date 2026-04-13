@@ -20,7 +20,20 @@ import TransferModalHeader from "./transfer-master/TransferModalHeader.jsx";
 
 export default function TransferMasterRoleModal({ isOpen, onClose }) {
   const [step, setStep] = useState(1);
+  const [option, setOption] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
+
+  const update = () => {
+    console.log("update master role");
+    if (option === "delete") {
+        console.log("delete account");
+        console.log("transfer master role to ", selectedUser);
+    }
+    else {
+        console.log("make current master ccm");
+        console.log("transfer master role to ", selectedUser);
+    }
+  }
 
   const stepMap = {
     1: (
@@ -39,7 +52,7 @@ export default function TransferMasterRoleModal({ isOpen, onClose }) {
           onClose();
           setStep(1);
         }}
-        selected={selectedUser}
+        selectedUid={selectedUser}
         onNext={() => setStep(3)}
       />
     ),
@@ -49,7 +62,7 @@ export default function TransferMasterRoleModal({ isOpen, onClose }) {
           onClose();
           setStep(1);
         }}
-        selected={selectedUser}
+        onSelect={setOption}
         onFinalize={() => {
           update();
           onClose();
@@ -57,10 +70,6 @@ export default function TransferMasterRoleModal({ isOpen, onClose }) {
         }}
       />
     ),
-  };
-
-  const update = () => {
-    console.log("update master role");
   };
 
   return (
