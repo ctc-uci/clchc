@@ -6,7 +6,7 @@ export default function StepFinalize({ onClose, onSelect, onFinalize }) {
   const [selectedOption, setSelectedOption] = useState(null);
   return (
     <>
-      <VStack alignItems="flex-start">
+      <VStack alignItems="flex-start" h="100%">
         <Text
           fontSize="14px"
           fontWeight="400"
@@ -77,7 +77,7 @@ export default function StepFinalize({ onClose, onSelect, onFinalize }) {
       <HStack
         justifyContent="flex-end"
         gap="10px"
-        mt="30px"
+        mt="118px"
       >
         <Button
           onClick={onClose}

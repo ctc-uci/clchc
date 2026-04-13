@@ -127,7 +127,7 @@ export default function TransferMasterRoleModal({ isOpen, onClose }) {
         minH="500px"
       >
         <TransferModalHeader step={step} />
-        <ModalBody>{stepMap[step]}</ModalBody>
+        <ModalBody h="100%">{stepMap[step]}</ModalBody>
       </ModalContent>
     </Modal>
   );
