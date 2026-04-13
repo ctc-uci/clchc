@@ -193,6 +193,7 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
   const [nameError, setNameError] = useState(false);
   const [pendingAction, setPendingAction] = useState(null);
   const [pendingDeleteIds, setPendingDeleteIds] = useState([]);
+  const [hasReordered, setHasReordered] = useState(false);
   const toast = useToast();
   const formStackRef = useRef(null);
   const { data: serverCategories = [], isLoading } = useDirectoryCategories();
@@ -209,6 +210,7 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
     setDeletedIds([]);
     setPendingDeleteIds([]);
     setPendingAction(null);
+    setHasReordered(false);
   };
 
   // Reset local state when drawer opens
@@ -247,6 +249,7 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
 
     if (!over || active.id === over.id) return;
 
+    setHasReordered(true);
     setCategories((items) => {
       const oldIndex = items.findIndex((i) => i.id === active.id);
       const newIndex = items.findIndex((i) => i.id === over.id);
@@ -289,7 +292,7 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
     const hasNewCategories = categories.some((cat) =>
       String(cat.id).startsWith("temp-")
     );
-    if (!pendingAction && !hasNewCategories) {
+    if (!pendingAction && !hasNewCategories && !hasReordered) {
       onClose();
       return;
     }
@@ -394,7 +397,10 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
         });
       });
 
+      const wasReorderOnly = hasReordered && !pendingAction && !categories.some((cat) => String(cat.id).startsWith("temp-"));
       resetLocalState();
+
+      if (wasReorderOnly) onClose();
 
       if (typeof onSaved === "function") {
         onSaved();
@@ -798,8 +804,9 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
                   minHeight="48px"
                   fontSize="18px"
                   fontWeight="600"
+                  isDisabled={!pendingAction && !hasReordered && !categories.some((cat) => String(cat.id).startsWith("temp-"))}
                 >
-                  {pendingAction?.type === "delete" ? "Delete" : "Confirm"}
+                  {pendingAction?.type === "delete" ? "Delete" : hasReordered ? "Save Changes" : "Confirm"}
                 </Button>
               </DrawerFooter>
             </>
