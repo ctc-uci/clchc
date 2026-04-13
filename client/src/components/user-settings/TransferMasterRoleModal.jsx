@@ -1,6 +1,12 @@
 import React, { useState } from "react";
 
-import { Modal, ModalBody, ModalContent, ModalOverlay } from "@chakra-ui/react";
+import {
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalOverlay,
+  useToast,
+} from "@chakra-ui/react";
 
 import {
   useDeleteUserByFirebaseUid,
@@ -15,6 +21,7 @@ import TransferModalHeader from "./transfer-master/TransferModalHeader.jsx";
 
 export default function TransferMasterRoleModal({ isOpen, onClose }) {
   const { currentUser, logout } = useAuthContext();
+  const toast = useToast();
   const [step, setStep] = useState(1);
   const [option, setOption] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -28,7 +35,6 @@ export default function TransferMasterRoleModal({ isOpen, onClose }) {
 
     if (option === "delete") {
       try {
-        console.log(selectedUser);
         await updateUser({ uid: selectedUser, data: { role: "master" } });
       } catch (error) {
         console.error("Error transferring master role:", error);
@@ -93,6 +99,15 @@ export default function TransferMasterRoleModal({ isOpen, onClose }) {
             window.location.reload();
           } catch (error) {
             console.error("Error finalizing transfer flow:", error);
+            toast({
+              title: "Transfer failed",
+              description:
+                "We couldn't complete the role transfer.",
+              status: "error",
+              duration: 7000,
+              isClosable: true,
+              position: "top",
+            });
           }
         }}
       />

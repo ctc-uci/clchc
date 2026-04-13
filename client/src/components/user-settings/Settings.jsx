@@ -36,7 +36,7 @@ export function Settings() {
         backgroundColor="#F9F9F9"
       >
         <GridItem
-          rowSpan={dbUser?.role === "master" ? 4 : dbUser?.role === "ccm" ? 3 : 2}
+          rowSpan={dbUser?.role === "master" || dbUser?.role === "ccm" ? 3 : 2}
           p="2em"
           display="flex"
           flexDirection="column"
