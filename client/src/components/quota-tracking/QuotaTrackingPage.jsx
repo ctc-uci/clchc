@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { AddIcon, SearchIcon } from "@chakra-ui/icons";
 import {
@@ -97,9 +97,42 @@ export const QuotaTracking = () => {
     provider: providerQuery,
   });
 
+  /** Live progress from each ProgressBar (optimistic UI) merged into list totals / stats */
+  const [displayedProgressById, setDisplayedProgressById] = useState({});
+
+  const handleDisplayedProgressChange = useCallback((quotaId, progress) => {
+    const key = String(quotaId);
+    setDisplayedProgressById((prev) => {
+      if (prev[key] === progress) return prev;
+      return { ...prev, [key]: progress };
+    });
+  }, []);
+
+  useEffect(() => {
+    const valid = new Set(quotas.map((q) => String(q.id)));
+    setDisplayedProgressById((prev) => {
+      let next = prev;
+      for (const k of Object.keys(prev)) {
+        if (!valid.has(k)) {
+          if (next === prev) next = { ...prev };
+          delete next[k];
+        }
+      }
+      return next;
+    });
+  }, [quotas]);
+
+  const mergedQuotas = useMemo(() => {
+    return quotas.map((q) => {
+      const live = displayedProgressById[String(q.id)];
+      if (live === undefined) return q;
+      return { ...q, progress: live };
+    });
+  }, [quotas, displayedProgressById]);
+
   const stats = useMemo(() => {
     // undefined quotas
-    if (!quotas || quotas.length === 0) {
+    if (!mergedQuotas || mergedQuotas.length === 0) {
       return {
         totalProgress: 0,
         totalQuota: 0,
@@ -115,7 +148,7 @@ export const QuotaTracking = () => {
     const distinctProviders = new Set();
     const distinctLocations = new Set();
 
-    quotas.forEach((q) => {
+    mergedQuotas.forEach((q) => {
       // totals
       const p = Number(q.progress) || 0;
       const t = Number(q.quota) || 0;
@@ -139,7 +172,7 @@ export const QuotaTracking = () => {
       differentLocations: distinctLocations.size,
       needsAttention: needsAttentionCount,
     };
-  }, [quotas]);
+  }, [mergedQuotas]);
 
   const {
     isOpen: isCreateDrawerOpen,
@@ -264,9 +297,10 @@ export const QuotaTracking = () => {
       </InputGroup>
 
       <QuotaTable
-        rows={quotas}
+        rows={mergedQuotas}
         loading={isLoading}
         role={role}
+        onDisplayedProgressChange={handleDisplayedProgressChange}
       />
 
       <QuotaDrawer

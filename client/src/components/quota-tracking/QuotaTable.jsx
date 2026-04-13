@@ -37,7 +37,13 @@ const SkeletonRows = () => {
   );
 };
 
-const QuotaTable = ({ rows, loading, onRowsUpdate, role }) => {
+const QuotaTable = ({
+  rows,
+  loading,
+  onRowsUpdate,
+  onDisplayedProgressChange,
+  role,
+}) => {
   const isViewer = role === "viewer";
   const [editingQuotaId, setEditingQuotaId] = useState(null);
   const [selectedRowId, setSelectedRowId] = useState(null);
@@ -196,7 +202,10 @@ const QuotaTable = ({ rows, loading, onRowsUpdate, role }) => {
                 {/* Progress */}
                 <Td {...tdProps} padding="16px 24px">
                   <Box onClick={(e) => e.stopPropagation()}>
-                    <ProgressBar quota={row} />
+                    <ProgressBar
+                      quota={row}
+                      onDisplayedProgressChange={onDisplayedProgressChange}
+                    />
                   </Box>
                 </Td>
 

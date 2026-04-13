@@ -9,10 +9,12 @@ import { useCreateLog } from "@/contexts/hooks/data-fetching/useVersionLogs";
 import { useUserContext } from "@/contexts/hooks/useUserContext";
 import { MinusIcon, Plus} from "lucide-react";
 
-export default function ProgressBar({ quota }) {
+export default function ProgressBar({ quota, onDisplayedProgressChange }) {
   const quotaRef = useRef(null);
   const deltaQueueRef = useRef([]); // buffers +1 / -1 clicks
   const confirmedRef = useRef(null); // last server-confirmed value
+  const onProgressParentRef = useRef(onDisplayedProgressChange);
+  onProgressParentRef.current = onDisplayedProgressChange;
 
   const { mutateAsync: updateQuota } = useUpdateQuota();
   const { mutateAsync: createLog } = useCreateLog();
@@ -33,6 +35,11 @@ export default function ProgressBar({ quota }) {
       confirmedRef.current = quota.progress ?? 0;
     }
   }, [quota]);
+
+  useEffect(() => {
+    if (quota?.id == null) return;
+    onProgressParentRef.current?.(quota.id, currentProgress);
+  }, [quota?.id, currentProgress]);
 
   const clamp = (n) => Math.max(0, Math.min(n, maxProgress));
 
