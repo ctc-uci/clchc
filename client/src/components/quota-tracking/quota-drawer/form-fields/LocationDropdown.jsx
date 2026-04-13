@@ -101,7 +101,7 @@ export function LocationDropdown({ locationId, setLocationId, isLocked }) {
       { id },
       {
         onSuccess: () => {
-          if (String(id) === String(locationId)) setLocationId("");
+          setLocationId((prev) => (String(id) === String(prev) ? "" : prev));
         },
         onSettled: () =>
           setDeletingMap((m) => {
