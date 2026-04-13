@@ -226,11 +226,18 @@ export function LocationDropdown({ locationId, setLocationId, isLocked }) {
                   size="sm"
                   value={newValue}
                   onChange={(e) => setNewValue(e.target.value)}
+                  variant="unstyled"
+                  fontSize="12px"
+                  fontWeight="400"
+                  pl="5"
                 />
                 <Button
                   size="xs"
                   onClick={handleCreate}
                   isDisabled={createLocation.isPending}
+                  variant="ghost"
+                  _hover={{ bg: "none" }}
+                  _active={{ bg: "none" }}
                 >
                   {createLocation.isPending ? (
                     <Spinner size="xs" />
