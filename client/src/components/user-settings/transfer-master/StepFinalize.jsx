@@ -1,6 +1,9 @@
+import { useState } from "react";
+
 import { Box, Button, HStack, Text, VStack } from "@chakra-ui/react";
 
 export default function StepFinalize({ onClose, onSelect, onFinalize }) {
+  const [selectedOption, setSelectedOption] = useState(null);
   return (
     <>
       <VStack alignItems="flex-start">
@@ -19,12 +22,13 @@ export default function StepFinalize({ onClose, onSelect, onFinalize }) {
         </Text>
 
         <Box
-          bg="#F7F7F7"
+          bg={selectedOption==="ccm" ? "#E7E7E7" : "#F7F7F7"}
           border="1px solid #E5E5E5"
           borderRadius="12px"
           px={4}
           py={3}
           w="95%"
+          onClick={() => {setSelectedOption("ccm"); onSelect("ccm")}}
         >
           <Text fontSize="14px" fontWeight="400">
             Keep my account as CCM
@@ -34,12 +38,13 @@ export default function StepFinalize({ onClose, onSelect, onFinalize }) {
           </Text>
         </Box>
         <Box
-          bg="#F7F7F7"
+          bg={selectedOption==="delete" ? "#E7E7E7" : "#F7F7F7"}
           border="1px solid #E5E5E5"
           borderRadius="12px"
           px={4}
           py={3}
           w="95%"
+          onClick={() => {setSelectedOption("delete"); onSelect("delete")}}
         >
           <Text fontSize="14px" fontWeight="400">
             Delete my account Permanently

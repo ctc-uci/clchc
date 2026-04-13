@@ -109,7 +109,7 @@ export default function StepSelectUser({ onClose, onSelect, onNext }) {
                 key={user.id}
               >
                 <Box
-                  bg={user.firebaseUid===selectedUser ? "#e7e7e7" : "#F7F7F7"}
+                  bg={user.firebaseUid===selectedUser ? "#E7E7E7" : "#F7F7F7"}
                   border="1px solid #E5E5E5"
                   borderRadius="12px"
                   px={4}
