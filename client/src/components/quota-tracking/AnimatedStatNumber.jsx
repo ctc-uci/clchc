@@ -1,5 +1,5 @@
 import { motion, useAnimation } from "framer-motion";
-import { useLayoutEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import { useAnimatedNumber } from "@/hooks/useAnimatedNumber";
 
@@ -8,7 +8,7 @@ export function AnimatedStatNumber({ value, duration }) {
   const controls = useAnimation();
   const prevRef = useRef(value);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const prev = prevRef.current;
     if (prev === value) return;
     prevRef.current = value;

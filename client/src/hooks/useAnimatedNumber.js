@@ -1,5 +1,5 @@
 import { animate } from "framer-motion";
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 function displayInteger(current, target) {
 
@@ -18,7 +18,7 @@ export function useAnimatedNumber(target, options = {}) {
   const lastRef = useRef(target);
   const didMount = useRef(false);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (!didMount.current) {
       didMount.current = true;
       lastRef.current = target;
