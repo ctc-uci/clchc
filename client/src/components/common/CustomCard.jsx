@@ -37,7 +37,7 @@ export const CustomCard = ({ title, body, footer, footerUnderline, footerColor, 
         >
           {body}
         </Text>
-        {footer && (
+        {!!footer && (
           <Text
             fontSize="16px"
             fontFamily={"Lato"}

@@ -25,6 +25,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { useNavigate, useParams } from "react-router-dom";
 
 import CalendarCard from "../common/CalendarCard";
+import { AnimatedStatNumber } from "./AnimatedStatNumber";
 import QuotaTable from "./QuotaTable";
 
 const SkeletonCard = () => {
@@ -205,27 +206,43 @@ export const QuotaTracking = () => {
             <>
               <CustomCard
                 title="Total Progress"
-                body={`${stats.totalProgress}/${stats.totalQuota}`}
+                body={
+                  <>
+                    <AnimatedStatNumber value={stats.totalProgress} />
+                    {" / "}
+                    <AnimatedStatNumber value={stats.totalQuota} />
+                  </>
+                }
                 height="172.826px"
                 flex={1}
               />
               <CustomCard
                 title="Completion Rate"
-                body={`${stats.rate}%`}
+                body={
+                  <>
+                    <AnimatedStatNumber value={stats.rate} />
+                    {"%"}
+                  </>
+                }
                 footer="Overall progress"
                 height="172.826px"
                 flex={1}
               />
               <CustomCard
                 title="Active Providers"
-                body={stats.activeProviders.toString()}
-                footer={`${stats.differentLocations} locations`}
+                body={<AnimatedStatNumber value={stats.activeProviders} />}
+                footer={
+                  <>
+                    <AnimatedStatNumber value={stats.differentLocations} />
+                    {" locations"}
+                  </>
+                }
                 height="172.826px"
                 flex={1}
               />
               <CustomCard
                 title="Needs Attention"
-                body={stats.needsAttention.toString()}
+                body={<AnimatedStatNumber value={stats.needsAttention} />}
                 footer=""
                 height="172.826px"
                 flex={1}
