@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { AddIcon, DeleteIcon } from "@chakra-ui/icons";
+import { AddIcon, Checkbox } from "@chakra-ui/icons";
 import {
   Button,
   HStack,
@@ -226,15 +226,18 @@ const TagSelect = ({
       align="stretch"
     >
       {Array.isArray(selectedTags) && selectedTags.length > 0 && (
-        <HStack spacing={1} wrap="wrap">
+        <HStack
+          spacing={1}
+          wrap="wrap"
+        >
           {selectedTags.map((tagId) => {
             if (!tagId) return null;
             return (
-              <Tag 
-                size="md" 
-                key={tagId} 
-                variant="solid" 
-                backgroundColor="black" 
+              <Tag
+                size="md"
+                key={tagId}
+                variant="solid"
+                backgroundColor="black"
                 borderRadius={"4px"}
                 gap={"6px"}
                 padding={"5px 8px"}
@@ -247,7 +250,9 @@ const TagSelect = ({
                 lineHeight={"16px"}
               >
                 <TagLabel>{tagsMap[tagId]?.tagValue || ""}</TagLabel>
-                {!readOnly && <TagCloseButton onClick={handleRemoveTag(tagId)} />}
+                {!readOnly && (
+                  <TagCloseButton onClick={handleRemoveTag(tagId)} />
+                )}
               </Tag>
             );
           })}
@@ -257,6 +262,7 @@ const TagSelect = ({
       <Menu
         closeOnSelect={false}
         isLazy={false}
+        // matchWidth={true}
       >
         <MenuButton
           as={Button}
@@ -265,7 +271,7 @@ const TagSelect = ({
           // w="172px"
           justifyContent="flex-start"
           textAlign="left"
-          rightIcon={<ChevronDown size={(20)}/>}
+          rightIcon={<ChevronDown size={20} />}
           isDisabled={readOnly}
           color={"var(--gray-700, #2D3748)"}
           fontFamily={"Inter"}
@@ -301,15 +307,32 @@ const TagSelect = ({
                   justifyContent="space-between"
                   w="100%"
                 >
-                  <Text>{tag.tagValue}</Text>
+                  <Text
+                    maxW="120px"
+                    wordBreak="break-word"
+                    whiteSpace="normal"
+                  >
+                    {tag.tagValue}
+                  </Text>
                   {!readOnly && (
                     <Button
                       size="xs"
-                      colorScheme="gray"
+                      variant="ghost"
                       onClick={handleDeleteTag(tag)}
                       isLoading={!!deletingMap[tag.id]}
                     >
-                      <DeleteIcon />
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="14"
+                        height="18"
+                        viewBox="0 0 14 18"
+                        fill="none"
+                      >
+                        <path
+                          d="M1 16C1 17.1 1.9 18 3 18H11C12.1 18 13 17.1 13 16V4H1V16ZM3 6H11V16H3V6ZM10.5 1L9.5 0H4.5L3.5 1H0V3H14V1H10.5Z"
+                          fill="black"
+                        />
+                      </svg>
                     </Button>
                   )}
                 </HStack>
