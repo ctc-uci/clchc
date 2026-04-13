@@ -16,11 +16,12 @@ export default function TransferMasterRole({isOpen, onOpen, onClose}) {
       <HStack
         pl="2.5em"
         pr="2em"
-        py="1.5em"
+        py="1em"
       >
         <VStack
           w="100%"
           align="flex-start"
+          gap="0"
         >
           <Text
             fontWeight="bold"
@@ -29,7 +30,6 @@ export default function TransferMasterRole({isOpen, onOpen, onClose}) {
             Transfer Master Role
           </Text>
           <Text
-            my="2px"
             fontSize="14px"
             color="gray.600"
           >
@@ -42,6 +42,7 @@ export default function TransferMasterRole({isOpen, onOpen, onClose}) {
             p={4}
             border="2px solid"
             borderColor="#0052CE"
+            mt="10px"
           >
             <VStack align="flex-start">
               <HStack>

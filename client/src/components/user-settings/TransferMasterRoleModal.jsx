@@ -6,7 +6,6 @@ import {
   useDeleteUserByFirebaseUid,
   useUpdateUserByFirebaseUid,
 } from "@/contexts/hooks/data-fetching/useUsers.js";
-import { useQueryClient } from "@tanstack/react-query";
 import { useAuthContext } from "@/contexts/hooks/useAuthContext";
 
 import StepFinalize from "./transfer-master/StepFinalize.jsx";
@@ -16,7 +15,6 @@ import TransferModalHeader from "./transfer-master/TransferModalHeader.jsx";
 
 
 export default function TransferMasterRoleModal({ isOpen, onClose }) {
-  const queryClient = useQueryClient();
   const { currentUser, logout } = useAuthContext();
   const [step, setStep] = useState(1);
   const [option, setOption] = useState(null);
@@ -90,8 +88,7 @@ export default function TransferMasterRoleModal({ isOpen, onClose }) {
           await update();
           onClose();
           setStep(1);
-          queryClient.invalidateQueries(["currentUser"]);
-          queryClient.invalidateQueries(["users"]);
+          window.location.reload();
         }}
       />
     ),
@@ -105,7 +102,7 @@ export default function TransferMasterRoleModal({ isOpen, onClose }) {
     >
       <ModalOverlay />
       <ModalContent
-        padding="1em"
+        padding="0.5em"
         minW="700px"
         minH="500px"
       >
