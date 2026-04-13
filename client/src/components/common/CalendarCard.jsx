@@ -16,7 +16,7 @@ import {
 
 const DAYS_OF_WEEK = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
-const CalendarCard = ({ value, onChange }) => {
+const CalendarCard = ({ value, onChange, fullWidth = false }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [viewMonth, setViewMonth] = useState(() => {
     const d = value ? new Date(value + "T00:00:00") : new Date();
@@ -72,7 +72,7 @@ const CalendarCard = ({ value, onChange }) => {
     <Popover
       isOpen={isOpen}
       onClose={() => setIsOpen(false)}
-      placement="bottom-end"
+      placement={fullWidth ? "bottom-start" : "bottom-end"}
       closeOnBlur
     >
       <PopoverTrigger>
@@ -81,9 +81,9 @@ const CalendarCard = ({ value, onChange }) => {
           rightIcon={<ChevronDownIcon />}
           onClick={handleOpen}
           h="45px"
-          w="110px"
+          w={fullWidth ? "100%" : "110px"}
           px={3}
-          justifyContent="center"
+          justifyContent={fullWidth ? "space-between" : "center"}
           fontFamily="Lato"
           fontWeight="500"
           fontSize="14px"
