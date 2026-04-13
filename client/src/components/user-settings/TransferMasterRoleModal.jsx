@@ -13,7 +13,6 @@ import StepReviewTransfer from "./transfer-master/StepReviewTransfer.jsx";
 import StepSelectUser from "./transfer-master/StepSelectUser.jsx";
 import TransferModalHeader from "./transfer-master/TransferModalHeader.jsx";
 
-
 export default function TransferMasterRoleModal({ isOpen, onClose }) {
   const { currentUser, logout } = useAuthContext();
   const [step, setStep] = useState(1);
@@ -23,38 +22,40 @@ export default function TransferMasterRoleModal({ isOpen, onClose }) {
   const { mutateAsync: updateUser } = useUpdateUserByFirebaseUid();
 
   const update = async () => {
-  if (!selectedUser) return;
-
-  if (option === "delete") {
-    try {
-        console.log(selectedUser)
-      await updateUser({ uid: selectedUser, data: { role: "master" } });
-    } catch (error) {
-      console.error("Error transferring master role:", error);
-      return;
-    }
-    try {
-      await deleteUser(currentUser.uid);
-      logout();
-    } catch (error) {
-      console.error("Error deleting user:", error);
-      return;
+    if (!selectedUser) {
+      throw new Error("No user selected for transfer");
     }
 
-  } else if (option === "ccm") {
-    try {
-      await updateUser({ uid: selectedUser, data: { role: "master" } });
-    } catch (error) {
-      console.error("Error transferring master role:", error);
-      return;
+    if (option === "delete") {
+      try {
+        console.log(selectedUser);
+        await updateUser({ uid: selectedUser, data: { role: "master" } });
+      } catch (error) {
+        console.error("Error transferring master role:", error);
+        throw error;
+      }
+      try {
+        await deleteUser(currentUser.uid);
+        logout();
+      } catch (error) {
+        console.error("Error deleting user:", error);
+        throw error;
+      }
+    } else if (option === "ccm") {
+      try {
+        await updateUser({ uid: selectedUser, data: { role: "master" } });
+      } catch (error) {
+        console.error("Error transferring master role:", error);
+        throw error;
+      }
+      try {
+        await updateUser({ uid: currentUser.uid, data: { role: "ccm" } });
+      } catch (error) {
+        console.error("Error downgrading own role:", error);
+        throw error;
+      }
     }
-    try {
-      await updateUser({ uid: currentUser.uid, data: { role: "ccm" } });
-    } catch (error) {
-      console.error("Error downgrading own role:", error);
-    }
-  }
-};
+  };
 
   const stepMap = {
     1: (
@@ -85,10 +86,14 @@ export default function TransferMasterRoleModal({ isOpen, onClose }) {
         }}
         onSelect={setOption}
         onFinalize={async () => {
-          await update();
-          onClose();
-          setStep(1);
-          window.location.reload();
+          try {
+            await update();
+            onClose();
+            setStep(1);
+            window.location.reload();
+          } catch (error) {
+            console.error("Error finalizing transfer flow:", error);
+          }
         }}
       />
     ),

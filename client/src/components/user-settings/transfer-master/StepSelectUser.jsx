@@ -12,10 +12,10 @@ import {
   Input,
   InputGroup,
   InputLeftElement,
+  Skeleton,
   Tag,
   Text,
   VStack,
-  Skeleton
 } from "@chakra-ui/react";
 
 import { useUsers } from "@/contexts/hooks/data-fetching/useUsers";
@@ -77,8 +77,13 @@ export default function StepSelectUser({ onClose, onSelect, onNext }) {
           privileges. Viewers are not eligible.
         </Text>
         <InputGroup>
-          <InputLeftElement pointerEvents="none" display="flex" alignItems="center" h="100%">
-            <SearchIcon color="gray.400"/>
+          <InputLeftElement
+            pointerEvents="none"
+            display="flex"
+            alignItems="center"
+            h="100%"
+          >
+            <SearchIcon color="gray.400" />
           </InputLeftElement>
           <Input
             bg="white"
@@ -90,11 +95,25 @@ export default function StepSelectUser({ onClose, onSelect, onNext }) {
           />
         </InputGroup>
 
-        {isLoading ? ( <>
-          <Skeleton height="60px" width="100%"></Skeleton>
-          <Skeleton height="60px" width="100%"></Skeleton>
-          <Skeleton height="60px" width="100%"></Skeleton>
-          <Skeleton height="60px" width="100%"></Skeleton> </>
+        {isLoading ? (
+          <>
+            <Skeleton
+              height="60px"
+              width="100%"
+            ></Skeleton>
+            <Skeleton
+              height="60px"
+              width="100%"
+            ></Skeleton>
+            <Skeleton
+              height="60px"
+              width="100%"
+            ></Skeleton>
+            <Skeleton
+              height="60px"
+              width="100%"
+            ></Skeleton>{" "}
+          </>
         ) : (
           <Grid
             templateColumns="1fr 1fr"
@@ -105,13 +124,11 @@ export default function StepSelectUser({ onClose, onSelect, onNext }) {
           >
             {" "}
             {qualifiedUsers.map((user) => (
-              <GridItem
-                key={user.id}
-              >
+              <GridItem key={user.id}>
                 <Box
-                  bg={user.firebaseUid===selectedUser ? "#E7E7E7" : "#F7F7F7"}
+                  bg={user.firebaseUid === selectedUser ? "#E7E7E7" : "#F7F7F7"}
                   border="1px solid #E5E5E5"
-                  borderRadius="12px"
+                  borderRadius="8px"
                   px={4}
                   py={3}
                   w="100%"
@@ -154,7 +171,7 @@ export default function StepSelectUser({ onClose, onSelect, onNext }) {
 
                     <Tag
                       border="1px solid #D1D5DB"
-                      borderRadius="8px"
+                      borderRadius="6px"
                       px={2}
                       py="2px"
                       fontSize="12px"

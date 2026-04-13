@@ -32,12 +32,70 @@ const ROLE_COLORS = {
   master: "#573D59",
 };
 
+function UserCard({ user, roleBg, roleLabel }) {
+  return (
+    <Box
+      bg="#F7F7F7"
+      border="1px solid #E5E5E5"
+      borderRadius="8px"
+      px={4}
+      py={3}
+      w="100%"
+    >
+      <Flex
+        align="center"
+        gap={3}
+      >
+        <Avatar
+          name={`${user?.firstName} ${user?.lastName}`}
+          src={user?.photoURL}
+          size="sm"
+          bg="#FFF"
+          color="black"
+          borderRadius="10px"
+          w="36px"
+          h="36px"
+          fontSize="14px"
+        />
+
+        <Box flex={1}>
+          <Text
+            fontWeight="600"
+            fontSize="14px"
+          >
+            {user?.firstName} {user?.lastName}
+          </Text>
+          <Text
+            fontSize="12px"
+            color="gray.500"
+          >
+            {user?.email}
+          </Text>
+        </Box>
+
+        <Tag
+          border="1px solid #D1D5DB"
+          borderRadius="6px"
+          px={2}
+          py="2px"
+          fontSize="12px"
+          color="white"
+          bg={roleBg || "#F5F5F5"}
+        >
+          {roleLabel}
+        </Tag>
+      </Flex>
+    </Box>
+  );
+}
+
 export default function StepReviewTransfer({ onClose, selectedUid, onNext }) {
   const userData = useUserContext();
   const dbUser = userData?.dbUser;
   const [input, setInput] = useState("");
   const isTransferEnabled = input === "TRANSFER";
   const { data: selected, isLoading } = useUserByFirebaseUid(selectedUid);
+  const selectedUser = selected?.[0];
 
   return (
     <>
@@ -79,112 +137,18 @@ export default function StepReviewTransfer({ onClose, selectedUid, onNext }) {
             mx="auto"
           >
             <GridItem>
-              <Box
-                bg="#F7F7F7"
-                border="1px solid #E5E5E5"
-                borderRadius="12px"
-                px={4}
-                py={3}
-                w="100%"
-              >
-                <Flex
-                  align="center"
-                  gap={3}
-                >
-                  <Avatar
-                    name={`${dbUser?.firstName} ${dbUser?.lastName}`}
-                    src={dbUser?.photoURL}
-                    size="sm"
-                    bg="#FFF"
-                    color="black"
-                    borderRadius="10px"
-                    w="36px"
-                    h="36px"
-                    fontSize="14px"
-                  />
-
-                  <Box flex={1}>
-                    <Text
-                      fontWeight="600"
-                      fontSize="14px"
-                    >
-                      {dbUser?.firstName} {dbUser?.lastName}
-                    </Text>
-                    <Text
-                      fontSize="12px"
-                      color="gray.500"
-                    >
-                      {dbUser?.email}
-                    </Text>
-                  </Box>
-
-                  <Tag
-                    border="1px solid #D1D5DB"
-                    borderRadius="8px"
-                    px={2}
-                    py="2px"
-                    fontSize="12px"
-                    color="white"
-                    bg={ROLE_COLORS[dbUser?.role] || "#F5F5F5"}
-                  >
-                    {ROLE_LABELS[dbUser?.role] || dbUser?.role}
-                  </Tag>
-                </Flex>
-              </Box>
+              <UserCard
+                user={dbUser}
+                roleBg={ROLE_COLORS[dbUser?.role]}
+                roleLabel={ROLE_LABELS[dbUser?.role] || dbUser?.role}
+              />
             </GridItem>
             <GridItem>
-              <Box
-                bg="#F7F7F7"
-                border="1px solid #E5E5E5"
-                borderRadius="12px"
-                px={4}
-                py={3}
-                w="100%"
-              >
-                <Flex
-                  align="center"
-                  gap={3}
-                >
-                  <Avatar
-                    name={`${selected[0]?.firstName} ${selected[0]?.lastName}`}
-                    src={selected[0]?.photoURL}
-                    size="sm"
-                    bg="#FFF"
-                    color="black"
-                    borderRadius="10px"
-                    w="36px"
-                    h="36px"
-                    fontSize="14px"
-                  />
-
-                  <Box flex={1}>
-                    <Text
-                      fontWeight="600"
-                      fontSize="14px"
-                    >
-                      {selected[0]?.firstName} {selected[0]?.lastName}
-                    </Text>
-                    <Text
-                      fontSize="12px"
-                      color="gray.500"
-                    >
-                      {selected[0]?.email}
-                    </Text>
-                  </Box>
-
-                  <Tag
-                    border="1px solid #D1D5DB"
-                    borderRadius="8px"
-                    px={2}
-                    py="2px"
-                    fontSize="12px"
-                    color="white"
-                    bg={ROLE_COLORS[selected[0]?.role] || "#F5F5F5"}
-                  >
-                    {ROLE_LABELS[selected[0]?.role] || selected[0]?.role}
-                  </Tag>
-                </Flex>
-              </Box>
+              <UserCard
+                user={selectedUser}
+                roleBg={ROLE_COLORS[selectedUser?.role]}
+                roleLabel={ROLE_LABELS[selectedUser?.role] || selectedUser?.role}
+              />
             </GridItem>
             <GridItem>
               <VStack gap="0px">
@@ -215,112 +179,18 @@ export default function StepReviewTransfer({ onClose, selectedUid, onNext }) {
               </VStack>
             </GridItem>
             <GridItem>
-              <Box
-                bg="#F7F7F7"
-                border="1px solid #E5E5E5"
-                borderRadius="12px"
-                px={4}
-                py={3}
-                w="100%"
-              >
-                <Flex
-                  align="center"
-                  gap={3}
-                >
-                  <Avatar
-                    name={`${dbUser?.firstName} ${dbUser?.lastName}`}
-                    src={dbUser?.photoURL}
-                    size="sm"
-                    bg="#FFF"
-                    color="black"
-                    borderRadius="10px"
-                    w="36px"
-                    h="36px"
-                    fontSize="14px"
-                  />
-
-                  <Box flex={1}>
-                    <Text
-                      fontWeight="600"
-                      fontSize="14px"
-                    >
-                      {dbUser?.firstName} {dbUser?.lastName}
-                    </Text>
-                    <Text
-                      fontSize="12px"
-                      color="gray.500"
-                    >
-                      {dbUser?.email}
-                    </Text>
-                  </Box>
-
-                  <Tag
-                    border="1px solid #D1D5DB"
-                    borderRadius="8px"
-                    px={2}
-                    py="2px"
-                    fontSize="12px"
-                    color="white"
-                    bg={ROLE_COLORS[selected[0]?.role] || "#F5F5F5"}
-                  >
-                    {ROLE_LABELS[selected[0]?.role] || selected[0]?.role}
-                  </Tag>
-                </Flex>
-              </Box>
+              <UserCard
+                user={dbUser}
+                roleBg={ROLE_COLORS[selectedUser?.role]}
+                roleLabel={ROLE_LABELS[selectedUser?.role] || selectedUser?.role}
+              />
             </GridItem>
             <GridItem>
-              <Box
-                bg="#F7F7F7"
-                border="1px solid #E5E5E5"
-                borderRadius="12px"
-                px={4}
-                py={3}
-                w="100%"
-              >
-                <Flex
-                  align="center"
-                  gap={3}
-                >
-                  <Avatar
-                    name={`${selected[0]?.firstName} ${selected[0]?.lastName}`}
-                    src={selected[0]?.photoURL}
-                    size="sm"
-                    bg="#FFF"
-                    color="black"
-                    borderRadius="10px"
-                    w="36px"
-                    h="36px"
-                    fontSize="14px"
-                  />
-
-                  <Box flex={1}>
-                    <Text
-                      fontWeight="600"
-                      fontSize="14px"
-                    >
-                      {selected[0]?.firstName} {selected[0]?.lastName}
-                    </Text>
-                    <Text
-                      fontSize="12px"
-                      color="gray.500"
-                    >
-                      {selected[0]?.email}
-                    </Text>
-                  </Box>
-
-                  <Tag
-                    border="1px solid #D1D5DB"
-                    borderRadius="8px"
-                    px={2}
-                    py="2px"
-                    fontSize="12px"
-                    color="white"
-                    bg={ROLE_COLORS[dbUser?.role] || "#F5F5F5"}
-                  >
-                    {ROLE_LABELS[dbUser?.role] || dbUser?.role}
-                  </Tag>
-                </Flex>
-              </Box>
+              <UserCard
+                user={selectedUser}
+                roleBg={ROLE_COLORS[dbUser?.role]}
+                roleLabel={ROLE_LABELS[dbUser?.role] || dbUser?.role}
+              />
             </GridItem>
           </Grid>
         )}

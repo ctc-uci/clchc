@@ -45,7 +45,6 @@ export default function TransferModalHeader({ step }) {
 
         <VStack
           w="80px"
-          spacing={2}
           align="center"
         >
           <Box
@@ -79,7 +78,6 @@ export default function TransferModalHeader({ step }) {
 
         <VStack
           w="80px"
-          spacing={2}
           align="center"
         >
           <Box
