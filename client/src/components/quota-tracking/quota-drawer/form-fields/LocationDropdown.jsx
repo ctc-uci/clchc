@@ -96,11 +96,13 @@ export function LocationDropdown({ locationId, setLocationId, isLocked }) {
     e.stopPropagation();
     const id = location.id;
     setDeletingMap((m) => ({ ...m, [id]: true }));
-    if (String(id) === String(locationId)) setLocationId("");
 
     deleteLocation.mutate(
       { id },
       {
+        onSuccess: () => {
+          if (String(id) === String(locationId)) setLocationId("");
+        },
         onSettled: () =>
           setDeletingMap((m) => {
             const copy = { ...m };
