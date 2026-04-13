@@ -1,9 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
-
 import { CloseIcon } from "@chakra-ui/icons";
 import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  AlertTitle,
   Box,
   Button,
+  CloseButton,
   Drawer,
   DrawerBody,
   DrawerCloseButton,
@@ -49,6 +53,7 @@ import { CSS } from "@dnd-kit/utilities";
 import {
   MdCheck,
   MdDelete,
+  MdInfoOutline,
   MdLocalOffer,
   MdMenu,
   MdOutlineHorizontalRule,
@@ -72,7 +77,7 @@ const SkeletonBody = () => {
   );
 };
 
-function SortableCategory({ category, onDelete }) {
+function SortableCategory({ category, onDelete, isPendingDelete }) {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: category.id });
 
@@ -87,13 +92,14 @@ function SortableCategory({ category, onDelete }) {
       style={style}
       align="center"
       justify="space-between"
-      bg="white"
+      bg={isPendingDelete ? "#FFD2D2" : "white"}
       mb={3}
       height="48px"
+      borderRadius="6px"
     >
       <Flex
         align="center"
-        bg="#EDF2F7"
+        bg={isPendingDelete ? "#8B0000" : "#EDF2F7"}
         px={4}
         py={3}
         {...attributes}
@@ -105,18 +111,17 @@ function SortableCategory({ category, onDelete }) {
       >
         <MdMenu
           size="18px"
-          color="#000000"
+          color={isPendingDelete ? "#FFD2D2" : "#000000"}
         />
       </Flex>
       <Flex
         borderRadius="0 6px 6px 0"
-        border="1px solid #E2E8F0"
+        border={isPendingDelete ? "1px solid #CE0000" : "1px solid #E2E8F0"}
         width="100%"
         height="100%"
         align="center"
         position="relative"
       >
-        {/* Category Name */}
         <VStack
           pl="16px"
           pr="40px"
@@ -130,6 +135,7 @@ function SortableCategory({ category, onDelete }) {
             fontStyle="normal"
             fontSize="18px"
             mb={-1}
+            color={isPendingDelete ? "#8B0000" : "inherit"}
           >
             {category.name}
           </Text>
@@ -137,7 +143,7 @@ function SortableCategory({ category, onDelete }) {
             fontWeight="400"
             fontStyle="normal"
             fontSize="8px"
-            color="#0000007A"
+            color={isPendingDelete ? "#CE0000" : "#0000007A"}
           >
             {category.inputType === "text" ? "Plain Text" : "Tags"}{" "}
           </Text>
@@ -151,6 +157,9 @@ function SortableCategory({ category, onDelete }) {
           right="8px"
           top="50%"
           transform="translateY(-50%)"
+          color={isPendingDelete ? "#CE0000" : "inherit"}
+          _hover={{ bg: "transparent", boxShadow: "none" }}
+          _focus={{ boxShadow: "none" }}
           onClick={() => onDelete(category.id)}
         />
       </Flex>
@@ -159,8 +168,18 @@ function SortableCategory({ category, onDelete }) {
 }
 
 const inputTypeOptions = [
-  { value: "tag", label: "Tag (Default)", icon: MdLocalOffer },
-  { value: "text", label: "Plain Text", icon: MdTextFields },
+  {
+    value: "tag",
+    label: "Tag (Default)",
+    buttonLabel: "Tag",
+    icon: MdLocalOffer,
+  },
+  {
+    value: "text",
+    label: "Plain Text",
+    buttonLabel: "Plain Text",
+    icon: MdTextFields,
+  },
 ];
 
 const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
@@ -171,6 +190,9 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
   const [showForm, setShowForm] = useState(false);
   const [inputTypeMenuOpen, setInputTypeMenuOpen] = useState(false);
   const [deletedIds, setDeletedIds] = useState([]);
+  const [nameError, setNameError] = useState(false);
+  const [pendingAction, setPendingAction] = useState(null);
+  const [pendingDeleteIds, setPendingDeleteIds] = useState([]);
   const toast = useToast();
   const formStackRef = useRef(null);
   const { data: serverCategories = [], isLoading } = useDirectoryCategories();
@@ -185,25 +207,23 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
     setShowForm(false);
     setInputTypeMenuOpen(false);
     setDeletedIds([]);
+    setPendingDeleteIds([]);
+    setPendingAction(null);
   };
 
+  // Reset local state when drawer opens
+  useEffect(() => {
+    if (isOpen) resetLocalState();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
+
+  // Sync categories from server whenever serverCategories updates (including after save)
   useEffect(() => {
     if (!isOpen) return;
-
-    const fetchCategories = async () => {
-      try {
-        const sorted = [...serverCategories].sort(
-          (a, b) => a.columnOrder - b.columnOrder
-        );
-
-        setCategories(sorted);
-        resetLocalState();
-      } catch (err) {
-        console.error("Failed to fetch categories", err);
-      }
-    };
-
-    fetchCategories();
+    const sorted = [...serverCategories].sort(
+      (a, b) => a.columnOrder - b.columnOrder
+    );
+    setCategories(sorted);
   }, [isOpen, serverCategories]);
 
   // after clicking add new category, it scrolls to show the new stack form shown
@@ -241,9 +261,11 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
   };
 
   const handleAddCategory = () => {
-    if (!name.trim() || !inputType) {
+    if (!name.trim()) {
+      setNameError(true);
       return;
     }
+    if (!inputType) return;
 
     const newCategory = {
       id: `temp-${Date.now()}`,
@@ -254,26 +276,40 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
       dateCreated: new Date().toISOString(),
     };
 
-    setCategories([...categories, newCategory]);
+    setCategories((prev) => [...prev, newCategory]);
     setName("");
     setInputType("tag");
     setIsRequired(false);
+    setNameError(false);
     setShowForm(false);
+    setPendingAction({ type: "create" });
   };
 
   const handleSubmit = async () => {
+    const hasNewCategories = categories.some((cat) =>
+      String(cat.id).startsWith("temp-")
+    );
+    if (!pendingAction && !hasNewCategories) {
+      onClose();
+      return;
+    }
+
     try {
-      const idsToDelete = deletedIds.filter(
+      const idsToDelete = pendingDeleteIds.filter(
         (id) => !String(id).startsWith("temp-")
       );
-      const idsToDeleteSet = new Set(idsToDelete);
+      const pendingDeleteSet = new Set(pendingDeleteIds);
+
+      const deletedNames = categories
+        .filter((cat) => pendingDeleteSet.has(cat.id))
+        .map((cat) => cat.name);
 
       for (const id of idsToDelete) {
         await deleteCategory(id);
       }
 
       const categoriesToPersist = categories.filter(
-        (cat) => !idsToDeleteSet.has(cat.id)
+        (cat) => !pendingDeleteSet.has(cat.id)
       );
       const orderById = new Map(
         categoriesToPersist.map((cat, index) => [cat.id, index])
@@ -306,19 +342,59 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
         )
       );
 
-      // feedback for successfully saving categories
-      toast({
-        title: "Success",
-        description: "Categories saved successfully!",
-        status: "success",
-        position: "bottom-right",
-        duration: 5000,
-        isClosable: true,
+      newCategories.forEach((cat) => {
+        toast({
+          position: "bottom-right",
+          duration: 5000,
+          isClosable: true,
+          render: ({ onClose }) => (
+            <Alert
+              status="success"
+              borderBottom="4px solid #0C824D"
+              boxShadow="md"
+              pr={8}
+              position="relative"
+            >
+              <AlertIcon />
+              <Box>
+                <AlertTitle fontSize="14px" fontWeight="700">Category Created</AlertTitle>
+                <AlertDescription fontSize="13px" >
+                  You have created the new category &ldquo;{cat.name}&rdquo;.
+                </AlertDescription>
+              </Box>
+              <CloseButton position="absolute" right={2} top={2} size="sm" onClick={onClose} />
+            </Alert>
+          ),
+        });
       });
 
-      setCategories([]);
+      deletedNames.forEach((name) => {
+        toast({
+          position: "bottom-right",
+          duration: 5000,
+          isClosable: true,
+          render: ({ onClose }) => (
+            <Alert
+              status="error"
+              borderBottom="4px solid #90080F"
+              boxShadow="md"
+              pr={8}
+              position="relative"
+            >
+              <AlertIcon />
+              <Box gap = {0}>
+                <AlertTitle fontSize="14px" fontWeight="700">Category Deletion</AlertTitle>
+                <AlertDescription fontSize="13px">
+                  You have deleted the category &ldquo;{name}&rdquo;.
+                </AlertDescription>
+              </Box>
+              <CloseButton position="absolute" right={2} top={2} size="sm" onClick={onClose} />
+            </Alert>
+          ),
+        });
+      });
+
       resetLocalState();
-      onClose();
 
       if (typeof onSaved === "function") {
         onSaved();
@@ -343,14 +419,10 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
   };
 
   const handleMarkForDelete = (id) => {
-    setCategories((prev) => prev.filter((cat) => cat.id !== id));
-    setDeletedIds((prev) => {
-      if (String(id).startsWith("temp-") || prev.includes(id)) {
-        return prev;
-      }
-
-      return [...prev, id];
-    });
+    setPendingDeleteIds((prev) => (prev.includes(id) ? [] : [id]));
+    setPendingAction((prev) =>
+      prev?.type === "delete" && pendingDeleteIds.includes(id) ? null : { type: "delete" }
+    );
   };
   return (
     <>
@@ -406,6 +478,61 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
           ) : (
             <>
               <DrawerBody p="14px 28px 14px 28px">
+                {pendingAction && (
+                  <Box
+                    bg={pendingAction.type === "delete" ? "#FFD2D2" : "#92CAFD"}
+                    borderRadius="8px"
+                    p={4}
+                    mb={4}
+                    mt={2}
+                    border={`2px solid ${pendingAction.type === "delete" ? "#CE0000" : "#0052CE"}`}
+                  >
+                    <VStack
+                      align="flex-start"
+                      mb={3}
+                    >
+                      <HStack
+                        align="start"
+                        spacing={1}
+                        alignItems="center"
+                      >
+                        <Icon
+                          as={MdInfoOutline}
+                          color={pendingAction.type === "delete" ? "#CE0000" : "#0052CE"}
+                          boxSize="25px"
+                          mt="1px"
+                          flexShrink={0}
+                        />
+
+                        <Text
+                          fontWeight="500"
+                          color={pendingAction.type === "delete" ? "#CE0000" : "#0052CE"}
+                          fontSize="20px"
+                        >
+                          Notification
+                        </Text>
+                      </HStack>
+                      <Text
+                        color={pendingAction.type === "delete" ? "#CE0000" : "#0052CE"}
+                        fontSize="18px"
+                        fontWeight="400"
+                      >
+                        Please confirm you would like to{" "}
+                        <Text
+                          as="span"
+                          fontWeight="700"
+                        >
+                          {pendingAction.type}
+                        </Text>{" "}
+                        {pendingAction.type === "create"
+                          ? "a new category with the following information"
+                          : "this category with the following information"}
+                        .
+                      </Text>
+                    </VStack>
+                  </Box>
+                )}
+
                 <Box
                   border="1px solid #E2E8F0"
                   p="12px"
@@ -428,23 +555,26 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
                           key={cat.id}
                           category={cat}
                           onDelete={handleMarkForDelete}
+                          isPendingDelete={pendingDeleteIds.includes(cat.id)}
                         />
                       ))}
                     </SortableContext>
                   </DndContext>
 
-                  {!showForm && <Button
-                    onClick={() => setShowForm(!showForm)}
-                    width="100%"
-                    bg="#EDF2F7"
-                    borderRadius="10px"
-                    fontWeight="400"
-                    fontStyle="normal"
-                    fontSize="16px"
-                    maxHeight="40px"
-                  >
-                    + Add New Category
-                  </Button>}
+                  {!showForm && (
+                    <Button
+                      onClick={() => setShowForm(!showForm)}
+                      width="100%"
+                      bg="#EDF2F7"
+                      borderRadius="10px"
+                      fontWeight="400"
+                      fontStyle="normal"
+                      fontSize="16px"
+                      maxHeight="40px"
+                    >
+                      + Add New Category
+                    </Button>
+                  )}
 
                   {showForm && (
                     <Stack
@@ -469,9 +599,25 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
                             borderRadius="2px"
                             // align="start"
                             value={name}
-                            onChange={(e) => setName(e.target.value)}
+                            onChange={(e) => {
+                              setName(e.target.value);
+                              if (nameError) setNameError(false);
+                            }}
+                            borderColor={nameError ? "#E53E3E" : undefined}
+                            _hover={{
+                              borderColor: nameError ? "#E53E3E" : undefined,
+                            }}
                             height="36px"
                           />
+                          {nameError && (
+                            <Text
+                              fontSize="12px"
+                              color="red.400"
+                              mt={1}
+                            >
+                              Please fill out category name.
+                            </Text>
+                          )}
                         </FormControl>
                         <Flex
                           as="label"
@@ -534,7 +680,7 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
                               >
                                 {inputTypeOptions.find(
                                   (opt) => opt.value === inputType
-                                )?.label ?? "Select type"}
+                                )?.buttonLabel ?? "Select type"}
                               </Text>
                             </HStack>
                           </Button>
@@ -573,7 +719,12 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
                                 >
                                   <HStack spacing={3}>
                                     <Icon as={option.icon} />
-                                    <Text fontWeight={400} fontSize="14px">{option.label}</Text>
+                                    <Text
+                                      fontWeight={400}
+                                      fontSize="14px"
+                                    >
+                                      {option.label}
+                                    </Text>
                                   </HStack>
                                   {inputType === option.value && (
                                     <Icon
@@ -639,7 +790,7 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
                   Cancel
                 </Button>
                 <Button
-                  bg="#113D64"
+                  bg={pendingAction?.type === "delete" ? "#90080F" : "#113D64"}
                   color="white"
                   width="48%"
                   onClick={handleSubmit}
@@ -648,7 +799,7 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
                   fontSize="18px"
                   fontWeight="600"
                 >
-                  Confirm
+                  {pendingAction?.type === "delete" ? "Delete" : "Confirm"}
                 </Button>
               </DrawerFooter>
             </>
