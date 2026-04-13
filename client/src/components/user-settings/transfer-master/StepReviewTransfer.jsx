@@ -43,8 +43,6 @@ export default function StepReviewTransfer({ onClose, dummySelected, onNext }) {
     email: "jane.smith@example.com",
   };
 
-  
-
   return (
     <>
       <VStack alignItems="flex-start">
@@ -64,7 +62,7 @@ export default function StepReviewTransfer({ onClose, dummySelected, onNext }) {
         <Grid
           templateColumns="1fr 1fr"
           columnGap="20px"
-          rowGap="20px"
+          rowGap="5px"
           w="100%"
           mx="auto"
         >
@@ -179,10 +177,14 @@ export default function StepReviewTransfer({ onClose, dummySelected, onNext }) {
           <GridItem>
             <VStack gap="0px">
               <ChevronUpIcon
+                padding="0"
+                margin="0"
                 boxSize={6}
                 color="black"
               />
               <ChevronDownIcon
+                padding="0"
+                margin="0"
                 boxSize={6}
                 color="black"
               />

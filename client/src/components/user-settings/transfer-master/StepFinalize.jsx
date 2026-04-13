@@ -1,6 +1,6 @@
-import { Button, HStack, Text, VStack } from "@chakra-ui/react";
+import { Box, Button, HStack, Text, VStack } from "@chakra-ui/react";
 
-export default function StepSelectUser({ onClose, onSelect, onFinalize }) {
+export default function StepFinalize({ onClose, onSelect, onFinalize }) {
   return (
     <>
       <VStack alignItems="flex-start">
@@ -17,10 +17,42 @@ export default function StepSelectUser({ onClose, onSelect, onFinalize }) {
         >
           Choose what happens to your account after transfer.
         </Text>
+
+        <Box
+          bg="#F7F7F7"
+          border="1px solid #E5E5E5"
+          borderRadius="12px"
+          px={4}
+          py={3}
+          w="95%"
+        >
+          <Text fontSize="14px" fontWeight="400">
+            Keep my account as CCM
+          </Text>
+          <Text fontSize="12px" color="gray.500">
+            You will be demoted to Call Center manager and retain full platform access.
+          </Text>
+        </Box>
+        <Box
+          bg="#F7F7F7"
+          border="1px solid #E5E5E5"
+          borderRadius="12px"
+          px={4}
+          py={3}
+          w="95%"
+        >
+          <Text fontSize="14px" fontWeight="400">
+            Delete my account Permanently
+          </Text>
+          <Text fontSize="12px" color="gray.500">
+            Your account will be permanently removed from CLCHC. This cannot be undone.
+          </Text>
+        </Box>
       </VStack>
       <HStack
         justifyContent="flex-end"
         gap="10px"
+        mt="30px"
       >
         <Button
           onClick={onClose}
