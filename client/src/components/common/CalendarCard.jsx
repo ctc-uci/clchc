@@ -14,13 +14,10 @@ import {
   Text,
 } from "@chakra-ui/react";
 
-const DAYS_OF_WEEK = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+const DAYS_OF_WEEK = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
 const CalendarCard = ({ value, onChange }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [tempDate, setTempDate] = useState(() => {
-    return value ? new Date(value + "T00:00:00") : new Date();
-  });
   const [viewMonth, setViewMonth] = useState(() => {
     const d = value ? new Date(value + "T00:00:00") : new Date();
     return new Date(d.getFullYear(), d.getMonth(), 1);
@@ -28,25 +25,19 @@ const CalendarCard = ({ value, onChange }) => {
 
   useEffect(() => {
     const d = value ? new Date(value + "T00:00:00") : new Date();
-    setTempDate(d);
     setViewMonth(new Date(d.getFullYear(), d.getMonth(), 1));
   }, [value]);
 
   const handleOpen = () => {
     const d = value ? new Date(value + "T00:00:00") : new Date();
-    setTempDate(d);
     setViewMonth(new Date(d.getFullYear(), d.getMonth(), 1));
     setIsOpen(true);
   };
 
-  const handleCancel = () => {
-    setIsOpen(false);
-  };
-
-  const handleApply = () => {
-    const y = tempDate.getFullYear();
-    const m = String(tempDate.getMonth() + 1).padStart(2, "0");
-    const d = String(tempDate.getDate()).padStart(2, "0");
+  const handleDayClick = (day) => {
+    const y = viewMonth.getFullYear();
+    const m = String(viewMonth.getMonth() + 1).padStart(2, "0");
+    const d = String(day).padStart(2, "0");
     onChange(`${y}-${m}-${d}`);
     setIsOpen(false);
   };
@@ -122,28 +113,30 @@ const CalendarCard = ({ value, onChange }) => {
             align="center"
             mb={3}
           >
-            <IconButton
-              icon={<ChevronLeftIcon />}
-              size="sm"
-              variant="ghost"
-              onClick={prevMonth}
-              aria-label="Previous month"
-              borderRadius="md"
-            />
-            <Text
-              fontWeight="semibold"
-              fontSize="sm"
-            >
-              {monthLabel}
-            </Text>
-            <IconButton
-              icon={<ChevronRightIcon />}
-              size="sm"
-              variant="ghost"
-              onClick={nextMonth}
-              aria-label="Next month"
-              borderRadius="md"
-            />
+            <Flex align="center" gap={1}>
+              <Text fontWeight="semibold" fontSize="sm">
+                {monthLabel}
+              </Text>
+              <ChevronRightIcon color="gray.500" boxSize={3} />
+            </Flex>
+            <Flex gap={1}>
+              <IconButton
+                icon={<ChevronLeftIcon />}
+                size="sm"
+                variant="ghost"
+                onClick={prevMonth}
+                aria-label="Previous month"
+                borderRadius="md"
+              />
+              <IconButton
+                icon={<ChevronRightIcon />}
+                size="sm"
+                variant="ghost"
+                onClick={nextMonth}
+                aria-label="Next month"
+                borderRadius="md"
+              />
+            </Flex>
           </Flex>
 
           <Grid
@@ -171,10 +164,12 @@ const CalendarCard = ({ value, onChange }) => {
 
             {Array.from({ length: daysInMonth }).map((_, i) => {
               const day = i + 1;
+              const selectedDate = value ? new Date(value + "T00:00:00") : null;
               const isSelected =
-                tempDate.getFullYear() === year &&
-                tempDate.getMonth() === month &&
-                tempDate.getDate() === day;
+                selectedDate &&
+                selectedDate.getFullYear() === year &&
+                selectedDate.getMonth() === month &&
+                selectedDate.getDate() === day;
               const isToday =
                 today.getFullYear() === year &&
                 today.getMonth() === month &&
@@ -184,16 +179,19 @@ const CalendarCard = ({ value, onChange }) => {
                 <Button
                   key={day}
                   size="xs"
-                  variant={isSelected ? "solid" : "ghost"}
-                  colorScheme={isSelected ? "blue" : "gray"}
+                  variant="ghost"
                   borderRadius="full"
-                  onClick={() => setTempDate(new Date(year, month, day))}
-                  fontWeight={isToday && !isSelected ? "bold" : "normal"}
-                  color={isToday && !isSelected ? "blue.500" : undefined}
+                  onClick={() => handleDayClick(day)}
                   h="32px"
                   w="32px"
                   minW="32px"
                   p={0}
+                  bg={isSelected ? "pink.100" : undefined}
+                  color={isSelected ? "pink.600" : isToday ? "gray.800" : undefined}
+                  fontWeight={isToday || isSelected ? "bold" : "normal"}
+                  border={isToday && !isSelected ? "1.5px solid" : undefined}
+                  borderColor={isToday && !isSelected ? "gray.400" : undefined}
+                  _hover={{ bg: isSelected ? "pink.200" : "gray.100" }}
                 >
                   {day}
                 </Button>
@@ -201,26 +199,6 @@ const CalendarCard = ({ value, onChange }) => {
             })}
           </Grid>
 
-          <Flex
-            mt={4}
-            gap={2}
-            justify="flex-end"
-          >
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={handleCancel}
-            >
-              Cancel
-            </Button>
-            <Button
-              size="sm"
-              colorScheme="blue"
-              onClick={handleApply}
-            >
-              Apply
-            </Button>
-          </Flex>
         </PopoverBody>
       </PopoverContent>
     </Popover>
