@@ -222,7 +222,7 @@ export function LocationDropdown({ locationId, setLocationId, isLocked }) {
                 gap={2}
               >
                 <Input
-                  placeholder="New location"
+                  placeholder="Add"
                   size="sm"
                   value={newValue}
                   onChange={(e) => setNewValue(e.target.value)}
@@ -230,6 +230,8 @@ export function LocationDropdown({ locationId, setLocationId, isLocked }) {
                   fontSize="12px"
                   fontWeight="400"
                   pl="5"
+                  color="black"
+                  _placeholder={{ color: "black" }}
                 />
                 <Button
                   size="xs"
