@@ -88,7 +88,7 @@ export default function StepSelectUser({ onClose, onSelect, onNext }) {
           <Input
             bg="white"
             placeholder="Search Users"
-            borderRadius="md"
+            borderRadius="10px"
             h="45px"
             value={searchInput}
             onChange={handleSearchChange}
