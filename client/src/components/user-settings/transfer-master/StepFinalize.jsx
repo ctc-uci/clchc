@@ -5,8 +5,15 @@ import { Box, Button, HStack, Text, VStack } from "@chakra-ui/react";
 export default function StepFinalize({ onClose, onSelect, onFinalize }) {
   const [selectedOption, setSelectedOption] = useState(null);
   return (
-    <>
-      <VStack alignItems="flex-start">
+    <VStack
+      alignItems="stretch"
+      h="100%"
+      spacing={0}
+    >
+      <VStack
+        alignItems="flex-start"
+        flex="1"
+      >
         <Text
           fontSize="14px"
           fontWeight="400"
@@ -77,7 +84,9 @@ export default function StepFinalize({ onClose, onSelect, onFinalize }) {
       <HStack
         justifyContent="flex-end"
         gap="10px"
-        mt="186px"
+        mt="auto"
+        pt="28px"
+        mb="-7px"
       >
         <Button
           onClick={onClose}
@@ -106,6 +115,6 @@ export default function StepFinalize({ onClose, onSelect, onFinalize }) {
           Next
         </Button>
       </HStack>
-    </>
+    </VStack>
   );
 }

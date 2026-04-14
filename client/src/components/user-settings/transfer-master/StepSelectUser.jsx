@@ -56,9 +56,14 @@ export default function StepSelectUser({ onClose, onSelect, onNext }) {
   };
 
   return (
-    <>
+    <VStack
+      alignItems="stretch"
+      h="100%"
+      spacing={0}
+    >
       <VStack
         alignItems="flex-start"
+        flex="1"
         w="100%"
         gap="10px"
       >
@@ -189,7 +194,8 @@ export default function StepSelectUser({ onClose, onSelect, onNext }) {
       <HStack
         justifyContent="flex-end"
         gap="10px"
-        mt="13px"
+        mt="auto"
+        pt="12px"
       >
         <Button
           onClick={onClose}
@@ -218,6 +224,6 @@ export default function StepSelectUser({ onClose, onSelect, onNext }) {
           Next
         </Button>
       </HStack>
-    </>
+    </VStack>
   );
 }

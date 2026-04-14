@@ -98,8 +98,15 @@ export default function StepReviewTransfer({ onClose, selectedUid, onNext }) {
   const selectedUser = selected?.[0];
 
   return (
-    <>
-      <VStack alignItems="flex-start">
+    <VStack
+      alignItems="stretch"
+      h="100%"
+      spacing={0}
+    >
+      <VStack
+        alignItems="flex-start"
+        flex="1"
+      >
         <Text
           fontSize="14px"
           fontWeight="400"
@@ -211,7 +218,8 @@ export default function StepReviewTransfer({ onClose, selectedUid, onNext }) {
       <HStack
         justifyContent="flex-end"
         gap="10px"
-        mt="30px"
+        mt="auto"
+        pt="29px"
       >
         <Button
           onClick={onClose}
@@ -240,6 +248,6 @@ export default function StepReviewTransfer({ onClose, selectedUid, onNext }) {
           Next
         </Button>
       </HStack>
-    </>
+    </VStack>
   );
 }
