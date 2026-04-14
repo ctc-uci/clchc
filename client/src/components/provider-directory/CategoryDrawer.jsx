@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 
-import { DeleteIcon, HamburgerIcon } from "@chakra-ui/icons";
+import { AddIcon, DeleteIcon, HamburgerIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
@@ -20,6 +20,7 @@ import {
   RadioGroup,
   Skeleton,
   Stack,
+  Text,
   useToast,
 } from "@chakra-ui/react";
 
@@ -320,7 +321,35 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
                     items={categories.map((cat) => cat.id)}
                     strategy={verticalListSortingStrategy}
                   >
-                    {categories.map((cat) => (
+                    {categories.length === 0 ? (
+                      <Box display="flex" flexDirection="column" alignItems="center" pb="16px" borderRadius="4px" border="1px solid" borderColor="gray.200">
+                        <Box display="flex" alignItems="center" justifyContent="center" w={"80%"} px={"10.5px"} pt={"88px"}>
+                          <Text fontFamily="Inter" fontSize="14px" color="rgba(88, 103, 113, 0.73)" fontWeight={"normal"} textAlign="center" mb={"88px"}>
+                            No categories added yet. Add a new category now.
+                          </Text>
+                        </Box>
+                        <Button
+                          onClick={() => setShowForm(!showForm)}
+                          display="flex"
+                          w="90%"
+                          h="40px"
+                          px="16px"
+                          justifyContent="center"
+                          alignItems="center"
+                          iconSpacing="8px"
+                          borderRadius="10px"
+                          bg="#EDF2F7"
+                          color="gray.600"
+                          fontFamily="Lato"
+                          fontSize="14px"
+                          fontWeight="normal"
+                          leftIcon={<AddIcon boxSize="10px" />}
+                          _hover={{ bg: "gray.200" }}
+                        >
+                          Add New Category
+                        </Button>
+                      </Box>
+                    ) : categories.map((cat) => (
                       <SortableCategory
                         key={cat.id}
                         category={cat}
@@ -330,9 +359,11 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
                   </SortableContext>
                 </DndContext>
 
-                <Button onClick={() => setShowForm(!showForm)}>
-                  Add Category
-                </Button>
+                {categories.length > 0 && (
+                  <Button onClick={() => setShowForm(!showForm)}>
+                    Add Category
+                  </Button>
+                )}
 
                 {showForm && (
                   <Stack
