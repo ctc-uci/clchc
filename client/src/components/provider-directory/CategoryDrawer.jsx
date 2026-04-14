@@ -10,21 +10,17 @@ import {
   CloseButton,
   Drawer,
   DrawerBody,
-  DrawerCloseButton,
   DrawerContent,
   DrawerFooter,
   DrawerHeader,
   DrawerOverlay,
   Flex,
   FormControl,
-  FormLabel,
   HStack,
   Icon,
   IconButton,
   Input,
   Radio,
-  RadioGroup,
-  Select,
   Skeleton,
   Stack,
   Text,
@@ -77,7 +73,7 @@ const SkeletonBody = () => {
   );
 };
 
-function SortableCategory({ category, onDelete, isPendingDelete }) {
+function SortableCategory({ category, onDelete, isPendingDelete, isPendingCreate, isDeleteDisabled }) {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: category.id });
 
@@ -92,14 +88,14 @@ function SortableCategory({ category, onDelete, isPendingDelete }) {
       style={style}
       align="center"
       justify="space-between"
-      bg={isPendingDelete ? "#FFD2D2" : "white"}
+      bg={isPendingDelete ? "#FFD2D2" : isPendingCreate ? "#92CAFD" : "white"}
       mb={3}
       height="48px"
       borderRadius="6px"
     >
       <Flex
         align="center"
-        bg={isPendingDelete ? "#8B0000" : "#EDF2F7"}
+        bg={isPendingDelete ? "#8B0000" : isPendingCreate ? "#0052CE" : "#EDF2F7"}
         px={4}
         py={3}
         {...attributes}
@@ -111,12 +107,12 @@ function SortableCategory({ category, onDelete, isPendingDelete }) {
       >
         <MdMenu
           size="18px"
-          color={isPendingDelete ? "#FFD2D2" : "#000000"}
+          color={isPendingDelete || isPendingCreate ? "white" : "#000000"}
         />
       </Flex>
       <Flex
         borderRadius="0 6px 6px 0"
-        border={isPendingDelete ? "1px solid #CE0000" : "1px solid #E2E8F0"}
+        border={isPendingDelete ? "1px solid #CE0000" : isPendingCreate ? "1px solid #0052CE" : "1px solid #E2E8F0"}
         width="100%"
         height="100%"
         align="center"
@@ -135,7 +131,7 @@ function SortableCategory({ category, onDelete, isPendingDelete }) {
             fontStyle="normal"
             fontSize="18px"
             mb={-1}
-            color={isPendingDelete ? "#8B0000" : "inherit"}
+            color={isPendingDelete ? "#8B0000" : isPendingCreate ? "#0052CE" : "inherit"}
           >
             {category.name}
           </Text>
@@ -143,14 +139,14 @@ function SortableCategory({ category, onDelete, isPendingDelete }) {
             fontWeight="400"
             fontStyle="normal"
             fontSize="8px"
-            color={isPendingDelete ? "#CE0000" : "#0000007A"}
+            color={isPendingDelete ? "#CE0000" : isPendingCreate ? "#0052CE" : "#0000007A"}
           >
             {category.inputType === "text" ? "Plain Text" : "Tags"}{" "}
           </Text>
         </VStack>
 
         <IconButton
-          icon={<MdDelete   />}
+          icon={<MdDelete />}
           aria-label="Delete category"
           variant="ghost"
           position="absolute"
@@ -160,6 +156,8 @@ function SortableCategory({ category, onDelete, isPendingDelete }) {
           color={isPendingDelete ? "#CE0000" : "inherit"}
           _hover={{ bg: "transparent", boxShadow: "none" }}
           _focus={{ boxShadow: "none" }}
+          isDisabled={isDeleteDisabled}
+          opacity={isDeleteDisabled ? 0.3 : 1}
           onClick={() => onDelete(category.id)}
         />
       </Flex>
@@ -189,10 +187,10 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
   const [categories, setCategories] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [inputTypeMenuOpen, setInputTypeMenuOpen] = useState(false);
-  const [deletedIds, setDeletedIds] = useState([]);
   const [nameError, setNameError] = useState(false);
-  const [pendingAction, setPendingAction] = useState(null);
   const [pendingDeleteIds, setPendingDeleteIds] = useState([]);
+  const [deletePhase, setDeletePhase] = useState(null); // null | "confirming"
+  const [createPhase, setCreatePhase] = useState(null); // null | "confirming"
   const [hasReordered, setHasReordered] = useState(false);
   const toast = useToast();
   const formStackRef = useRef(null);
@@ -207,9 +205,9 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
     setIsRequired(false);
     setShowForm(false);
     setInputTypeMenuOpen(false);
-    setDeletedIds([]);
     setPendingDeleteIds([]);
-    setPendingAction(null);
+    setDeletePhase(null);
+    setCreatePhase(null);
     setHasReordered(false);
     setNameError(false);
   };
@@ -269,7 +267,6 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
       setNameError(true);
       return;
     }
-    if (!inputType) return;
 
     const newCategory = {
       id: `temp-${Date.now()}`,
@@ -286,14 +283,13 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
     setIsRequired(false);
     setNameError(false);
     setShowForm(false);
-    setPendingAction({ type: "create" });
   };
 
   const handleSubmit = async () => {
     const hasNewCategories = categories.some((cat) =>
       String(cat.id).startsWith("temp-")
     );
-    if (!pendingAction && !hasNewCategories && !hasReordered) {
+    if (!hasNewCategories && !hasReordered && deletePhase !== "confirming") {
       onClose();
       return;
     }
@@ -398,7 +394,7 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
         });
       });
 
-      const wasReorderOnly = hasReordered && !pendingAction && !categories.some((cat) => String(cat.id).startsWith("temp-"));
+      const wasReorderOnly = hasReordered && deletePhase !== "confirming" && !categories.some((cat) => String(cat.id).startsWith("temp-"));
       resetLocalState();
 
       if (wasReorderOnly) onClose();
@@ -426,10 +422,10 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
   };
 
   const handleMarkForDelete = (id) => {
-    setPendingDeleteIds((prev) => (prev.includes(id) ? [] : [id]));
-    setPendingAction((prev) =>
-      prev?.type === "delete" && pendingDeleteIds.includes(id) ? null : { type: "delete" }
+    setPendingDeleteIds((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
     );
+    setDeletePhase(null);
   };
   return (
     <>
@@ -485,14 +481,14 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
           ) : (
             <>
               <DrawerBody p="14px 28px 14px 28px">
-                {pendingAction && (
+                {(createPhase === "confirming" || deletePhase === "confirming") && (
                   <Box
-                    bg={pendingAction.type === "delete" ? "#FFD2D2" : "#92CAFD"}
+                    bg={deletePhase === "confirming" ? "#FFD2D2" : "#92CAFD"}
                     borderRadius="8px"
                     p={4}
                     mb={4}
                     mt={2}
-                    border={`2px solid ${pendingAction.type === "delete" ? "#CE0000" : "#0052CE"}`}
+                    border={`2px solid ${deletePhase === "confirming" ? "#CE0000" : "#0052CE"}`}
                   >
                     <VStack
                       align="flex-start"
@@ -505,35 +501,33 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
                       >
                         <Icon
                           as={MdInfoOutline}
-                          color={pendingAction.type === "delete" ? "#CE0000" : "#0052CE"}
+                          color={deletePhase === "confirming" ? "#CE0000" : "#0052CE"}
                           boxSize="25px"
                           mt="1px"
                           flexShrink={0}
                         />
-
                         <Text
                           fontWeight="500"
-                          color={pendingAction.type === "delete" ? "#CE0000" : "#0052CE"}
+                          color={deletePhase === "confirming" ? "#CE0000" : "#0052CE"}
                           fontSize="20px"
                         >
                           Notification
                         </Text>
                       </HStack>
                       <Text
-                        color={pendingAction.type === "delete" ? "#CE0000" : "#0052CE"}
+                        color={deletePhase === "confirming" ? "#CE0000" : "#0052CE"}
                         fontSize="18px"
                         fontWeight="400"
                       >
                         Please confirm you would like to{" "}
-                        <Text
-                          as="span"
-                          fontWeight="700"
-                        >
-                          {pendingAction.type}
+                        <Text as="span" fontWeight="700">
+                          {deletePhase === "confirming" ? "delete" : "create"}
                         </Text>{" "}
-                        {pendingAction.type === "create"
-                          ? "a new category with the following information"
-                          : "this category with the following information"}
+                        {deletePhase === "confirming"
+                          ? pendingDeleteIds.length > 1
+                            ? `these ${pendingDeleteIds.length} categories`
+                            : "this category"
+                          : "a new category with the following information"}
                         .
                       </Text>
                     </VStack>
@@ -563,6 +557,8 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
                           category={cat}
                           onDelete={handleMarkForDelete}
                           isPendingDelete={pendingDeleteIds.includes(cat.id)}
+                          isPendingCreate={String(cat.id).startsWith("temp-")}
+                          isDeleteDisabled={categories.some((c) => String(c.id).startsWith("temp-"))}
                         />
                       ))}
                     </SortableContext>
@@ -578,12 +574,13 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
                       fontStyle="normal"
                       fontSize="16px"
                       maxHeight="40px"
+                      isDisabled={pendingDeleteIds.length > 0}
                     >
                       + Add New Category
                     </Button>
                   )}
 
-                  {showForm && (
+                  {showForm && pendingDeleteIds.length === 0 && (
                     <Stack
                       gap={4}
                       mt={4}
@@ -602,9 +599,7 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
                             bg="white"
                             type="text"
                             placeholder="Category Name"
-                            // color="black"
                             borderRadius="2px"
-                            // align="start"
                             value={name}
                             onChange={(e) => {
                               setName(e.target.value);
@@ -635,8 +630,7 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
                           cursor="pointer"
                         >
                           <Radio
-                            value="required"
-                            isChecked={isRequired}
+                            isChecked={!isRequired}
                             onChange={() => setIsRequired(!isRequired)}
                             border="2px solid #718096"
                           />
@@ -753,7 +747,6 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
                         <Button
                           bg="white"
                           color="black"
-                          // variant="outline"
                           onClick={() => setShowForm(false)}
                           width="122px"
                           height="40px"
@@ -797,17 +790,31 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
                   Cancel
                 </Button>
                 <Button
-                  bg={pendingAction?.type === "delete" ? "#90080F" : "#113D64"}
+                  bg={pendingDeleteIds.length > 0 ? "#90080F" : "#113D64"}
                   color="white"
                   width="48%"
-                  onClick={handleSubmit}
+                  onClick={() => {
+                    if (pendingDeleteIds.length > 0 && deletePhase !== "confirming") {
+                      setDeletePhase("confirming");
+                    } else if (categories.some((c) => String(c.id).startsWith("temp-")) && createPhase !== "confirming") {
+                      setCreatePhase("confirming");
+                    } else {
+                      handleSubmit();
+                    }
+                  }}
                   borderRadius="4px"
                   minHeight="48px"
                   fontSize="18px"
                   fontWeight="600"
-                  isDisabled={!pendingAction && !hasReordered && !categories.some((cat) => String(cat.id).startsWith("temp-"))}
+                  isDisabled={!hasReordered && pendingDeleteIds.length === 0 && !categories.some((cat) => String(cat.id).startsWith("temp-"))}
                 >
-                  {pendingAction?.type === "delete" ? "Delete" : hasReordered ? "Save Changes" : "Confirm"}
+                  {deletePhase === "confirming"
+                    ? "Confirm Delete"
+                    : pendingDeleteIds.length > 0
+                    ? "Delete"
+                    : hasReordered
+                    ? "Save Changes"
+                    : "Confirm"}
                 </Button>
               </DrawerFooter>
             </>
