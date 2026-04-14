@@ -214,6 +214,11 @@ export const ProviderDirectoryPage = () => {
                 : undefined
             }
             loading={isLoading || loadingCategories}
+            onCreateProvider={
+              role === "ccm" || role === "master"
+                ? openCreateProviderDrawer
+                : undefined
+            }
           />
         </Box>
       ) : (

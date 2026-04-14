@@ -1,6 +1,7 @@
 import React from "react";
 
 import {
+  Box,
   Skeleton,
   Table,
   TableContainer,
@@ -12,6 +13,8 @@ import {
   Tr,
   VStack,
 } from "@chakra-ui/react";
+
+import { MdSentimentDissatisfied } from "react-icons/md";
 
 const SkeletonRows = () => {
   return (
@@ -103,15 +106,13 @@ const VersionLogTable = ({ loading, logs }) => {
           <Tbody>
             {!loading && logs.length === 0 && (
               <Tr>
-                <Td
-                  colSpan={4}
-                  py="40px"
-                  textAlign="center"
-                  color="gray.400"
-                  fontFamily="Inter"
-                  fontSize="14px"
-                >
-                  No version history available
+                <Td colSpan={4} height={"424px"} textAlign="center" py={10}>
+                  <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
+                    <MdSentimentDissatisfied size={69} color="#586771" />
+                    <Text fontFamily="Lato" fontSize="18px" color="gray.500">
+                      No audit logs found.
+                    </Text>
+                  </Box>
                 </Td>
               </Tr>
             )}

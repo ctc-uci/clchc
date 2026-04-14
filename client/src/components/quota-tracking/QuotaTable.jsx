@@ -15,6 +15,8 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 
+import { MdSentimentDissatisfied } from "react-icons/md";
+
 import TextPopup from "@/components/common/TextPopup";
 import ProgressBar from "@/components/quota-tracking/ProgressBar";
 import QuotaDrawer from "@/components/quota-tracking/QuotaDrawer";
@@ -137,6 +139,17 @@ const QuotaTable = ({ rows, loading, onRowsUpdate, role }) => {
         <Tbody>
           {loading ? (
             <SkeletonRows />
+          ) : rows.length === 0 ? (
+            <Tr>
+              <Td colSpan={5} height={"240px"} textAlign="center" py={10}>
+                <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
+                  <MdSentimentDissatisfied size={69} color="#586771" />
+                  <Text fontFamily="Lato" fontSize="18px" color="gray.500">
+                    No quotas found.
+                  </Text>
+                </Box>
+              </Td>
+            </Tr>
           ) : (
             rows.map((row) => (
               <Tr

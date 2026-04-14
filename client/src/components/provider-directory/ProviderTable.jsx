@@ -1,4 +1,6 @@
 import {
+  Box,
+  Button,
   Skeleton,
   Table,
   TableContainer,
@@ -12,9 +14,12 @@ import {
   Wrap,
   WrapItem,
 } from "@chakra-ui/react";
+import { AddIcon } from "@chakra-ui/icons";
+import { MdPersonAdd } from "react-icons/md";
 
 import TextPopup from "@/components/common/TextPopup";
 import { useTags } from "@/contexts/hooks/data-fetching/useTags";
+import { color } from "framer-motion";
 
 const SkeletonHeader = () => {
   return (
@@ -67,6 +72,7 @@ export default function ProviderTable({
   onProviderSelect,
   onProviderDoubleClick,
   loading,
+  onCreateProvider,
 }) {
   const { data: tagsData } = useTags();
   const tagsMap = tagsData?.tagsMap ?? {};
@@ -93,6 +99,13 @@ export default function ProviderTable({
     borderColor: "gray.200",
   };
 
+  const defaultHeaderCells = (
+    <>
+      <Th {...fixedThProps}>Provider</Th>
+      <Th {...fixedThProps}>NPI/License</Th>
+    </>
+  );
+
   const Header = () => {
     const dynamicColumns = sortedCategories.map((cat) => (
       <Th
@@ -112,8 +125,7 @@ export default function ProviderTable({
         zIndex={1}
       >
         <Tr>
-          <Th {...fixedThProps}>Provider</Th>
-          <Th {...fixedThProps}>NPI/License</Th>
+          {defaultHeaderCells}
           {dynamicColumns}
           <Th {...fixedThProps} borderRight="none">Long Term Notes</Th>
         </Tr>
@@ -357,6 +369,51 @@ export default function ProviderTable({
           <>
             <SkeletonHeader />
             <SkeletonBody />
+          </>
+  
+        ) : providers.length === 0 ? (
+          <>
+            <Thead bg="#EBEBEB" h="40px" position="sticky" top={0} zIndex={1}>
+              <Tr>
+                {defaultHeaderCells}
+                <Th {...fixedThProps} borderRight="none">Long Term Notes</Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              <Tr>
+                <Td colSpan={1000} height={"424px"} textAlign="center" py={10}>
+                  <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
+                    <MdPersonAdd size={69} color="#586771" />
+                    <Text fontFamily="Lato" fontSize="22px" color="rgba(88, 103, 113, 0.73)">
+                      No providers added yet.
+                    </Text>
+                    <Text fontFamily="Lato" fontSize="16px" color="rgba(88, 103, 113, 0.73)">
+                      Add a provider to view and manage their information.
+                    </Text>
+                    <Button
+                      marginTop={"29px"}
+                      bg="#35639D"
+                      color="white"
+                      h={"40px"}
+                      w={"211px"}
+                      padding={"0 16px"}
+                      iconSpacing={"8px"}
+                      fontFamily={"Inter"}
+                      fontSize={"16px"}
+                      fontStyle={"normal"}
+                      fontWeight={"light"}
+                      lineHeight={"28px"}
+                      _hover={{ bg: "#35639D" }}
+                      leftIcon={<AddIcon boxSize={"12px"}/>}
+                      borderRadius={"6px"}
+                      onClick={onCreateProvider}
+                    >
+                      Create Provider
+                    </Button>
+                  </Box>
+                </Td>
+              </Tr>
+            </Tbody>
           </>
         ) : (
           <>
