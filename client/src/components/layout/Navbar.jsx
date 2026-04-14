@@ -1,18 +1,17 @@
 import { Flex, Link } from "@chakra-ui/react";
 
+import { useAuthContext } from "@/contexts/hooks/useAuthContext";
 import { useUserContext } from "@/contexts/hooks/useUserContext";
 import { NavLink, useLocation } from "react-router-dom";
 
 const useIsActive = (pathname) => {
   const location = useLocation();
-  return (
-    location.pathname === pathname ||
-    location.pathname.startsWith(`${pathname}/`)
-  );
+  return location.pathname === pathname || location.pathname.startsWith(`${pathname}/`);
 };
 
 export const Navbar = () => {
-  const { role } = useUserContext();
+  const { currentUser } = useAuthContext();
+  const { role, loading } = useUserContext();
 
   const savedQuotaDate = sessionStorage.getItem("quotaDate") || "";
 
@@ -29,7 +28,9 @@ export const Navbar = () => {
     fontStyle: "normal",
     fontWeight: isActive ? "700" : "400",
     lineHeight: "normal",
-    py: "3.6px",
+    px: 2,
+    py: 1,
+    borderRadius: "md",
     textDecoration: "none",
     whiteSpace: "nowrap",
     _hover: {
@@ -40,12 +41,12 @@ export const Navbar = () => {
 
   return (
     <Flex
-      flex="1"
-      align="flex-end"
+      w="100%"
+      h="100px"
+      align="center"
       justify="flex-end"
-      gap="30px"
+      gap={{ base: 4, md: 8 }}
       flexWrap="wrap"
-      py="31px"
     >
       <Link
         as={NavLink}
