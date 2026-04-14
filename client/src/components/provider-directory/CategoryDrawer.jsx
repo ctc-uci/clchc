@@ -56,12 +56,12 @@ import {
   MdInfoOutline,
   MdLocalOffer,
   MdMenu,
-  MdOutlineHorizontalRule,
   MdOutlineKeyboardArrowDown,
   MdOutlineKeyboardArrowUp,
   MdTag,
-  MdTextFields,
 } from "react-icons/md";
+import { HiMinusSm } from "react-icons/hi";
+import { BsTextareaT } from "react-icons/bs";
 
 const SkeletonBody = () => {
   return (
@@ -150,7 +150,7 @@ function SortableCategory({ category, onDelete, isPendingDelete }) {
         </VStack>
 
         <IconButton
-          icon={<MdDelete size="18px" />}
+          icon={<MdDelete   />}
           aria-label="Delete category"
           variant="ghost"
           position="absolute"
@@ -178,7 +178,7 @@ const inputTypeOptions = [
     value: "text",
     label: "Plain Text",
     buttonLabel: "Plain Text",
-    icon: MdTextFields,
+    icon: BsTextareaT,
   },
 ];
 
@@ -759,7 +759,7 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
                           fontSize="16px"
                           fontWeight="400"
                           borderRadius="10px"
-                          leftIcon={<Icon as={MdOutlineHorizontalRule} />}
+                          leftIcon={<Icon as={HiMinusSm} boxSize="24px" />}
                         >
                           Discard
                         </Button>
