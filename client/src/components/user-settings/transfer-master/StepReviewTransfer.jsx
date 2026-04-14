@@ -116,15 +116,15 @@ export default function StepReviewTransfer({ onClose, selectedUid, onNext }) {
         {isLoading ? (
           <>
             <Skeleton
-              height="60px"
+              height="57px"
               width="100%"
             />
             <Skeleton
-              height="60px"
+              height="56px"
               width="100%"
             />
             <Skeleton
-              height="60px"
+              height="57px"
               width="100%"
             />{" "}
           </>

@@ -98,21 +98,17 @@ export default function StepSelectUser({ onClose, onSelect, onNext }) {
         {isLoading ? (
           <>
             <Skeleton
-              height="60px"
+              height="70px"
               width="100%"
             ></Skeleton>
             <Skeleton
-              height="60px"
+              height="70px"
               width="100%"
             ></Skeleton>
             <Skeleton
-              height="60px"
+              height="70px"
               width="100%"
             ></Skeleton>
-            <Skeleton
-              height="60px"
-              width="100%"
-            ></Skeleton>{" "}
           </>
         ) : (
           <Grid
@@ -121,6 +117,9 @@ export default function StepSelectUser({ onClose, onSelect, onNext }) {
             mx="auto"
             rowGap="20px"
             columnGap="20px"
+            minH="230px"
+            maxH="230px"
+            overflowY="auto"
           >
             {" "}
             {qualifiedUsers.map((user) => (
@@ -190,7 +189,7 @@ export default function StepSelectUser({ onClose, onSelect, onNext }) {
       <HStack
         justifyContent="flex-end"
         gap="10px"
-        mt="30px"
+        mt="13px"
       >
         <Button
           onClick={onClose}
