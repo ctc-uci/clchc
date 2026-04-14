@@ -3,13 +3,12 @@ import {
   FormControl,
   FormLabel,
   InputGroup,
-  Select,
   Skeleton,
 } from "@chakra-ui/react";
 
+import CustomSelect from "@/components/common/CustomSelect";
 import { useLocations } from "@/contexts/hooks/data-fetching/useLocations";
 
-import { selectStyles } from "../tools/constants";
 import { LockRightElement } from "../tools/shared";
 
 export function LocationDropdown({ locationId, setLocationId, isLocked }) {
@@ -30,6 +29,10 @@ export function LocationDropdown({ locationId, setLocationId, isLocked }) {
     );
   }
 
+  const options = locations.map((l) => ({
+    value: String(l.id),
+    label: l.tagValue,
+  }));
   const selectedLocation = locations.find(
     (location) => String(location.id) === String(locationId)
   );
@@ -43,7 +46,9 @@ export function LocationDropdown({ locationId, setLocationId, isLocked }) {
       <FormLabel
         fontSize="14px"
         color="#113D64"
-      >Location</FormLabel>
+      >
+        Location
+      </FormLabel>
       {isLocked ? (
         <InputGroup>
           <Box
@@ -63,25 +68,11 @@ export function LocationDropdown({ locationId, setLocationId, isLocked }) {
           <LockRightElement />
         </InputGroup>
       ) : (
-        <InputGroup>
-          <Select
-            {...selectStyles}
-            placeholder=" "
-            pr={isLocked ? "2.25rem" : undefined}
-            value={locationId === "" ? "" : String(locationId)}
-            onChange={(e) => setLocationId(Number(e.target.value))}
-          >
-            {locations &&
-              locations.map((location) => (
-                <option
-                  key={location.id}
-                  value={location.id}
-                >
-                  {location.tagValue}
-                </option>
-              ))}
-          </Select>
-        </InputGroup>
+        <CustomSelect
+          options={options}
+          value={locationId === "" ? "" : String(locationId)}
+          setValue={(val) => setLocationId(Number(val))}
+        />
       )}
     </FormControl>
   );

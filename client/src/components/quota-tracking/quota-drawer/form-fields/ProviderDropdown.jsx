@@ -3,13 +3,12 @@ import {
   FormControl,
   FormLabel,
   InputGroup,
-  Select,
   Skeleton,
 } from "@chakra-ui/react";
 
+import CustomSelect from "@/components/common/CustomSelect";
 import { useProvidersSummary } from "@/contexts/hooks/data-fetching/useProviders";
 
-import { selectStyles } from "../tools//constants";
 import { LockRightElement } from "../tools/shared";
 
 export function ProviderDropdown({ providerId, setProviderId, isLocked }) {
@@ -28,6 +27,10 @@ export function ProviderDropdown({ providerId, setProviderId, isLocked }) {
     );
   }
 
+  const options = providers.map((p) => ({
+    value: String(p.id),
+    label: p.name,
+  }));
   const selectedProvider = providers.find(
     (provider) => String(provider.id) === String(providerId)
   );
@@ -40,7 +43,9 @@ export function ProviderDropdown({ providerId, setProviderId, isLocked }) {
       <FormLabel
         fontSize="14px"
         color="#113D64"
-      >Provider</FormLabel>
+      >
+        Provider
+      </FormLabel>
       {isLocked ? (
         <InputGroup>
           <Box
@@ -59,28 +64,11 @@ export function ProviderDropdown({ providerId, setProviderId, isLocked }) {
           <LockRightElement />
         </InputGroup>
       ) : (
-        <InputGroup>
-          <Select
-            {...selectStyles}
-            fontSize="14px"
-            placeholder=" "
-            pr={isLocked ? "2.25rem" : undefined}
-            value={providerId === "" ? "" : String(providerId)}
-            onChange={(e) => {
-              setProviderId(Number(e.target.value));
-            }}
-          >
-            {providers &&
-              providers.map((provider) => (
-                <option
-                  key={provider.id}
-                  value={provider.id}
-                >
-                  {provider.name}
-                </option>
-              ))}
-          </Select>
-        </InputGroup>
+        <CustomSelect
+          options={options}
+          value={providerId === "" ? "" : String(providerId)}
+          setValue={(val) => setProviderId(Number(val))}
+        />
       )}
     </FormControl>
   );
