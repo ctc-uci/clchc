@@ -262,13 +262,11 @@ const TagSelect = ({
       <Menu
         closeOnSelect={false}
         isLazy={false}
-        // matchWidth={true}
       >
         <MenuButton
           as={Button}
           variant="outline"
           w="100%"
-          // w="172px"
           justifyContent="flex-start"
           textAlign="left"
           rightIcon={<ChevronDown size={20} />}
