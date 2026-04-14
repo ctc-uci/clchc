@@ -64,6 +64,15 @@ export const Navbar = () => {
         Provider Directory
       </Link>
 
+
+      <Link
+        as={NavLink}
+        to="/version-log"
+        {...getLinkProps(isVersionActive)}
+      >
+        Audit Log
+      </Link>
+
       {role === "master" || role === "ccm" ? (
         <>
           <Link
