@@ -211,6 +211,7 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
     setPendingDeleteIds([]);
     setPendingAction(null);
     setHasReordered(false);
+    setNameError(false);
   };
 
   // Reset local state when drawer opens
