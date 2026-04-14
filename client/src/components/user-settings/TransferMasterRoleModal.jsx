@@ -118,6 +118,7 @@ export default function TransferMasterRoleModal({ isOpen, onClose }) {
     <Modal
       isOpen={isOpen}
       onClose={onClose}
+      isCentered
       //   size="full"
     >
       <ModalOverlay />
