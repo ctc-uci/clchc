@@ -8,7 +8,6 @@ let running = false;
 const interval = "0 2 * * *"
 
 const startCron = () => {
-    console.log("cron started");
     task = cron.schedule(interval, async () => {
         if (running) return;
 
@@ -17,7 +16,7 @@ const startCron = () => {
             await db.query(
                 // For now, I just set "old" to 1 week
                 `DELETE FROM version_log 
-                WHERE timestamp > NOW() - INTERVAL '7 days'`
+                WHERE timestamp < NOW() - INTERVAL '7 days'`
             );
         }
         catch (err) {
@@ -31,7 +30,6 @@ const startCron = () => {
 }
 
 const stopCron = () => {
-    console.log("cron stopped");
     if (!task) return;
 
     task.stop();
