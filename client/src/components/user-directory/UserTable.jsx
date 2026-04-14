@@ -151,7 +151,7 @@ export default function UserTable({
               <SkeletonRows />
             ) : users.length === 0 ? (
               <Tr>
-                <Td colSpan={5} height={"360px"} textAlign="center" py={10}>
+                <Td colSpan={4} height={"360px"} textAlign="center" py={10}>
                   <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
                     <MdSentimentDissatisfied size={69} color="#586771" />
                     <Text fontFamily="Lato" fontSize="18px" color="gray.500">
