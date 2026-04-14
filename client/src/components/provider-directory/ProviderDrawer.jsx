@@ -787,6 +787,7 @@ const ProviderDrawer = ({
                     onClick={() => {
                       setShowConfirmation(false);
                       setPendingTagDeletes([]);
+                      setActiveMode("edit");
                     }}
                     flex={1}
                     color="#022442"

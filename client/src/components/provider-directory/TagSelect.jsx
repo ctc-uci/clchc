@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { AddIcon, Checkbox } from "@chakra-ui/icons";
+import { AddIcon } from "@chakra-ui/icons";
 import {
   Button,
   HStack,
