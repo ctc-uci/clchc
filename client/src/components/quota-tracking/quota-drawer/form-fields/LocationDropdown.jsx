@@ -200,13 +200,13 @@ export function LocationDropdown({ locationId, setLocationId, isLocked }) {
                   key={location.id}
                   value={String(location.id)}
                   ref={String(location.id) === String(locationId) ? selectedItemRef : null}
-                  pl="2"
+                  pl="0"
                 >
                   <HStack
                     justifyContent="space-between"
                     w="100%"
                   >
-                    <Text w="106px" h="fit-content" fontSize="12px" fontWeight="400">{location.tagValue}</Text>
+                    <Text w="114px" h="fit-content" fontSize="12px" fontWeight="400">{location.tagValue}</Text>
                     <Button
                       as="span"
                       variant="ghost"
@@ -224,16 +224,19 @@ export function LocationDropdown({ locationId, setLocationId, isLocked }) {
                 gap={2}
               >
                 <Input
-                  placeholder="Add"
+                  placeholder="Enter location"
                   size="sm"
                   value={newValue}
                   onChange={(e) => setNewValue(e.target.value)}
-                  variant="unstyled"
+                  variant="outline"
                   fontSize="12px"
                   fontWeight="400"
-                  pl="5"
+                  ml="10px"
                   color="black"
-                  _placeholder={{ color: "black" }}
+                  borderColor="gray.200"
+                  borderRadius="6px"
+                  w="150px"
+                  _placeholder={{ color: "gray.400" }}
                 />
                 <Button
                   size="xs"
