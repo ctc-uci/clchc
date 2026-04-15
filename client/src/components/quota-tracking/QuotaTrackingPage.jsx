@@ -168,24 +168,26 @@ export const QuotaTracking = () => {
             value={selectedDate}
             onChange={handleDateChange}
           />
-          <Button
-            rightIcon={<AddIcon boxSize={3} />}
-            h="45px"
-            w="160px"
-            padding="0 24px"
-            borderRadius="4px"
-            background="#113D64"
-            justifyContent="center"
-            alignItems="center"
-            gap="8px"
-            onClick={onCreateDrawerOpen}
-            textColor="white"
-            fontSize="14px"
-            fontWeight="normal"
-            _hover={{ background: "#485365" }}
-          >
-            Create Quota
-          </Button>
+          {(role === "ccm" || role === "master") && (
+            <Button
+              rightIcon={<AddIcon boxSize={3} />}
+              h="45px"
+              w="160px"
+              padding="0 24px"
+              borderRadius="4px"
+              background="#113D64"
+              justifyContent="center"
+              alignItems="center"
+              gap="8px"
+              onClick={onCreateDrawerOpen}
+              textColor="white"
+              fontSize="14px"
+              fontWeight="normal"
+              _hover={{ background: "#485365" }}
+            >
+              Create Quota
+            </Button>
+          )}
         </Flex>
       </Flex>
 

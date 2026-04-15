@@ -40,7 +40,7 @@ const SkeletonRows = () => {
 };
 
 const QuotaTable = ({ rows, loading, onRowsUpdate, role }) => {
-  const isViewer = role === "viewer";
+  const isViewer = role !== "ccm" && role !== "master";
   const [editingQuotaId, setEditingQuotaId] = useState(null);
   const [selectedRowId, setSelectedRowId] = useState(null);
   const tableRef = useRef(null);

@@ -87,19 +87,15 @@ export const ProviderDirectoryPage = () => {
 
   return (
     <Box p={6}>
-      {role === "ccm" || role === "master" ? (
-        <Flex
-          flexDirection="column"
-          mb={5}
-          gap={6}
-        >
-          {/* TOP ROW: PageHeader + Manage Button */}
-          <Flex justify="space-between" align="center">
-            <PageHeader
-              title="Provider Directory"
-              role={role}
-              isLoading={roleLoading}
-            />
+      <Flex flexDirection="column" mb={5} gap={6}>
+        {/* TOP ROW: PageHeader + Manage Button (Manage only for ccm/master) */}
+        <Flex justify="space-between" align="center">
+          <PageHeader
+            title="Provider Directory"
+            role={role}
+            isLoading={roleLoading}
+          />
+          {(role === "ccm" || role === "master") && (
             <Box position="relative">
               <Button
                 bg="var(--Primary-1, #022442)"
@@ -177,27 +173,27 @@ export const ProviderDirectoryPage = () => {
                 )}
               </AnimatePresence>
             </Box>
-          </Flex>
-          {/* BOTTOM ROW: Search Bar */}
-          <InputGroup width="100%">
-            <InputLeftElement 
-              display="flex"
-              alignItems="center"
-              h="100%"
-              pointerEvents="none"
-            >
-              <SearchIcon color="gray.400" />
-            </InputLeftElement>
-            <Input
-              bg="white"
-              placeholder="Search Providers"
-              borderRadius="md"
-              h="45px"
-              onChange={handleChange}
-            />
-          </InputGroup>
+          )}
         </Flex>
-      ) : null}
+        {/* BOTTOM ROW: Search Bar */}
+        <InputGroup width="100%">
+          <InputLeftElement
+            display="flex"
+            alignItems="center"
+            h="100%"
+            pointerEvents="none"
+          >
+            <SearchIcon color="gray.400" />
+          </InputLeftElement>
+          <Input
+            bg="white"
+            placeholder="Search Providers"
+            borderRadius="md"
+            h="45px"
+            onChange={handleChange}
+          />
+        </InputGroup>
+      </Flex>
 
       {providers && providerCategories ? (
         <Box>
