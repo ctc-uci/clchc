@@ -11,7 +11,6 @@ import {
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
-  Spacer,
   Spinner,
   Tag,
   TagCloseButton,
@@ -26,6 +25,7 @@ import { useTags } from "@/contexts/hooks/data-fetching/useTags";
 import { errorToString } from "@/utils/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { ChevronDown } from "lucide-react";
+import { MdDeleteOutline } from "react-icons/md";
 
 const TagSelect = ({
   categoryId,
@@ -266,6 +266,7 @@ const TagSelect = ({
       <Menu
         closeOnSelect={false}
         isLazy={false}
+        matchWidth
       >
         <MenuButton
           as={Button}
@@ -291,58 +292,55 @@ const TagSelect = ({
         <MenuList
           maxHeight="240px"
           overflowY="auto"
+          minW="0"
         >
           {tags.map((tag) => (
             <HStack
               key={tag.id}
-              px={3}
+              pl={3}
+              pr={0}
               py={2}
-              gap={2}
-              justify="flex-start"
-              align="center"
+              // gap={2}
+              justifyContent="space-between"
               w="100%"
+              cursor={readOnly ? "default" : "pointer"}
+              onClick={() => {
+                if (readOnly) return;
+                if (selectedIds.includes(tag.id)) {
+                  onTagsChange(selectedIds.filter((id) => id !== tag.id));
+                } else {
+                  onTagsChange([...selectedIds, tag.id]);
+                }
+              }}
+              _hover={readOnly ? {} : { bg: "gray.100" }}
             >
               {!readOnly && (
                 <Checkbox
                   isChecked={selectedIds.includes(tag.id)}
-                  onChange={() => {
-                    if (selectedIds.includes(tag.id)) {
-                      onTagsChange(selectedIds.filter((id) => id !== tag.id));
-                    } else {
-                      onTagsChange([...selectedIds, tag.id]);
-                    }
-                  }}
+                  onChange={() => {}}
                   colorScheme="blue"
                   size="md"
+                  pointerEvents="none"
                 />
               )}
               <Text
-                maxW="120px"
-                wordBreak="break-word"
-                whiteSpace="normal"
+                flex="1"
+                fontSize="12px"
+                fontWeight="400"
               >
                 {tag.tagValue}
               </Text>
-              <Spacer />
               {!readOnly && (
                 <Button
-                  size="xs"
+                  as="span"
                   variant="ghost"
-                  onClick={handleDeleteTag(tag)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteTag(tag)(e);
+                  }}
                   isLoading={!!deletingMap[tag.id]}
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="14"
-                    height="18"
-                    viewBox="0 0 14 18"
-                    fill="none"
-                  >
-                    <path
-                      d="M1 16C1 17.1 1.9 18 3 18H11C12.1 18 13 17.1 13 16V4H1V16ZM3 6H11V16H3V6ZM10.5 1L9.5 0H4.5L3.5 1H0V3H14V1H10.5Z"
-                      fill="black"
-                    />
-                  </svg>
+                  <MdDeleteOutline size={20} />
                 </Button>
               )}
             </HStack>
@@ -354,15 +352,31 @@ const TagSelect = ({
           >
             <Input
               placeholder="New tag"
-              size="sm"
               value={newTagValue}
               onChange={(e) => setNewTagValue(e.target.value)}
               isDisabled={readOnly}
+              variant="outline"
+              fontFamily={"Inter"}
+              fontStyle={"normal"}
+              lineHeight={"20px"}
+              fontSize="12px"
+              fontWeight="400"
+              color="black"
+              border={"1px solid var(--gray-200, #E2E8F0)"}
+              borderRadius="4px"
+              w="100%"
+              h="30px"
+              padding={"10px"}
+              margin={"0"}
+              _placeholder={{ color: "#A0AEC0" }}
             />
             <Button
               size="xs"
               onClick={handleCreateTag}
               isDisabled={readOnly || creating}
+              variant="ghost"
+              _hover={{ bg: "none" }}
+              _active={{ bg: "none" }}
             >
               {creating ? <Spinner size="xs" /> : <AddIcon />}
             </Button>
