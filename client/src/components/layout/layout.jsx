@@ -17,7 +17,7 @@ const Layout = () => {
                 justifyContent="space-between"
             >
                 <Image
-                    src="/navbar-clchc-logo.svg"
+                    src="/navbar-clchc-logo.png"
                     width="250px"
                     height="94px"
                     objectFit="contain"
