@@ -233,7 +233,7 @@ const ProviderFormFields = ({
         gap={6}
         alignItems="end"
       >
-        <Box maxW="172px">
+        <Box w="100%">
           <FormLabel {...fixedLabelProps}>Provider Name</FormLabel>
           <Flex gap={2}>
             <FormControl
@@ -247,7 +247,13 @@ const ProviderFormFields = ({
                 fontSize="12px"
               />
               {errors["name"] && (
-                <Text color="red.500" fontSize="sm" mt={1}>{errors["name"]}</Text>
+                <Text
+                  color="red.500"
+                  fontSize="sm"
+                  mt={1}
+                >
+                  {errors["name"]}
+                </Text>
               )}
             </FormControl>
             <FormControl maxW="40px">
@@ -263,7 +269,7 @@ const ProviderFormFields = ({
           </Flex>
         </Box>
 
-        <Box maxW="172px">
+        <Box w="100%">
           <FormControl
             isRequired
             isInvalid={!!errors["license"]}
@@ -275,12 +281,18 @@ const ProviderFormFields = ({
               {...fixedInputProps}
             />
             {errors["license"] && (
-              <Text color="red.500" fontSize="sm" mt={1}>{errors["license"]}</Text>
+              <Text
+                color="red.500"
+                fontSize="sm"
+                mt={1}
+              >
+                {errors["license"]}
+              </Text>
             )}
           </FormControl>
         </Box>
 
-        <Box maxW="172px">
+        <Box w="100%">
           <FormControl>
             <FormLabel {...fixedLabelProps}>DEA</FormLabel>
             <Input
@@ -291,7 +303,7 @@ const ProviderFormFields = ({
           </FormControl>
         </Box>
 
-        <Box maxW="172px">
+        <Box w="100%">
           <FormControl>
             <FormLabel {...fixedLabelProps}>Phone Number</FormLabel>
             <Input
@@ -312,7 +324,7 @@ const ProviderFormFields = ({
           return (
             <Box
               key={cat.id}
-              maxW="172px"
+              w="100%"
             >
               <FormControl
                 key={cat.id}
@@ -649,10 +661,10 @@ const ProviderDrawer = ({
       isOpen={isOpen}
       placement="left"
       onClose={handleClose}
-      size="md"
+      size="sm"
     >
       <DrawerOverlay />
-      <DrawerContent maxW="432px">
+      <DrawerContent w="432px">
         <DrawerCloseButton
           top="38px"
           color="#113D64"
@@ -734,24 +746,26 @@ const ProviderDrawer = ({
 
             <DrawerFooter
               justifyContent="space-between"
-              gap={4}
-              // px={6}
+              gap="20px"
+              w="100%"
+              bg="white"
+              borderTop="1px solid"
+              borderColor="gray.200"
             >
               {activeMode === "edit" && !showConfirmation ? (
                 <>
                   <Button
-                    // bg="#FFF"
                     variant="outline"
                     color="#90080F"
                     borderColor="#90080F"
                     _hover={{ bg: "red.800", color: "#FFF" }}
-                    flex={1}
                     onClick={() => {
                       setActiveMode("delete");
                       setShowConfirmation(true);
                     }}
-                    borderRadius={"4px"}
-                    border={"1px solid"}
+                    borderRadius="4px"
+                    width="50%"
+                    px={10}
                   >
                     Delete
                   </Button>
@@ -761,9 +775,9 @@ const ProviderDrawer = ({
                     color="white"
                     _hover={{ bg: "#1a4f7a" }}
                     onClick={handleSubmit}
-                    flex={1}
-                    borderRadius={"4px"}
-                    border={"1px solid"}
+                    borderRadius="4px"
+                    width="50%"
+                    px={10}
                   >
                     Confirm Changes
                   </Button>
@@ -772,22 +786,30 @@ const ProviderDrawer = ({
                 <>
                   <Button
                     variant="outline"
-                    onClick={handleClose}
-                    flex={1}
+                    onClick={() => {
+                      setShowConfirmation(false);
+                      setPendingTagDeletes([]);
+                      setActiveMode("edit");
+                    }}
                     color="#022442"
-                    fontWeight={600}
+                    borderColor="#0000003D"
+                    borderRadius="4px"
+                    width="50%"
+                    px={10}
                   >
                     Back to Editing
                   </Button>
 
                   <Button
-                    flex={1}
                     bg={activeMode === "delete" ? "red.700" : "#113D64"}
                     color="white"
                     _hover={{
                       bg: activeMode === "delete" ? "red.800" : "#1a4f7a",
                     }}
                     onClick={handleSubmit}
+                    borderRadius="4px"
+                    width="50%"
+                    px={10}
                   >
                     {showConfirmation
                       ? activeMode === "delete"

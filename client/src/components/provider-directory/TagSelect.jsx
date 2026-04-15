@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { AddIcon, DeleteIcon } from "@chakra-ui/icons";
+import { AddIcon } from "@chakra-ui/icons";
 import {
   Button,
+  Checkbox,
   HStack,
   Input,
   Menu,
@@ -24,6 +25,7 @@ import { useTags } from "@/contexts/hooks/data-fetching/useTags";
 import { errorToString } from "@/utils/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { ChevronDown } from "lucide-react";
+import { MdDeleteOutline } from "react-icons/md";
 
 const TagSelect = ({
   categoryId,
@@ -63,7 +65,9 @@ const TagSelect = ({
   };
 
   const handleCreateTag = async (e) => {
-    e.stopPropagation();
+    if (e?.stopPropagation) {
+      e.stopPropagation();
+    }
     const trimmedTag = newTagValue.trim();
     if (readOnly || !trimmedTag) return;
     setCreating(true);
@@ -226,15 +230,18 @@ const TagSelect = ({
       align="stretch"
     >
       {Array.isArray(selectedTags) && selectedTags.length > 0 && (
-        <HStack spacing={1} wrap="wrap">
+        <HStack
+          spacing={1}
+          wrap="wrap"
+        >
           {selectedTags.map((tagId) => {
             if (!tagId) return null;
             return (
-              <Tag 
-                size="md" 
-                key={tagId} 
-                variant="solid" 
-                backgroundColor="black" 
+              <Tag
+                size="md"
+                key={tagId}
+                variant="solid"
+                backgroundColor="black"
                 borderRadius={"4px"}
                 gap={"6px"}
                 padding={"5px 8px"}
@@ -247,7 +254,9 @@ const TagSelect = ({
                 lineHeight={"16px"}
               >
                 <TagLabel>{tagsMap[tagId]?.tagValue || ""}</TagLabel>
-                {!readOnly && <TagCloseButton onClick={handleRemoveTag(tagId)} />}
+                {!readOnly && (
+                  <TagCloseButton onClick={handleRemoveTag(tagId)} />
+                )}
               </Tag>
             );
           })}
@@ -257,15 +266,15 @@ const TagSelect = ({
       <Menu
         closeOnSelect={false}
         isLazy={false}
+        matchWidth
       >
         <MenuButton
           as={Button}
           variant="outline"
           w="100%"
-          // w="172px"
           justifyContent="flex-start"
           textAlign="left"
-          rightIcon={<ChevronDown size={(20)}/>}
+          rightIcon={<ChevronDown size={20} />}
           isDisabled={readOnly}
           color={"var(--gray-700, #2D3748)"}
           fontFamily={"Inter"}
@@ -283,59 +292,95 @@ const TagSelect = ({
         <MenuList
           maxHeight="240px"
           overflowY="auto"
+          minW="0"
         >
-          <MenuOptionGroup
-            title="Select Tags"
-            type="checkbox"
-            value={selectedIds}
-            onChange={(values) =>
-              onTagsChange(values.filter((id) => id !== null && id !== ""))
-            }
-          >
-            {tags.map((tag) => (
-              <MenuItemOption
-                key={tag.id}
-                value={tag.id}
-              >
-                <HStack
-                  justifyContent="space-between"
-                  w="100%"
-                >
-                  <Text>{tag.tagValue}</Text>
-                  {!readOnly && (
-                    <Button
-                      size="xs"
-                      colorScheme="gray"
-                      onClick={handleDeleteTag(tag)}
-                      isLoading={!!deletingMap[tag.id]}
-                    >
-                      <DeleteIcon />
-                    </Button>
-                  )}
-                </HStack>
-              </MenuItemOption>
-            ))}
+          {tags.map((tag) => (
             <HStack
-              px={3}
+              key={tag.id}
+              pl={3}
+              pr={0}
               py={2}
-              gap={2}
+              // gap={2}
+              justifyContent="space-between"
+              w="100%"
+              cursor={readOnly ? "default" : "pointer"}
+              onClick={() => {
+                if (readOnly) return;
+                if (selectedIds.includes(tag.id)) {
+                  onTagsChange(selectedIds.filter((id) => id !== tag.id));
+                } else {
+                  onTagsChange([...selectedIds, tag.id]);
+                }
+              }}
+              _hover={readOnly ? {} : { bg: "gray.100" }}
             >
-              <Input
-                placeholder="New tag"
-                size="sm"
-                value={newTagValue}
-                onChange={(e) => setNewTagValue(e.target.value)}
-                isDisabled={readOnly}
-              />
-              <Button
-                size="xs"
-                onClick={handleCreateTag}
-                isDisabled={readOnly || creating}
+              {!readOnly && (
+                <Checkbox
+                  isChecked={selectedIds.includes(tag.id)}
+                  onChange={() => {}}
+                  colorScheme="blue"
+                  size="md"
+                  pointerEvents="none"
+                />
+              )}
+              <Text
+                flex="1"
+                fontSize="12px"
+                fontWeight="400"
               >
-                {creating ? <Spinner size="xs" /> : <AddIcon />}
-              </Button>
+                {tag.tagValue}
+              </Text>
+              {!readOnly && (
+                <Button
+                  as="span"
+                  variant="ghost"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteTag(tag)(e);
+                  }}
+                  isLoading={!!deletingMap[tag.id]}
+                >
+                  <MdDeleteOutline size={20} />
+                </Button>
+              )}
             </HStack>
-          </MenuOptionGroup>
+          ))}
+          <HStack
+            px={3}
+            py={2}
+            gap={2}
+          >
+            <Input
+              placeholder="New tag"
+              value={newTagValue}
+              onChange={(e) => setNewTagValue(e.target.value)}
+              isDisabled={readOnly}
+              variant="outline"
+              fontFamily={"Inter"}
+              fontStyle={"normal"}
+              lineHeight={"20px"}
+              fontSize="12px"
+              fontWeight="400"
+              color="black"
+              border={"1px solid var(--gray-200, #E2E8F0)"}
+              borderRadius="4px"
+              w="100%"
+              h="30px"
+              padding={"10px"}
+              margin={"0"}
+              _placeholder={{ color: "#A0AEC0" }}
+            />
+            <Button
+              size="xs"
+              onClick={handleCreateTag}
+              isDisabled={readOnly || creating}
+              variant="ghost"
+              _hover={{ bg: "none" }}
+              _active={{ bg: "none" }}
+            >
+              {creating ? <Spinner size="xs" /> : <AddIcon />}
+            </Button>
+          </HStack>
         </MenuList>
       </Menu>
     </VStack>
