@@ -51,6 +51,7 @@ import {
   MdDelete,
   MdInfoOutline,
   MdLocalOffer,
+  MdLock,
   MdMenu,
   MdOutlineKeyboardArrowDown,
   MdOutlineKeyboardArrowUp,
@@ -159,6 +160,84 @@ function SortableCategory({ category, onDelete, isPendingDelete, isPendingCreate
           isDisabled={isDeleteDisabled}
           opacity={isDeleteDisabled ? 0.3 : 1}
           onClick={() => onDelete(category.id)}
+        />
+      </Flex>
+    </Flex>
+  );
+}
+
+const LOCKED_COLUMNS = [
+  { name: "Provider", position: "first" },
+  { name: "NPI/License", position: "first" },
+  { name: "Long Term Notes", position: "last" },
+];
+
+function LockedCategory({ name }) {
+  return (
+    <Flex
+      align="center"
+      justify="space-between"
+      bg="white"
+      mb={3}
+      height="48px"
+      borderRadius="6px"
+      opacity={0.5}
+    >
+      <Flex
+        align="center"
+        bg="#EDF2F7"
+        px={4}
+        py={3}
+        borderRadius="6px 0 0 6px"
+        height="100%"
+        cursor="not-allowed"
+      >
+        <MdLock size="18px" color="#718096" />
+      </Flex>
+      <Flex
+        borderRadius="0 6px 6px 0"
+        border="1px solid #E2E8F0"
+        width="100%"
+        height="100%"
+        align="center"
+        position="relative"
+      >
+        <VStack
+          pl="16px"
+          pr="40px"
+          py="4px"
+          height="100%"
+          align="start"
+          gap={0}
+        >
+          <Text
+            fontWeight="400"
+            fontStyle="normal"
+            fontSize="18px"
+            mb={-1}
+            color="inherit"
+          >
+            {name}
+          </Text>
+          <Text
+            fontWeight="400"
+            fontStyle="normal"
+            fontSize="8px"
+            color="#0000007A"
+          >
+            Locked
+          </Text>
+        </VStack>
+        <IconButton
+          icon={<MdDelete />}
+          aria-label="Delete category"
+          variant="ghost"
+          position="absolute"
+          right="8px"
+          top="50%"
+          transform="translateY(-50%)"
+          isDisabled
+          opacity={0.3}
         />
       </Flex>
     </Flex>
@@ -547,6 +626,9 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
                       restrictToParentElement,
                     ]}
                   >
+                    {LOCKED_COLUMNS.filter((c) => c.position === "first").map((col) => (
+                      <LockedCategory key={col.name} name={col.name} />
+                    ))}
                     <SortableContext
                       items={categories.map((cat) => cat.id)}
                       strategy={verticalListSortingStrategy}
@@ -558,10 +640,13 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
                           onDelete={handleMarkForDelete}
                           isPendingDelete={pendingDeleteIds.includes(cat.id)}
                           isPendingCreate={String(cat.id).startsWith("temp-")}
-                          isDeleteDisabled={categories.some((c) => String(c.id).startsWith("temp-"))}
+                          isDeleteDisabled={categories.some((c) => String(c.id).startsWith("temp-")) || deletePhase === "confirming" || createPhase === "confirming"}
                         />
                       ))}
                     </SortableContext>
+                    {LOCKED_COLUMNS.filter((c) => c.position === "last").map((col) => (
+                      <LockedCategory key={col.name} name={col.name} />
+                    ))}
                   </DndContext>
 
                   {!showForm && (
@@ -574,13 +659,13 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
                       fontStyle="normal"
                       fontSize="16px"
                       maxHeight="40px"
-                      isDisabled={pendingDeleteIds.length > 0}
+                      isDisabled={pendingDeleteIds.length > 0 || createPhase === "confirming" || deletePhase === "confirming"}
                     >
                       + Add New Category
                     </Button>
                   )}
 
-                  {showForm && pendingDeleteIds.length === 0 && (
+                  {showForm && pendingDeleteIds.length === 0 && createPhase !== "confirming" && deletePhase !== "confirming" && (
                     <Stack
                       gap={4}
                       mt={4}
@@ -779,15 +864,24 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
                 <Button
                   variant="outline"
                   mr={3}
-                  onClick={handleDrawerClose}
+                  onClick={() => {
+                    if (createPhase === "confirming" || deletePhase === "confirming") {
+                      setCreatePhase(null);
+                      setDeletePhase(null);
+                    } else {
+                      handleDrawerClose();
+                    }
+                  }}
                   width="48%"
-                  border="1px solid black"
+                  color="#022442"
+                  borderColor="#0000003D"
+                  _hover={{ bg: "gray.100" }}
                   borderRadius="4px"
                   minHeight="48px"
                   fontSize="18px"
                   fontWeight="600"
                 >
-                  Cancel
+                  {createPhase === "confirming" || deletePhase === "confirming" ? "Back to Editing" : "Cancel"}
                 </Button>
                 <Button
                   bg={pendingDeleteIds.length > 0 ? "#90080F" : "#113D64"}
@@ -795,8 +889,10 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
                   width="48%"
                   onClick={() => {
                     if (pendingDeleteIds.length > 0 && deletePhase !== "confirming") {
+                      setShowForm(false);
                       setDeletePhase("confirming");
                     } else if (categories.some((c) => String(c.id).startsWith("temp-")) && createPhase !== "confirming") {
+                      setShowForm(false);
                       setCreatePhase("confirming");
                     } else {
                       handleSubmit();
