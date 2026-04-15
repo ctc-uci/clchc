@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { AddIcon } from "@chakra-ui/icons";
 import {
   Button,
+  Checkbox,
   HStack,
   Input,
   Menu,
@@ -10,6 +11,7 @@ import {
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
+  Spacer,
   Spinner,
   Tag,
   TagCloseButton,
@@ -63,7 +65,9 @@ const TagSelect = ({
   };
 
   const handleCreateTag = async (e) => {
-    e.stopPropagation();
+    if (e?.stopPropagation) {
+      e.stopPropagation();
+    }
     const trimmedTag = newTagValue.trim();
     if (readOnly || !trimmedTag) return;
     setCreating(true);
@@ -288,75 +292,81 @@ const TagSelect = ({
           maxHeight="240px"
           overflowY="auto"
         >
-          <MenuOptionGroup
-            title="Select Tags"
-            type="checkbox"
-            value={selectedIds}
-            onChange={(values) =>
-              onTagsChange(values.filter((id) => id !== null && id !== ""))
-            }
-          >
-            {tags.map((tag) => (
-              <MenuItemOption
-                key={tag.id}
-                value={tag.id}
-              >
-                <HStack
-                  justifyContent="space-between"
-                  w="100%"
-                >
-                  <Text
-                    maxW="120px"
-                    wordBreak="break-word"
-                    whiteSpace="normal"
-                  >
-                    {tag.tagValue}
-                  </Text>
-                  {!readOnly && (
-                    <Button
-                      size="xs"
-                      variant="ghost"
-                      onClick={handleDeleteTag(tag)}
-                      isLoading={!!deletingMap[tag.id]}
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="14"
-                        height="18"
-                        viewBox="0 0 14 18"
-                        fill="none"
-                      >
-                        <path
-                          d="M1 16C1 17.1 1.9 18 3 18H11C12.1 18 13 17.1 13 16V4H1V16ZM3 6H11V16H3V6ZM10.5 1L9.5 0H4.5L3.5 1H0V3H14V1H10.5Z"
-                          fill="black"
-                        />
-                      </svg>
-                    </Button>
-                  )}
-                </HStack>
-              </MenuItemOption>
-            ))}
+          {tags.map((tag) => (
             <HStack
+              key={tag.id}
               px={3}
               py={2}
               gap={2}
+              justify="flex-start"
+              align="center"
+              w="100%"
             >
-              <Input
-                placeholder="New tag"
-                size="sm"
-                value={newTagValue}
-                onChange={(e) => setNewTagValue(e.target.value)}
-                isDisabled={readOnly}
-              />
-              <Button
-                size="xs"
-                onClick={handleCreateTag}
-                isDisabled={readOnly || creating}
+              {!readOnly && (
+                <Checkbox
+                  isChecked={selectedIds.includes(tag.id)}
+                  onChange={() => {
+                    if (selectedIds.includes(tag.id)) {
+                      onTagsChange(selectedIds.filter((id) => id !== tag.id));
+                    } else {
+                      onTagsChange([...selectedIds, tag.id]);
+                    }
+                  }}
+                  colorScheme="blue"
+                  size="md"
+                />
+              )}
+              <Text
+                maxW="120px"
+                wordBreak="break-word"
+                whiteSpace="normal"
               >
-                {creating ? <Spinner size="xs" /> : <AddIcon />}
-              </Button>
+                {tag.tagValue}
+              </Text>
+              <Spacer />
+              {!readOnly && (
+                <Button
+                  size="xs"
+                  variant="ghost"
+                  onClick={handleDeleteTag(tag)}
+                  isLoading={!!deletingMap[tag.id]}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="14"
+                    height="18"
+                    viewBox="0 0 14 18"
+                    fill="none"
+                  >
+                    <path
+                      d="M1 16C1 17.1 1.9 18 3 18H11C12.1 18 13 17.1 13 16V4H1V16ZM3 6H11V16H3V6ZM10.5 1L9.5 0H4.5L3.5 1H0V3H14V1H10.5Z"
+                      fill="black"
+                    />
+                  </svg>
+                </Button>
+              )}
             </HStack>
-          </MenuOptionGroup>
+          ))}
+          <HStack
+            px={3}
+            py={2}
+            gap={2}
+          >
+            <Input
+              placeholder="New tag"
+              size="sm"
+              value={newTagValue}
+              onChange={(e) => setNewTagValue(e.target.value)}
+              isDisabled={readOnly}
+            />
+            <Button
+              size="xs"
+              onClick={handleCreateTag}
+              isDisabled={readOnly || creating}
+            >
+              {creating ? <Spinner size="xs" /> : <AddIcon />}
+            </Button>
+          </HStack>
         </MenuList>
       </Menu>
     </VStack>
