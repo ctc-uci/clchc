@@ -22,10 +22,12 @@ export const ProtectedRoute = ({
     ? allowedRoles
     : [allowedRoles];
   const isValidRole = getIsValidRole(roles, role ?? undefined);
+  const canAccessQuotaTracking = getIsValidRole(["viewer"], role ?? undefined);
+
   return currentUser && isValidRole ? (
     element
   ) : currentUser ? (
-    <Navigate to={"dashboard"} />
+    <Navigate to={canAccessQuotaTracking ? "/quota-tracking" : "/"} />
   ) : (
     <Navigate to={"/"} />
   );

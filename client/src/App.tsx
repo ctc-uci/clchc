@@ -39,11 +39,21 @@ const App = () => {
                   <Route element={<Layout />}>
                     <Route
                       path="/user-directory"
-                      element={<UserDirectory />}
+                      element={
+                        <ProtectedRoute
+                          element={<UserDirectory />}
+                          allowedRoles={["ccm"]}
+                        />
+                      }
                     />
                     <Route
                       path="/pending-requests"
-                      element={<PendingRequestsPage />}
+                      element={
+                        <ProtectedRoute
+                          element={<PendingRequestsPage />}
+                          allowedRoles={["ccm"]}
+                        />
+                      }
                     />
 
                     <Route
@@ -51,6 +61,7 @@ const App = () => {
                       element={
                         <ProtectedRoute
                           element={<Settings />}
+                          allowedRoles={["viewer"]}
                         />
                       }
                     />
@@ -59,6 +70,7 @@ const App = () => {
                       element={
                         <ProtectedRoute
                           element={<QuotaTracking />}
+                          allowedRoles={["viewer"]}
                         />
                       }
                     />
@@ -67,6 +79,7 @@ const App = () => {
                       element={
                         <ProtectedRoute
                           element={<ProviderDirectoryPage />}
+                          allowedRoles={["viewer"]}
                         />
                       }
                     />
@@ -75,6 +88,7 @@ const App = () => {
                       element={
                         <ProtectedRoute
                           element={<VersionLogPage />}
+                          allowedRoles={["ccm"]}
                           />
                       }
                     />
@@ -85,31 +99,33 @@ const App = () => {
                   />
                   <Route
                     path="/pending-approval"
-                    element={<PendingApprovalPage />}
+                    element={
+                      <ProtectedRoute
+                        element={<PendingApprovalPage />}
+                        allowedRoles={["viewer"]}
+                      />
+                    }
                   />
-                  <Route
+                  {/* <Route
                     path="/signup"
                     element={<Signup />}
-                  />
-                  <Route
-                    path="/playground"
-                    element={<Playground />}
-                  />
-                  <Route
+                  /> */}
+                  {/* <Route
                     path="/dashboard"
                     element={<ProtectedRoute
                       element={<Dashboard />}
                     />}
-                  />
+                  /> */}
                   <Route
                     path="/version-log"
                     element={
                     <ProtectedRoute
                       element={<VersionLogPage />}
+                      allowedRoles={["ccm"]}
                       />
                     }
                   />
-                  <Route
+                  {/* <Route
                     path="/admin"
                     element={
                       <ProtectedRoute
@@ -117,7 +133,7 @@ const App = () => {
                         allowedRoles={"ccm"}
                       />
                     }
-                  />
+                  /> */}
                   <Route
                     path="/"
                     element={
