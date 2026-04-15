@@ -163,18 +163,31 @@ const QuotaTable = ({ rows, loading, onRowsUpdate, role }) => {
 
                 {/* Location */}
                 <Td {...tdProps}>
-                  <Badge
-                    px={3}
-                    py={1}
-                    fontWeight={0}
-                    fontSize="14px"
-                    textTransform="none"
-                    bgColor="#35639D"
-                    textColor="white"
-                    borderRadius="6px"
-                  >
-                    {row.locationName}
-                  </Badge>
+                  {row.locationName ? (
+                    <Badge
+                      px={3}
+                      py={1}
+                      fontWeight={0}
+                      fontSize="14px"
+                      textTransform="none"
+                      bgColor="#35639D"
+                      textColor="white"
+                      borderRadius="6px"
+                    >
+                      {row.locationName}
+                    </Badge>
+                  ) : (
+                    <Text
+                      color="gray.400"
+                      fontFamily="Inter"
+                      fontSize="14px"
+                      fontStyle="normal"
+                      fontWeight="400"
+                      lineHeight="22px"
+                    >
+                      NO LOCATION SELECTED
+                    </Text>
+                  )}
                 </Td>
 
                 {/* Type */}
