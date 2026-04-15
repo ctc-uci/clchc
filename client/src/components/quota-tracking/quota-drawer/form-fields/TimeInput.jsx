@@ -2,6 +2,7 @@ import {
   Box,
   Flex,
   FormControl,
+  FormErrorMessage,
   FormLabel,
   Input,
   InputGroup,
@@ -16,6 +17,7 @@ export const TimeInput = ({
   endTime,
   setEndTime,
   isLocked,
+  isInvalid,
 }) => {
   const handleStartTimeChange = (value) => {
     setStartTime(value);
@@ -41,6 +43,7 @@ export const TimeInput = ({
       <FormControl
         isRequired
         isDisabled={isLocked}
+        isInvalid={isInvalid}
       >
         <FormLabel
           fontSize="14px"
@@ -145,6 +148,7 @@ export const TimeInput = ({
             </>
           )}
         </Flex>
+        <FormErrorMessage>Required</FormErrorMessage>
       </FormControl>
     </Flex>
   );

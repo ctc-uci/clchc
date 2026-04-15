@@ -52,6 +52,15 @@ export function QuotaProgress({
           bg="gray.200"
           my={2}
           colorScheme="green"
+          sx={{
+            "& > div": {
+              transition:
+                "width 0.4s cubic-bezier(0.33, 1, 0.68, 1), background-color 0.2s ease",
+            },
+            "@media (prefers-reduced-motion: reduce)": {
+              "& > div": { transition: "none" },
+            },
+          }}
         />
         <Box
           px={4}

@@ -1,4 +1,8 @@
+import { useEffect, useRef, useState } from "react";
+
 import {
+  Box,
+  Button,
   Skeleton,
   Table,
   TableContainer,
@@ -12,9 +16,13 @@ import {
   Wrap,
   WrapItem,
 } from "@chakra-ui/react";
+import { AddIcon } from "@chakra-ui/icons";
+import { MdPersonAdd } from "react-icons/md";
 
 import TextPopup from "@/components/common/TextPopup";
 import { useTags } from "@/contexts/hooks/data-fetching/useTags";
+
+const SELECTED_BG = "#EDF2F7";
 
 const SkeletonHeader = () => {
   return (
@@ -63,22 +71,29 @@ const SkeletonBody = () => {
 export default function ProviderTable({
   providers,
   providerCategories,
-  selectedProviderId,
-  onProviderSelect,
   onProviderDoubleClick,
   loading,
+  onCreateProvider,
 }) {
   const { data: tagsData } = useTags();
   const tagsMap = tagsData?.tagsMap ?? {};
+  const [selectedRowId, setSelectedRowId] = useState(null);
+  const tableRef = useRef(null);
 
-  // sort categories by columnOrder
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (tableRef.current && !tableRef.current.contains(event.target)) {
+        setSelectedRowId(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const sortedCategories = [...providerCategories].sort(
     (a, b) => a.columnOrder - b.columnOrder
   );
-  /**
-   * Making table header by mapping categories from providerCategories
-   * @returns <Thead> with each category as a cell in the header row.
-   */
+
   const fixedThProps = {
     fontFamily: "Inter",
     fontSize: "12px",
@@ -92,6 +107,13 @@ export default function ProviderTable({
     borderRight: "1px solid",
     borderColor: "gray.200",
   };
+
+  const defaultHeaderCells = (
+    <>
+      <Th {...fixedThProps}>Provider</Th>
+      <Th {...fixedThProps}>NPI/License</Th>
+    </>
+  );
 
   const Header = () => {
     const dynamicColumns = sortedCategories.map((cat) => (
@@ -112,8 +134,7 @@ export default function ProviderTable({
         zIndex={1}
       >
         <Tr>
-          <Th {...fixedThProps}>Provider</Th>
-          <Th {...fixedThProps}>NPI/License</Th>
+          {defaultHeaderCells}
           {dynamicColumns}
           <Th {...fixedThProps} borderRight="none">Long Term Notes</Th>
         </Tr>
@@ -121,13 +142,6 @@ export default function ProviderTable({
     );
   };
 
-  /**
-   * Based on each category, takes data from each provider to render
-   * the correct information in the respective cells.
-   *
-   * Will be used by Body subcomponent.
-   * @returns <Tr> with each cell of necessary provider info <Td>.
-   */
   const renderCellValue = (provider, cat) => {
     const raw = provider?.data?.[cat.name];
 
@@ -150,14 +164,7 @@ export default function ProviderTable({
         lineHeight={"22px"}>
           NO TAGS SELECTED
         </Text>;
-      return <Text 
-        color="gray.400"
-        fontFamily={"Inter"} 
-        fontSize={"14px"} 
-        fontStyle={"normal"}
-        fontWeight={"400"}
-        lineHeight={"22px"}>
-      </Text>;
+      return null;
     }
 
     // Format per inputType
@@ -227,7 +234,7 @@ export default function ProviderTable({
   };
 
   const ProviderRow = ({ provider }) => {
-    const isSelected = selectedProviderId === provider.id;
+    const isSelected = selectedRowId === provider.id;
 
     const fixedTdProps = {
       borderRight: "1px solid",
@@ -247,13 +254,17 @@ export default function ProviderTable({
       <Tr
         borderBottom="1px solid"
         borderColor="gray.200"
-        cursor={onProviderSelect ? "pointer" : "default"}
-        bg={isSelected ? "blue.50" : "transparent"}
-        _hover={
-          onProviderSelect ? { bg: isSelected ? "blue.100" : "gray.50" } : {}
-        }
-        onClick={() => onProviderSelect?.(provider)}
-        onDoubleClick={() => onProviderDoubleClick?.(provider)}
+        cursor={onProviderDoubleClick ? "pointer" : "default"}
+        sx={isSelected ? { background: `${SELECTED_BG} !important` } : undefined}
+        _hover={onProviderDoubleClick ? { bg: isSelected ? SELECTED_BG : "gray.50" } : {}}
+        onClick={() => {
+          if (!onProviderDoubleClick) return;
+          if (selectedRowId === provider.id) {
+            onProviderDoubleClick(provider);
+          } else {
+            setSelectedRowId(provider.id);
+          }
+        }}
       >
         <Td {...fixedTdProps}>
           <Text
@@ -320,10 +331,6 @@ export default function ProviderTable({
     );
   };
 
-  /**
-   * Uses ProviderRow subcomp to display provider data.
-   * @returns <Tbody> containing all rows of provider info.
-   */
   const Body = () => {
     const rows = providers.map((prov) => (
       <ProviderRow
@@ -336,27 +343,66 @@ export default function ProviderTable({
 
   return (
     <TableContainer
+      ref={tableRef}
       border="1px solid"
       borderColor="gray.200"
       borderRadius="lg"
-      maxHeight="60vh"
       overflowY="auto"
     >
       <Table
         sx={{
-          "tbody tr:nth-of-type(even)": {
-            bg: "#F9F9F9", // Your custom stripe color
-          },
-          "tbody tr:nth-of-type(odd)": {
-            bg: "white", // Ensures the other rows are solid white
-          },
+          "tbody tr:nth-of-type(even)": { bg: "#F9F9F9" },
+          "tbody tr:nth-of-type(odd)": { bg: "white" },
         }}
       >
-        {/**Subcomps to simplify structure */}
         {loading ? (
           <>
             <SkeletonHeader />
             <SkeletonBody />
+          </>
+        ) : providers.length === 0 ? (
+          <>
+            <Thead bg="#EBEBEB" h="40px" position="sticky" top={0} zIndex={1}>
+              <Tr>
+                {defaultHeaderCells}
+                <Th {...fixedThProps} borderRight="none">Long Term Notes</Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              <Tr>
+                <Td colSpan={1000} height={"424px"} textAlign="center" py={10}>
+                  <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
+                    <MdPersonAdd size={69} color="#586771" />
+                    <Text fontFamily="Lato" fontSize="22px" color="rgba(88, 103, 113, 0.73)">
+                      No providers added yet.
+                    </Text>
+                    <Text fontFamily="Lato" fontSize="16px" color="rgba(88, 103, 113, 0.73)">
+                      Add a provider to view and manage their information.
+                    </Text>
+                    <Button
+                      marginTop={"29px"}
+                      bg="#35639D"
+                      color="white"
+                      h={"40px"}
+                      w={"211px"}
+                      padding={"0 16px"}
+                      iconSpacing={"8px"}
+                      fontFamily={"Inter"}
+                      fontSize={"16px"}
+                      fontStyle={"normal"}
+                      fontWeight={"light"}
+                      lineHeight={"28px"}
+                      _hover={{ bg: "#35639D" }}
+                      leftIcon={<AddIcon boxSize={"12px"}/>}
+                      borderRadius={"6px"}
+                      onClick={onCreateProvider}
+                    >
+                      Create Provider
+                    </Button>
+                  </Box>
+                </Td>
+              </Tr>
+            </Tbody>
           </>
         ) : (
           <>

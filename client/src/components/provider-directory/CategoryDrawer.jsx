@@ -294,7 +294,6 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
   // Reset local state when drawer opens
   useEffect(() => {
     if (isOpen) resetLocalState();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
   // Sync categories from server whenever serverCategories updates (including after save)

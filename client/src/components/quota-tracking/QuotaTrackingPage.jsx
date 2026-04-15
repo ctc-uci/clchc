@@ -234,12 +234,17 @@ export const QuotaTracking = () => {
           )}
       </Flex>
       <InputGroup mb={6}>
-        <InputLeftElement pointerEvents="none">
+        <InputLeftElement 
+          display="flex"
+          alignItems="center"
+          h="100%"
+          pointerEvents="none"
+        >
           <SearchIcon color="gray.400" />
         </InputLeftElement>
         <Input
           bg="white"
-          placeholder="Search Providers"
+          placeholder="Search Quotas"
           borderRadius="md"
           h="45px"
           onChange={handleChange}
