@@ -115,6 +115,14 @@ export const useApi = () => {
         const res = await backend.get("/location");
         return res.data;
       },
+      create: async (data) => {
+        const res = await backend.post("/location", data);
+        return res.data;
+      },
+      delete: async (id) => {
+        const res = await backend.delete(`/location/${id}`);
+        return res.data;
+      }
     },
     versionLogs: {
       getAll: async ({ params }) => {
@@ -122,7 +130,7 @@ export const useApi = () => {
         return res.data;
       },
       create: async (data) => {
-        const res = await backend.post("/versionLog", data);;
+        const res = await backend.post("/versionLog", data);
         return res.data;
       }
     },

@@ -1,4 +1,3 @@
-import { ChevronDownIcon } from "@chakra-ui/icons";
 import {
   Button,
   Menu,
@@ -7,6 +6,7 @@ import {
   MenuList,
   MenuOptionGroup,
 } from "@chakra-ui/react";
+import { ChevronDown } from "lucide-react";
 
 export default function CustomSelect({
   options,
@@ -17,40 +17,40 @@ export default function CustomSelect({
   const selectedLabel = options.find((opt) => opt.value === value)?.label;
 
   return (
-    <Menu
-      matchWidth
-      strategy="fixed"
-    >
+    <Menu matchWidth>
       <MenuButton
         as={Button}
+        variant="outline"
         w="100%"
-        rightIcon={<ChevronDownIcon />}
-        bg="white"
-        borderWidth="1px"
-        borderColor="gray.300"
-        borderRadius="6px"
-        fontWeight="normal"
-        fontSize="14px"
+        rightIcon={<ChevronDown size={20} />}
+        justifyContent="flex-start"
         textAlign="left"
-        color={selectedLabel ? "inherit" : "gray.400"}
-        _hover={{ bg: "white", borderColor: "gray.400" }}
-        _active={{ bg: "white" }}
-        _expanded={{ borderColor: "blue.500", boxShadow: "0 0 0 1px #3182ce" }}
+        color={selectedLabel ? "var(--gray-700, #2D3748)" : "gray.400"}
+        fontFamily="Inter"
+        fontSize="14px"
+        fontWeight="400"
+        fontStyle="normal"
+        lineHeight="20px"
+        borderRadius="4px"
+        border="1px solid var(--gray-200, #E2E8F0)"
+        background="var(--white, #FFF)"
         _disabled={{
           bg: "gray.50",
           color: "gray.500",
           opacity: 1,
           cursor: "not-allowed",
         }}
-        {...styleProps} // In case we use this somewhere else
+        {...styleProps}
       >
         {selectedLabel || "Select option"}
       </MenuButton>
 
       <MenuList
         zIndex="popover"
-        maxH="200px" // To prevent overflow, but scrolling might not be obvious -@grace
+        maxHeight="240px" // To prevent overflow, but scrolling might not be obvious -@grace
         overflowY="auto"
+        w="100%"
+        minW="0"
       >
         <MenuOptionGroup
           type="radio"

@@ -1,6 +1,7 @@
 import {
   Box,
   FormControl,
+  FormErrorMessage,
   FormLabel,
   InputGroup,
 } from "@chakra-ui/react";
@@ -9,12 +10,13 @@ import CalendarCard from "../../../common/CalendarCard";
 import { LockRightElement } from "../tools/shared";
 import { formatDateForDisplay } from "../tools/utils";
 
-export const DateInput = ({ date, setDate, isLocked }) => {
+export const DateInput = ({ date, setDate, isLocked, isInvalid }) => {
   return (
     <FormControl
       isRequired
       w="45%"
       isDisabled={isLocked}
+      isInvalid={isInvalid}
     >
       <FormLabel
         fontSize="14px"
@@ -45,6 +47,7 @@ export const DateInput = ({ date, setDate, isLocked }) => {
           fullWidth
         />
       )}
+      <FormErrorMessage>Required</FormErrorMessage>
     </FormControl>
   );
 };

@@ -1,3 +1,5 @@
+import { useEffect, useRef, useState } from "react";
+
 import {
   Box,
   Button,
@@ -19,7 +21,8 @@ import { MdPersonAdd } from "react-icons/md";
 
 import TextPopup from "@/components/common/TextPopup";
 import { useTags } from "@/contexts/hooks/data-fetching/useTags";
-import { color } from "framer-motion";
+
+const SELECTED_BG = "#EDF2F7";
 
 const SkeletonHeader = () => {
   return (
@@ -68,23 +71,29 @@ const SkeletonBody = () => {
 export default function ProviderTable({
   providers,
   providerCategories,
-  selectedProviderId,
-  onProviderSelect,
   onProviderDoubleClick,
   loading,
   onCreateProvider,
 }) {
   const { data: tagsData } = useTags();
   const tagsMap = tagsData?.tagsMap ?? {};
+  const [selectedRowId, setSelectedRowId] = useState(null);
+  const tableRef = useRef(null);
 
-  // sort categories by columnOrder
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (tableRef.current && !tableRef.current.contains(event.target)) {
+        setSelectedRowId(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const sortedCategories = [...providerCategories].sort(
     (a, b) => a.columnOrder - b.columnOrder
   );
-  /**
-   * Making table header by mapping categories from providerCategories
-   * @returns <Thead> with each category as a cell in the header row.
-   */
+
   const fixedThProps = {
     fontFamily: "Inter",
     fontSize: "12px",
@@ -133,13 +142,6 @@ export default function ProviderTable({
     );
   };
 
-  /**
-   * Based on each category, takes data from each provider to render
-   * the correct information in the respective cells.
-   *
-   * Will be used by Body subcomponent.
-   * @returns <Tr> with each cell of necessary provider info <Td>.
-   */
   const renderCellValue = (provider, cat) => {
     const raw = provider?.data?.[cat.name];
 
@@ -162,14 +164,7 @@ export default function ProviderTable({
         lineHeight={"22px"}>
           NO TAGS SELECTED
         </Text>;
-      return <Text 
-        color="gray.400"
-        fontFamily={"Inter"} 
-        fontSize={"14px"} 
-        fontStyle={"normal"}
-        fontWeight={"400"}
-        lineHeight={"22px"}>
-      </Text>;
+      return null;
     }
 
     // Format per inputType
@@ -239,7 +234,7 @@ export default function ProviderTable({
   };
 
   const ProviderRow = ({ provider }) => {
-    const isSelected = selectedProviderId === provider.id;
+    const isSelected = selectedRowId === provider.id;
 
     const fixedTdProps = {
       borderRight: "1px solid",
@@ -259,13 +254,17 @@ export default function ProviderTable({
       <Tr
         borderBottom="1px solid"
         borderColor="gray.200"
-        cursor={onProviderSelect ? "pointer" : "default"}
-        bg={isSelected ? "blue.50" : "transparent"}
-        _hover={
-          onProviderSelect ? { bg: isSelected ? "blue.100" : "gray.50" } : {}
-        }
-        onClick={() => onProviderSelect?.(provider)}
-        onDoubleClick={() => onProviderDoubleClick?.(provider)}
+        cursor={onProviderDoubleClick ? "pointer" : "default"}
+        sx={isSelected ? { background: `${SELECTED_BG} !important` } : undefined}
+        _hover={onProviderDoubleClick ? { bg: isSelected ? SELECTED_BG : "gray.50" } : {}}
+        onClick={() => {
+          if (!onProviderDoubleClick) return;
+          if (selectedRowId === provider.id) {
+            onProviderDoubleClick(provider);
+          } else {
+            setSelectedRowId(provider.id);
+          }
+        }}
       >
         <Td {...fixedTdProps}>
           <Text
@@ -332,10 +331,6 @@ export default function ProviderTable({
     );
   };
 
-  /**
-   * Uses ProviderRow subcomp to display provider data.
-   * @returns <Tbody> containing all rows of provider info.
-   */
   const Body = () => {
     const rows = providers.map((prov) => (
       <ProviderRow
@@ -348,6 +343,7 @@ export default function ProviderTable({
 
   return (
     <TableContainer
+      ref={tableRef}
       border="1px solid"
       borderColor="gray.200"
       borderRadius="lg"
@@ -355,21 +351,15 @@ export default function ProviderTable({
     >
       <Table
         sx={{
-          "tbody tr:nth-of-type(even)": {
-            bg: "#F9F9F9", // Your custom stripe color
-          },
-          "tbody tr:nth-of-type(odd)": {
-            bg: "white", // Ensures the other rows are solid white
-          },
+          "tbody tr:nth-of-type(even)": { bg: "#F9F9F9" },
+          "tbody tr:nth-of-type(odd)": { bg: "white" },
         }}
       >
-        {/**Subcomps to simplify structure */}
         {loading ? (
           <>
             <SkeletonHeader />
             <SkeletonBody />
           </>
-  
         ) : providers.length === 0 ? (
           <>
             <Thead bg="#EBEBEB" h="40px" position="sticky" top={0} zIndex={1}>

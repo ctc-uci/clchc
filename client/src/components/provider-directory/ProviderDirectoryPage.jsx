@@ -28,7 +28,6 @@ export const ProviderDirectoryPage = () => {
   const [providerQuery, setProviderQuery] = useState("");
   const [drawerMode, setDrawerMode] = useState("create");
   const [selectedProvider, setSelectedProvider] = useState(null);
-  const [highlightedProviderId, setHighlightedProviderId] = useState(null);
   const [manageOpen, setManageOpen] = useState(false);
 
   const debouncedProviderQuery = useDebounce(
@@ -198,21 +197,13 @@ export const ProviderDirectoryPage = () => {
             />
           </InputGroup>
         </Flex>
-      ) : (
-        <></>
-      )}
+      ) : null}
 
       {providers && providerCategories ? (
         <Box>
           <ProviderTable
             providers={providers}
             providerCategories={providerCategories}
-            selectedProviderId={highlightedProviderId}
-            onProviderSelect={
-              role === "ccm" || role === "master"
-                ? (provider) => setHighlightedProviderId(provider.id)
-                : undefined
-            }
             onProviderDoubleClick={
               role === "ccm" || role === "master"
                 ? openEditProviderDrawer
@@ -246,42 +237,3 @@ export const ProviderDirectoryPage = () => {
     </Box>
   );
 };
-
-/* Reusable Stat Item */
-// const StatItem = ({ label, value }) => (
-//   <Box textAlign="left">
-//     <Text
-//       fontSize="lg"
-//       color="gray.700"
-//       mb={1}
-//     >
-//       {label}
-//     </Text>
-//     <Text
-//       fontSize="3xl"
-//       fontWeight="bold"
-//     >
-//       {value}
-//     </Text>
-//   </Box>
-// );
-
-// /* Horizontal Divider */
-// const HorizontalDivider = () => (
-//   <Divider
-//     borderColor="black.400"
-//     length="1,906px"
-//   />
-// );
-
-// /* Grid Divider */
-// const GridDivider = ({ left }) => (
-//   <Box
-//     position="absolute"
-//     top={0}
-//     bottom={0}
-//     left={`calc(${left} - 20px)`}
-//     width="1px"
-//     bg="gray.400"
-//   />
-// );
