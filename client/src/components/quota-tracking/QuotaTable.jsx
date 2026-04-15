@@ -153,7 +153,7 @@ const QuotaTable = ({ rows, loading, onRowsUpdate, role }) => {
             rows.map((row) => (
               <Tr
                 key={row.id}
-                bg={selectedRowId === row.id ? SELECTED_BG : undefined}
+                sx={selectedRowId === row.id ? { background: `${SELECTED_BG} !important` } : undefined}
                 borderBottom="1px solid"
                 borderColor="gray.200"
                 onClick={() => {
