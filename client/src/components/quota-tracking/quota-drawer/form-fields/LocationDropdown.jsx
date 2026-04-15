@@ -5,6 +5,7 @@ import {
   Box,
   Button,
   FormControl,
+  FormErrorMessage,
   FormLabel,
   HStack,
   Input,
@@ -32,7 +33,7 @@ import CustomSelect from "@/components/common/CustomSelect";
 import { LockRightElement } from "../tools/shared";
 import { MdDeleteOutline } from "react-icons/md";
 
-export function LocationDropdown({ locationId, setLocationId, isLocked }) {
+export function LocationDropdown({ locationId, setLocationId, isLocked, isInvalid }) {
   const { data: { locations = [] } = {}, isLoading: loadingLocations } =
     useLocations();
   const createLocation = useCreateLocation();
@@ -133,6 +134,7 @@ export function LocationDropdown({ locationId, setLocationId, isLocked }) {
       isRequired
       w="50%"
       isDisabled={isLocked}
+      isInvalid={isInvalid}
     >
       <FormLabel
         fontSize="14px"
@@ -180,7 +182,7 @@ export function LocationDropdown({ locationId, setLocationId, isLocked }) {
             lineHeight={"20px"}
             fontStyle={"normal"}
             borderRadius={"4px"}
-            border={"1px solid var(--gray-200, #E2E8F0)"}
+            border={isInvalid ? "1px solid #FC8181" : "1px solid var(--gray-200, #E2E8F0)"}
             background={"var(--white, #FFF)"}
           >
             {selectedLocation?.tagValue
@@ -267,6 +269,7 @@ export function LocationDropdown({ locationId, setLocationId, isLocked }) {
           </MenuList>
         </Menu>
       )}
+      <FormErrorMessage>Required</FormErrorMessage>
     </FormControl>
   );
 }

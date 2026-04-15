@@ -1,6 +1,7 @@
 import {
   Box,
   FormControl,
+  FormErrorMessage,
   FormLabel,
   InputGroup,
   Skeleton,
@@ -11,7 +12,7 @@ import { useProvidersSummary } from "@/contexts/hooks/data-fetching/useProviders
 
 import { LockRightElement } from "../tools/shared";
 
-export function ProviderDropdown({ providerId, setProviderId, isLocked }) {
+export function ProviderDropdown({ providerId, setProviderId, isLocked, isInvalid }) {
   const { data: providers = [], isLoading: loadingSummary } =
     useProvidersSummary();
 
@@ -39,6 +40,7 @@ export function ProviderDropdown({ providerId, setProviderId, isLocked }) {
     <FormControl
       isRequired
       isDisabled={isLocked}
+      isInvalid={isInvalid}
     >
       <FormLabel
         fontSize="14px"
@@ -68,8 +70,10 @@ export function ProviderDropdown({ providerId, setProviderId, isLocked }) {
           options={options}
           value={providerId === "" ? "" : String(providerId)}
           setValue={(val) => setProviderId(Number(val))}
+          styleProps={isInvalid ? { border: "1px solid #FC8181" } : {}}
         />
       )}
+      <FormErrorMessage>Required</FormErrorMessage>
     </FormControl>
   );
 }

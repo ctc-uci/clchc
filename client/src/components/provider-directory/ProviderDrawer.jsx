@@ -142,33 +142,7 @@ const ConfirmationBanner = ({ mode, pendingTagDeletes = [] }) => {
     </Alert>
   );
 };
-//We're not using these functions right now, but they could be helpful for formatting specific fields in the future
-// Maps a display label to the actual DB category name (case-insensitive match)
-// const findCategoryName = (categories, label) => {
-//   const lower = label.toLowerCase();
-//   const match = categories.find((c) => c.name.toLowerCase() === lower);
-//   return match ? match.name : label;
-// };
 
-// // Format phone: (XXX) XXX - XXXX
-// const formatPhone = (value) => {
-//   const digits = value.replace(/\D/g, "").slice(0, 10);
-//   if (digits.length === 0) return "";
-//   if (digits.length <= 3) return `(${digits}`;
-//   if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
-//   return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)} - ${digits.slice(6)}`;
-// };
-
-// // Format license/NPI: XXX XXXXX XXXXXXXXXX (3 + 5 + rest, alphanumeric)
-// const formatLicenseNpi = (value) => {
-//   const clean = value.replace(/[^a-zA-Z0-9]/g, "");
-//   if (clean.length <= 3) return clean;
-//   if (clean.length <= 8) return `${clean.slice(0, 3)} ${clean.slice(3)}`;
-//   return `${clean.slice(0, 3)} ${clean.slice(3, 8)} ${clean.slice(8)}`;
-// };
-
-// --- Provider Form Fields (hardcoded 2-column layout matching MidFi) ---
-// `catNames` maps display labels to actual DB category names
 const ProviderFormFields = ({
   categories,
   tags,
@@ -765,7 +739,12 @@ const ProviderDrawer = ({
                     }}
                     borderRadius="4px"
                     width="50%"
-                    px={10}
+                    fontFamily="Inter"
+                    fontSize="16px"
+                    fontStyle="normal"
+                    fontWeight="600"
+                    lineHeight="28px"
+                    padding="10px"
                   >
                     Delete
                   </Button>
@@ -777,9 +756,51 @@ const ProviderDrawer = ({
                     onClick={handleSubmit}
                     borderRadius="4px"
                     width="50%"
-                    px={10}
+                    fontFamily="Inter"
+                    fontSize="16px"
+                    fontStyle="normal"
+                    fontWeight="600"
+                    lineHeight="28px"
+                    padding="10px"
                   >
                     Confirm Changes
+                  </Button>
+                </>
+              ) : activeMode === "create" && !showConfirmation ? (
+                <>
+                  <Button
+                    variant="outline"
+                    onClick={handleClose}
+                    color="#022442"
+                    borderColor="#0000003D"
+                    _hover={{ bg: "gray.100" }}
+                    borderRadius="4px"
+                    width="50%"
+                    fontFamily="Inter"
+                    fontSize="16px"
+                    fontStyle="normal"
+                    fontWeight="600"
+                    lineHeight="28px"
+                    padding="10px"
+                  >
+                    Cancel
+                  </Button>
+
+                  <Button
+                    bg="#929292"
+                    color="white"
+                    _hover={{ bg: "#1a4f7a" }}
+                    onClick={handleSubmit}
+                    borderRadius="4px"
+                    width="50%"
+                    fontFamily="Inter"
+                    fontSize="16px"
+                    fontStyle="normal"
+                    fontWeight="600"
+                    lineHeight="28px"
+                    padding="10px"
+                  >
+                    Create
                   </Button>
                 </>
               ) : (
@@ -789,13 +810,18 @@ const ProviderDrawer = ({
                     onClick={() => {
                       setShowConfirmation(false);
                       setPendingTagDeletes([]);
-                      setActiveMode("edit");
+                      if (activeMode === "delete") setActiveMode("edit");
                     }}
                     color="#022442"
                     borderColor="#0000003D"
                     borderRadius="4px"
                     width="50%"
-                    px={10}
+                    fontFamily="Inter"
+                    fontSize="16px"
+                    fontStyle="normal"
+                    fontWeight="600"
+                    lineHeight="28px"
+                    padding="10px"
                   >
                     Back to Editing
                   </Button>
@@ -809,15 +835,14 @@ const ProviderDrawer = ({
                     onClick={handleSubmit}
                     borderRadius="4px"
                     width="50%"
-                    px={10}
+                    fontFamily="Inter"
+                    fontSize="16px"
+                    fontStyle="normal"
+                    fontWeight="600"
+                    lineHeight="28px"
+                    padding="10px"
                   >
-                    {showConfirmation
-                      ? activeMode === "delete"
-                        ? "Delete"
-                        : "Confirm"
-                      : activeMode === "create"
-                        ? "Create"
-                        : "Confirm"}
+                    {activeMode === "delete" ? "Delete" : "Confirm"}
                   </Button>
                 </>
               )}
