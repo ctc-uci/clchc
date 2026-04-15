@@ -98,7 +98,7 @@ export default function UserEditModal({ isOpen, onClose, userId, onUpdated }) {
     }
 
     try {
-      await deleteUser({ uid: currentFirebaseUid });
+      await deleteUser(currentFirebaseUid);
       if (onUpdated) await onUpdated();
       onClose();
     } catch (err) {
@@ -393,7 +393,7 @@ export default function UserEditModal({ isOpen, onClose, userId, onUpdated }) {
                   py="10px"
                   h="41px"
                   onClick={async () => {
-                    onDelete();
+                    await onDelete();
                   }}
                   _hover={{ bg: "#A50F15" }}
                   isDisabled={deleteInput !== "Delete"}
@@ -416,7 +416,7 @@ export default function UserEditModal({ isOpen, onClose, userId, onUpdated }) {
                   py="10px"
                   h="41px"
                   onClick={async () => {
-                    onApprove();
+                    await onApprove();
                   }}
                   _hover={{ bg: "#0C824D" }}
                 >

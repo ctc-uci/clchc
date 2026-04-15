@@ -1,21 +1,19 @@
-import { Avatar, Box, Grid, GridItem, Text } from "@chakra-ui/react";
+import { Avatar, Box, Grid, GridItem, Text, useDisclosure } from "@chakra-ui/react";
 
-
-
-import { useUserContext } from "@/contexts/hooks/useUserContext";
 import { useAuthContext } from "@/contexts/hooks/useAuthContext";
-
+import { useUserContext } from "@/contexts/hooks/useUserContext";
 
 import PersonalInfo from "./PersonalInfo.jsx";
 import QuotaCalcFactor from "./QuotaCalcFactor.jsx";
 import SignOutSection from "./SignOutSection.jsx";
-
+import TransferMasterRole from "./TransferMasterRole.jsx";
 
 export const PERSONAL_INFO = "personal-info";
 export const DELETE_ACCOUNT = "delete-account";
 export const CALCULATION_FACTOR = "calculation-factor";
 
 export function Settings() {
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const userData = useUserContext();
   const dbUser = userData?.dbUser;
   const { currentUser } = useAuthContext();
@@ -25,14 +23,14 @@ export function Settings() {
       display="flex"
       alignItems="center"
       justifyContent="center"
-      py="40px"
+      pt="40px"
       px="40px"
       backgroundColor="#F9F9F9"
     >
       <Grid
         templateColumns="300px 1fr 1fr"
         maxW="1400px"
-        templateRows="auto auto auto"
+        // templateRows="auto auto auto"
         mx="auto"
         minH="520px"
         backgroundColor="#F9F9F9"
@@ -51,11 +49,11 @@ export function Settings() {
           <Avatar
             w="280px"
             h="280px"
-            // name={`${dbUser?.firstName} ${dbUser?.lastName}`}
+            name={`${dbUser?.firstName} ${dbUser?.lastName}`}
             src={currentUser?.photoURL}
             css={{
-            imageRendering: "-webkit-optimize-contrast",
-          }}
+              imageRendering: "-webkit-optimize-contrast",
+            }}
           />
           <Text
             fontWeight="bold"
@@ -141,6 +139,7 @@ export function Settings() {
         <GridItem
           p="1em"
           ml="80px"
+          marginBottom="30px"
         >
           <Text
             fontWeight="bold"
@@ -162,6 +161,20 @@ export function Settings() {
         >
           <SignOutSection />
         </GridItem>
+        {dbUser?.role === "master" ? (
+          <>
+            <GridItem>{/* Transfer Master Role Grid Item */}</GridItem>
+            <GridItem
+              p="1em"
+              ml="80px"
+              colSpan={2}
+            >
+              <TransferMasterRole isOpen={isOpen} onOpen={onOpen} onClose={onClose} />
+            </GridItem>
+          </>
+        ) : (
+          <></>
+        )}
       </Grid>
     </Box>
   );

@@ -81,7 +81,7 @@ quotaRouter.get("/details", verifyRole("viewer"), async (req, res) => {
         SELECT q.*, p.name AS provider_name, l.tag_value AS location_name
         FROM quota q 
         JOIN providers p ON q.provider_id = p.id 
-        JOIN location l ON q.location_id = l.id
+        LEFT JOIN location l ON q.location_id = l.id
         ${whereClause}
         ORDER BY q.id ASC`,
       values
