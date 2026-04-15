@@ -98,19 +98,22 @@ export const ProviderDirectoryPage = () => {
           {(role === "ccm" || role === "master") && (
             <Box position="relative">
               <Button
-                bg="var(--Primary-1, #022442)"
+                bg="#113D64"
                 color="white"
-                h={"45px"}
-                w={"135px"}
-                padding={"8px 12px"}
-                fontFamily={"Inter"}
-                fontSize={"18px"}
-                fontStyle={"normal"}
-                fontWeight={"600"}
-                lineHeight={"28px"}
-                _hover={{ bg: "#022442" }}
-                _active={{ bg: "#022442" }}
-                leftIcon={<HamburgerIcon size={"24px"}/>}
+                h="45px"
+                w="160px"
+                justifyContent={"center"}
+                alignItems={"center"}
+                gap={"8px"}
+                padding="0 24px"
+                fontFamily="Lato"
+                fontSize="14px"
+                fontStyle="normal"
+                fontWeight="600"
+                lineHeight="28px"
+                _hover={{ bg: "#485365" }}
+                _active={{ bg: "#485365" }}
+                rightIcon={<HamburgerIcon boxSize={4} />}
                 borderRadius={manageOpen ? "4px 4px 0 0" : "4px"}
                 onClick={() => setManageOpen(o => !o)}
               >
@@ -140,8 +143,8 @@ export const ProviderDirectoryPage = () => {
                       px={4}
                       py={3}
                       color="white"
-                      fontFamily="Inter"
-                      fontSize="18px"
+                      fontFamily="Lato"
+                      fontSize="14px"
                       fontStyle="normal"
                       fontWeight="600"
                       lineHeight="28px"
@@ -158,8 +161,8 @@ export const ProviderDirectoryPage = () => {
                       px={4}
                       py={3}
                       color="white"
-                      fontFamily="Inter"
-                      fontSize="18px"
+                      fontFamily="Lato"
+                      fontSize="14px"
                       fontStyle="normal"
                       fontWeight="600"
                       lineHeight="28px"

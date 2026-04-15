@@ -182,7 +182,10 @@ export const QuotaTracking = () => {
               onClick={onCreateDrawerOpen}
               textColor="white"
               fontSize="14px"
-              fontWeight="normal"
+              fontWeight="600"
+              fontStyle={"normal"}
+              lineHeight={"28px"}
+              fontFamily={"Lato"}
               _hover={{ background: "#485365" }}
             >
               Create Quota
