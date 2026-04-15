@@ -12,7 +12,7 @@
   "license": "MIT",
   "scripts": {
     "start": "tsx watch --clear-screen=false src/server.ts",
-    "test": "vitest --run",
+    "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint",
     "format": "npx prettier --write ."
@@ -58,7 +58,7 @@
     "typescript": "5.5.3",
     "typescript-eslint": "^8.1.0",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "1"
+    "vitest": "^4.1.4"
   },
   "description": "",
   "keywords": [],
