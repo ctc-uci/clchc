@@ -859,10 +859,16 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
                 </Box>
               </DrawerBody>
 
-              <DrawerFooter gap="2%">
+              <DrawerFooter
+                justifyContent="space-between"
+                gap="20px"
+                w="100%"
+                bg="white"
+                borderTop="1px solid"
+                borderColor="gray.200"
+              >
                 <Button
                   variant="outline"
-                  mr={3}
                   onClick={() => {
                     if (createPhase === "confirming" || deletePhase === "confirming") {
                       setCreatePhase(null);
@@ -871,21 +877,38 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
                       handleDrawerClose();
                     }
                   }}
-                  width="48%"
+                  width="50%"
                   color="#022442"
                   borderColor="#0000003D"
                   _hover={{ bg: "gray.100" }}
                   borderRadius="4px"
-                  minHeight="48px"
-                  fontSize="18px"
+                  fontFamily="Inter"
+                  fontSize="16px"
+                  fontStyle="normal"
                   fontWeight="600"
+                  lineHeight="28px"
+                  padding="10px"
                 >
                   {createPhase === "confirming" || deletePhase === "confirming" ? "Back to Editing" : "Cancel"}
                 </Button>
                 <Button
-                  bg={pendingDeleteIds.length > 0 ? "#90080F" : "#113D64"}
-                  color="white"
-                  width="48%"
+                  variant={pendingDeleteIds.length > 0 && deletePhase !== "confirming" ? "outline" : "solid"}
+                  bg={
+                    deletePhase === "confirming"
+                      ? "red.700"
+                      : pendingDeleteIds.length > 0
+                      ? "transparent"
+                      : createPhase === "confirming"
+                      ? "#113D64"
+                      : "#929292"
+                  }
+                  color={pendingDeleteIds.length > 0 && deletePhase !== "confirming" ? "#90080F" : "white"}
+                  borderColor={pendingDeleteIds.length > 0 && deletePhase !== "confirming" ? "#90080F" : undefined}
+                  _hover={{
+                    bg: deletePhase === "confirming" || pendingDeleteIds.length > 0 ? "red.800" : "#1a4f7a",
+                    color: pendingDeleteIds.length > 0 && deletePhase !== "confirming" ? "#FFF" : undefined,
+                  }}
+                  width="50%"
                   onClick={() => {
                     if (pendingDeleteIds.length > 0 && deletePhase !== "confirming") {
                       setShowForm(false);
@@ -898,9 +921,12 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
                     }
                   }}
                   borderRadius="4px"
-                  minHeight="48px"
-                  fontSize="18px"
+                  fontFamily="Inter"
+                  fontSize="16px"
+                  fontStyle="normal"
                   fontWeight="600"
+                  lineHeight="28px"
+                  padding="10px"
                   isDisabled={!hasReordered && pendingDeleteIds.length === 0 && !categories.some((cat) => String(cat.id).startsWith("temp-"))}
                 >
                   {deletePhase === "confirming"
