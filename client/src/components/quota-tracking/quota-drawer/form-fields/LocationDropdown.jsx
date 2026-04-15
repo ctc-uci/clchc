@@ -200,20 +200,21 @@ export function LocationDropdown({ locationId, setLocationId, isLocked }) {
                   key={location.id}
                   value={String(location.id)}
                   ref={String(location.id) === String(locationId) ? selectedItemRef : null}
-                  pl="0"
+                  pl="3"
+                  pr="0"
                 >
                   <HStack
                     justifyContent="space-between"
                     w="100%"
                   >
-                    <Text w="114px" h="fit-content" fontSize="12px" fontWeight="400">{location.tagValue}</Text>
+                    <Text flex="1" fontSize="12px" fontWeight="400">{location.tagValue}</Text>
                     <Button
                       as="span"
                       variant="ghost"
                       onClick={handleDelete(location)}
                       isLoading={!!deletingMap[location.id]}
                     >
-                      <MdDeleteOutline size={20} color="" />
+                      <MdDeleteOutline size={20} />
                     </Button>
                   </HStack>
                 </MenuItemOption>
@@ -225,18 +226,22 @@ export function LocationDropdown({ locationId, setLocationId, isLocked }) {
               >
                 <Input
                   placeholder="Enter location"
-                  size="sm"
                   value={newValue}
                   onChange={(e) => setNewValue(e.target.value)}
                   variant="outline"
+                  fontFamily={"Inter"}
+                  fontStyle={"normal"}
+                  lineHeight={"20px"}
                   fontSize="12px"
                   fontWeight="400"
-                  ml="10px"
                   color="black"
-                  borderColor="gray.200"
-                  borderRadius="6px"
-                  w="150px"
-                  _placeholder={{ color: "gray.400" }}
+                  border={"1px solid var(--gray-200, #E2E8F0)"}
+                  borderRadius="4px"
+                  w="100%"
+                  h="30px"
+                  padding={"10px"}
+                  margin={"0"}
+                  _placeholder={{ color: "#A0AEC0" }}
                 />
                 <Button
                   size="xs"
