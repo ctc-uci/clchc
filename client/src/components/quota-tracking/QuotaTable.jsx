@@ -112,7 +112,6 @@ const QuotaTable = ({ rows, loading, onRowsUpdate, role }) => {
       border="1px solid"
       borderColor="gray.200"
       borderRadius="lg"
-      maxHeight="60vh"
       overflowY="auto"
     >
       <Table
