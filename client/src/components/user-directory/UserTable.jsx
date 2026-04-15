@@ -3,6 +3,7 @@ import { useState } from "react";
 // import { Icon } from "@chakra-ui/icons";
 import {
   Badge,
+  Box,
   HStack,
   IconButton,
   Skeleton,
@@ -18,7 +19,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 
-import { MdCreate } from "react-icons/md";
+import { MdCreate, MdSentimentDissatisfied } from "react-icons/md";
 
 import UserEditModal from "./UserEditModal";
 
@@ -127,7 +128,6 @@ export default function UserTable({
         border="1px solid"
         borderColor="gray.200"
         borderRadius="lg"
-        maxHeight="60vh"
         overflowY="auto"
       >
         <Table
@@ -148,6 +148,17 @@ export default function UserTable({
           <Tbody>
             {loading ? (
               <SkeletonRows />
+            ) : users.length === 0 ? (
+              <Tr>
+                <Td colSpan={4} height={"360px"} textAlign="center" py={10}>
+                  <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
+                    <MdSentimentDissatisfied size={69} color="#586771" />
+                    <Text fontFamily="Lato" fontSize="18px" color="gray.500">
+                      No users found.
+                    </Text>
+                  </Box>
+                </Td>
+              </Tr>
             ) : (
               users.map((user) => (
                 <Tr key={user.id} borderBottom="1px solid" borderColor="gray.200">

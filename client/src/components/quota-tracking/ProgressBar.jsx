@@ -148,7 +148,16 @@ export default function ProgressBar({ quota }) {
           borderRadius="4px"
           background="rgba(0,0,0,0.06)"
           marginx="6px"
-          sx={{ "& > div": { backgroundColor: "#38A169" } }}
+          sx={{
+            "& > div": {
+              backgroundColor: "#38A169",
+              transition:
+                "width 0.4s cubic-bezier(0.33, 1, 0.68, 1), background-color 0.2s ease",
+            },
+            "@media (prefers-reduced-motion: reduce)": {
+              "& > div": { transition: "none" },
+            },
+          }}
         />
 
         <Button

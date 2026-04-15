@@ -27,6 +27,7 @@ import {
   useDeleteLocation,
   useLocations,
 } from "@/contexts/hooks/data-fetching/useLocations";
+import CustomSelect from "@/components/common/CustomSelect";
 
 import { LockRightElement } from "../tools/shared";
 import { MdDeleteOutline } from "react-icons/md";
@@ -65,6 +66,10 @@ export function LocationDropdown({ locationId, setLocationId, isLocked }) {
     );
   }
 
+  const options = locations.map((l) => ({
+    value: String(l.id),
+    label: l.tagValue,
+  }));
   const selectedLocation = locations.find(
     (location) => String(location.id) === String(locationId)
   );
