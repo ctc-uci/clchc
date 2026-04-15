@@ -181,7 +181,12 @@ export const ProviderDirectoryPage = () => {
           </Flex>
           {/* BOTTOM ROW: Search Bar */}
           <InputGroup width="100%">
-            <InputLeftElement pointerEvents="none">
+            <InputLeftElement 
+              display="flex"
+              alignItems="center"
+              h="100%"
+              pointerEvents="none"
+            >
               <SearchIcon color="gray.400" />
             </InputLeftElement>
             <Input

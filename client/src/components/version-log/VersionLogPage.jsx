@@ -77,7 +77,12 @@ export const VersionLogPage = () => {
         mb={5}
       >
         <InputGroup flex="1">
-          <InputLeftElement pointerEvents="none">
+          <InputLeftElement 
+            display="flex"
+            alignItems="center"
+            h="100%"
+            pointerEvents="none"
+          >
             <SearchIcon color="gray.400" />
           </InputLeftElement>
           <Input
