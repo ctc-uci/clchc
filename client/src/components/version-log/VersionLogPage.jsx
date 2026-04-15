@@ -87,7 +87,7 @@ export const VersionLogPage = () => {
           </InputLeftElement>
           <Input
             backgroundColor="white"
-            placeholder="Search Providers"
+            placeholder="Search Logs"
             borderRadius="md"
             h="45px"
             value={inputValue}

@@ -244,7 +244,7 @@ export const QuotaTracking = () => {
         </InputLeftElement>
         <Input
           bg="white"
-          placeholder="Search Providers"
+          placeholder="Search Quotas"
           borderRadius="md"
           h="45px"
           onChange={handleChange}
