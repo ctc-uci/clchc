@@ -326,7 +326,10 @@ export default function QuotaDrawer({
               </Stack>
               <Stack flex={1} gap={2}>
                 <Skeleton height="14px" width="55px" />
-                <Skeleton height="40px" borderRadius="6px" />
+                <Flex gap={2}>
+                  <Skeleton height="40px" borderRadius="6px" flex={1} />
+                  <Skeleton height="40px" borderRadius="6px" flex={1} />
+                </Flex>
               </Stack>
             </Flex>
 
@@ -348,7 +351,7 @@ export default function QuotaDrawer({
 
             <Stack gap={2}>
               <Skeleton height="14px" width="120px" />
-              <Skeleton height="70px" borderRadius="6px" />
+              <Skeleton height="120px" borderRadius="6px" />
             </Stack>
 
           </Stack>
