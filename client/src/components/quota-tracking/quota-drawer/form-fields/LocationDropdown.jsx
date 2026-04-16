@@ -15,7 +15,6 @@ import {
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
-  Skeleton,
   Spinner,
   Text,
   useDisclosure,
@@ -26,7 +25,6 @@ import { ChevronDown } from "lucide-react";
 import {
   useCreateLocation,
   useDeleteLocation,
-  useLocations,
 } from "@/contexts/hooks/data-fetching/useLocations";
 import CustomSelect from "@/components/common/CustomSelect";
 
