@@ -11,6 +11,7 @@ import {
   Stack,
   Text,
   useDisclosure,
+  Skeleton
 } from "@chakra-ui/react";
 
 import {
@@ -35,7 +36,6 @@ import { TypeInput } from "./quota-drawer/form-fields/TypeInput";
 import { NotificationBanner } from "./quota-drawer/NotificationBanner";
 import { QuotaDrawerFooter } from "./quota-drawer/QuotaDrawerFooter";
 import { drawerTitle } from "./quota-drawer/tools/constants";
-import { SkeletonBody } from "./quota-drawer/tools/shared";
 import {
   formatDateForInput,
   formatTimeForInput,
@@ -311,7 +311,48 @@ export default function QuotaDrawer({
         </DrawerHeader>
 
         {isDrawerLoading ? (
-          <SkeletonBody />
+          <DrawerBody padding="30px 24px 30px 24px">
+          <Stack gap={4}>
+
+            <Stack gap={2}>
+              <Skeleton height="14px" width="70px" />
+              <Skeleton height="40px" borderRadius="6px" />
+            </Stack>
+
+            <Flex justify="space-between" gap={4}>
+              <Stack flex={1} gap={2}>
+                <Skeleton height="14px" width="40px" />
+                <Skeleton height="40px" borderRadius="6px" />
+              </Stack>
+              <Stack flex={1} gap={2}>
+                <Skeleton height="14px" width="55px" />
+                <Skeleton height="40px" borderRadius="6px" />
+              </Stack>
+            </Flex>
+
+            <Flex justify="space-between" gap={4}>
+              <Stack flex={1} gap={2}>
+                <Skeleton height="14px" width="65px" />
+                <Skeleton height="40px" borderRadius="6px" />
+              </Stack>
+              <Stack flex={1} gap={2}>
+                <Skeleton height="14px" width="40px" />
+                <Skeleton height="40px" borderRadius="6px" />
+              </Stack>
+            </Flex>
+
+            <Stack gap={2}>
+              <Skeleton height="14px" width="85px" />
+              <Skeleton height="80px" borderRadius="6px" />
+            </Stack>
+
+            <Stack gap={2}>
+              <Skeleton height="14px" width="120px" />
+              <Skeleton height="70px" borderRadius="6px" />
+            </Stack>
+
+          </Stack>
+        </DrawerBody>
         ) : (
           <form onSubmit={handleSubmit}>
             <DrawerBody
