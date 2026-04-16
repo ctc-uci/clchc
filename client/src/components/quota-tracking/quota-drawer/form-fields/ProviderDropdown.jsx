@@ -12,21 +12,21 @@ import { useProvidersSummary } from "@/contexts/hooks/data-fetching/useProviders
 
 import { LockRightElement } from "../tools/shared";
 
-export function ProviderDropdown({ providerId, setProviderId, isLocked, isInvalid }) {
-  const { data: providers = [], isLoading: loadingSummary } =
-    useProvidersSummary();
+export function ProviderDropdown({ providers = [], providerId, setProviderId, isLocked, isInvalid }) {
+  // const { data: providers = [], isLoading: loadingSummary } =
+  //   useProvidersSummary();
 
-  if (loadingSummary) {
-    return (
-      <>
-        <Skeleton
-          height="16px"
-          mb={2}
-        />
-        <Skeleton height="40px" />
-      </>
-    );
-  }
+  // if (loadingSummary) {
+  //   return (
+  //     <>
+  //       <Skeleton
+  //         height="16px"
+  //         mb={2}
+  //       />
+  //       <Skeleton height="40px" />
+  //     </>
+  //   );
+  // }
 
   const options = providers.map((p) => ({
     value: String(p.id),

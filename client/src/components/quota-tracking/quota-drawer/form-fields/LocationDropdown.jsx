@@ -33,9 +33,9 @@ import CustomSelect from "@/components/common/CustomSelect";
 import { LockRightElement } from "../tools/shared";
 import { MdDeleteOutline } from "react-icons/md";
 
-export function LocationDropdown({ locationId, setLocationId, isLocked, isInvalid }) {
-  const { data: { locations = [] } = {}, isLoading: loadingLocations } =
-    useLocations();
+export function LocationDropdown({ locations = [], locationId, setLocationId, isLocked, isInvalid }) {
+  // const { data: { locations = [] } = {}, isLoading: loadingLocations } =
+  //   useLocations();
   const createLocation = useCreateLocation();
   const deleteLocation = useDeleteLocation();
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -52,20 +52,20 @@ export function LocationDropdown({ locationId, setLocationId, isLocked, isInvali
     }
   }, [isOpen]);
 
-  if (loadingLocations) {
-    return (
-      <FormControl w="50%">
-        <Skeleton
-          height="16px"
-          mb={2}
-        />
-        <Skeleton
-          height="40px"
-          borderRadius="6px"
-        />
-      </FormControl>
-    );
-  }
+  // if (loadingLocations) {
+  //   return (
+  //     <FormControl w="50%">
+  //       <Skeleton
+  //         height="16px"
+  //         mb={2}
+  //       />
+  //       <Skeleton
+  //         height="40px"
+  //         borderRadius="6px"
+  //       />
+  //     </FormControl>
+  //   );
+  // }
 
   const options = locations.map((l) => ({
     value: String(l.id),
