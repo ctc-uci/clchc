@@ -28,7 +28,6 @@ export const ProviderDirectoryPage = () => {
   const [providerQuery, setProviderQuery] = useState("");
   const [drawerMode, setDrawerMode] = useState("create");
   const [selectedProvider, setSelectedProvider] = useState(null);
-  const [highlightedProviderId, setHighlightedProviderId] = useState(null);
   const [manageOpen, setManageOpen] = useState(false);
 
   const debouncedProviderQuery = useDebounce(
@@ -88,34 +87,33 @@ export const ProviderDirectoryPage = () => {
 
   return (
     <Box p={6}>
-      {role === "ccm" || role === "master" ? (
-        <Flex
-          flexDirection="column"
-          mb={5}
-          gap={6}
-        >
-          {/* TOP ROW: PageHeader + Manage Button */}
-          <Flex justify="space-between" align="center">
-            <PageHeader
-              title="Provider Directory"
-              role={role}
-              isLoading={roleLoading}
-            />
+      <Flex flexDirection="column" mb={5} gap={6}>
+        {/* TOP ROW: PageHeader + Manage Button (Manage only for ccm/master) */}
+        <Flex justify="space-between" align="center">
+          <PageHeader
+            title="Provider Directory"
+            role={role}
+            isLoading={roleLoading}
+          />
+          {(role === "ccm" || role === "master") && (
             <Box position="relative">
               <Button
-                bg="var(--Primary-1, #022442)"
+                bg="#113D64"
                 color="white"
-                h={"45px"}
-                w={"135px"}
-                padding={"8px 12px"}
-                fontFamily={"Inter"}
-                fontSize={"18px"}
-                fontStyle={"normal"}
-                fontWeight={"600"}
-                lineHeight={"28px"}
-                _hover={{ bg: "#022442" }}
-                _active={{ bg: "#022442" }}
-                leftIcon={<HamburgerIcon size={"24px"}/>}
+                h="45px"
+                w="160px"
+                justifyContent={"center"}
+                alignItems={"center"}
+                gap={"8px"}
+                padding="0 24px"
+                fontFamily="Lato"
+                fontSize="14px"
+                fontStyle="normal"
+                fontWeight="600"
+                lineHeight="28px"
+                _hover={{ bg: "#485365" }}
+                _active={{ bg: "#485365" }}
+                rightIcon={<HamburgerIcon boxSize={4} />}
                 borderRadius={manageOpen ? "4px 4px 0 0" : "4px"}
                 onClick={() => setManageOpen(o => !o)}
               >
@@ -145,8 +143,8 @@ export const ProviderDirectoryPage = () => {
                       px={4}
                       py={3}
                       color="white"
-                      fontFamily="Inter"
-                      fontSize="18px"
+                      fontFamily="Lato"
+                      fontSize="14px"
                       fontStyle="normal"
                       fontWeight="600"
                       lineHeight="28px"
@@ -163,8 +161,8 @@ export const ProviderDirectoryPage = () => {
                       px={4}
                       py={3}
                       color="white"
-                      fontFamily="Inter"
-                      fontSize="18px"
+                      fontFamily="Lato"
+                      fontSize="14px"
                       fontStyle="normal"
                       fontWeight="600"
                       lineHeight="28px"
@@ -178,36 +176,33 @@ export const ProviderDirectoryPage = () => {
                 )}
               </AnimatePresence>
             </Box>
-          </Flex>
-          {/* BOTTOM ROW: Search Bar */}
-          <InputGroup width="100%">
-            <InputLeftElement pointerEvents="none">
-              <SearchIcon color="gray.400" />
-            </InputLeftElement>
-            <Input
-              bg="white"
-              placeholder="Search Providers"
-              borderRadius="md"
-              h="45px"
-              onChange={handleChange}
-            />
-          </InputGroup>
+          )}
         </Flex>
-      ) : (
-        <></>
-      )}
+        {/* BOTTOM ROW: Search Bar */}
+        <InputGroup width="100%">
+          <InputLeftElement
+            display="flex"
+            alignItems="center"
+            h="100%"
+            pointerEvents="none"
+          >
+            <SearchIcon color="gray.400" />
+          </InputLeftElement>
+          <Input
+            bg="white"
+            placeholder="Search Providers"
+            borderRadius="md"
+            h="45px"
+            onChange={handleChange}
+          />
+        </InputGroup>
+      </Flex>
 
       {providers && providerCategories ? (
         <Box>
           <ProviderTable
             providers={providers}
             providerCategories={providerCategories}
-            selectedProviderId={highlightedProviderId}
-            onProviderSelect={
-              role === "ccm" || role === "master"
-                ? (provider) => setHighlightedProviderId(provider.id)
-                : undefined
-            }
             onProviderDoubleClick={
               role === "ccm" || role === "master"
                 ? openEditProviderDrawer
@@ -241,42 +236,3 @@ export const ProviderDirectoryPage = () => {
     </Box>
   );
 };
-
-/* Reusable Stat Item */
-// const StatItem = ({ label, value }) => (
-//   <Box textAlign="left">
-//     <Text
-//       fontSize="lg"
-//       color="gray.700"
-//       mb={1}
-//     >
-//       {label}
-//     </Text>
-//     <Text
-//       fontSize="3xl"
-//       fontWeight="bold"
-//     >
-//       {value}
-//     </Text>
-//   </Box>
-// );
-
-// /* Horizontal Divider */
-// const HorizontalDivider = () => (
-//   <Divider
-//     borderColor="black.400"
-//     length="1,906px"
-//   />
-// );
-
-// /* Grid Divider */
-// const GridDivider = ({ left }) => (
-//   <Box
-//     position="absolute"
-//     top={0}
-//     bottom={0}
-//     left={`calc(${left} - 20px)`}
-//     width="1px"
-//     bg="gray.400"
-//   />
-// );

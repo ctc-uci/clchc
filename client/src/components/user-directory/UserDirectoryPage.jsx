@@ -126,12 +126,17 @@ export const UserDirectory = () => {
         pb={6}
       >
         <InputGroup flex={1}>
-          <InputLeftElement pointerEvents="none">
+          <InputLeftElement 
+            display="flex"
+            alignItems="center"
+            h="100%"
+            pointerEvents="none"
+          >
             <SearchIcon color="gray.400" />
           </InputLeftElement>
           <Input
             bg="white"
-            placeholder="Search Providers"
+            placeholder="Search Users"
             borderRadius="md"
             h="45px"
             value={searchInput}

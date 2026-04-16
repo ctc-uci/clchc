@@ -1,24 +1,24 @@
-import {
-  Box,
-  FormControl,
-  FormLabel,
-  InputGroup,
-  Select,
-} from "@chakra-ui/react";
+import { Box, FormControl, FormErrorMessage, FormLabel, InputGroup } from "@chakra-ui/react";
 
-import { selectStyles, TYPE_OPTIONS } from "../tools/constants";
+import CustomSelect from "@/components/common/CustomSelect";
+
+import { TYPE_OPTIONS } from "../tools/constants";
 import { LockRightElement } from "../tools/shared";
 
-export const TypeInput = ({ type, setType, isLocked }) => {
+export const TypeInput = ({ type, setType, isLocked, isInvalid }) => {
   return (
     <FormControl
+      isRequired
       w="43%"
       isDisabled={isLocked}
+      isInvalid={isInvalid}
     >
       <FormLabel
         fontSize="14px"
         color="#113D64"
-      >Type</FormLabel>
+      >
+        Type
+      </FormLabel>
       {isLocked ? (
         <InputGroup>
           <Box
@@ -37,27 +37,14 @@ export const TypeInput = ({ type, setType, isLocked }) => {
           <LockRightElement />
         </InputGroup>
       ) : (
-        <InputGroup>
-          <Select
-            {...selectStyles}
-            fontSize="14px"
-            placeholder=" "
-            pr={isLocked ? "2.25rem" : undefined}
-            value={type ?? ""}
-            onChange={(e) => setType(e.target.value)}
-          >
-            {TYPE_OPTIONS.map(({ value, label }) => (
-              <option
-                key={value}
-                value={value}
-              >
-                {label}
-              </option>
-            ))}
-          </Select>
-          {isLocked && <LockRightElement />}
-        </InputGroup>
+        <CustomSelect
+          options={TYPE_OPTIONS}
+          value={type ?? ""}
+          setValue={setType}
+          styleProps={isInvalid ? { border: "1px solid #FC8181" } : {}}
+        />
       )}
+      <FormErrorMessage>Required</FormErrorMessage>
     </FormControl>
   );
 };

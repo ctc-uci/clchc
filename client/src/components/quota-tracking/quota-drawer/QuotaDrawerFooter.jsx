@@ -29,25 +29,37 @@ export const QuotaDrawerFooter = ({
             <Button
               type="button"
               variant="outline"
-              px={10}
               width="50%"
               onClick={() => {
                 setIsLocked(false);
                 setAction("");
               }}
               borderRadius="4px"
+              color="#022442"
               borderColor="#0000003D"
+              fontFamily="Inter"
+              fontSize="16px"
+              fontStyle="normal"
+              fontWeight="600"
+              lineHeight="28px"
+              padding="10px"
             >
-              Continue Editing
+              Back to Editing
             </Button>
 
             <Button
               type="submit"
-              px={10}
               width="50%"
-              bg="black"
+              bg={action === "delete" ? "red.700" : "#113D64"}
               color="white"
+              _hover={{ bg: action === "delete" ? "red.800" : "#1a4f7a" }}
               borderRadius="4px"
+              fontFamily="Inter"
+              fontSize="16px"
+              fontStyle="normal"
+              fontWeight="600"
+              lineHeight="28px"
+              padding="10px"
             >
               {action === "delete" ? "Delete" : "Confirm"}
             </Button>
@@ -57,7 +69,6 @@ export const QuotaDrawerFooter = ({
             <Button
               type="button"
               variant="outline"
-              px={10}
               width="50%"
               onClick={(e) => {
                 if (!quotaID) {
@@ -67,20 +78,34 @@ export const QuotaDrawerFooter = ({
                 handleSubmit(e, "delete");
               }}
               borderRadius="4px"
-              borderColor="#0000003D"
+              color={quotaID ? "#90080F" : "#022442"}
+              borderColor={quotaID ? "#90080F" : "#0000003D"}
+              _hover={quotaID ? { bg: "red.800", color: "#FFF" } : { bg: "gray.100" }}
+              fontFamily="Inter"
+              fontSize="16px"
+              fontStyle="normal"
+              fontWeight="600"
+              lineHeight="28px"
+              padding="10px"
             >
               {!quotaID ? "Cancel" : "Delete Quota"}
             </Button>
 
             <Button
-              px={10}
               width="50%"
-              bg="#113D64"
+              bg="#929292"
               color="white"
+              _hover={{ bg: "#1a4f7a" }}
               borderRadius="4px"
               onClick={(e) => {
                 handleSubmit(e, "save");
               }}
+              fontFamily="Inter"
+              fontSize="16px"
+              fontStyle="normal"
+              fontWeight="600"
+              lineHeight="28px"
+              padding="10px"
             >
               {!quotaID ? "Create" : "Save Changes"}
             </Button>

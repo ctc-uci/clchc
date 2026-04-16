@@ -168,24 +168,29 @@ export const QuotaTracking = () => {
             value={selectedDate}
             onChange={handleDateChange}
           />
-          <Button
-            rightIcon={<AddIcon boxSize={3} />}
-            h="45px"
-            w="160px"
-            padding="0 24px"
-            borderRadius="4px"
-            background="#113D64"
-            justifyContent="center"
-            alignItems="center"
-            gap="8px"
-            onClick={onCreateDrawerOpen}
-            textColor="white"
-            fontSize="14px"
-            fontWeight="normal"
-            _hover={{ background: "#485365" }}
-          >
-            Create Quota
-          </Button>
+          {(role === "ccm" || role === "master") && (
+            <Button
+              rightIcon={<AddIcon boxSize={3} />}
+              h="45px"
+              w="160px"
+              padding="0 24px"
+              borderRadius="4px"
+              background="#113D64"
+              justifyContent="center"
+              alignItems="center"
+              gap="8px"
+              onClick={onCreateDrawerOpen}
+              textColor="white"
+              fontSize="14px"
+              fontWeight="600"
+              fontStyle={"normal"}
+              lineHeight={"28px"}
+              fontFamily={"Lato"}
+              _hover={{ background: "#485365" }}
+            >
+              Create Quota
+            </Button>
+          )}
         </Flex>
       </Flex>
 
@@ -234,12 +239,17 @@ export const QuotaTracking = () => {
           )}
       </Flex>
       <InputGroup mb={6}>
-        <InputLeftElement pointerEvents="none">
+        <InputLeftElement 
+          display="flex"
+          alignItems="center"
+          h="100%"
+          pointerEvents="none"
+        >
           <SearchIcon color="gray.400" />
         </InputLeftElement>
         <Input
           bg="white"
-          placeholder="Search Providers"
+          placeholder="Search Quotas"
           borderRadius="md"
           h="45px"
           onChange={handleChange}

@@ -78,6 +78,7 @@ export default function QuotaDrawer({
   const [isLocked, setIsLocked] = useState(false);
   const [action, setAction] = useState("");
   const [originalProgress, setOriginalProgress] = useState(0);
+  const [errors, setErrors] = useState({});
 
   const { mutate: createLog } = useCreateLog();
   
@@ -176,6 +177,18 @@ export default function QuotaDrawer({
     setProgress(3);
   };
 
+  const validateForm = () => {
+    const newErrors = {};
+    if (!providerId) newErrors.providerId = true;
+    if (!date) newErrors.date = true;
+    if (!startTime) newErrors.startTime = true;
+    if (!endTime) newErrors.endTime = true;
+    if (!locationId) newErrors.locationId = true;
+    if (!type) newErrors.type = true;
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e, nextAction) => {
     e.preventDefault();
     const effectiveAction = nextAction ?? action;
@@ -202,6 +215,7 @@ export default function QuotaDrawer({
     };
 
     if (!isLocked) {
+      if (!validateForm()) return;
       setIsLocked(true);
       if (!quotaID) {
         setAction("create");
@@ -257,6 +271,7 @@ export default function QuotaDrawer({
     setProgress(0);
     setIsLocked(false);
     setAction("");
+    setErrors({});
     onClose();
   };
 
@@ -302,12 +317,14 @@ export default function QuotaDrawer({
                   providerId={providerId}
                   setProviderId={setProviderId}
                   isLocked={isLocked}
+                  isInvalid={!!errors.providerId}
                 />
                 <Flex justify="space-between">
                   <DateInput
                     date={date}
                     setDate={setDate}
                     isLocked={isLocked}
+                    isInvalid={!!errors.date}
                   />
                   <TimeInput
                     startTime={startTime}
@@ -315,6 +332,7 @@ export default function QuotaDrawer({
                     endTime={endTime}
                     setEndTime={setEndTime}
                     isLocked={isLocked}
+                    isInvalid={!!errors.startTime || !!errors.endTime}
                   />
                 </Flex>
                 <Flex justify="space-between">
@@ -322,12 +340,14 @@ export default function QuotaDrawer({
                     locationId={locationId}
                     setLocationId={setLocationId}
                     isLocked={isLocked}
+                    isInvalid={!!errors.locationId}
                   />
 
                   <TypeInput
                     type={type}
                     setType={setType}
                     isLocked={isLocked}
+                    isInvalid={!!errors.type}
                   />
                 </Flex>
 

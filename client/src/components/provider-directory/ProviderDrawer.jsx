@@ -142,33 +142,7 @@ const ConfirmationBanner = ({ mode, pendingTagDeletes = [] }) => {
     </Alert>
   );
 };
-//We're not using these functions right now, but they could be helpful for formatting specific fields in the future
-// Maps a display label to the actual DB category name (case-insensitive match)
-// const findCategoryName = (categories, label) => {
-//   const lower = label.toLowerCase();
-//   const match = categories.find((c) => c.name.toLowerCase() === lower);
-//   return match ? match.name : label;
-// };
 
-// // Format phone: (XXX) XXX - XXXX
-// const formatPhone = (value) => {
-//   const digits = value.replace(/\D/g, "").slice(0, 10);
-//   if (digits.length === 0) return "";
-//   if (digits.length <= 3) return `(${digits}`;
-//   if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
-//   return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)} - ${digits.slice(6)}`;
-// };
-
-// // Format license/NPI: XXX XXXXX XXXXXXXXXX (3 + 5 + rest, alphanumeric)
-// const formatLicenseNpi = (value) => {
-//   const clean = value.replace(/[^a-zA-Z0-9]/g, "");
-//   if (clean.length <= 3) return clean;
-//   if (clean.length <= 8) return `${clean.slice(0, 3)} ${clean.slice(3)}`;
-//   return `${clean.slice(0, 3)} ${clean.slice(3, 8)} ${clean.slice(8)}`;
-// };
-
-// --- Provider Form Fields (hardcoded 2-column layout matching MidFi) ---
-// `catNames` maps display labels to actual DB category names
 const ProviderFormFields = ({
   categories,
   tags,
@@ -233,7 +207,7 @@ const ProviderFormFields = ({
         gap={6}
         alignItems="end"
       >
-        <Box maxW="172px">
+        <Box w="100%">
           <FormLabel {...fixedLabelProps}>Provider Name</FormLabel>
           <Flex gap={2}>
             <FormControl
@@ -247,7 +221,13 @@ const ProviderFormFields = ({
                 fontSize="12px"
               />
               {errors["name"] && (
-                <Text color="red.500" fontSize="sm" mt={1}>{errors["name"]}</Text>
+                <Text
+                  color="red.500"
+                  fontSize="sm"
+                  mt={1}
+                >
+                  {errors["name"]}
+                </Text>
               )}
             </FormControl>
             <FormControl maxW="40px">
@@ -263,7 +243,7 @@ const ProviderFormFields = ({
           </Flex>
         </Box>
 
-        <Box maxW="172px">
+        <Box w="100%">
           <FormControl
             isRequired
             isInvalid={!!errors["license"]}
@@ -275,12 +255,18 @@ const ProviderFormFields = ({
               {...fixedInputProps}
             />
             {errors["license"] && (
-              <Text color="red.500" fontSize="sm" mt={1}>{errors["license"]}</Text>
+              <Text
+                color="red.500"
+                fontSize="sm"
+                mt={1}
+              >
+                {errors["license"]}
+              </Text>
             )}
           </FormControl>
         </Box>
 
-        <Box maxW="172px">
+        <Box w="100%">
           <FormControl>
             <FormLabel {...fixedLabelProps}>DEA</FormLabel>
             <Input
@@ -291,7 +277,7 @@ const ProviderFormFields = ({
           </FormControl>
         </Box>
 
-        <Box maxW="172px">
+        <Box w="100%">
           <FormControl>
             <FormLabel {...fixedLabelProps}>Phone Number</FormLabel>
             <Input
@@ -312,7 +298,7 @@ const ProviderFormFields = ({
           return (
             <Box
               key={cat.id}
-              maxW="172px"
+              w="100%"
             >
               <FormControl
                 key={cat.id}
@@ -649,10 +635,10 @@ const ProviderDrawer = ({
       isOpen={isOpen}
       placement="left"
       onClose={handleClose}
-      size="md"
+      size="sm"
     >
       <DrawerOverlay />
-      <DrawerContent maxW="432px">
+      <DrawerContent w="432px">
         <DrawerCloseButton
           top="38px"
           color="#113D64"
@@ -734,24 +720,31 @@ const ProviderDrawer = ({
 
             <DrawerFooter
               justifyContent="space-between"
-              gap={4}
-              // px={6}
+              gap="20px"
+              w="100%"
+              bg="white"
+              borderTop="1px solid"
+              borderColor="gray.200"
             >
               {activeMode === "edit" && !showConfirmation ? (
                 <>
                   <Button
-                    // bg="#FFF"
                     variant="outline"
                     color="#90080F"
                     borderColor="#90080F"
                     _hover={{ bg: "red.800", color: "#FFF" }}
-                    flex={1}
                     onClick={() => {
                       setActiveMode("delete");
                       setShowConfirmation(true);
                     }}
-                    borderRadius={"4px"}
-                    border={"1px solid"}
+                    borderRadius="4px"
+                    width="50%"
+                    fontFamily="Inter"
+                    fontSize="16px"
+                    fontStyle="normal"
+                    fontWeight="600"
+                    lineHeight="28px"
+                    padding="10px"
                   >
                     Delete
                   </Button>
@@ -761,41 +754,95 @@ const ProviderDrawer = ({
                     color="white"
                     _hover={{ bg: "#1a4f7a" }}
                     onClick={handleSubmit}
-                    flex={1}
-                    borderRadius={"4px"}
-                    border={"1px solid"}
+                    borderRadius="4px"
+                    width="50%"
+                    fontFamily="Inter"
+                    fontSize="16px"
+                    fontStyle="normal"
+                    fontWeight="600"
+                    lineHeight="28px"
+                    padding="10px"
                   >
                     Confirm Changes
+                  </Button>
+                </>
+              ) : activeMode === "create" && !showConfirmation ? (
+                <>
+                  <Button
+                    variant="outline"
+                    onClick={handleClose}
+                    color="#022442"
+                    borderColor="#0000003D"
+                    _hover={{ bg: "gray.100" }}
+                    borderRadius="4px"
+                    width="50%"
+                    fontFamily="Inter"
+                    fontSize="16px"
+                    fontStyle="normal"
+                    fontWeight="600"
+                    lineHeight="28px"
+                    padding="10px"
+                  >
+                    Cancel
+                  </Button>
+
+                  <Button
+                    bg="#929292"
+                    color="white"
+                    _hover={{ bg: "#1a4f7a" }}
+                    onClick={handleSubmit}
+                    borderRadius="4px"
+                    width="50%"
+                    fontFamily="Inter"
+                    fontSize="16px"
+                    fontStyle="normal"
+                    fontWeight="600"
+                    lineHeight="28px"
+                    padding="10px"
+                  >
+                    Create
                   </Button>
                 </>
               ) : (
                 <>
                   <Button
                     variant="outline"
-                    onClick={handleClose}
-                    flex={1}
+                    onClick={() => {
+                      setShowConfirmation(false);
+                      setPendingTagDeletes([]);
+                      if (activeMode === "delete") setActiveMode("edit");
+                    }}
                     color="#022442"
-                    fontWeight={600}
+                    borderColor="#0000003D"
+                    borderRadius="4px"
+                    width="50%"
+                    fontFamily="Inter"
+                    fontSize="16px"
+                    fontStyle="normal"
+                    fontWeight="600"
+                    lineHeight="28px"
+                    padding="10px"
                   >
                     Back to Editing
                   </Button>
 
                   <Button
-                    flex={1}
                     bg={activeMode === "delete" ? "red.700" : "#113D64"}
                     color="white"
                     _hover={{
                       bg: activeMode === "delete" ? "red.800" : "#1a4f7a",
                     }}
                     onClick={handleSubmit}
+                    borderRadius="4px"
+                    width="50%"
+                    fontFamily="Inter"
+                    fontSize="16px"
+                    fontStyle="normal"
+                    fontWeight="600"
+                    lineHeight="28px"
+                    padding="10px"
                   >
-                    {showConfirmation
-                      ? activeMode === "delete"
-                        ? "Delete"
-                        : "Confirm"
-                      : activeMode === "create"
-                        ? "Create"
-                        : "Confirm"}
+                    {activeMode === "delete" ? "Delete" : "Confirm"}
                   </Button>
                 </>
               )}

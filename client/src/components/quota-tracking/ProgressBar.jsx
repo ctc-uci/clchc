@@ -16,7 +16,8 @@ export default function ProgressBar({ quota }) {
 
   const { mutateAsync: updateQuota } = useUpdateQuota();
   const { mutateAsync: createLog } = useCreateLog();
-  const { dbUser } = useUserContext();
+  const { dbUser, role } = useUserContext();
+  const canEdit = role === "ccs" || role === "ccm" || role === "master";
   const toast = useToast();
 
   const maxProgress = quota?.quota ?? 0;
@@ -116,28 +117,30 @@ export default function ProgressBar({ quota }) {
         flex="1"
         maxWidth="calc(100% - 39px)"
       >
-        <Button
-          onClick={() => handleClick(-1)}
-          isDisabled={currentProgress <= 0}
-          width="24px"
-          minW="0"
-          height="21px"
-          minH="0"
-          padding="0 0px"
-          bg="white"
-          borderRadius={"4px"}
-          border="1px solid rgba(0, 0, 0, 0.15)"
-          background="#FFF"
-          flexShrink={0}
-        >
-          <Icon
-            color="black"
-            width="12px"
-            height="12px"
+        {canEdit && (
+          <Button
+            onClick={() => handleClick(-1)}
+            isDisabled={currentProgress <= 0}
+            width="24px"
+            minW="0"
+            height="21px"
+            minH="0"
+            padding="0 0px"
+            bg="white"
+            borderRadius={"4px"}
+            border="1px solid rgba(0, 0, 0, 0.15)"
+            background="#FFF"
+            flexShrink={0}
           >
-            <MinusIcon />
-          </Icon>
-        </Button>
+            <Icon
+              color="black"
+              width="12px"
+              height="12px"
+            >
+              <MinusIcon />
+            </Icon>
+          </Button>
+        )}
 
         <Progress
           value={currentProgress}
@@ -160,28 +163,30 @@ export default function ProgressBar({ quota }) {
           }}
         />
 
-        <Button
-          onClick={() => handleClick(+1)}
-          isDisabled={currentProgress >= maxProgress}
-          width="24px"
-          minW="0"
-          height="21px"
-          minH="0"
-          padding="0 0px"
-          bg="white"
-          borderRadius={"4px"}
-          border="1px solid rgba(0, 0, 0, 0.15)"
-          background="#FFF"
-          flexShrink={0}
-        >
-          <Icon
-            color="black"
-            width="12px"
-            height="12px"
+        {canEdit && (
+          <Button
+            onClick={() => handleClick(+1)}
+            isDisabled={currentProgress >= maxProgress}
+            width="24px"
+            minW="0"
+            height="21px"
+            minH="0"
+            padding="0 0px"
+            bg="white"
+            borderRadius={"4px"}
+            border="1px solid rgba(0, 0, 0, 0.15)"
+            background="#FFF"
+            flexShrink={0}
           >
-            <Plus />
-          </Icon>
-        </Button>
+            <Icon
+              color="black"
+              width="12px"
+              height="12px"
+            >
+              <Plus />
+            </Icon>
+          </Button>
+        )}
       </Flex>
       <Text
         color="black"
