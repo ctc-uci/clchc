@@ -51,6 +51,7 @@ export default function PersonalInfo() {
     email: false,
     role: false,
   });
+  const [editingKey, setEditingKey] = useState("");
 
   useEffect(() => {
     if (dbUser) {
@@ -92,6 +93,7 @@ export default function PersonalInfo() {
   const toggleEdit = (key) => {
     if (editing[key]) {
       setPendingKey(key);
+      setEditingKey("");
       if (userInfo[key] !== dbUser[key]) {
         onOpen();
       } else {
@@ -99,6 +101,7 @@ export default function PersonalInfo() {
       }
     } else {
       setEditing((prev) => ({ ...prev, [key]: true }));
+      setEditingKey(key);
     }
   };
 
@@ -208,6 +211,7 @@ export default function PersonalInfo() {
                     aria-label={isEditMode ? `Save ${label}` : `Edit ${label}`}
                     onClick={() => toggleEdit(key)}
                     flexShrink={0}
+                    disabled={editingKey && editingKey !== key}
                   />
                 )}
               </Flex>
