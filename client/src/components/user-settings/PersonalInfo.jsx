@@ -65,8 +65,9 @@ export default function PersonalInfo() {
 
   if (!dbUser) return null;
 
-  const updateUserProp = (key, value) =>
+  const updateUserProp = (key, value) => {
     setUserInfo((prev) => ({ ...prev, [key]: value }));
+  }
 
   const handleSave = async () => {
     if (!dbUser?.id) return false;
@@ -91,7 +92,11 @@ export default function PersonalInfo() {
   const toggleEdit = (key) => {
     if (editing[key]) {
       setPendingKey(key);
-      onOpen();
+      if (userInfo[key] !== dbUser[key]) {
+        onOpen();
+      } else {
+        setEditing((prev) => ({ ...prev, [key]: false }));
+      }
     } else {
       setEditing((prev) => ({ ...prev, [key]: true }));
     }
