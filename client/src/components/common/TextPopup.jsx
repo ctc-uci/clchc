@@ -1,29 +1,29 @@
 import { useState } from "react";
 
-import {
-  Box,
-  Popover,
-  PopoverArrow,
-  PopoverBody,
-  PopoverContent,
-  PopoverTrigger,
-  Portal,
-  Text,
-} from "@chakra-ui/react";
+
+
+import { Box, Popover, PopoverArrow, PopoverBody, PopoverContent, PopoverTrigger, Portal, Text } from "@chakra-ui/react";
+
+
+
+
 
 const TextPopup = ({ text = "", alwaysShowPopup = false, truncateAt }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <Popover isOpen={isOpen} onClose={() => setIsOpen(false)}>
+    <Popover
+      isOpen={isOpen}
+      onClose={() => setIsOpen(false)}
+    >
       <PopoverTrigger>
         <Box
           maxWidth="100px"
-          onDoubleClick={(e) => {
+          cursor="pointer"
+          onClick={(e) => {
             e.stopPropagation();
-            setIsOpen(true);
+            setIsOpen((prev) => !prev);
           }}
-          onClick={(e) => e.stopPropagation()}
         >
           <Text
             isTruncated

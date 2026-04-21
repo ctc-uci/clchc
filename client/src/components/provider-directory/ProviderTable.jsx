@@ -1,26 +1,19 @@
 import { useEffect, useRef, useState } from "react";
 
-import {
-  Box,
-  Button,
-  Skeleton,
-  Table,
-  TableContainer,
-  Tag,
-  Tbody,
-  Td,
-  Text,
-  Th,
-  Thead,
-  Tr,
-  Wrap,
-  WrapItem,
-} from "@chakra-ui/react";
+
+
 import { AddIcon } from "@chakra-ui/icons";
-import { MdPersonAdd } from "react-icons/md";
+import { Box, Button, Skeleton, Table, TableContainer, Tag, Tbody, Td, Text, Th, Thead, Tr, Wrap, WrapItem } from "@chakra-ui/react";
+
+
 
 import TextPopup from "@/components/common/TextPopup";
 import { useTags } from "@/contexts/hooks/data-fetching/useTags";
+import { MdPersonAdd } from "react-icons/md";
+
+
+
+
 
 const SELECTED_BG = "#EDF2F7";
 
@@ -155,10 +148,10 @@ export default function ProviderTable({
     if (isMissing) {
       // Defaults per inputType
       if (cat.inputType === "tag")
-        return <Text 
-        color="gray.400" 
-        fontFamily={"Inter"} 
-        fontSize={"14px"} 
+        return <Text
+        color="gray.400"
+        fontFamily={"Inter"}
+        fontSize={"14px"}
         fontStyle={"normal"}
         fontWeight={"400"}
         lineHeight={"22px"}>
@@ -255,8 +248,14 @@ export default function ProviderTable({
         borderBottom="1px solid"
         borderColor="gray.200"
         cursor={onProviderDoubleClick ? "pointer" : "default"}
-        sx={isSelected ? { background: `${SELECTED_BG} !important` } : undefined}
-        _hover={onProviderDoubleClick ? { bg: isSelected ? SELECTED_BG : "gray.50" } : {}}
+        sx={
+          isSelected ? { background: `${SELECTED_BG} !important` } : undefined
+        }
+        _hover={
+          onProviderDoubleClick
+            ? { bg: isSelected ? SELECTED_BG : "gray.50" }
+            : {}
+        }
         onClick={() => {
           if (!onProviderDoubleClick) return;
           if (selectedRowId === provider.id) {
@@ -275,7 +274,8 @@ export default function ProviderTable({
             lineHeight="22px"
             color="#113D64"
           >
-            {provider.name ?? ""}{provider.degree ? `, ${provider.degree}` : ""}
+            {provider.name ?? ""}
+            {provider.degree ? `, ${provider.degree}` : ""}
           </Text>
           {provider.phoneNumber && (
             <Text
@@ -316,16 +316,23 @@ export default function ProviderTable({
         </Td>
         {dynamicCells}
         <Td {...fixedTdProps}>
-          <Text
-            fontFamily="Inter"
-            fontSize="14px"
-            fontStyle="normal"
-            fontWeight="400"
-            lineHeight="22px"
-            color="#113D64"
-          >
-            {provider.notes ?? ""}
-          </Text>
+          {provider.notes && provider.notes.length > 100 ? (
+            <TextPopup
+              text={provider.notes}
+              truncateAt={100}
+            />
+          ) : (
+            <Text
+              fontFamily="Inter"
+              fontSize="14px"
+              fontStyle="normal"
+              fontWeight="400"
+              lineHeight="22px"
+              color="#113D64"
+            >
+              {provider.notes ?? ""}
+            </Text>
+          )}
         </Td>
       </Tr>
     );
