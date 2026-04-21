@@ -103,6 +103,7 @@ export const QuotaTracking = () => {
         totalProgress: 0,
         totalQuota: 0,
         rate: 0,
+        differentLocations: 0,
         activeProviders: 0,
         needsAttention: 0,
       };
