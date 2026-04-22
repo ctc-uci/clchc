@@ -90,7 +90,7 @@ useEffect(() => {
   const handleMenuOpen = () => {
     setPendingNewLocations([]);
     setPendingDeleteIds([]);
-    setMenuOpen(true);
+    setMenuOpen((prev) => !prev);
   };
 
   const handleCreate = (e) => {
@@ -208,7 +208,6 @@ useEffect(() => {
       ) : (
         <Menu
           isOpen={menuOpen}
-          onOpen={handleMenuOpen}
           onClose={() => { if (!isDifferent) setMenuOpen(false); }}
           closeOnBlur={!isDifferent}
           closeOnEsc={!isDifferent}

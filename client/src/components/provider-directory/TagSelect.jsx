@@ -59,7 +59,7 @@ const TagSelect = ({
   const handleMenuOpen = () => {
     setPendingNewTags([]);
     setPendingDeleteIds([]);
-    setMenuOpen(true);
+    setMenuOpen((prev) => !prev);
   };
 
   const isDifferent = pendingNewTags.length > 0 || pendingDeleteIds.length > 0;
@@ -210,7 +210,6 @@ const TagSelect = ({
 
       <Menu
         isOpen={menuOpen}
-        onOpen={handleMenuOpen}
         onClose={() => {
           if (!isDifferent) setMenuOpen(false);
         }}
