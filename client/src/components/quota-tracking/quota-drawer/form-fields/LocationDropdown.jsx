@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
-import { AddIcon } from "@chakra-ui/icons";
+import { AddIcon, CheckIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
@@ -10,26 +10,22 @@ import {
   HStack,
   Input,
   InputGroup,
-  Menu,
-  MenuButton,
-  MenuItemOption,
-  MenuList,
-  MenuOptionGroup,
+  InputRightElement,
   Spinner,
   Text,
   useDisclosure,
+  useOutsideClick,
   useToast,
 } from "@chakra-ui/react";
 import { ChevronDown } from "lucide-react";
+import { MdDeleteOutline } from "react-icons/md";
 
 import {
   useCreateLocation,
   useDeleteLocation,
 } from "@/contexts/hooks/data-fetching/useLocations";
-import CustomSelect from "@/components/common/CustomSelect";
-
+import { useDebounce } from "@/hooks/useDebounce";
 import { LockRightElement } from "../tools/shared";
-import { MdDeleteOutline } from "react-icons/md";
 
 export function LocationDropdown({ locations = [], locationId, setLocationId, isLocked, isInvalid }) {
   const createLocation = useCreateLocation();
@@ -37,24 +33,39 @@ export function LocationDropdown({ locations = [], locationId, setLocationId, is
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [newValue, setNewValue] = useState("");
   const [deletingMap, setDeletingMap] = useState({});
+  const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const toast = useToast();
-  const selectedItemRef = useRef(null);
+  const containerRef = useRef(null);
 
-  useEffect(() => {
-    if (isOpen) {
-      setTimeout(() => {
-        selectedItemRef.current?.scrollIntoView({ block: "nearest" });
-      }, 0);
-    }
-  }, [isOpen]);
+  const debouncedSetSearch = useDebounce((val) => setDebouncedSearch(val), 300);
 
-  const options = locations.map((l) => ({
-    value: String(l.id),
-    label: l.tagValue,
-  }));
+  const handleClose = () => {
+    setSearchQuery("");
+    setDebouncedSearch("");
+    onClose();
+  };
+
+  useOutsideClick({ ref: containerRef, handler: handleClose });
+
   const selectedLocation = locations.find(
     (location) => String(location.id) === String(locationId)
   );
+
+  const filteredLocations = locations.filter((l) =>
+    l.tagValue.toLowerCase().includes(debouncedSearch.toLowerCase())
+  );
+
+  const handleInputChange = (e) => {
+    const val = e.target.value;
+    setSearchQuery(val);
+    debouncedSetSearch(val);
+  };
+
+  const handleSelect = (id) => {
+    setLocationId(id);
+    handleClose();
+  };
 
   const handleCreate = async (e) => {
     e.stopPropagation();
@@ -66,7 +77,7 @@ export function LocationDropdown({ locations = [], locationId, setLocationId, is
       const newLocation = Array.isArray(result) ? result[0] : result;
       if (newLocation?.id) setLocationId(newLocation.id);
       setNewValue("");
-      onClose();
+      handleClose();
     } catch (_err) {
       toast({
         title: "Error",
@@ -142,93 +153,136 @@ export function LocationDropdown({ locations = [], locationId, setLocationId, is
           <LockRightElement />
         </InputGroup>
       ) : (
-        <Menu
-          closeOnSelect={true}
-          isOpen={isOpen}
-          onOpen={onOpen}
-          onClose={onClose}
-          matchWidth
+        <Box
+          ref={containerRef}
+          position="relative"
         >
-          <MenuButton
-            as={Button}
-            variant="outline"
-            w="100%"
-            justifyContent="flex-start"
-            textAlign="left"
-            rightIcon={<ChevronDown size={20} />}
-            color={"var(--gray-700, #2D3748)"}
-            fontFamily={"Inter"}
-            fontSize={"14px"}
-            fontWeight={"400"}
-            lineHeight={"20px"}
-            fontStyle={"normal"}
-            borderRadius={"4px"}
-            border={isInvalid ? "1px solid #FC8181" : "1px solid var(--gray-200, #E2E8F0)"}
-            background={"var(--white, #FFF)"}
-          >
-            {selectedLocation?.tagValue
-              ? selectedLocation.tagValue.length > 16
-                ? selectedLocation.tagValue.slice(0, 16) + "..."
-                : selectedLocation.tagValue
-              : "Select"}
-          </MenuButton>
-          <MenuList
-            maxHeight="240px"
-            overflowY="auto"
-            minW="0"
-          >
-            <MenuOptionGroup
-              title=""
-              type="radio"
-              value={locationId === "" ? "" : String(locationId)}
-              onChange={(value) => setLocationId(Number(value))}
+          <InputGroup>
+            <Input
+              value={isOpen ? searchQuery : (selectedLocation?.tagValue ?? "")}
+              onChange={handleInputChange}
+              onFocus={() => { setSearchQuery(""); setDebouncedSearch(""); onOpen(); }}
+              placeholder="Select location"
+              cursor={isOpen ? "text" : "pointer"}
+              readOnly={!isOpen}
+              fontFamily="Inter"
+              fontSize="14px"
+              fontWeight="400"
+              color={selectedLocation || isOpen ? "var(--gray-700, #2D3748)" : "gray.400"}
+              borderRadius="4px"
+              border={isInvalid ? "1px solid #FC8181" : "1px solid var(--gray-200, #E2E8F0)"}
+              background="var(--white, #FFF)"
+              _focus={{ boxShadow: "none", borderColor: "inherit" }}
+              pr="2.5rem"
+            />
+            <InputRightElement pointerEvents="none" color="gray.500">
+              <ChevronDown size={20} />
+            </InputRightElement>
+          </InputGroup>
+
+          {isOpen && (
+            <Box
+              position="absolute"
+              top="calc(100% + 4px)"
+              left="0"
+              right="0"
+              zIndex="popover"
+              bg="white"
+              border="1px solid"
+              borderColor="gray.200"
+              borderRadius="md"
+              boxShadow="sm"
+              overflow="hidden"
             >
-              {locations.map((location) => (
-                <MenuItemOption
-                  key={location.id}
-                  value={String(location.id)}
-                  ref={String(location.id) === String(locationId) ? selectedItemRef : null}
-                  pl="3"
-                  pr="0"
-                >
-                  <HStack
-                    justifyContent="space-between"
-                    w="100%"
-                  >
-                    <Text flex="1" fontSize="12px" fontWeight="400">{location.tagValue}</Text>
-                    <Button
-                      as="span"
-                      variant="ghost"
-                      onClick={handleDelete(location)}
-                      isLoading={!!deletingMap[location.id]}
+              <Box
+                overflowY="auto"
+                maxH="180px"
+              >
+                {filteredLocations.map((location) => {
+                  const isSelected = String(location.id) === String(locationId);
+                  return (
+                    <HStack
+                      key={location.id}
+                      px={3}
+                      py={2}
+                      justify="space-between"
+                      cursor="pointer"
+                      bg={isSelected ? "blue.50" : "white"}
+                      _hover={{ bg: isSelected ? "blue.50" : "gray.50" }}
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={() => handleSelect(location.id)}
                     >
-                      <MdDeleteOutline size={20} />
-                    </Button>
-                  </HStack>
-                </MenuItemOption>
-              ))}
+                      <HStack
+                        flex="1"
+                        gap={2}
+                        minW="0"
+                      >
+                        {isSelected && (
+                          <CheckIcon
+                            boxSize={3}
+                            color="blue.500"
+                            flexShrink={0}
+                          />
+                        )}
+                        <Text
+                          fontSize="12px"
+                          fontWeight="400"
+                          color={isSelected ? "blue.600" : "inherit"}
+                          noOfLines={1}
+                        >
+                          {location.tagValue}
+                        </Text>
+                      </HStack>
+                      <Button
+                        variant="ghost"
+                        size="xs"
+                        flexShrink={0}
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(location)(e);
+                        }}
+                        isLoading={!!deletingMap[location.id]}
+                      >
+                        <MdDeleteOutline size={20} />
+                      </Button>
+                    </HStack>
+                  );
+                })}
+                {filteredLocations.length === 0 && (
+                  <Text
+                    px={3}
+                    py={2}
+                    fontSize="12px"
+                    color="gray.400"
+                  >
+                    No locations found
+                  </Text>
+                )}
+              </Box>
               <HStack
                 px={3}
                 py={2}
                 gap={2}
+                borderTop="1px solid"
+                borderColor="gray.100"
               >
                 <Input
                   placeholder="Enter location"
                   value={newValue}
                   onChange={(e) => setNewValue(e.target.value)}
-                  variant="outline"
-                  fontFamily={"Inter"}
-                  fontStyle={"normal"}
-                  lineHeight={"20px"}
+                  onKeyDown={(e) => { if (e.key === "Enter") handleCreate(e); }}
+                  onMouseDown={(e) => e.stopPropagation()}
+                  fontFamily="Inter"
+                  fontStyle="normal"
+                  lineHeight="20px"
                   fontSize="12px"
                   fontWeight="400"
                   color="black"
-                  border={"1px solid var(--gray-200, #E2E8F0)"}
+                  border="1px solid var(--gray-200, #E2E8F0)"
                   borderRadius="4px"
-                  w="100%"
                   h="30px"
-                  padding={"10px"}
-                  margin={"0"}
+                  padding="10px"
                   _placeholder={{ color: "#A0AEC0" }}
                 />
                 <Button
@@ -239,16 +293,12 @@ export function LocationDropdown({ locations = [], locationId, setLocationId, is
                   _hover={{ bg: "none" }}
                   _active={{ bg: "none" }}
                 >
-                  {createLocation.isPending ? (
-                    <Spinner size="xs" />
-                  ) : (
-                    <AddIcon />
-                  )}
+                  {createLocation.isPending ? <Spinner size="xs" /> : <AddIcon />}
                 </Button>
               </HStack>
-            </MenuOptionGroup>
-          </MenuList>
-        </Menu>
+            </Box>
+          )}
+        </Box>
       )}
       <FormErrorMessage>Required</FormErrorMessage>
     </FormControl>
