@@ -10,15 +10,22 @@ import {
   HStack,
   Input,
   InputGroup,
+  ListItem,
   Menu,
   MenuButton,
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
   Skeleton,
-  Spinner,
   Text,
-  useDisclosure,
+  UnorderedList,
+  VStack,
   useToast,
 } from "@chakra-ui/react";
 import { ChevronDown } from "lucide-react";
@@ -28,29 +35,38 @@ import {
   useDeleteLocation,
   useLocations,
 } from "@/contexts/hooks/data-fetching/useLocations";
-import CustomSelect from "@/components/common/CustomSelect";
 
 import { LockRightElement } from "../tools/shared";
 import { MdDeleteOutline } from "react-icons/md";
 
-export function LocationDropdown({ locationId, setLocationId, isLocked, isInvalid }) {
+export function LocationDropdown({ locationId, setLocationId, isLocked, isInvalid, onDifferentChange }) {
   const { data: { locations = [] } = {}, isLoading: loadingLocations } =
     useLocations();
   const createLocation = useCreateLocation();
   const deleteLocation = useDeleteLocation();
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [menuOpen, setMenuOpen] = useState(false);
   const [newValue, setNewValue] = useState("");
-  const [deletingMap, setDeletingMap] = useState({});
+  const [pendingNewLocations, setPendingNewLocations] = useState([]);
+  const [pendingDeleteIds, setPendingDeleteIds] = useState([]);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const toast = useToast();
   const selectedItemRef = useRef(null);
 
+  const isDifferent = pendingNewLocations.length > 0 || pendingDeleteIds.length > 0;
+
   useEffect(() => {
-    if (isOpen) {
+    if (menuOpen) {
       setTimeout(() => {
         selectedItemRef.current?.scrollIntoView({ block: "nearest" });
       }, 0);
     }
-  }, [isOpen]);
+  }, [menuOpen]);
+
+useEffect(() => {
+    if (typeof onDifferentChange === "function") {
+      onDifferentChange(isDifferent);
+    }
+  }, [isDifferent, onDifferentChange]);
 
   if (loadingLocations) {
     return (
@@ -67,66 +83,95 @@ export function LocationDropdown({ locationId, setLocationId, isLocked, isInvali
     );
   }
 
-  const options = locations.map((l) => ({
-    value: String(l.id),
-    label: l.tagValue,
-  }));
   const selectedLocation = locations.find(
     (location) => String(location.id) === String(locationId)
   );
 
-  const handleCreate = async (e) => {
-    e.stopPropagation();
+  const handleMenuOpen = () => {
+    setPendingNewLocations([]);
+    setPendingDeleteIds([]);
+    setMenuOpen(true);
+  };
+
+  const handleCreate = (e) => {
+    if (e?.stopPropagation) e.stopPropagation();
     const trimmed = newValue.trim();
     if (!trimmed) return;
 
+    const alreadyExists = locations.some(
+      (l) => l.tagValue.toLowerCase() === trimmed.toLowerCase()
+    );
+    const alreadyPending = pendingNewLocations.some(
+      (l) => l.tagValue.toLowerCase() === trimmed.toLowerCase()
+    );
+    if (alreadyExists || alreadyPending) {
+      toast({
+        title: "Location already exists",
+        status: "warning",
+        position: "bottom-right",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+    setPendingNewLocations((prev) => [
+      ...prev,
+      { tempId: `loc-temp-${Date.now()}`, tagValue: trimmed },
+    ]);
+    setNewValue("");
+  };
+
+  const handleDelete = (location) => (e) => {
+    e.stopPropagation();
+    setPendingDeleteIds((prev) => [...prev, location.id]);
+  };
+
+  const handleSave = () => setIsConfirmOpen(true);
+
+  const handleCancel = () => {
+    setPendingNewLocations([]);
+    setPendingDeleteIds([]);
+    setMenuOpen(false);
+  };
+
+  const handleConfirm = async () => {
+    setIsConfirmOpen(false);
     try {
-      const result = await createLocation.mutateAsync({ tagValue: trimmed });
-      const newLocation = Array.isArray(result) ? result[0] : result;
-      if (newLocation?.id) setLocationId(newLocation.id);
-      setNewValue("");
-      onClose();
+      let lastCreatedId = null;
+      for (const { tagValue } of pendingNewLocations) {
+        const result = await createLocation.mutateAsync({ tagValue });
+        const newLoc = Array.isArray(result) ? result[0] : result;
+        if (newLoc?.id) lastCreatedId = newLoc.id;
+      }
+
+      for (const id of pendingDeleteIds) {
+        await deleteLocation.mutateAsync({ id });
+      }
+
+      if (lastCreatedId && !locationId) {
+        setLocationId(lastCreatedId);
+      }
+
+      if (
+        pendingDeleteIds.includes(Number(locationId)) ||
+        pendingDeleteIds.includes(String(locationId))
+      ) {
+        setLocationId("");
+      }
+
+      setPendingNewLocations([]);
+      setPendingDeleteIds([]);
+      setMenuOpen(false);
     } catch (_err) {
       toast({
         title: "Error",
-        description: "Failed to create location",
+        description: "Failed to save location changes",
         status: "error",
         position: "bottom-right",
         duration: 5000,
         isClosable: true,
       });
     }
-  };
-
-  const handleDelete = (location) => (e) => {
-    e.stopPropagation();
-    const id = location.id;
-    setDeletingMap((m) => ({ ...m, [id]: true }));
-
-    deleteLocation.mutate(
-      { id },
-      {
-        onSuccess: () => {
-          setLocationId((prev) => (String(id) === String(prev) ? "" : prev));
-        },
-        onSettled: () =>
-          setDeletingMap((m) => {
-            const copy = { ...m };
-            delete copy[id];
-            return copy;
-          }),
-        onError: () => {
-          toast({
-            title: "Error",
-            description: "Failed to delete location",
-            status: "error",
-            position: "bottom-right",
-            duration: 5000,
-            isClosable: true,
-          });
-        },
-      }
-    );
   };
 
   return (
@@ -162,13 +207,16 @@ export function LocationDropdown({ locationId, setLocationId, isLocked, isInvali
         </InputGroup>
       ) : (
         <Menu
-          closeOnSelect={true}
-          isOpen={isOpen}
-          onOpen={onOpen}
-          onClose={onClose}
+          isOpen={menuOpen}
+          onOpen={handleMenuOpen}
+          onClose={() => { if (!isDifferent) setMenuOpen(false); }}
+          closeOnBlur={!isDifferent}
+          closeOnEsc={!isDifferent}
+          closeOnSelect={false}
           matchWidth
         >
           <MenuButton
+            onClick={handleMenuOpen}
             as={Button}
             variant="outline"
             w="100%"
@@ -202,30 +250,63 @@ export function LocationDropdown({ locationId, setLocationId, isLocked, isInvali
               value={locationId === "" ? "" : String(locationId)}
               onChange={(value) => setLocationId(Number(value))}
             >
-              {locations.map((location) => (
-                <MenuItemOption
-                  key={location.id}
-                  value={String(location.id)}
-                  ref={String(location.id) === String(locationId) ? selectedItemRef : null}
-                  pl="3"
-                  pr="0"
-                >
-                  <HStack
-                    justifyContent="space-between"
-                    w="100%"
+              {/* Existing locations, minus staged deletes */}
+              {locations
+                .filter((l) => !pendingDeleteIds.includes(l.id))
+                .map((location) => (
+                  <MenuItemOption
+                    key={location.id}
+                    value={String(location.id)}
+                    ref={String(location.id) === String(locationId) ? selectedItemRef : null}
+                    pl="3"
+                    pr="0"
                   >
-                    <Text flex="1" fontSize="12px" fontWeight="400">{location.tagValue}</Text>
-                    <Button
-                      as="span"
-                      variant="ghost"
-                      onClick={handleDelete(location)}
-                      isLoading={!!deletingMap[location.id]}
+                    <HStack
+                      justifyContent="space-between"
+                      w="100%"
                     >
-                      <MdDeleteOutline size={20} />
-                    </Button>
-                  </HStack>
-                </MenuItemOption>
+                      <Text flex="1" fontSize="12px" fontWeight="400">{location.tagValue}</Text>
+                      <Button
+                        as="span"
+                        variant="ghost"
+                        onClick={handleDelete(location)}
+                      >
+                        <MdDeleteOutline size={20} />
+                      </Button>
+                    </HStack>
+                  </MenuItemOption>
+                ))}
+
+              {/* Pending new locations — staged locally, not yet in DB */}
+              {pendingNewLocations.map(({ tempId, tagValue }) => (
+                <HStack
+                  key={tempId}
+                  pl={9}
+                  pr={0}
+                  py={2}
+                  justifyContent="space-between"
+                  w="100%"
+                  opacity={0.7}
+                  cursor="default"
+                >
+                  <Text flex="1" fontSize="12px" fontWeight="400" fontStyle="italic">
+                    {tagValue}
+                  </Text>
+                  <Button
+                    as="span"
+                    variant="ghost"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setPendingNewLocations((prev) =>
+                        prev.filter((l) => l.tempId !== tempId)
+                      );
+                    }}
+                  >
+                    <MdDeleteOutline size={20} />
+                  </Button>
+                </HStack>
               ))}
+
               <HStack
                 px={3}
                 py={2}
@@ -235,6 +316,9 @@ export function LocationDropdown({ locationId, setLocationId, isLocked, isInvali
                   placeholder="Enter location"
                   value={newValue}
                   onChange={(e) => setNewValue(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleCreate(e);
+                  }}
                   variant="outline"
                   fontFamily={"Inter"}
                   fontStyle={"normal"}
@@ -253,23 +337,101 @@ export function LocationDropdown({ locationId, setLocationId, isLocked, isInvali
                 <Button
                   size="xs"
                   onClick={handleCreate}
-                  isDisabled={createLocation.isPending}
                   variant="ghost"
                   _hover={{ bg: "none" }}
                   _active={{ bg: "none" }}
                 >
-                  {createLocation.isPending ? (
-                    <Spinner size="xs" />
-                  ) : (
-                    <AddIcon />
-                  )}
+                  <AddIcon />
                 </Button>
               </HStack>
             </MenuOptionGroup>
+
+            <HStack
+              px={3}
+              py={2}
+              gap={2}
+              borderTop="1px solid"
+              borderColor="gray.200"
+            >
+              <Button
+                size="xs"
+                variant="ghost"
+                onClick={handleCancel}
+                flex={1}
+                borderRadius="6px"
+              >
+                Cancel
+              </Button>
+              <Button
+                size="xs"
+                onClick={handleSave}
+                isDisabled={!isDifferent}
+                opacity={isDifferent ? 1 : 0.4}
+                colorScheme="blue"
+                flex={1}
+                borderRadius="6px"
+              >
+                Save
+              </Button>
+            </HStack>
           </MenuList>
         </Menu>
       )}
       <FormErrorMessage>Required</FormErrorMessage>
+
+      <Modal
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        isCentered
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader fontSize="16px">Confirm location changes</ModalHeader>
+          <ModalBody>
+            <VStack align="stretch" spacing={3}>
+              {pendingNewLocations.length > 0 && (
+                <VStack align="stretch" spacing={1}>
+                  <Text fontWeight="600" fontSize="14px">
+                    Creating {pendingNewLocations.length} location
+                    {pendingNewLocations.length > 1 ? "s" : ""}:
+                  </Text>
+                  <UnorderedList pl={4}>
+                    {pendingNewLocations.map(({ tempId, tagValue }) => (
+                      <ListItem key={tempId} fontSize="14px">{tagValue}</ListItem>
+                    ))}
+                  </UnorderedList>
+                </VStack>
+              )}
+              {pendingDeleteIds.length > 0 && (
+                <VStack align="stretch" spacing={1}>
+                  <Text fontWeight="600" fontSize="14px">
+                    Deleting {pendingDeleteIds.length} location
+                    {pendingDeleteIds.length > 1 ? "s" : ""}:
+                  </Text>
+                  <UnorderedList pl={4}>
+                    {pendingDeleteIds.map((id) => {
+                      const loc = locations.find((l) => l.id === id);
+                      return (
+                        <ListItem key={id} fontSize="14px">
+                          {loc?.tagValue ?? id}
+                        </ListItem>
+                      );
+                    })}
+                  </UnorderedList>
+                </VStack>
+              )}
+            </VStack>
+          </ModalBody>
+          <ModalFooter gap={2}>
+            <Button variant="ghost" size="sm" onClick={() => setIsConfirmOpen(false)}>
+              Cancel
+            </Button>
+            <Button colorScheme="blue" size="sm" onClick={handleConfirm}>
+              Confirm
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </FormControl>
   );
 }
