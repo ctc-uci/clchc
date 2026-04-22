@@ -26,11 +26,11 @@ const SELECTED_BG = "#EDF2F7";
 const SkeletonRows = () => {
   return (
     <>
-      {Array.from({ length: 5 }, (_, i) => (
+      {Array.from({ length: 15 }, (_, i) => (
         <Tr key={i} borderBottom="1px solid" borderColor="gray.200">
           {Array.from({ length: 5 }, (_, j) => (
             <Td key={j} borderRight="1px solid" borderColor="gray.200">
-              <Skeleton height="40px" />
+              <Skeleton height="20px" width={j === 3 ? "100%" : `${60 + (i * 13 + j * 17) % 30}%`} />
             </Td>
           ))}
         </Tr>
@@ -113,6 +113,7 @@ const QuotaTable = ({ rows, loading, onRowsUpdate, role }) => {
       borderColor="gray.200"
       borderRadius="lg"
       overflowY="auto"
+      minH="calc(100vh - 480px)"
     >
       <Table
         sx={{
