@@ -680,7 +680,7 @@ const ProviderDrawer = ({
                     color="white"
                     _hover={{ bg: "#1a4f7a" }}
                     onClick={handleSubmit}
-                    isDisabled={isTagDifferent}
+                    isDisabled={activeMode !== "delete" && isTagDifferent}
                     borderRadius="4px"
                     width="50%"
                     fontFamily="Inter"
