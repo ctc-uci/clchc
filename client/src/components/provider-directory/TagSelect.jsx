@@ -57,9 +57,10 @@ const TagSelect = ({
   }, [selectedTags]);
 
   const handleMenuOpen = () => {
+    if (menuOpen) return;
     setPendingNewTags([]);
     setPendingDeleteIds([]);
-    setMenuOpen((prev) => !prev);
+    setMenuOpen(true);
   };
 
   const isDifferent = pendingNewTags.length > 0 || pendingDeleteIds.length > 0;
