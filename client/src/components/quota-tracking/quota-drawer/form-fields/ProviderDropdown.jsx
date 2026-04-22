@@ -266,7 +266,7 @@ export function ProviderDropdown({ providers = [], providerId, setProviderId, is
                   placeholder="Enter provider name"
                   value={newValue}
                   onChange={(e) => setNewValue(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === "Enter") handleCreate(e); }}
+                  onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleCreate(e); } }}
                   onMouseDown={(e) => e.stopPropagation()}
                   fontFamily="Inter"
                   fontStyle="normal"
