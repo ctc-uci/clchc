@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { AddIcon } from "@chakra-ui/icons";
 import {
@@ -6,18 +6,23 @@ import {
   Checkbox,
   HStack,
   Input,
+  ListItem,
   Menu,
   MenuButton,
-  MenuItemOption,
   MenuList,
-  MenuOptionGroup,
-  Spinner,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
   Tag,
   TagCloseButton,
   TagLabel,
   Text,
-  useToast,
+  UnorderedList,
   VStack,
+  useToast,
 } from "@chakra-ui/react";
 
 import { useApi } from "@/api.js";
@@ -33,114 +38,121 @@ const TagSelect = ({
   selectedTags,
   onTagsChange,
   readOnly,
-  onRequestDeleteTag,
+  onDifferentChange,
 }) => {
   const queryClient = useQueryClient();
   const { data: tagsData, refetch: refetchTags } = useTags();
   const tagsMap = tagsData?.tagsMap ?? {};
   const { tags: tagsApi } = useApi();
   const [newTagValue, setNewTagValue] = useState("");
-  const [creating, setCreating] = useState(false);
-  const [deletingMap, setDeletingMap] = useState({});
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [pendingNewTags, setPendingNewTags] = useState([]);
+  const [pendingDeleteIds, setPendingDeleteIds] = useState([]);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+
   const toast = useToast();
-  const useConfirmDelete = typeof onRequestDeleteTag === "function";
 
   const selectedIds = useMemo(() => {
     return Array.isArray(selectedTags) ? selectedTags : [];
   }, [selectedTags]);
-  const selectedIdsRef = useRef(selectedIds);
 
-  // avoid race condition during async: use ref for latest tags
+  const handleMenuOpen = () => {
+    setPendingNewTags([]);
+    setPendingDeleteIds([]);
+    setMenuOpen(true);
+  };
+
+  const isDifferent = pendingNewTags.length > 0 || pendingDeleteIds.length > 0;
+
   useEffect(() => {
-    selectedIdsRef.current = selectedIds;
-  }, [selectedIds]);
+    if (typeof onDifferentChange === "function") {
+      onDifferentChange(isDifferent);
+    }
+  }, [isDifferent, onDifferentChange]);
 
   const handleRemoveTag = (tagId) => (e) => {
     e.stopPropagation();
-    if (readOnly) {
-      return;
-    }
-    const nextTags = selectedIds.filter((id) => id !== tagId);
-    onTagsChange(nextTags);
+    if (readOnly) return;
+    onTagsChange(selectedIds.filter((id) => id !== tagId));
   };
 
-  const handleCreateTag = async (e) => {
-    if (e?.stopPropagation) {
-      e.stopPropagation();
-    }
+
+  const handleCreateTag = (e) => {
+    if (e?.stopPropagation) e.stopPropagation();
     const trimmedTag = newTagValue.trim();
     if (readOnly || !trimmedTag) return;
-    setCreating(true);
 
-    const tempId = `tag-temp-${Date.now()}`;
-    const optimisticTag = { id: tempId, categoryId, tagValue: trimmedTag };
-    const prevTags = queryClient.getQueryData(["tags"]);
-    const prevSelectedIds = selectedIdsRef.current;
-
-    try {
-      // add tag optimistically
-      await queryClient.cancelQueries({ queryKey: ["tags"] });
-      queryClient.setQueryData(["tags"], (oldData) => {
-        const curr = oldData?.tags ?? (Array.isArray(oldData) ? oldData : []);
-        const next = [...curr, optimisticTag];
-        return {
-          tags: next,
-          tagsMap: Object.fromEntries(next.map((t) => [t.id, t])),
-        };
-      });
-      onTagsChange([...prevSelectedIds, tempId]);
-      setNewTagValue("");
-
-      const rawCreated = await tagsApi.create({
-        tagValue: trimmedTag,
-        categoryId,
-      });
-
-      const newTag = Array.isArray(rawCreated) ? rawCreated[0] : rawCreated;
-      const newTagId = newTag?.id;
-
-      // replace optimistic tag with actual tag
-      if (newTagId !== undefined && newTagId !== null) {
-        queryClient.setQueryData(["tags"], (oldData) => {
-          const curr = oldData?.tags ?? (Array.isArray(oldData) ? oldData : []);
-          const next = curr.map((t) => (t?.id === tempId ? newTag : t));
-          return {
-            tags: next,
-            tagsMap: Object.fromEntries(next.map((t) => [t.id, t])),
-          };
-        });
-
-        const latestSelected = selectedIdsRef.current;
-        const replaced = latestSelected.map((id) =>
-          id === tempId ? newTagId : id
-        );
-        onTagsChange([...new Set(replaced)]);
-      }
-
-      queryClient.invalidateQueries({ queryKey: ["providers"] });
-      queryClient.invalidateQueries({ queryKey: ["providersSummary"] });
-      queryClient.invalidateQueries({ queryKey: ["tags"] });
-      if (typeof refetchTags === "function") {
-        await refetchTags();
-      }
-
-      // feedback for successfully (or not) creating tags
+    const alreadyExists = tags.some(
+      (t) => t.tagValue.toLowerCase() === trimmedTag.toLowerCase()
+    );
+    const alreadyPending = pendingNewTags.some(
+      (t) => t.tagValue.toLowerCase() === trimmedTag.toLowerCase()
+    );
+    if (alreadyExists || alreadyPending) {
       toast({
-        title: "Success",
-        description: "New tag created!",
-        status: "success",
+        title: "Tag already exists",
+        status: "warning",
         position: "bottom-right",
-        duration: 5000,
+        duration: 3000,
         isClosable: true,
       });
+      return;
+    }
+
+    setPendingNewTags((prev) => [
+      ...prev,
+      { tempId: `tag-temp-${Date.now()}`, tagValue: trimmedTag },
+    ]);
+    setNewTagValue("");
+  };
+
+
+  const handleDeleteTag = (tag) => (e) => {
+    e.stopPropagation();
+    if (readOnly) return;
+    const tagId = tag?.id ?? tag;
+    setPendingDeleteIds((prev) => [...prev, tagId]);
+  };
+
+  const handleSave = () => {
+    setIsConfirmOpen(true);
+  };
+
+
+  const handleConfirm = async () => {
+    setIsConfirmOpen(false);
+    try {
+      const createdIds = [];
+      for (const { tagValue } of pendingNewTags) {
+        const rawCreated = await tagsApi.create({ tagValue, categoryId });
+        const newTag = Array.isArray(rawCreated) ? rawCreated[0] : rawCreated;
+        if (newTag?.id !== null && newTag?.id !== undefined) createdIds.push(newTag.id);
+      }
+
+      for (const tagId of pendingDeleteIds) {
+        await tagsApi.delete(tagId);
+      }
+
+      if (pendingNewTags.length > 0 || pendingDeleteIds.length > 0) {
+        queryClient.invalidateQueries({
+          predicate: (query) =>
+            ["providers", "providersSummary", "tags"].includes(
+              query.queryKey[0]
+            ),
+        });
+        if (typeof refetchTags === "function") await refetchTags();
+      }
+
+      const finalIds = [
+        ...selectedIds.filter((id) => !pendingDeleteIds.includes(id)),
+        ...createdIds,
+      ];
+      onTagsChange([...new Set(finalIds)]);
+      setPendingNewTags([]);
+      setPendingDeleteIds([]);
+      setMenuOpen(false);
     } catch (err) {
-      console.error("Failed to create tag", err);
-
-      // undo optimistic updates
-      queryClient.setQueryData(["tags"], prevTags);
-      onTagsChange(prevSelectedIds);
-      setNewTagValue(trimmedTag);
-
+      console.error("Failed to save tag changes", err);
       toast({
         title: "Error",
         description: errorToString(err),
@@ -149,79 +161,13 @@ const TagSelect = ({
         duration: 5000,
         isClosable: true,
       });
-    } finally {
-      setCreating(false);
     }
   };
 
-  const handleDeleteTag = (tag) => (e) => {
-    e.stopPropagation();
-    if (readOnly) return;
-
-    if (useConfirmDelete) {
-      onRequestDeleteTag(tag);
-      return;
-    }
-
-    (async () => {
-      const tagId = tag?.id ?? tag;
-      setDeletingMap((m) => ({ ...m, [tagId]: true }));
-
-      const prevTags = queryClient.getQueryData(["tags"]);
-      const prevSelectedIds = selectedIdsRef.current;
-
-      try {
-        await queryClient.cancelQueries({ queryKey: ["tags"] });
-        queryClient.setQueryData(["tags"], (old) => {
-          const curr = old?.tags ?? (Array.isArray(old) ? old : []);
-          const next = curr.filter((t) => t?.id !== tagId);
-          return {
-            tags: next,
-            tagsMap: Object.fromEntries(next.map((t) => [t.id, t])),
-          };
-        });
-        if (prevSelectedIds.includes(tagId)) {
-          onTagsChange(prevSelectedIds.filter((id) => id !== tagId));
-        }
-
-        await tagsApi.delete(tagId);
-
-        queryClient.invalidateQueries({
-          predicate: (query) =>
-            ["providers", "providersSummary", "tags"].includes(
-              query.queryKey[0]
-            ),
-        });
-
-        if (typeof refetchTags === "function") await refetchTags();
-        toast({
-          title: "Success",
-          description: "Tag successfully deleted!",
-          status: "success",
-          position: "bottom-right",
-          duration: 5000,
-          isClosable: true,
-        });
-      } catch (err) {
-        console.error("Failed to delete tag", err);
-        queryClient.setQueryData(["tags"], prevTags);
-        onTagsChange(prevSelectedIds);
-        toast({
-          title: "Error",
-          description: errorToString(err),
-          status: "error",
-          position: "bottom-right",
-          duration: 5000,
-          isClosable: true,
-        });
-      } finally {
-        setDeletingMap((m) => {
-          const copy = { ...m };
-          delete copy[tagId];
-          return copy;
-        });
-      }
-    })();
+  const handleCancel = () => {
+    setPendingNewTags([]);
+    setPendingDeleteIds([]);
+    setMenuOpen(false);
   };
 
   return (
@@ -245,7 +191,6 @@ const TagSelect = ({
                 borderRadius={"4px"}
                 gap={"6px"}
                 padding={"5px 8px"}
-                // minH={"30px"}
                 color={"#FFF"}
                 fontFamily={"Inter"}
                 fontSize={"14px"}
@@ -264,11 +209,19 @@ const TagSelect = ({
       )}
 
       <Menu
+        isOpen={menuOpen}
+        onOpen={handleMenuOpen}
+        onClose={() => {
+          if (!isDifferent) setMenuOpen(false);
+        }}
+        closeOnBlur={!isDifferent}
+        closeOnEsc={!isDifferent}
         closeOnSelect={false}
         isLazy={false}
         matchWidth
       >
         <MenuButton
+          onClick={handleMenuOpen}
           as={Button}
           variant="outline"
           w="100%"
@@ -294,29 +247,73 @@ const TagSelect = ({
           overflowY="auto"
           minW="0"
         >
-          {tags.map((tag) => (
+          {/* existing tags, minus any staged for deletion */}
+          {tags
+            .filter((tag) => !pendingDeleteIds.includes(tag.id))
+            .map((tag) => (
+              <HStack
+                key={tag.id}
+                pl={3}
+                pr={0}
+                py={2}
+                justifyContent="space-between"
+                w="100%"
+                cursor={readOnly ? "default" : "pointer"}
+                onClick={() => {
+                  if (readOnly) return;
+                  if (selectedIds.includes(tag.id)) {
+                    onTagsChange(selectedIds.filter((id) => id !== tag.id));
+                  } else {
+                    onTagsChange([...selectedIds, tag.id]);
+                  }
+                }}
+                _hover={readOnly ? {} : { bg: "gray.100" }}
+              >
+                {!readOnly && (
+                  <Checkbox
+                    isChecked={selectedIds.includes(tag.id)}
+                    onChange={() => {}}
+                    colorScheme="blue"
+                    size="md"
+                    pointerEvents="none"
+                  />
+                )}
+                <Text
+                  flex="1"
+                  fontSize="12px"
+                  fontWeight="400"
+                >
+                  {tag.tagValue}
+                </Text>
+                {!readOnly && (
+                  <Button
+                    as="span"
+                    variant="ghost"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteTag(tag)(e);
+                    }}
+                  >
+                    <MdDeleteOutline size={20} />
+                  </Button>
+                )}
+              </HStack>
+            ))}
+
+          {pendingNewTags.map(({ tempId, tagValue }) => (
             <HStack
-              key={tag.id}
+              key={tempId}
               pl={3}
               pr={0}
               py={2}
-              // gap={2}
               justifyContent="space-between"
               w="100%"
-              cursor={readOnly ? "default" : "pointer"}
-              onClick={() => {
-                if (readOnly) return;
-                if (selectedIds.includes(tag.id)) {
-                  onTagsChange(selectedIds.filter((id) => id !== tag.id));
-                } else {
-                  onTagsChange([...selectedIds, tag.id]);
-                }
-              }}
-              _hover={readOnly ? {} : { bg: "gray.100" }}
+              cursor="default"
+              opacity={0.7}
             >
               {!readOnly && (
                 <Checkbox
-                  isChecked={selectedIds.includes(tag.id)}
+                  isChecked
                   onChange={() => {}}
                   colorScheme="blue"
                   size="md"
@@ -327,8 +324,9 @@ const TagSelect = ({
                 flex="1"
                 fontSize="12px"
                 fontWeight="400"
+                fontStyle="italic"
               >
-                {tag.tagValue}
+                {tagValue}
               </Text>
               {!readOnly && (
                 <Button
@@ -336,15 +334,17 @@ const TagSelect = ({
                   variant="ghost"
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleDeleteTag(tag)(e);
+                    setPendingNewTags((prev) =>
+                      prev.filter((t) => t.tempId !== tempId)
+                    );
                   }}
-                  isLoading={!!deletingMap[tag.id]}
                 >
                   <MdDeleteOutline size={20} />
                 </Button>
               )}
             </HStack>
           ))}
+
           <HStack
             px={3}
             py={2}
@@ -354,6 +354,9 @@ const TagSelect = ({
               placeholder="New tag"
               value={newTagValue}
               onChange={(e) => setNewTagValue(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleCreateTag(e);
+              }}
               isDisabled={readOnly}
               variant="outline"
               fontFamily={"Inter"}
@@ -373,16 +376,126 @@ const TagSelect = ({
             <Button
               size="xs"
               onClick={handleCreateTag}
-              isDisabled={readOnly || creating}
+              isDisabled={readOnly}
               variant="ghost"
               _hover={{ bg: "none" }}
               _active={{ bg: "none" }}
             >
-              {creating ? <Spinner size="xs" /> : <AddIcon />}
+              <AddIcon />
+            </Button>
+          </HStack>
+          <HStack
+            px={3}
+            py={2}
+            gap={2}
+            borderTop="1px solid"
+            borderColor="gray.200"
+          >
+            <Button
+              size="xs"
+              variant="ghost"
+              onClick={handleCancel}
+              flex={1}
+              borderRadius="6px"
+            >
+              Cancel
+            </Button>
+            <Button
+              size="xs"
+              onClick={handleSave}
+              isDisabled={!isDifferent}
+              opacity={isDifferent ? 1 : 0.4}
+              colorScheme="blue"
+              flex={1}
+              borderRadius="6px"
+            >
+              Save
             </Button>
           </HStack>
         </MenuList>
       </Menu>
+
+      <Modal
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        isCentered
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader fontSize="16px">Confirm tag changes</ModalHeader>
+          <ModalBody>
+            <VStack
+              align="stretch"
+              spacing={3}
+            >
+              {pendingNewTags.length > 0 && (
+                <VStack
+                  align="stretch"
+                  spacing={1}
+                >
+                  <Text
+                    fontWeight="600"
+                    fontSize="14px"
+                  >
+                    Creating {pendingNewTags.length} tag
+                    {pendingNewTags.length > 1 ? "s" : ""}:
+                  </Text>
+                  <UnorderedList pl={4}>
+                    {pendingNewTags.map(({ tempId, tagValue }) => (
+                      <ListItem
+                        key={tempId}
+                        fontSize="14px"
+                      >
+                        {tagValue}
+                      </ListItem>
+                    ))}
+                  </UnorderedList>
+                </VStack>
+              )}
+              {pendingDeleteIds.length > 0 && (
+                <VStack
+                  align="stretch"
+                  spacing={1}
+                >
+                  <Text
+                    fontWeight="600"
+                    fontSize="14px"
+                  >
+                    Deleting {pendingDeleteIds.length} tag
+                    {pendingDeleteIds.length > 1 ? "s" : ""}:
+                  </Text>
+                  <UnorderedList pl={4}>
+                    {pendingDeleteIds.map((id) => (
+                      <ListItem
+                        key={id}
+                        fontSize="14px"
+                      >
+                        {tagsMap[id]?.tagValue ?? id}
+                      </ListItem>
+                    ))}
+                  </UnorderedList>
+                </VStack>
+              )}
+            </VStack>
+          </ModalBody>
+          <ModalFooter gap={2}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsConfirmOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              colorScheme="blue"
+              size="sm"
+              onClick={handleConfirm}
+            >
+              Confirm
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </VStack>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 import {
   Alert,
@@ -24,7 +24,6 @@ import {
   useToast,
 } from "@chakra-ui/react";
 
-import { useApi } from "@/api.js";
 import TagSelect from "@/components/provider-directory/TagSelect";
 import {
   useCreateProvider,
@@ -33,7 +32,6 @@ import {
 } from "@/contexts/hooks/data-fetching/useProviders";
 import { useTags } from "@/contexts/hooks/data-fetching/useTags";
 import { errorToString } from "@/utils/utils";
-import { useQueryClient } from "@tanstack/react-query";
 import { PiWarningCircle } from "react-icons/pi";
 
 const SkeletonBody = () => {
@@ -50,7 +48,7 @@ const SkeletonBody = () => {
   );
 };
 
-const ConfirmationBanner = ({ mode, pendingTagDeletes = [] }) => {
+const ConfirmationBanner = ({ mode }) => {
   const bannerModes = {
     create: {
       message: (
@@ -127,17 +125,6 @@ const ConfirmationBanner = ({ mode, pendingTagDeletes = [] }) => {
         >
           {bannerModes[mode].message}
         </Text>
-        {pendingTagDeletes.length > 0 && (
-          <Text
-            color="red.600"
-            fontSize="sm"
-            mt={2}
-          >
-            {pendingTagDeletes.length} tag(s) will be deleted:{" "}
-            {pendingTagDeletes.map((t) => t.tagValue).join(", ")}. This will
-            remove them from all providers.
-          </Text>
-        )}
       </Box>
     </Alert>
   );
@@ -150,22 +137,13 @@ const ProviderFormFields = ({
   onChange,
   readOnly,
   errors,
-  onRequestDeleteTag,
-  pendingTagDeletes = [],
+  onDifferentChange,
 }) => {
-  const pendingTagDeleteIds = useMemo(
-    () => new Set(pendingTagDeletes.map((t) => t.id)),
-    [pendingTagDeletes]
-  );
-
   const getTagsByCategory = useCallback(
     (categoryId) => {
-      return tags.filter(
-        (tag) =>
-          tag.categoryId === categoryId && !pendingTagDeleteIds.has(tag.id)
-      );
+      return tags.filter((tag) => tag.categoryId === categoryId);
     },
-    [tags, pendingTagDeleteIds]
+    [tags]
   );
 
   const fixedInputProps = {
@@ -352,7 +330,7 @@ const ProviderFormFields = ({
                       onChange(cat.id, value);
                     }}
                     readOnly={readOnly}
-                    onRequestDeleteTag={onRequestDeleteTag}
+                    onDifferentChange={onDifferentChange}
                   />
                 )}
 
@@ -405,16 +383,13 @@ const ProviderDrawer = ({
 }) => {
   const [activeMode, setActiveMode] = useState(mode);
   const [showConfirmation, setShowConfirmation] = useState(false);
-  const [pendingTagDeletes, setPendingTagDeletes] = useState([]);
+  const [isTagDifferent, setIsTagDifferent] = useState(false);
   const [formValues, setFormValues] = useState({});
   const [errors, setErrors] = useState({});
-  const queryClient = useQueryClient();
   const toast = useToast();
-  const { tags: tagsApi } = useApi();
   const {
     data: tagsData,
     isLoading: loadingTags,
-    refetch: refetchTags,
   } = useTags();
   const tags = tagsData?.tags ?? [];
   const { mutateAsync: createProvider } = useCreateProvider();
@@ -463,7 +438,7 @@ const ProviderDrawer = ({
 
     init();
     setShowConfirmation(false);
-    setPendingTagDeletes([]);
+    setIsTagDifferent(false);
   }, [isOpen, mode, provider, categories]);
 
   const handleChange = (categoryId, value) => {
@@ -510,42 +485,12 @@ const ProviderDrawer = ({
     }
 
     try {
-      // remove staged tag ids from form state so payload doesn't include them
-      const idsToRemove = new Set(pendingTagDeletes.map((t) => t.id));
-      const formValuesAfterTagDeletes = { ...formValues };
-      categories.forEach((cat) => {
-        if (
-          cat.inputType === "tag" &&
-          Array.isArray(formValuesAfterTagDeletes[cat.id])
-        ) {
-          formValuesAfterTagDeletes[cat.id] = formValuesAfterTagDeletes[
-            cat.id
-          ].filter((id) => !idsToRemove.has(id));
-        }
-      });
-
-      // confirmation, delete staged tags
-      for (const { id } of pendingTagDeletes) {
-        await tagsApi.delete(id);
-      }
-      if (pendingTagDeletes.length > 0) {
-        queryClient.invalidateQueries({
-          predicate: (query) =>
-            ["providers", "providersSummary", "tags"].includes(
-              query.queryKey[0]
-            ),
-        });
-        if (typeof refetchTags === "function") await refetchTags();
-        setFormValues(formValuesAfterTagDeletes);
-        setPendingTagDeletes([]);
-      }
-
       if (activeMode === "create") {
-        await createProvider(buildPayload(formValuesAfterTagDeletes));
+        await createProvider(buildPayload());
       } else if (activeMode === "edit") {
         await updateProvider({
           id: provider.id,
-          providerData: buildPayload(formValuesAfterTagDeletes),
+          providerData: buildPayload(),
         });
       } else if (activeMode === "delete") {
         await deleteProvider(provider.id);
@@ -577,28 +522,11 @@ const ProviderDrawer = ({
 
   const handleClose = () => {
     setShowConfirmation(false);
-    setPendingTagDeletes([]);
+    setIsTagDifferent(false);
     setActiveMode(mode);
     setFormValues({});
     onClose();
   };
-
-  const handleRequestDeleteTag = useCallback((tag) => {
-    setPendingTagDeletes((prev) => {
-      const hasTagId = prev.some((t) => t.id === tag.id);
-      if (hasTagId) return prev;
-      return [...prev, tag];
-    });
-    // optimistic
-    if (tag.categoryId !== undefined && tag.categoryId !== null) {
-      setFormValues((prev) => ({
-        ...prev,
-        [tag.categoryId]: (prev[tag.categoryId] || []).filter(
-          (id) => id !== tag.id
-        ),
-      }));
-    }
-  }, []);
 
   const validateForm = () => {
     const newErrors = {};
@@ -701,7 +629,6 @@ const ProviderDrawer = ({
                 <Box mb={4}>
                   <ConfirmationBanner
                     mode={activeMode}
-                    pendingTagDeletes={pendingTagDeletes}
                   />
                 </Box>
               )}
@@ -713,8 +640,7 @@ const ProviderDrawer = ({
                 onChange={handleChange}
                 readOnly={isReadOnly}
                 errors={errors}
-                onRequestDeleteTag={handleRequestDeleteTag}
-                pendingTagDeletes={pendingTagDeletes}
+                onDifferentChange={setIsTagDifferent}
               />
             </DrawerBody>
 
@@ -754,6 +680,7 @@ const ProviderDrawer = ({
                     color="white"
                     _hover={{ bg: "#1a4f7a" }}
                     onClick={handleSubmit}
+                    isDisabled={isTagDifferent}
                     borderRadius="4px"
                     width="50%"
                     fontFamily="Inter"
@@ -791,6 +718,7 @@ const ProviderDrawer = ({
                     color="white"
                     _hover={{ bg: "#1a4f7a" }}
                     onClick={handleSubmit}
+                    isDisabled={isTagDifferent}
                     borderRadius="4px"
                     width="50%"
                     fontFamily="Inter"
@@ -809,7 +737,6 @@ const ProviderDrawer = ({
                     variant="outline"
                     onClick={() => {
                       setShowConfirmation(false);
-                      setPendingTagDeletes([]);
                       if (activeMode === "delete") setActiveMode("edit");
                     }}
                     color="#022442"
@@ -833,6 +760,7 @@ const ProviderDrawer = ({
                       bg: activeMode === "delete" ? "red.800" : "#1a4f7a",
                     }}
                     onClick={handleSubmit}
+                    isDisabled={isTagDifferent}
                     borderRadius="4px"
                     width="50%"
                     fontFamily="Inter"
