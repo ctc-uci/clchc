@@ -81,21 +81,19 @@ const tdTextProps = {
 
 const SkeletonRows = () => (
   <>
-    {Array.from({ length: 5 }, (_, i) => (
+    {Array.from({ length: 15 }, (_, i) => (
       <Tr key={i} borderBottom="1px solid" borderColor="gray.200">
-        <Td borderRight="1px solid" borderColor="gray.200">
-          <Skeleton height="20px" />
+        <Td {...tdProps}>
+          <Skeleton height="20px" width={`${55 + (i * 11) % 30}%`} />
         </Td>
-        <Td borderRight="1px solid" borderColor="gray.200">
-          <Skeleton height="20px" />
+        <Td {...tdProps}>
+          <Skeleton height="20px" width={`${50 + (i * 17) % 35}%`} />
         </Td>
-        <Td borderRight="1px solid" borderColor="gray.200">
-          <Skeleton height="20px" />
+        <Td {...tdProps} textAlign="center">
+          <Skeleton height="22px" width="60px" borderRadius="6px" mx="auto" />
         </Td>
-        <Td>
-          <HStack>
-            <Skeleton boxSize="30px" borderRadius="md" />
-          </HStack>
+        <Td {...tdProps} borderRight="none" w="90px">
+          <Skeleton boxSize="30px" borderRadius="16px" />
         </Td>
       </Tr>
     ))}
@@ -131,6 +129,7 @@ export default function UserTable({
         borderColor="gray.200"
         borderRadius="lg"
         overflowY="auto"
+        minH="calc(100vh - 540px)"
       >
         <Table
           sx={{

@@ -24,15 +24,34 @@ import QuotaDrawer from "@/components/quota-tracking/QuotaDrawer";
 const SELECTED_BG = "#EDF2F7";
 
 const SkeletonRows = () => {
+  const tdProps = {
+    borderRight: "1px solid",
+    borderColor: "gray.200",
+    padding: "16px 24px",
+    gap: "10px",
+  };
   return (
     <>
-      {Array.from({ length: 5 }, (_, i) => (
+      {Array.from({ length: 15 }, (_, i) => (
         <Tr key={i} borderBottom="1px solid" borderColor="gray.200">
-          {Array.from({ length: 5 }, (_, j) => (
-            <Td key={j} borderRight="1px solid" borderColor="gray.200">
-              <Skeleton height="40px" />
-            </Td>
-          ))}
+          <Td {...tdProps}>
+            <Skeleton height="20px" width={`${55 + (i * 11) % 30}%`} />
+          </Td>
+          <Td {...tdProps}>
+            <Skeleton height="28px" width={`${70 + (i * 13) % 25}px`} borderRadius="6px" />
+          </Td>
+          <Td {...tdProps}>
+            <Skeleton height="28px" width="80px" borderRadius="6px" />
+          </Td>
+          <Td {...tdProps}>
+            <Box>
+              <Skeleton height="8px" width="100%" borderRadius="full" mb={1} />
+              <Skeleton height="12px" width="50%" />
+            </Box>
+          </Td>
+          <Td {...tdProps} borderRight="none">
+            <Skeleton height="20px" width={`${40 + (i * 17) % 40}%`} />
+          </Td>
         </Tr>
       ))}
     </>
@@ -113,6 +132,7 @@ const QuotaTable = ({ rows, loading, onRowsUpdate, role }) => {
       borderColor="gray.200"
       borderRadius="lg"
       overflowY="auto"
+      minH="calc(100vh - 480px)"
     >
       <Table
         sx={{

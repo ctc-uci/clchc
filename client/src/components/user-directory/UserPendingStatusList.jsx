@@ -27,6 +27,9 @@ const RequestSkeleton = () => {
     <Flex
       align="center"
       justify="space-between"
+      borderTop="1px solid #E2E8F0"
+      borderRadius="md"
+      p={3}
     >
       <HStack
         spacing={3}
@@ -39,11 +42,11 @@ const RequestSkeleton = () => {
           spacing={2}
         >
           <Skeleton
-            height="18px"
+            height="16px"
             width="160px"
           />
           <Skeleton
-            height="12px"
+            height="14px"
             width="220px"
           />
         </VStack>
@@ -55,14 +58,14 @@ const RequestSkeleton = () => {
           width="110px"
         />
         <Skeleton
-          height="32px"
-          width="110px"
-          borderRadius="md"
+          height="41px"
+          width="113px"
+          borderRadius="6px"
         />
         <Skeleton
-          height="32px"
-          width="110px"
-          borderRadius="md"
+          height="41px"
+          width="113px"
+          borderRadius="6px"
         />
       </HStack>
     </Flex>
@@ -118,7 +121,6 @@ export const UserPendingStatusList = ({ showAll = false }) => {
       >
         {isLoading ? (
           <>
-            <RequestSkeleton />
             <RequestSkeleton />
             <RequestSkeleton />
           </>
