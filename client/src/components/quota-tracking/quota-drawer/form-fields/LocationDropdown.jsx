@@ -88,9 +88,14 @@ useEffect(() => {
   );
 
   const handleMenuOpen = () => {
-    setPendingNewLocations([]);
-    setPendingDeleteIds([]);
-    setMenuOpen((prev) => !prev);
+    setMenuOpen((prev) => {
+      if (prev && isDifferent) return prev;
+      if (!prev) {
+        setPendingNewLocations([]);
+        setPendingDeleteIds([]);
+      }
+      return !prev;
+    });
   };
 
   const handleCreate = (e) => {
