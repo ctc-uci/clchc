@@ -29,10 +29,13 @@ const SkeletonRows = () => {
             <Skeleton height="20px" width={`${50 + (i * 13) % 35}%`} />
           </Td>
           <Td {...tdProps}>
-            <Skeleton height="20px" width="80px" />
+            <Box display="flex" gap="4px" alignItems="center">
+              <Skeleton height="20px" width="46px" />
+              <Skeleton height="20px" width="24px" />
+            </Box>
           </Td>
           <Td {...tdProps}>
-            <Skeleton height="20px" width="140px" />
+            <Skeleton height="20px" width="148px" />
           </Td>
           <Td {...tdProps} borderRight="none">
             <Skeleton height="20px" width={`${40 + (i * 17) % 40}%`} />
