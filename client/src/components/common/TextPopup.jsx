@@ -20,10 +20,11 @@ const TextPopup = ({ text = "", alwaysShowPopup = false, truncateAt }) => {
         <Box
           maxWidth="100px"
           cursor="pointer"
-          onClick={(e) => {
+          onDoubleClick={(e) => {
             e.stopPropagation();
-            setIsOpen((prev) => !prev);
+            setIsOpen(true);
           }}
+          onClick={(e) => e.stopPropagation()}
         >
           <Text
             isTruncated
