@@ -84,6 +84,7 @@ export default function PersonalInfo({activeEditingKey, setActiveEditingKey}) {
       });
       await refetch();
       setEditing((prev) => ({ ...prev, [pendingKey]: false }));
+      setActiveEditingKey(null)
       return true;
     } catch (_error) {
       return false;

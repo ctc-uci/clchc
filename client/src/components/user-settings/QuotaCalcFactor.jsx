@@ -50,6 +50,7 @@ export default function QuotaCalcFactor({activeEditingKey, setActiveEditingKey})
       });
       await refetch();
       setIsEditMode(false);
+      setActiveEditingKey(null);
       return true;
     } catch (_error) {
       return false;
