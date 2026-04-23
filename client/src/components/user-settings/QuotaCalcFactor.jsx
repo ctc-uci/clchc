@@ -19,7 +19,7 @@ import { MdEdit } from "react-icons/md";
 
 import ConfirmationModal from "./ConfirmationModal";
 
-export default function QuotaCalcFactor() {
+export default function QuotaCalcFactor({activeEditingKey, setActiveEditingKey}) {
   const userData = useUserContext();
   const { mutateAsync: updateUser } = useUpdateUser();
   const dbUser = userData?.dbUser;
@@ -65,9 +65,12 @@ export default function QuotaCalcFactor() {
         onOpen();
       } else {
         setIsEditMode(false);
+        setActiveEditingKey(null);
       }
     } else {
+      if (activeEditingKey && activeEditingKey !== "quotaFactor") return;
       setIsEditMode(true);
+      setActiveEditingKey("quotaFactor");
     }
   };
 
@@ -134,6 +137,7 @@ export default function QuotaCalcFactor() {
             }
             onClick={handleToggle}
             flexShrink={0}
+            disabled={activeEditingKey && activeEditingKey !== "quotaFactor"}
           />
         </Flex>
       </FormControl>

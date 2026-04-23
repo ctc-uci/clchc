@@ -30,7 +30,7 @@ const ROLE_LABELS = {
   master: "Master",
 };
 
-export default function PersonalInfo() {
+export default function PersonalInfo({activeEditingKey, setActiveEditingKey}) {
   const userData = useUserContext();
   const { currentUser } = useAuthContext();
   const { mutateAsync: update } = useUpdateUser();
@@ -98,10 +98,15 @@ export default function PersonalInfo() {
         onOpen();
       } else {
         setEditing((prev) => ({ ...prev, [key]: false }));
+        setActiveEditingKey(null);
       }
     } else {
+      // Prevents editing if another field is being edited
+      if (activeEditingKey && activeEditingKey !== key) return;
+
       setEditing((prev) => ({ ...prev, [key]: true }));
       setEditingKey(key);
+      setActiveEditingKey(key);
     }
   };
 
@@ -211,7 +216,7 @@ export default function PersonalInfo() {
                     aria-label={isEditMode ? `Save ${label}` : `Edit ${label}`}
                     onClick={() => toggleEdit(key)}
                     flexShrink={0}
-                    disabled={editingKey && editingKey !== key}
+                    disabled={activeEditingKey && activeEditingKey !== key}
                   />
                 )}
               </Flex>
