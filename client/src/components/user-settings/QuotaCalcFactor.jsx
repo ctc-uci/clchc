@@ -29,6 +29,7 @@ export default function QuotaCalcFactor() {
   const [factor, setFactor] = useState(
     dbUser?.apptCalcFactor?.toString() || ""
   );
+  
   const [isEditMode, setIsEditMode] = useState(false);
 
   useEffect(() => {
@@ -57,7 +58,14 @@ export default function QuotaCalcFactor() {
 
   const handleToggle = () => {
     if (isEditMode) {
-      onOpen();
+      const currentNum = factor === "" ? 0 : parseFloat(factor);
+      const originalNum = dbUser?.apptCalcFactor || 0;
+
+      if (currentNum !== originalNum) {
+        onOpen();
+      } else {
+        setIsEditMode(false);
+      }
     } else {
       setIsEditMode(true);
     }
