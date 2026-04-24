@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 
-import { AddIcon, CheckIcon } from "@chakra-ui/icons";
+import { CheckIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
@@ -11,7 +11,6 @@ import {
   Input,
   InputGroup,
   InputRightElement,
-  Spinner,
   Text,
   useDisclosure,
   useOutsideClick,
@@ -20,18 +19,13 @@ import {
 import { ChevronDown } from "lucide-react";
 import { MdDeleteOutline } from "react-icons/md";
 
-import {
-  useCreateLocation,
-  useDeleteLocation,
-} from "@/contexts/hooks/data-fetching/useLocations";
+import { useDeleteLocation } from "@/contexts/hooks/data-fetching/useLocations";
 import { useDebounce } from "@/hooks/useDebounce";
 import { LockRightElement } from "../tools/shared";
 
 export function LocationDropdown({ locations = [], locationId, setLocationId, isLocked, isInvalid }) {
-  const createLocation = useCreateLocation();
   const deleteLocation = useDeleteLocation();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [newValue, setNewValue] = useState("");
   const [deletingMap, setDeletingMap] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -67,26 +61,10 @@ export function LocationDropdown({ locations = [], locationId, setLocationId, is
     handleClose();
   };
 
-  const handleCreate = async (e) => {
-    e.stopPropagation();
-    const trimmed = newValue.trim();
-    if (!trimmed) return;
-
-    try {
-      const result = await createLocation.mutateAsync({ tagValue: trimmed });
-      const newLocation = Array.isArray(result) ? result[0] : result;
-      if (newLocation?.id) setLocationId(newLocation.id);
-      setNewValue("");
-      handleClose();
-    } catch (_err) {
-      toast({
-        title: "Error",
-        description: "Failed to create location",
-        status: "error",
-        position: "bottom-right",
-        duration: 5000,
-        isClosable: true,
-      });
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && filteredLocations.length > 0) {
+      e.preventDefault();
+      handleSelect(filteredLocations[0].id);
     }
   };
 
@@ -162,7 +140,9 @@ export function LocationDropdown({ locations = [], locationId, setLocationId, is
               value={isOpen ? searchQuery : (selectedLocation?.tagValue ?? "")}
               onChange={handleInputChange}
               onFocus={() => { setSearchQuery(""); setDebouncedSearch(""); onOpen(); }}
+              onKeyDown={handleKeyDown}
               placeholder="Select location"
+              autoComplete="off"
               cursor={isOpen ? "text" : "pointer"}
               readOnly={!isOpen}
               fontFamily="Inter"
@@ -260,42 +240,6 @@ export function LocationDropdown({ locations = [], locationId, setLocationId, is
                   </Text>
                 )}
               </Box>
-              <HStack
-                px={3}
-                py={2}
-                gap={2}
-                borderTop="1px solid"
-                borderColor="gray.100"
-              >
-                <Input
-                  placeholder="Enter location"
-                  value={newValue}
-                  onChange={(e) => setNewValue(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleCreate(e); } }}
-                  onMouseDown={(e) => e.stopPropagation()}
-                  fontFamily="Inter"
-                  fontStyle="normal"
-                  lineHeight="20px"
-                  fontSize="12px"
-                  fontWeight="400"
-                  color="black"
-                  border="1px solid var(--gray-200, #E2E8F0)"
-                  borderRadius="4px"
-                  h="30px"
-                  padding="10px"
-                  _placeholder={{ color: "#A0AEC0" }}
-                />
-                <Button
-                  size="xs"
-                  onClick={handleCreate}
-                  isDisabled={createLocation.isPending}
-                  variant="ghost"
-                  _hover={{ bg: "none" }}
-                  _active={{ bg: "none" }}
-                >
-                  {createLocation.isPending ? <Spinner size="xs" /> : <AddIcon />}
-                </Button>
-              </HStack>
             </Box>
           )}
         </Box>
