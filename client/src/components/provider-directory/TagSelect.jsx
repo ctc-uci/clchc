@@ -390,13 +390,15 @@ const TagSelect = ({
                 Are you sure? This is going to be deleted for all providers.
               </Text>
             )}
-            <HStack gap={2}>
+            <HStack py={1}gap={2}>
               <Button
                 size="xs"
                 variant="ghost"
                 onClick={handleCancel}
                 flex={1}
-                borderRadius="6px"
+                border="1px solid var(--gray-200, #E2E8F0)"
+                borderRadius="4px"
+                padding="0 8px"
               >
                 Cancel
               </Button>
@@ -408,7 +410,8 @@ const TagSelect = ({
                 bg={pendingDeleteIds.length > 0 ? "#63171B" : "#3182CE"}
                 color="white"
                 flex={1}
-                borderRadius="6px"
+                borderRadius="4px"
+                padding="0 8px"
               >
                 {pendingDeleteIds.length > 0
                   ? isDeleteConfirmArmed
