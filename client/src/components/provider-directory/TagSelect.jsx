@@ -6,24 +6,16 @@ import {
   Button,
   HStack,
   Input,
-  ListItem,
   Menu,
   MenuButton,
   MenuItem,
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Tag,
   TagCloseButton,
   TagLabel,
   Text,
-  UnorderedList,
   useToast,
   VStack,
 } from "@chakra-ui/react";
@@ -48,7 +40,6 @@ const TagSelect = ({
   const [newTagValue, setNewTagValue] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const [pendingDeleteIds, setPendingDeleteIds] = useState([]);
-  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [isDeleteConfirmArmed, setIsDeleteConfirmArmed] = useState(false);
   const [isAddingTag, setIsAddingTag] = useState(false);
 
@@ -144,7 +135,6 @@ const TagSelect = ({
       });
       return;
     }
-    setIsConfirmOpen(true);
   };
 
   const handleDeleteAction = () => {
@@ -157,7 +147,6 @@ const TagSelect = ({
   };
 
   const handleConfirm = async () => {
-    setIsConfirmOpen(false);
     try {
       for (const tagId of pendingDeleteIds) {
         await deleteTag({ id: tagId });
@@ -423,64 +412,6 @@ const TagSelect = ({
           </HStack>
         </MenuList>
       </Menu>
-
-      <Modal
-        isOpen={isConfirmOpen}
-        onClose={() => setIsConfirmOpen(false)}
-        isCentered
-      >
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader fontSize="16px">Confirm tag changes</ModalHeader>
-          <ModalBody>
-            <VStack
-              align="stretch"
-              spacing={3}
-            >
-              {pendingDeleteIds.length > 0 && (
-                <VStack
-                  align="stretch"
-                  spacing={1}
-                >
-                  <Text
-                    fontWeight="600"
-                    fontSize="14px"
-                  >
-                    Deleting {pendingDeleteIds.length} tag
-                    {pendingDeleteIds.length > 1 ? "s" : ""}:
-                  </Text>
-                  <UnorderedList pl={4}>
-                    {pendingDeleteIds.map((id) => (
-                      <ListItem
-                        key={id}
-                        fontSize="14px"
-                      >
-                        {tagsMap[id]?.tagValue ?? id}
-                      </ListItem>
-                    ))}
-                  </UnorderedList>
-                </VStack>
-              )}
-            </VStack>
-          </ModalBody>
-          <ModalFooter gap={2}>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsConfirmOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              colorScheme="blue"
-              size="sm"
-              onClick={handleConfirm}
-            >
-              Confirm
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
     </VStack>
   );
 };
