@@ -1,41 +1,44 @@
 import { useEffect, useRef, useState } from "react";
 
-import {
-  Box,
-  Button,
-  Skeleton,
-  Table,
-  TableContainer,
-  Tag,
-  Tbody,
-  Td,
-  Text,
-  Th,
-  Thead,
-  Tr,
-  Wrap,
-  WrapItem,
-} from "@chakra-ui/react";
+
+
 import { AddIcon } from "@chakra-ui/icons";
-import { MdPersonAdd } from "react-icons/md";
+import { Box, Button, Skeleton, Table, TableContainer, Tag, Tbody, Td, Text, Th, Thead, Tr, Wrap, WrapItem } from "@chakra-ui/react";
+
+
 
 import TextPopup from "@/components/common/TextPopup";
 import { useTags } from "@/contexts/hooks/data-fetching/useTags";
+import { MdPersonAdd } from "react-icons/md";
+
+
+
+
 
 const SELECTED_BG = "#EDF2F7";
 
+const skeletonThProps = {
+  fontFamily: "Inter",
+  fontSize: "12px",
+  fontStyle: "normal",
+  fontWeight: "700",
+  lineHeight: "16px",
+  letterSpacing: "0.6px",
+  padding: "15px 25px",
+  backgroundColor: "#C8D4E6",
+  color: "#113D64",
+  borderRight: "1px solid",
+  borderColor: "gray.200",
+};
+
 const SkeletonHeader = () => {
   return (
-    <Thead>
+    <Thead bg="#C8D4E6" h="40px" position="sticky" top={0} zIndex={1}>
       <Tr>
-        {Array.from({ length: 4 }, (_, i) => (
-          <Th
-            key={i}
-            p={0}
-          >
-            <Skeleton height="60px" />
-          </Th>
-        ))}
+        <Th {...skeletonThProps}>Provider</Th>
+        <Th {...skeletonThProps}>NPI/License</Th>
+        <Th {...skeletonThProps}>&nbsp;</Th>
+        <Th {...skeletonThProps} borderRight="none">Long Term Notes</Th>
       </Tr>
     </Thead>
   );
@@ -44,23 +47,25 @@ const SkeletonHeader = () => {
 const SkeletonBody = () => {
   return (
     <Tbody>
-      {Array.from({ length: 5 }, (_, i) => (
+      {Array.from({ length: 15 }, (_, i) => (
         <Tr
           key={i}
           borderBottom="1px solid"
           borderColor="gray.200"
+          bg={i % 2 === 0 ? "white" : "#F9F9F9"}
         >
-          <Td>
-            <Skeleton height="40px" />
+          <Td borderRight="1px solid" borderColor="gray.200" padding="16px 24px">
+            <Skeleton height="20px" width={`${50 + (i * 13) % 35}%`} mb={1} />
+            <Skeleton height="14px" width="40%" />
           </Td>
-          <Td>
-            <Skeleton height="40px" />
+          <Td borderRight="1px solid" borderColor="gray.200" padding="16px 24px">
+            <Skeleton height="20px" width={`${40 + (i * 11) % 30}%`} />
           </Td>
-          <Td>
-            <Skeleton height="40px" />
+          <Td borderRight="1px solid" borderColor="gray.200" padding="16px 24px">
+            <Skeleton height="24px" width="80px" borderRadius="6px" />
           </Td>
-          <Td>
-            <Skeleton height="40px" />
+          <Td padding="16px 24px">
+            <Skeleton height="20px" width={`${30 + (i * 17) % 50}%`} />
           </Td>
         </Tr>
       ))}
@@ -155,10 +160,10 @@ export default function ProviderTable({
     if (isMissing) {
       // Defaults per inputType
       if (cat.inputType === "tag")
-        return <Text 
-        color="gray.400" 
-        fontFamily={"Inter"} 
-        fontSize={"14px"} 
+        return <Text
+        color="gray.400"
+        fontFamily={"Inter"}
+        fontSize={"14px"}
         fontStyle={"normal"}
         fontWeight={"400"}
         lineHeight={"22px"}>
@@ -255,8 +260,14 @@ export default function ProviderTable({
         borderBottom="1px solid"
         borderColor="gray.200"
         cursor={onProviderDoubleClick ? "pointer" : "default"}
-        sx={isSelected ? { background: `${SELECTED_BG} !important` } : undefined}
-        _hover={onProviderDoubleClick ? { bg: isSelected ? SELECTED_BG : "gray.50" } : {}}
+        sx={
+          isSelected ? { background: `${SELECTED_BG} !important` } : undefined
+        }
+        _hover={
+          onProviderDoubleClick
+            ? { bg: isSelected ? SELECTED_BG : "gray.50" }
+            : {}
+        }
         onClick={() => {
           if (!onProviderDoubleClick) return;
           if (selectedRowId === provider.id) {
@@ -275,7 +286,8 @@ export default function ProviderTable({
             lineHeight="22px"
             color="#113D64"
           >
-            {provider.name ?? ""}{provider.degree ? `, ${provider.degree}` : ""}
+            {provider.name ?? ""}
+            {provider.degree ? `, ${provider.degree}` : ""}
           </Text>
           {provider.phoneNumber && (
             <Text
@@ -316,16 +328,23 @@ export default function ProviderTable({
         </Td>
         {dynamicCells}
         <Td {...fixedTdProps}>
-          <Text
-            fontFamily="Inter"
-            fontSize="14px"
-            fontStyle="normal"
-            fontWeight="400"
-            lineHeight="22px"
-            color="#113D64"
-          >
-            {provider.notes ?? ""}
-          </Text>
+          {provider.notes && provider.notes.length > 100 ? (
+            <TextPopup
+              text={provider.notes}
+              truncateAt={100}
+            />
+          ) : (
+            <Text
+              fontFamily="Inter"
+              fontSize="14px"
+              fontStyle="normal"
+              fontWeight="400"
+              lineHeight="22px"
+              color="#113D64"
+            >
+              {provider.notes ?? ""}
+            </Text>
+          )}
         </Td>
       </Tr>
     );
@@ -348,6 +367,7 @@ export default function ProviderTable({
       borderColor="gray.200"
       borderRadius="lg"
       overflowY="auto"
+      minH="calc(100vh - 300px)"
     >
       <Table
         sx={{

@@ -23,9 +23,9 @@ import {
 import { ChevronDown } from "lucide-react";
 
 import {
+  useLocations,
   useCreateLocation,
   useDeleteLocation,
-  useLocations,
 } from "@/contexts/hooks/data-fetching/useLocations";
 
 import { LockRightElement } from "../tools/shared";

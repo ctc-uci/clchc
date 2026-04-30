@@ -19,7 +19,7 @@ import { MdEdit } from "react-icons/md";
 
 import ConfirmationModal from "./ConfirmationModal";
 
-export default function QuotaCalcFactor() {
+export default function QuotaCalcFactor({activeEditingKey, setActiveEditingKey}) {
   const userData = useUserContext();
   const { mutateAsync: updateUser } = useUpdateUser();
   const dbUser = userData?.dbUser;
@@ -29,6 +29,7 @@ export default function QuotaCalcFactor() {
   const [factor, setFactor] = useState(
     dbUser?.apptCalcFactor?.toString() || ""
   );
+  
   const [isEditMode, setIsEditMode] = useState(false);
 
   useEffect(() => {
@@ -49,6 +50,7 @@ export default function QuotaCalcFactor() {
       });
       await refetch();
       setIsEditMode(false);
+      setActiveEditingKey(null);
       return true;
     } catch (_error) {
       return false;
@@ -57,9 +59,19 @@ export default function QuotaCalcFactor() {
 
   const handleToggle = () => {
     if (isEditMode) {
-      onOpen();
+      const currentNum = factor === "" ? 0 : parseFloat(factor);
+      const originalNum = dbUser?.apptCalcFactor || 0;
+
+      if (currentNum !== originalNum) {
+        onOpen();
+      } else {
+        setIsEditMode(false);
+        setActiveEditingKey(null);
+      }
     } else {
+      if (activeEditingKey && activeEditingKey !== "quotaFactor") return;
       setIsEditMode(true);
+      setActiveEditingKey("quotaFactor");
     }
   };
 
@@ -126,6 +138,7 @@ export default function QuotaCalcFactor() {
             }
             onClick={handleToggle}
             flexShrink={0}
+            disabled={activeEditingKey && activeEditingKey !== "quotaFactor"}
           />
         </Flex>
       </FormControl>
