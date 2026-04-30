@@ -34,8 +34,8 @@ import { MdDeleteOutline } from "react-icons/md";
 export function LocationDropdown({ locationId, setLocationId, isLocked, isInvalid, onDifferentChange }) {
   const { data: { locations = [] } = {}, isLoading: loadingLocations } =
     useLocations();
-  const createLocation = useCreateLocation();
-  const deleteLocation = useDeleteLocation();
+  const { mutateAsync: createLocation} = useCreateLocation();
+  const { mutateAsync: deleteLocation} = useDeleteLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [newValue, setNewValue] = useState("");
   const [pendingDeleteIds, setPendingDeleteIds] = useState([]);
@@ -111,7 +111,7 @@ export function LocationDropdown({ locationId, setLocationId, isLocked, isInvali
     }
 
     try {
-      const result = await createLocation.mutateAsync({ tagValue: trimmed });
+      const result = await createLocation({ tagValue: trimmed });
       const newLoc = Array.isArray(result) ? result[0] : result;
       if (newLoc?.id) {
         if (!locationId) {
@@ -174,7 +174,7 @@ export function LocationDropdown({ locationId, setLocationId, isLocked, isInvali
   const handleConfirm = async () => {
     try {
       for (const id of pendingDeleteIds) {
-        await deleteLocation.mutateAsync({ id });
+        await deleteLocation({ id });
       }
 
       if (
