@@ -3,13 +3,15 @@ import { useEffect, useMemo, useState } from "react";
 import { AddIcon } from "@chakra-ui/icons";
 import {
   Button,
-  Checkbox,
   HStack,
   Input,
   ListItem,
   Menu,
   MenuButton,
+  MenuDivider,
+  MenuItemOption,
   MenuList,
+  MenuOptionGroup,
   Modal,
   ModalBody,
   ModalContent,
@@ -61,6 +63,14 @@ const TagSelect = ({
     setPendingNewTags([]);
     setPendingDeleteIds([]);
     setMenuOpen(true);
+  };
+
+  const handleTagsMenuChange = (nextValues) => {
+    const nextSelectedIds = Array.isArray(nextValues)
+      ? nextValues.map((value) => Number(value)).filter(Number.isFinite)
+      : [];
+
+    onTagsChange(nextSelectedIds);
   };
 
   const isDifferent = pendingNewTags.length > 0 || pendingDeleteIds.length > 0;
@@ -247,58 +257,50 @@ const TagSelect = ({
           overflowY="auto"
           minW="0"
         >
-          {/* existing tags, minus any staged for deletion */}
-          {tags
-            .filter((tag) => !pendingDeleteIds.includes(tag.id))
-            .map((tag) => (
-              <HStack
-                key={tag.id}
-                pl={3}
-                pr={0}
-                py={2}
-                justifyContent="space-between"
-                w="100%"
-                cursor={readOnly ? "default" : "pointer"}
-                onClick={() => {
-                  if (readOnly) return;
-                  if (selectedIds.includes(tag.id)) {
-                    onTagsChange(selectedIds.filter((id) => id !== tag.id));
-                  } else {
-                    onTagsChange([...selectedIds, tag.id]);
-                  }
-                }}
-                _hover={readOnly ? {} : { bg: "gray.100" }}
-              >
-                {!readOnly && (
-                  <Checkbox
-                    isChecked={selectedIds.includes(tag.id)}
-                    onChange={() => {}}
-                    colorScheme="blue"
-                    size="md"
-                    pointerEvents="none"
-                  />
-                )}
-                <Text
-                  flex="1"
+          <MenuOptionGroup
+            type="checkbox"
+            value={selectedIds.map((id) => String(id))}
+            onChange={handleTagsMenuChange}
+          >
+            {/* existing tags, minus any staged for deletion */}
+            {tags
+              // .filter((tag) => !pendingDeleteIds.includes(tag.id))
+              .map((tag) => (
+                <MenuItemOption
+                  key={tag.id}
+                  value={String(tag.id)}
+                  isDisabled={readOnly}
+                  bg={pendingDeleteIds.includes(tag.id) ? "#FFD2D2" : "white"}
+                  px={3}
+                  py={2}
                   fontSize="12px"
                   fontWeight="400"
                 >
-                  {tag.tagValue}
-                </Text>
-                {!readOnly && (
-                  <Button
-                    as="span"
-                    variant="ghost"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteTag(tag)(e);
-                    }}
+                  <HStack
+                    justifyContent="space-between"
+                    w="100%"
+                    spacing={2}
                   >
-                    <MdDeleteOutline size={20} />
-                  </Button>
-                )}
-              </HStack>
-            ))}
+                    <Text flex="1">{tag.tagValue}</Text>
+                    {!readOnly && (
+                      <Button
+                        as="span"
+                        variant="ghost"
+                        aria-label={`Delete ${tag.tagValue} tag`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteTag(tag)(e);
+                        }}
+                      >
+                        <MdDeleteOutline size={20} />
+                      </Button>
+                    )}
+                  </HStack>
+                </MenuItemOption>
+              ))}
+          </MenuOptionGroup>
+
+          <MenuDivider />
 
           {pendingNewTags.map(({ tempId, tagValue }) => (
             <HStack
@@ -311,15 +313,6 @@ const TagSelect = ({
               cursor="default"
               opacity={0.7}
             >
-              {!readOnly && (
-                <Checkbox
-                  isChecked
-                  onChange={() => {}}
-                  colorScheme="blue"
-                  size="md"
-                  pointerEvents="none"
-                />
-              )}
               <Text
                 flex="1"
                 fontSize="12px"
