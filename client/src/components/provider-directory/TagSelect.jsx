@@ -52,6 +52,7 @@ const TagSelect = ({
   const [pendingNewTags, setPendingNewTags] = useState([]);
   const [pendingDeleteIds, setPendingDeleteIds] = useState([]);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [isDeleteConfirmArmed, setIsDeleteConfirmArmed] = useState(false);
 
   const toast = useToast();
 
@@ -122,11 +123,26 @@ const TagSelect = ({
     e.stopPropagation();
     if (readOnly) return;
     const tagId = tag?.id ?? tag;
+    if (pendingDeleteIds.includes(tagId)) {
+        setPendingDeleteIds((prev) => prev.filter((id) => id !== tagId));
+        setIsDeleteConfirmArmed(false);
+        return;
+    }
     setPendingDeleteIds((prev) => [...prev, tagId]);
+    setIsDeleteConfirmArmed(false);
   };
 
   const handleSave = () => {
     setIsConfirmOpen(true);
+  };
+
+  const handleDeleteAction = () => {
+    if (!isDeleteConfirmArmed) {
+      setIsDeleteConfirmArmed(true);
+      return;
+    }
+
+    handleConfirm();
   };
 
   const handleConfirm = async () => {
@@ -179,7 +195,11 @@ const TagSelect = ({
     setPendingNewTags([]);
     setPendingDeleteIds([]);
     setMenuOpen(false);
+    setIsDeleteConfirmArmed(false);
   };
+
+  const menuMaxHeight =
+    pendingDeleteIds.length > 0 && isDeleteConfirmArmed ? "300px" : "240px";
 
   return (
     <VStack
@@ -253,7 +273,7 @@ const TagSelect = ({
         </MenuButton>
 
         <MenuList
-          maxHeight="240px"
+          maxHeight={menuMaxHeight}
           overflow="hidden"
           minW="0"
           p={0}
@@ -289,6 +309,8 @@ const TagSelect = ({
                         as="span"
                         variant="ghost"
                         aria-label={`Delete ${tag.tagValue} tag`}
+                        _hover={{ bg: "transparent" }}
+                        _active={{ bg: "transparent" }}
                         onClick={(e) => {
                           e.stopPropagation();
                           handleDeleteTag(tag)(e);
@@ -327,6 +349,8 @@ const TagSelect = ({
                   <Button
                     as="span"
                     variant="ghost"
+                    _hover={{ bg: "transparent" }}
+                    _active={{ bg: "transparent" }}
                     onClick={(e) => {
                       e.stopPropagation();
                       setPendingNewTags((prev) =>
@@ -383,31 +407,50 @@ const TagSelect = ({
 
           <HStack
             px={3}
-            py={2}
-            gap={2}
+            pt={2}
+            pb={1}
+            gap={1}
             borderTop="1px solid"
             borderColor="gray.200"
+            flexDirection="column"
+            alignItems="stretch"
           >
-            <Button
-              size="xs"
-              variant="ghost"
-              onClick={handleCancel}
-              flex={1}
-              borderRadius="6px"
-            >
-              Cancel
-            </Button>
-            <Button
-              size="xs"
-              onClick={handleSave}
-              isDisabled={!isDifferent}
-              opacity={isDifferent ? 1 : 0.4}
-              colorScheme="blue"
-              flex={1}
-              borderRadius="6px"
-            >
-              Save
-            </Button>
+            {pendingDeleteIds.length > 0 && isDeleteConfirmArmed && (
+              <Text
+                color="red.500"
+                fontSize="10px"
+                lineHeight="1.1"
+              >
+                Are you sure? This is going to be deleted for all providers.
+              </Text>
+            )}
+            <HStack gap={2}>
+              <Button
+                size="xs"
+                variant="ghost"
+                onClick={handleCancel}
+                flex={1}
+                borderRadius="6px"
+              >
+                Cancel
+              </Button>
+              <Button
+                size="xs"
+                onClick={pendingDeleteIds.length > 0 ? handleDeleteAction : handleSave}
+                isDisabled={!isDifferent}
+                opacity={isDifferent ? 1 : 0.4}
+                bg={pendingDeleteIds.length > 0 ? "#63171B" : "#3182CE"}
+                color="white"
+                flex={1}
+                borderRadius="6px"
+              >
+                {pendingDeleteIds.length > 0
+                  ? isDeleteConfirmArmed
+                    ? "Confirm"
+                    : "Delete"
+                  : "Save"}
+              </Button>
+            </HStack>
           </HStack>
         </MenuList>
       </Menu>
