@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { AddIcon } from "@chakra-ui/icons";
 import {
+  Box,
   Button,
   HStack,
   Input,
@@ -23,8 +24,8 @@ import {
   TagLabel,
   Text,
   UnorderedList,
-  VStack,
   useToast,
+  VStack,
 } from "@chakra-ui/react";
 
 import { useApi } from "@/api.js";
@@ -54,9 +55,10 @@ const TagSelect = ({
 
   const toast = useToast();
 
-  const selectedIds = useMemo(() => {
-    return Array.isArray(selectedTags) ? selectedTags : [];
-  }, [selectedTags]);
+  const selectedIds = useMemo(
+    () => (Array.isArray(selectedTags) ? selectedTags : []),
+    [selectedTags]
+  );
 
   const handleMenuOpen = () => {
     if (menuOpen) return;
@@ -87,7 +89,6 @@ const TagSelect = ({
     onTagsChange(selectedIds.filter((id) => id !== tagId));
   };
 
-
   const handleCreateTag = (e) => {
     if (e?.stopPropagation) e.stopPropagation();
     const trimmedTag = newTagValue.trim();
@@ -117,7 +118,6 @@ const TagSelect = ({
     setNewTagValue("");
   };
 
-
   const handleDeleteTag = (tag) => (e) => {
     e.stopPropagation();
     if (readOnly) return;
@@ -129,7 +129,6 @@ const TagSelect = ({
     setIsConfirmOpen(true);
   };
 
-
   const handleConfirm = async () => {
     setIsConfirmOpen(false);
     try {
@@ -137,7 +136,8 @@ const TagSelect = ({
       for (const { tagValue } of pendingNewTags) {
         const rawCreated = await tagsApi.create({ tagValue, categoryId });
         const newTag = Array.isArray(rawCreated) ? rawCreated[0] : rawCreated;
-        if (newTag?.id !== null && newTag?.id !== undefined) createdIds.push(newTag.id);
+        if (newTag?.id !== null && newTag?.id !== undefined)
+          createdIds.push(newTag.id);
       }
 
       for (const tagId of pendingDeleteIds) {
@@ -254,18 +254,20 @@ const TagSelect = ({
 
         <MenuList
           maxHeight="240px"
-          overflowY="auto"
+          overflow="hidden"
           minW="0"
+          p={0}
         >
-          <MenuOptionGroup
-            type="checkbox"
-            value={selectedIds.map((id) => String(id))}
-            onChange={handleTagsMenuChange}
+          <Box
+            maxH="180px"
+            overflowY="auto"
           >
-            {/* existing tags, minus any staged for deletion */}
-            {tags
-              // .filter((tag) => !pendingDeleteIds.includes(tag.id))
-              .map((tag) => (
+            <MenuOptionGroup
+              type="checkbox"
+              value={selectedIds.map((id) => String(id))}
+              onChange={handleTagsMenuChange}
+            >
+              {tags.map((tag) => (
                 <MenuItemOption
                   key={tag.id}
                   value={String(tag.id)}
@@ -298,85 +300,87 @@ const TagSelect = ({
                   </HStack>
                 </MenuItemOption>
               ))}
-          </MenuOptionGroup>
+            </MenuOptionGroup>
 
-          <MenuDivider />
+            <MenuDivider />
 
-          {pendingNewTags.map(({ tempId, tagValue }) => (
-            <HStack
-              key={tempId}
-              pl={3}
-              pr={0}
-              py={2}
-              justifyContent="space-between"
-              w="100%"
-              cursor="default"
-              opacity={0.7}
-            >
-              <Text
-                flex="1"
-                fontSize="12px"
-                fontWeight="400"
-                fontStyle="italic"
+            {pendingNewTags.map(({ tempId, tagValue }) => (
+              <HStack
+                key={tempId}
+                pl={3}
+                pr={0}
+                py={2}
+                justifyContent="space-between"
+                w="100%"
+                cursor="default"
+                opacity={0.7}
               >
-                {tagValue}
-              </Text>
-              {!readOnly && (
-                <Button
-                  as="span"
-                  variant="ghost"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setPendingNewTags((prev) =>
-                      prev.filter((t) => t.tempId !== tempId)
-                    );
-                  }}
+                <Text
+                  flex="1"
+                  fontSize="12px"
+                  fontWeight="400"
+                  fontStyle="italic"
                 >
-                  <MdDeleteOutline size={20} />
-                </Button>
-              )}
-            </HStack>
-          ))}
+                  {tagValue}
+                </Text>
+                {!readOnly && (
+                  <Button
+                    as="span"
+                    variant="ghost"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setPendingNewTags((prev) =>
+                        prev.filter((t) => t.tempId !== tempId)
+                      );
+                    }}
+                  >
+                    <MdDeleteOutline size={20} />
+                  </Button>
+                )}
+              </HStack>
+            ))}
 
-          <HStack
-            px={3}
-            py={2}
-            gap={2}
-          >
-            <Input
-              placeholder="New tag"
-              value={newTagValue}
-              onChange={(e) => setNewTagValue(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleCreateTag(e);
-              }}
-              isDisabled={readOnly}
-              variant="outline"
-              fontFamily={"Inter"}
-              fontStyle={"normal"}
-              lineHeight={"20px"}
-              fontSize="12px"
-              fontWeight="400"
-              color="black"
-              border={"1px solid var(--gray-200, #E2E8F0)"}
-              borderRadius="4px"
-              w="100%"
-              h="30px"
-              padding={"10px"}
-              margin={"0"}
-              _placeholder={{ color: "#A0AEC0" }}
-            />
-            <Button
-              size="xs"
-              onClick={handleCreateTag}
-              isDisabled={readOnly}
-              variant="ghost"
-              _hover={{ bg: "none" }}
-              _active={{ bg: "none" }}
+            <HStack
+              px={3}
+              py={2}
+              gap={2}
             >
-              <AddIcon />
-            </Button>
-          </HStack>
+              <Input
+                placeholder="New tag"
+                value={newTagValue}
+                onChange={(e) => setNewTagValue(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleCreateTag(e);
+                }}
+                isDisabled={readOnly}
+                variant="outline"
+                fontFamily={"Inter"}
+                fontStyle={"normal"}
+                lineHeight={"20px"}
+                fontSize="12px"
+                fontWeight={"400"}
+                color="black"
+                border={"1px solid var(--gray-200, #E2E8F0)"}
+                borderRadius="4px"
+                w="100%"
+                h="30px"
+                padding={"10px"}
+                margin={"0"}
+                _placeholder={{ color: "#A0AEC0" }}
+              />
+              <Button
+                size="xs"
+                onClick={handleCreateTag}
+                isDisabled={readOnly}
+                variant="ghost"
+                _hover={{ bg: "none" }}
+                _active={{ bg: "none" }}
+              >
+                <AddIcon />
+              </Button>
+            </HStack>
+          </Box>
+
           <HStack
             px={3}
             py={2}
