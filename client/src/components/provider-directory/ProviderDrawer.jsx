@@ -663,6 +663,7 @@ const ProviderDrawer = ({
                       setActiveMode("delete");
                       setShowConfirmation(true);
                     }}
+                    isDisabled={isTagDifferent}
                     borderRadius="4px"
                     width="50%"
                     fontFamily="Inter"
@@ -676,7 +677,7 @@ const ProviderDrawer = ({
                   </Button>
 
                   <Button
-                    bg="#929292"
+                    bg="#113D64"
                     color="white"
                     _hover={{ bg: "#1a4f7a" }}
                     onClick={handleSubmit}
