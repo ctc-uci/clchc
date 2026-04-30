@@ -137,6 +137,7 @@ export function LocationDropdown({ locationId, setLocationId, isLocked, isInvali
   };
 
   const handleDelete = (location) => (e) => {
+    e.stopPropagation();
     if (pendingDeleteIds.includes(location.id)) {
       setPendingDeleteIds((prev) => prev.filter((id) => id !== location.id));
       setIsDeleteConfirmArmed(false);
@@ -334,6 +335,7 @@ export function LocationDropdown({ locationId, setLocationId, isLocked, isInvali
                       if (e.key === "Enter") {
                         e.preventDefault();
                         e.stopPropagation();
+                        void handleCreate();
                       }
                     }}
                     variant="outline"

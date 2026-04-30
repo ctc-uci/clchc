@@ -322,6 +322,7 @@ const TagSelect = ({
                     if (e.key === "Enter") {
                       e.preventDefault();
                       e.stopPropagation();
+                      handleSave();
                     }
                   }}
                   isDisabled={readOnly || isDeletingTags}
@@ -384,7 +385,7 @@ const TagSelect = ({
                 Are you sure? This is going to be deleted for all providers.
               </Text>
             )}
-            <HStack py={1}gap={2}>
+            <HStack py={1} gap={2}>
               <Button
                 size="xs"
                 variant="ghost"
