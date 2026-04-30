@@ -10,22 +10,14 @@ import {
   HStack,
   Input,
   InputGroup,
-  ListItem,
   Menu,
   MenuButton,
+  MenuItem,
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Skeleton,
   Text,
-  UnorderedList,
-  VStack,
   useToast,
 } from "@chakra-ui/react";
 import { ChevronDown } from "lucide-react";
@@ -46,13 +38,13 @@ export function LocationDropdown({ locationId, setLocationId, isLocked, isInvali
   const deleteLocation = useDeleteLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [newValue, setNewValue] = useState("");
-  const [pendingNewLocations, setPendingNewLocations] = useState([]);
   const [pendingDeleteIds, setPendingDeleteIds] = useState([]);
-  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [isDeleteConfirmArmed, setIsDeleteConfirmArmed] = useState(false);
+  const [isAddingLocation, setIsAddingLocation] = useState(false);
   const toast = useToast();
   const selectedItemRef = useRef(null);
 
-  const isDifferent = pendingNewLocations.length > 0 || pendingDeleteIds.length > 0;
+  const isDifferent = pendingDeleteIds.length > 0 || (isAddingLocation && newValue.trim().length > 0);
 
   useEffect(() => {
     if (menuOpen) {
@@ -62,7 +54,7 @@ export function LocationDropdown({ locationId, setLocationId, isLocked, isInvali
     }
   }, [menuOpen]);
 
-useEffect(() => {
+  useEffect(() => {
     if (typeof onDifferentChange === "function") {
       onDifferentChange(isDifferent);
     }
@@ -91,25 +83,23 @@ useEffect(() => {
     setMenuOpen((prev) => {
       if (prev && isDifferent) return prev;
       if (!prev) {
-        setPendingNewLocations([]);
         setPendingDeleteIds([]);
+        setIsDeleteConfirmArmed(false);
+        setIsAddingLocation(false);
+        setNewValue("");
       }
       return !prev;
     });
   };
 
-  const handleCreate = (e) => {
-    if (e?.stopPropagation) e.stopPropagation();
+  const handleCreate = async () => {
     const trimmed = newValue.trim();
     if (!trimmed) return;
 
     const alreadyExists = locations.some(
       (l) => l.tagValue.toLowerCase() === trimmed.toLowerCase()
     );
-    const alreadyPending = pendingNewLocations.some(
-      (l) => l.tagValue.toLowerCase() === trimmed.toLowerCase()
-    );
-    if (alreadyExists || alreadyPending) {
+    if (alreadyExists) {
       toast({
         title: "Location already exists",
         status: "warning",
@@ -117,44 +107,74 @@ useEffect(() => {
         duration: 3000,
         isClosable: true,
       });
-      return;
+      return false;
     }
-    setPendingNewLocations((prev) => [
-      ...prev,
-      { tempId: `loc-temp-${Date.now()}`, tagValue: trimmed },
-    ]);
-    setNewValue("");
+
+    try {
+      const result = await createLocation.mutateAsync({ tagValue: trimmed });
+      const newLoc = Array.isArray(result) ? result[0] : result;
+      if (newLoc?.id) {
+        if (!locationId) {
+          setLocationId(newLoc.id);
+        }
+        setNewValue("");
+        setIsAddingLocation(false);
+        return true;
+      }
+      return false;
+    } catch (_err) {
+      toast({
+        title: "Error",
+        description: "Failed to create location",
+        status: "error",
+        position: "bottom-right",
+        duration: 5000,
+        isClosable: true,
+      });
+      return false;
+    }
   };
 
   const handleDelete = (location) => (e) => {
+    if (pendingDeleteIds.includes(location.id)) {
+      setPendingDeleteIds((prev) => prev.filter((id) => id !== location.id));
+      setIsDeleteConfirmArmed(false);
+      return;
+    }
     e.stopPropagation();
     setPendingDeleteIds((prev) => [...prev, location.id]);
+    setIsDeleteConfirmArmed(false);
   };
 
-  const handleSave = () => setIsConfirmOpen(true);
+  const handleDeleteAction = () => {
+    if (!isDeleteConfirmArmed) {
+      setIsDeleteConfirmArmed(true);
+      return;
+    }
+
+    handleConfirm();
+  };
+
+  const handleSave = async () => {
+    if (isAddingLocation && newValue.trim()) {
+      await handleCreate();
+      return;
+    }
+    handleConfirm();
+  };
 
   const handleCancel = () => {
-    setPendingNewLocations([]);
     setPendingDeleteIds([]);
     setMenuOpen(false);
+    setIsDeleteConfirmArmed(false);
+    setIsAddingLocation(false);
+    setNewValue("");
   };
 
   const handleConfirm = async () => {
-    setIsConfirmOpen(false);
     try {
-      let lastCreatedId = null;
-      for (const { tagValue } of pendingNewLocations) {
-        const result = await createLocation.mutateAsync({ tagValue });
-        const newLoc = Array.isArray(result) ? result[0] : result;
-        if (newLoc?.id) lastCreatedId = newLoc.id;
-      }
-
       for (const id of pendingDeleteIds) {
         await deleteLocation.mutateAsync({ id });
-      }
-
-      if (lastCreatedId && !locationId) {
-        setLocationId(lastCreatedId);
       }
 
       if (
@@ -164,9 +184,9 @@ useEffect(() => {
         setLocationId("");
       }
 
-      setPendingNewLocations([]);
       setPendingDeleteIds([]);
       setMenuOpen(false);
+      setIsDeleteConfirmArmed(false);
     } catch (_err) {
       toast({
         title: "Error",
@@ -178,6 +198,9 @@ useEffect(() => {
       });
     }
   };
+
+  const menuMaxHeight =
+    pendingDeleteIds.length > 0 && isDeleteConfirmArmed ? "300px" : "240px";
 
   return (
     <FormControl
@@ -244,10 +267,15 @@ useEffect(() => {
               : "Select"}
           </MenuButton>
           <MenuList
-            maxHeight="240px"
-            overflowY="auto"
+            maxHeight={menuMaxHeight}
+            overflow="hidden"
             minW="0"
+            p={0}
           >
+            <Box
+              maxH="180px"
+              overflowY="auto"
+            >
             <MenuOptionGroup
               title=""
               type="radio"
@@ -255,25 +283,33 @@ useEffect(() => {
               onChange={(value) => setLocationId(Number(value))}
             >
               {/* Existing locations, minus staged deletes */}
-              {locations
-                .filter((l) => !pendingDeleteIds.includes(l.id))
-                .map((location) => (
+              {locations.map((location) => (
                   <MenuItemOption
                     key={location.id}
                     value={String(location.id)}
                     ref={String(location.id) === String(locationId) ? selectedItemRef : null}
                     pl="3"
                     pr="0"
+                    bg={pendingDeleteIds.includes(location.id) ? "#FFD2D2" : "white"}
                   >
                     <HStack
                       justifyContent="space-between"
                       w="100%"
                     >
-                      <Text flex="1" fontSize="12px" fontWeight="400">{location.tagValue}</Text>
+                      <Text
+                        flex="1"
+                        fontSize="12px"
+                        fontWeight="400"
+                      >
+                        {location.tagValue}
+                      </Text>
                       <Button
                         as="span"
                         variant="ghost"
+                        aria-label={`Delete ${location.tagValue} location`}
                         onClick={handleDelete(location)}
+                        _hover={{ bg: "transparent" }}
+                        _active={{ bg: "transparent" }}
                       >
                         <MdDeleteOutline size={20} />
                       </Button>
@@ -281,161 +317,117 @@ useEffect(() => {
                   </MenuItemOption>
                 ))}
 
-              {/* Pending new locations — staged locally, not yet in DB */}
-              {pendingNewLocations.map(({ tempId, tagValue }) => (
+              {isAddingLocation ? (
                 <HStack
-                  key={tempId}
-                  pl={9}
-                  pr={0}
+                  px={3}
                   py={2}
-                  justifyContent="space-between"
-                  w="100%"
-                  opacity={0.7}
-                  cursor="default"
+                  gap={0}
                 >
-                  <Text flex="1" fontSize="12px" fontWeight="400" fontStyle="italic">
-                    {tagValue}
-                  </Text>
-                  <Button
-                    as="span"
-                    variant="ghost"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setPendingNewLocations((prev) =>
-                        prev.filter((l) => l.tempId !== tempId)
-                      );
+                  <Input
+                    placeholder="Enter location"
+                    value={newValue}
+                    onChange={(e) => setNewValue(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      }
                     }}
-                  >
-                    <MdDeleteOutline size={20} />
-                  </Button>
+                    variant="outline"
+                    fontFamily={"Inter"}
+                    fontStyle={"normal"}
+                    lineHeight={"20px"}
+                    fontSize="12px"
+                    fontWeight="400"
+                    color="black"
+                    border={"1px solid var(--gray-200, #E2E8F0)"}
+                    borderRadius="4px"
+                    w="100%"
+                    h="30px"
+                    padding={"10px"}
+                    margin={"0"}
+                    _placeholder={{ color: "#A0AEC0" }}
+                    autoFocus
+                  />
                 </HStack>
-              ))}
-
-              <HStack
-                px={3}
-                py={2}
-                gap={2}
-              >
-                <Input
-                  placeholder="Enter location"
-                  value={newValue}
-                  onChange={(e) => setNewValue(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") handleCreate(e);
+              ) : (
+                <MenuItem
+                  onClick={() => {
+                    if (isLocked) return;
+                    setIsAddingLocation(true);
                   }}
-                  variant="outline"
-                  fontFamily={"Inter"}
-                  fontStyle={"normal"}
-                  lineHeight={"20px"}
                   fontSize="12px"
                   fontWeight="400"
-                  color="black"
-                  border={"1px solid var(--gray-200, #E2E8F0)"}
-                  borderRadius="4px"
-                  w="100%"
-                  h="30px"
-                  padding={"10px"}
-                  margin={"0"}
-                  _placeholder={{ color: "#A0AEC0" }}
-                />
-                <Button
-                  size="xs"
-                  onClick={handleCreate}
-                  variant="ghost"
-                  _hover={{ bg: "none" }}
-                  _active={{ bg: "none" }}
+                  color="gray.700"
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  gap={"6px"}
+                  padding={"15px 20px 15px 38px"}
                 >
+                  <Text>Add Location</Text>
                   <AddIcon />
-                </Button>
-              </HStack>
+                </MenuItem>
+              )}
             </MenuOptionGroup>
+            </Box>
 
             <HStack
               px={3}
-              py={2}
-              gap={2}
+              pt={2}
+              pb={1}
+              gap={1}
               borderTop="1px solid"
               borderColor="gray.200"
+              flexDirection="column"
+              alignItems="stretch"
             >
-              <Button
-                size="xs"
-                variant="ghost"
-                onClick={handleCancel}
-                flex={1}
-                borderRadius="6px"
-              >
-                Cancel
-              </Button>
-              <Button
-                size="xs"
-                onClick={handleSave}
-                isDisabled={!isDifferent}
-                opacity={isDifferent ? 1 : 0.4}
-                colorScheme="blue"
-                flex={1}
-                borderRadius="6px"
-              >
-                Save
-              </Button>
+              {pendingDeleteIds.length > 0 && isDeleteConfirmArmed && (
+                <Text
+                  color="red.500"
+                  fontSize="10px"
+                  lineHeight="1.1"
+                >
+                  Are you sure? This is going to be deleted for all quotas.
+                </Text>
+              )}
+              <HStack py={1} gap={2}>
+                <Button
+                  size="xs"
+                  variant="ghost"
+                  onClick={handleCancel}
+                  flex={1}
+                  border="1px solid var(--gray-200, #E2E8F0)"
+                  borderRadius="4px"
+                  padding="0 8px"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  size="xs"
+                  onClick={pendingDeleteIds.length > 0 ? handleDeleteAction : handleSave}
+                  isDisabled={!isDifferent}
+                  opacity={isDifferent ? 1 : 0.4}
+                  bg={pendingDeleteIds.length > 0 ? "#63171B" : "#3182CE"}
+                  color="white"
+                  flex={1}
+                  borderRadius="4px"
+                  padding="0 8px"
+                >
+                  {pendingDeleteIds.length > 0
+                    ? isDeleteConfirmArmed
+                      ? "Confirm"
+                      : "Delete"
+                    : "Save"}
+                </Button>
+              </HStack>
             </HStack>
           </MenuList>
         </Menu>
       )}
+
       <FormErrorMessage>Required</FormErrorMessage>
 
-      <Modal
-        isOpen={isConfirmOpen}
-        onClose={() => setIsConfirmOpen(false)}
-        isCentered
-      >
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader fontSize="16px">Confirm location changes</ModalHeader>
-          <ModalBody>
-            <VStack align="stretch" spacing={3}>
-              {pendingNewLocations.length > 0 && (
-                <VStack align="stretch" spacing={1}>
-                  <Text fontWeight="600" fontSize="14px">
-                    Creating {pendingNewLocations.length} location
-                    {pendingNewLocations.length > 1 ? "s" : ""}:
-                  </Text>
-                  <UnorderedList pl={4}>
-                    {pendingNewLocations.map(({ tempId, tagValue }) => (
-                      <ListItem key={tempId} fontSize="14px">{tagValue}</ListItem>
-                    ))}
-                  </UnorderedList>
-                </VStack>
-              )}
-              {pendingDeleteIds.length > 0 && (
-                <VStack align="stretch" spacing={1}>
-                  <Text fontWeight="600" fontSize="14px">
-                    Deleting {pendingDeleteIds.length} location
-                    {pendingDeleteIds.length > 1 ? "s" : ""}:
-                  </Text>
-                  <UnorderedList pl={4}>
-                    {pendingDeleteIds.map((id) => {
-                      const loc = locations.find((l) => l.id === id);
-                      return (
-                        <ListItem key={id} fontSize="14px">
-                          {loc?.tagValue ?? id}
-                        </ListItem>
-                      );
-                    })}
-                  </UnorderedList>
-                </VStack>
-              )}
-            </VStack>
-          </ModalBody>
-          <ModalFooter gap={2}>
-            <Button variant="ghost" size="sm" onClick={() => setIsConfirmOpen(false)}>
-              Cancel
-            </Button>
-            <Button colorScheme="blue" size="sm" onClick={handleConfirm}>
-              Confirm
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
     </FormControl>
   );
 }
