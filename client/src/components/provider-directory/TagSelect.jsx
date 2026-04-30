@@ -49,6 +49,7 @@ const TagSelect = ({
     () => (Array.isArray(selectedTags) ? selectedTags : []),
     [selectedTags]
   );
+  const isDeletingTags = pendingDeleteIds.length > 0;
 
   const handleMenuOpen = () => {
     if (menuOpen) return;
@@ -118,6 +119,8 @@ const TagSelect = ({
     }
     setPendingDeleteIds((prev) => [...prev, tagId]);
     setIsDeleteConfirmArmed(false);
+    setIsAddingTag(false);
+    setNewTagValue("");
   };
 
   const handleSave = () => {
@@ -321,7 +324,7 @@ const TagSelect = ({
                       e.stopPropagation();
                     }
                   }}
-                  isDisabled={readOnly}
+                  isDisabled={readOnly || isDeletingTags}
                   variant="outline"
                   fontFamily={"Inter"}
                   fontStyle={"normal"}
@@ -342,9 +345,10 @@ const TagSelect = ({
             ) : (
               <MenuItem
                 onClick={() => {
-                  if (readOnly) return;
+                  if (readOnly || isDeletingTags) return;
                   setIsAddingTag(true);
                 }}
+                isDisabled={readOnly || isDeletingTags}
                 fontSize="12px"
                 fontWeight="400"
                 color="gray.700"
@@ -353,6 +357,7 @@ const TagSelect = ({
                 alignItems="center"
                 gap={"6px"}
                 padding={"15px 30px"}
+                opacity={readOnly || isDeletingTags ? 0.4 : 1}
               >
                 <Text>Add Tag</Text>
                 <AddIcon />

@@ -44,6 +44,7 @@ export function LocationDropdown({ locationId, setLocationId, isLocked, isInvali
   const toast = useToast();
   const selectedItemRef = useRef(null);
 
+  const isDeletingLocations = pendingDeleteIds.length > 0;
   const isDifferent = pendingDeleteIds.length > 0 || (isAddingLocation && newValue.trim().length > 0);
 
   useEffect(() => {
@@ -144,6 +145,8 @@ export function LocationDropdown({ locationId, setLocationId, isLocked, isInvali
     e.stopPropagation();
     setPendingDeleteIds((prev) => [...prev, location.id]);
     setIsDeleteConfirmArmed(false);
+    setIsAddingLocation(false);
+    setNewValue("");
   };
 
   const handleDeleteAction = () => {
@@ -347,15 +350,17 @@ export function LocationDropdown({ locationId, setLocationId, isLocked, isInvali
                     padding={"10px"}
                     margin={"0"}
                     _placeholder={{ color: "#A0AEC0" }}
+                    isDisabled={isDeletingLocations}
                     autoFocus
                   />
                 </HStack>
               ) : (
                 <MenuItem
                   onClick={() => {
-                    if (isLocked) return;
+                    if (isLocked || isDeletingLocations) return;
                     setIsAddingLocation(true);
                   }}
+                  isDisabled={isLocked || isDeletingLocations}
                   fontSize="12px"
                   fontWeight="400"
                   color="gray.700"
@@ -364,6 +369,7 @@ export function LocationDropdown({ locationId, setLocationId, isLocked, isInvali
                   alignItems="center"
                   gap={"6px"}
                   padding={"15px 20px 15px 38px"}
+                  opacity={isLocked || isDeletingLocations ? 0.4 : 1}
                 >
                   <Text>Add Location</Text>
                   <AddIcon />
