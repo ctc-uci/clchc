@@ -9,7 +9,7 @@ import {
   ListItem,
   Menu,
   MenuButton,
-  MenuDivider,
+  MenuItem,
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
@@ -28,10 +28,8 @@ import {
   VStack,
 } from "@chakra-ui/react";
 
-import { useApi } from "@/api.js";
-import { useTags } from "@/contexts/hooks/data-fetching/useTags";
+import { useTags, useCreateTag, useDeleteTag } from "@/contexts/hooks/data-fetching/useTags";
 import { errorToString } from "@/utils/utils";
-import { useQueryClient } from "@tanstack/react-query";
 import { ChevronDown } from "lucide-react";
 import { MdDeleteOutline } from "react-icons/md";
 
@@ -43,16 +41,16 @@ const TagSelect = ({
   readOnly,
   onDifferentChange,
 }) => {
-  const queryClient = useQueryClient();
-  const { data: tagsData, refetch: refetchTags } = useTags();
+  const { data: tagsData } = useTags();
+  const { mutateAsync: createTag } = useCreateTag();
+  const { mutateAsync: deleteTag } = useDeleteTag();
   const tagsMap = tagsData?.tagsMap ?? {};
-  const { tags: tagsApi } = useApi();
   const [newTagValue, setNewTagValue] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
-  const [pendingNewTags, setPendingNewTags] = useState([]);
   const [pendingDeleteIds, setPendingDeleteIds] = useState([]);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [isDeleteConfirmArmed, setIsDeleteConfirmArmed] = useState(false);
+  const [isAddingTag, setIsAddingTag] = useState(false);
 
   const toast = useToast();
 
@@ -63,7 +61,6 @@ const TagSelect = ({
 
   const handleMenuOpen = () => {
     if (menuOpen) return;
-    setPendingNewTags([]);
     setPendingDeleteIds([]);
     setMenuOpen(true);
   };
@@ -76,7 +73,8 @@ const TagSelect = ({
     onTagsChange(nextSelectedIds);
   };
 
-  const isDifferent = pendingNewTags.length > 0 || pendingDeleteIds.length > 0;
+  const isDifferent =
+    pendingDeleteIds.length > 0 || (isAddingTag && newTagValue.trim().length > 0);
 
   useEffect(() => {
     if (typeof onDifferentChange === "function") {
@@ -90,18 +88,14 @@ const TagSelect = ({
     onTagsChange(selectedIds.filter((id) => id !== tagId));
   };
 
-  const handleCreateTag = (e) => {
-    if (e?.stopPropagation) e.stopPropagation();
+  const handleCreateTag = async () => {
     const trimmedTag = newTagValue.trim();
-    if (readOnly || !trimmedTag) return;
+    if (readOnly || !trimmedTag) return false;
 
     const alreadyExists = tags.some(
       (t) => t.tagValue.toLowerCase() === trimmedTag.toLowerCase()
     );
-    const alreadyPending = pendingNewTags.some(
-      (t) => t.tagValue.toLowerCase() === trimmedTag.toLowerCase()
-    );
-    if (alreadyExists || alreadyPending) {
+    if (alreadyExists) {
       toast({
         title: "Tag already exists",
         status: "warning",
@@ -109,14 +103,17 @@ const TagSelect = ({
         duration: 3000,
         isClosable: true,
       });
-      return;
+      return false;
     }
 
-    setPendingNewTags((prev) => [
-      ...prev,
-      { tempId: `tag-temp-${Date.now()}`, tagValue: trimmedTag },
-    ]);
+    const rawCreated = await createTag({ tagValue: trimmedTag, categoryId });
+    const newTag = Array.isArray(rawCreated) ? rawCreated[0] : rawCreated;
+    if (newTag?.id === null || newTag?.id === undefined) return false;
+
+    onTagsChange([...new Set([...selectedIds, newTag.id])]);
     setNewTagValue("");
+    setIsAddingTag(false);
+    return true;
   };
 
   const handleDeleteTag = (tag) => (e) => {
@@ -133,6 +130,20 @@ const TagSelect = ({
   };
 
   const handleSave = () => {
+    if (isAddingTag && newTagValue.trim()) {
+      handleCreateTag().catch((err) => {
+        console.error("Failed to create tag", err);
+        toast({
+          title: "Error",
+          description: errorToString(err),
+          status: "error",
+          position: "bottom-right",
+          duration: 5000,
+          isClosable: true,
+        });
+      });
+      return;
+    }
     setIsConfirmOpen(true);
   };
 
@@ -148,34 +159,14 @@ const TagSelect = ({
   const handleConfirm = async () => {
     setIsConfirmOpen(false);
     try {
-      const createdIds = [];
-      for (const { tagValue } of pendingNewTags) {
-        const rawCreated = await tagsApi.create({ tagValue, categoryId });
-        const newTag = Array.isArray(rawCreated) ? rawCreated[0] : rawCreated;
-        if (newTag?.id !== null && newTag?.id !== undefined)
-          createdIds.push(newTag.id);
-      }
-
       for (const tagId of pendingDeleteIds) {
-        await tagsApi.delete(tagId);
-      }
-
-      if (pendingNewTags.length > 0 || pendingDeleteIds.length > 0) {
-        queryClient.invalidateQueries({
-          predicate: (query) =>
-            ["providers", "providersSummary", "tags"].includes(
-              query.queryKey[0]
-            ),
-        });
-        if (typeof refetchTags === "function") await refetchTags();
+        await deleteTag({ id: tagId });
       }
 
       const finalIds = [
         ...selectedIds.filter((id) => !pendingDeleteIds.includes(id)),
-        ...createdIds,
       ];
       onTagsChange([...new Set(finalIds)]);
-      setPendingNewTags([]);
       setPendingDeleteIds([]);
       setMenuOpen(false);
     } catch (err) {
@@ -192,10 +183,11 @@ const TagSelect = ({
   };
 
   const handleCancel = () => {
-    setPendingNewTags([]);
     setPendingDeleteIds([]);
     setMenuOpen(false);
     setIsDeleteConfirmArmed(false);
+    setIsAddingTag(false);
+    setNewTagValue("");
   };
 
   const menuMaxHeight =
@@ -324,85 +316,59 @@ const TagSelect = ({
               ))}
             </MenuOptionGroup>
 
-            <MenuDivider />
-
-            {pendingNewTags.map(({ tempId, tagValue }) => (
+            {isAddingTag ? (
               <HStack
-                key={tempId}
-                pl={3}
-                pr={0}
+                px={3}
                 py={2}
-                justifyContent="space-between"
-                w="100%"
-                cursor="default"
-                opacity={0.7}
+                gap={0}
               >
-                <Text
-                  flex="1"
-                  fontSize="12px"
-                  fontWeight="400"
-                  fontStyle="italic"
-                >
-                  {tagValue}
-                </Text>
-                {!readOnly && (
-                  <Button
-                    as="span"
-                    variant="ghost"
-                    _hover={{ bg: "transparent" }}
-                    _active={{ bg: "transparent" }}
-                    onClick={(e) => {
+                <Input
+                  placeholder="New tag"
+                  value={newTagValue}
+                  onChange={(e) => setNewTagValue(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
                       e.stopPropagation();
-                      setPendingNewTags((prev) =>
-                        prev.filter((t) => t.tempId !== tempId)
-                      );
-                    }}
-                  >
-                    <MdDeleteOutline size={20} />
-                  </Button>
-                )}
+                    }
+                  }}
+                  isDisabled={readOnly}
+                  variant="outline"
+                  fontFamily={"Inter"}
+                  fontStyle={"normal"}
+                  lineHeight={"20px"}
+                  fontSize="12px"
+                  fontWeight={"400"}
+                  color="black"
+                  border={"1px solid var(--gray-200, #E2E8F0)"}
+                  borderRadius="4px"
+                  w="100%"
+                  h="30px"
+                  padding={"10px"}
+                  margin={"0"}
+                  _placeholder={{ color: "#A0AEC0" }}
+                  autoFocus
+                />
               </HStack>
-            ))}
-
-            <HStack
-              px={3}
-              py={2}
-              gap={2}
-            >
-              <Input
-                placeholder="New tag"
-                value={newTagValue}
-                onChange={(e) => setNewTagValue(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handleCreateTag(e);
+            ) : (
+              <MenuItem
+                onClick={() => {
+                  if (readOnly) return;
+                  setIsAddingTag(true);
                 }}
-                isDisabled={readOnly}
-                variant="outline"
-                fontFamily={"Inter"}
-                fontStyle={"normal"}
-                lineHeight={"20px"}
                 fontSize="12px"
-                fontWeight={"400"}
-                color="black"
-                border={"1px solid var(--gray-200, #E2E8F0)"}
-                borderRadius="4px"
-                w="100%"
-                h="30px"
-                padding={"10px"}
-                margin={"0"}
-                _placeholder={{ color: "#A0AEC0" }}
-              />
-              <Button
-                size="xs"
-                onClick={handleCreateTag}
-                isDisabled={readOnly}
-                variant="ghost"
-                _hover={{ bg: "none" }}
-                _active={{ bg: "none" }}
+                fontWeight="400"
+                color="gray.700"
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+                gap={"6px"}
+                padding={"15px 30px"}
               >
+                <Text>Add Tag</Text>
                 <AddIcon />
-              </Button>
-            </HStack>
+              </MenuItem>
+            )}
           </Box>
 
           <HStack
@@ -468,30 +434,6 @@ const TagSelect = ({
               align="stretch"
               spacing={3}
             >
-              {pendingNewTags.length > 0 && (
-                <VStack
-                  align="stretch"
-                  spacing={1}
-                >
-                  <Text
-                    fontWeight="600"
-                    fontSize="14px"
-                  >
-                    Creating {pendingNewTags.length} tag
-                    {pendingNewTags.length > 1 ? "s" : ""}:
-                  </Text>
-                  <UnorderedList pl={4}>
-                    {pendingNewTags.map(({ tempId, tagValue }) => (
-                      <ListItem
-                        key={tempId}
-                        fontSize="14px"
-                      >
-                        {tagValue}
-                      </ListItem>
-                    ))}
-                  </UnorderedList>
-                </VStack>
-              )}
               {pendingDeleteIds.length > 0 && (
                 <VStack
                   align="stretch"
