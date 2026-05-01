@@ -421,7 +421,10 @@ export function LocationDropdown({ locationId, setLocationId, isLocked, isInvali
               )}
               <HStack py={1} gap="30px">
                 <Button
-                  size="xs"
+                  width="55px"
+                  height="24px"
+                  fontSize="12px"
+                  fontWeight="600"
                   variant="ghost"
                   onClick={handleCancel}
                   flex={1}
@@ -432,7 +435,10 @@ export function LocationDropdown({ locationId, setLocationId, isLocked, isInvali
                   Cancel
                 </Button>
                 <Button
-                  size="xs"
+                  width="55px"
+                  height="24px"
+                  fontSize="12px"
+                  fontWeight="600"
                   onClick={pendingDeleteIds.length > 0 ? handleDeleteAction : handleSave}
                   isDisabled={!isDifferent}
                   opacity={isDifferent ? 1 : 0.4}
