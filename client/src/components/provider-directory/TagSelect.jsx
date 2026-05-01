@@ -18,6 +18,8 @@ import {
   Text,
   useToast,
   VStack,
+  Checkbox,
+  Icon,
 } from "@chakra-ui/react";
 
 import { useTags, useCreateTag, useDeleteTag } from "@/contexts/hooks/data-fetching/useTags";
@@ -260,39 +262,59 @@ const TagSelect = ({
           maxHeight={menuMaxHeight}
           overflow="hidden"
           minW="0"
-          p={0}
+          p="10px"
         >
           <Box
             maxH="180px"
             overflowY="auto"
           >
-            <MenuOptionGroup
-              type="checkbox"
-              value={selectedIds.map((id) => String(id))}
-              onChange={handleTagsMenuChange}
-            >
-              {tags.map((tag) => (
-                <MenuItemOption
+            {tags.map((tag) => {
+              const isSelected = selectedIds.includes(tag.id);
+              return (
+                <MenuItem
                   key={tag.id}
-                  value={String(tag.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (readOnly) return;
+                    const nextSelected = isSelected
+                      ? selectedIds.filter((id) => id !== tag.id)
+                      : [...selectedIds, tag.id];
+                    onTagsChange(nextSelected);
+                  }}
                   isDisabled={readOnly}
                   bg={pendingDeleteIds.includes(tag.id) ? "#FFD2D2" : "white"}
-                  px={3}
-                  py={2}
+                  px="10px"
+                  py="4px"
                   fontSize="12px"
                   fontWeight="400"
+                  borderRadius="4px"
+                  my="6px"
                 >
                   <HStack
                     justifyContent="space-between"
                     w="100%"
                     spacing={2}
                   >
-                    <Text flex="1">{tag.tagValue}</Text>
+                    <HStack spacing={3} flex="1" alignItems="center">
+                      <Checkbox
+                        isChecked={isSelected}
+                        isDisabled={readOnly}
+                        pointerEvents="none"
+                      />
+                      <Text>{tag.tagValue}</Text>
+                    </HStack>
+
                     {!readOnly && (
                       <Button
                         as="span"
                         variant="ghost"
                         aria-label={`Delete ${tag.tagValue} tag`}
+                        ml="auto"
+                        p={0}
+                        minW={0}
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
                         _hover={{ bg: "transparent" }}
                         _active={{ bg: "transparent" }}
                         onClick={(e) => {
@@ -300,13 +322,13 @@ const TagSelect = ({
                           handleDeleteTag(tag)(e);
                         }}
                       >
-                        <MdDeleteOutline size={20} />
+                        <Icon as={MdDeleteOutline} boxSize="20px" />
                       </Button>
                     )}
                   </HStack>
-                </MenuItemOption>
-              ))}
-            </MenuOptionGroup>
+                </MenuItem>
+              );
+            })}
 
             {isAddingTag ? (
               <HStack
@@ -357,7 +379,7 @@ const TagSelect = ({
                 justifyContent="space-between"
                 alignItems="center"
                 gap={"6px"}
-                padding={"15px 30px"}
+                padding={"10px 30px"}
                 opacity={readOnly || isDeletingTags ? 0.4 : 1}
               >
                 <Text>Add Tag</Text>
