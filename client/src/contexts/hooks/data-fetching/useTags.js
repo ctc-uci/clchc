@@ -27,6 +27,7 @@ export function useCreateTag() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tags"] });
       queryClient.invalidateQueries({ queryKey: ["tag"], exact: false });
+      queryClient.invalidateQueries({ queryKey: ["providers"], exact: false });
     },
   });
 }
@@ -40,6 +41,7 @@ export function useDeleteTag() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tags"] });
       queryClient.invalidateQueries({ queryKey: ["tag"], exact: false });
+      queryClient.invalidateQueries({ queryKey: ["providers"], exact: false });
     },
   });
 }
