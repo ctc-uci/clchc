@@ -3,7 +3,6 @@ import { useRef, useState } from "react";
 import { CheckIcon } from "@chakra-ui/icons";
 import {
   Box,
-  Button,
   FormControl,
   FormErrorMessage,
   FormLabel,
@@ -17,16 +16,12 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { ChevronDown } from "lucide-react";
-import { MdDeleteOutline } from "react-icons/md";
 
-import { useDeleteProvider } from "@/contexts/hooks/data-fetching/useProviders";
 import { useDebounce } from "@/hooks/useDebounce";
 import { LockRightElement } from "../tools/shared";
 
 export function ProviderDropdown({ providers = [], providerId, setProviderId, isLocked, isInvalid }) {
-  const deleteProvider = useDeleteProvider();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [deletingMap, setDeletingMap] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const toast = useToast();
@@ -66,34 +61,6 @@ export function ProviderDropdown({ providers = [], providerId, setProviderId, is
       e.preventDefault();
       handleSelect(filteredProviders[0].id);
     }
-  };
-
-  const handleDelete = (provider) => (e) => {
-    e.stopPropagation();
-    const id = provider.id;
-    setDeletingMap((m) => ({ ...m, [id]: true }));
-
-    deleteProvider.mutate(id, {
-      onSuccess: () => {
-        setProviderId((prev) => (String(id) === String(prev) ? "" : prev));
-      },
-      onSettled: () =>
-        setDeletingMap((m) => {
-          const copy = { ...m };
-          delete copy[id];
-          return copy;
-        }),
-      onError: () => {
-        toast({
-          title: "Error",
-          description: "Failed to delete provider",
-          status: "error",
-          position: "bottom-right",
-          duration: 5000,
-          isClosable: true,
-        });
-      },
-    });
   };
 
   return (
@@ -208,19 +175,6 @@ export function ProviderDropdown({ providers = [], providerId, setProviderId, is
                           {provider.name}
                         </Text>
                       </HStack>
-                      <Button
-                        variant="ghost"
-                        size="xs"
-                        flexShrink={0}
-                        onMouseDown={(e) => e.preventDefault()}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDelete(provider)(e);
-                        }}
-                        isLoading={!!deletingMap[provider.id]}
-                      >
-                        <MdDeleteOutline size={20} />
-                      </Button>
                     </HStack>
                   );
                 })}
