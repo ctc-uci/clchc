@@ -9,9 +9,7 @@ import {
   Menu,
   MenuButton,
   MenuItem,
-  MenuItemOption,
   MenuList,
-  MenuOptionGroup,
   Tag,
   TagCloseButton,
   TagLabel,
@@ -57,14 +55,6 @@ const TagSelect = ({
     if (menuOpen) return;
     setPendingDeleteIds([]);
     setMenuOpen(true);
-  };
-
-  const handleTagsMenuChange = (nextValues) => {
-    const nextSelectedIds = Array.isArray(nextValues)
-      ? nextValues.map((value) => Number(value)).filter(Number.isFinite)
-      : [];
-
-    onTagsChange(nextSelectedIds);
   };
 
   const isDifferent =
@@ -262,11 +252,17 @@ const TagSelect = ({
           maxHeight={menuMaxHeight}
           overflow="hidden"
           minW="0"
-          p="10px"
+          px="10px"
+          py="2px"
         >
           <Box
             maxH="180px"
             overflowY="auto"
+            sx={{
+              '&::-webkit-scrollbar': { display: 'none' },
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
+            }}
           >
             {tags.map((tag) => {
               const isSelected = selectedIds.includes(tag.id);
@@ -372,14 +368,17 @@ const TagSelect = ({
                   setIsAddingTag(true);
                 }}
                 isDisabled={readOnly || isDeletingTags}
+                bg="white"
+                px="15px"
+                py="10px"
                 fontSize="12px"
                 fontWeight="400"
-                color="gray.700"
+                borderRadius="4px"
+                my="6px"
                 display="flex"
                 justifyContent="space-between"
                 alignItems="center"
                 gap={"6px"}
-                padding={"10px 30px"}
                 opacity={readOnly || isDeletingTags ? 0.4 : 1}
               >
                 <Text>Add Tag</Text>
@@ -389,11 +388,10 @@ const TagSelect = ({
           </Box>
 
           <HStack
-            px={3}
             pt={2}
+            px={0}
             pb={1}
             gap={1}
-            borderTop="1px solid"
             borderColor="gray.200"
             flexDirection="column"
             alignItems="stretch"
@@ -407,9 +405,12 @@ const TagSelect = ({
                 Are you sure? This is going to be deleted for all providers.
               </Text>
             )}
-            <HStack py={1} gap={2}>
+            <HStack py={1} gap="30px">
               <Button
-                size="xs"
+                width="55px"
+                height="24px"
+                fontSize="12px"
+                fontWeight="600"
                 variant="ghost"
                 onClick={handleCancel}
                 flex={1}
@@ -420,7 +421,10 @@ const TagSelect = ({
                 Cancel
               </Button>
               <Button
-                size="xs"
+                width="55px"
+                height="24px"
+                fontSize="12px"
+                fontWeight="600"
                 onClick={pendingDeleteIds.length > 0 ? handleDeleteAction : handleSave}
                 isDisabled={!isDifferent}
                 opacity={isDifferent ? 1 : 0.4}

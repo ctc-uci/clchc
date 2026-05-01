@@ -18,6 +18,7 @@ import {
   MenuOptionGroup,
   Skeleton,
   Text,
+  Icon,
   useToast,
 } from "@chakra-ui/react";
 import { ChevronDown } from "lucide-react";
@@ -274,11 +275,17 @@ export function LocationDropdown({ locationId, setLocationId, isLocked, isInvali
             maxHeight={menuMaxHeight}
             overflow="hidden"
             minW="0"
-            p={0}
+            px="10px"
+            py="2px"
           >
             <Box
               maxH="180px"
               overflowY="auto"
+              sx={{
+                '&::-webkit-scrollbar': { display: 'none' },
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none',
+              }}
             >
             <MenuOptionGroup
               title=""
@@ -292,13 +299,18 @@ export function LocationDropdown({ locationId, setLocationId, isLocked, isInvali
                     key={location.id}
                     value={String(location.id)}
                     ref={String(location.id) === String(locationId) ? selectedItemRef : null}
-                    pl="3"
-                    pr="0"
                     bg={pendingDeleteIds.includes(location.id) ? "#FFD2D2" : "white"}
+                    px="10px"
+                    py="4px"
+                    fontSize="12px"
+                    fontWeight="400"
+                    borderRadius="4px"
+                    my="6px"
                   >
                     <HStack
                       justifyContent="space-between"
                       w="100%"
+                      spacing={2}
                     >
                       <Text
                         flex="1"
@@ -311,11 +323,17 @@ export function LocationDropdown({ locationId, setLocationId, isLocked, isInvali
                         as="span"
                         variant="ghost"
                         aria-label={`Delete ${location.tagValue} location`}
+                        ml="auto"
+                        p={0}
+                        minW={0}
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
                         onClick={handleDelete(location)}
                         _hover={{ bg: "transparent" }}
                         _active={{ bg: "transparent" }}
                       >
-                        <MdDeleteOutline size={20} />
+                        <Icon as={MdDeleteOutline} boxSize="20px" />
                       </Button>
                     </HStack>
                   </MenuItemOption>
@@ -363,30 +381,32 @@ export function LocationDropdown({ locationId, setLocationId, isLocked, isInvali
                     setIsAddingLocation(true);
                   }}
                   isDisabled={isLocked || isDeletingLocations}
+                  bg="white"
+                  p="10px 14px 10px 32px"
                   fontSize="12px"
                   fontWeight="400"
-                  color="gray.700"
-                  display="flex"
-                  justifyContent="space-between"
-                  alignItems="center"
-                  gap={"6px"}
-                  padding={"15px 20px 15px 38px"}
+                  borderRadius="4px"
+                  my="6px"
                   opacity={isLocked || isDeletingLocations ? 0.4 : 1}
                 >
-                  <Text>Add Location</Text>
-                  <AddIcon />
+                  <HStack
+                    justifyContent="space-between"
+                    w="100%"
+                    spacing={2}
+                  >
+                    <Text>Add Location</Text>
+                    <AddIcon />
+                  </HStack>
                 </MenuItem>
               )}
             </MenuOptionGroup>
             </Box>
 
             <HStack
-              px={3}
               pt={2}
+              px={0}
               pb={1}
               gap={1}
-              borderTop="1px solid"
-              borderColor="gray.200"
               flexDirection="column"
               alignItems="stretch"
             >
@@ -399,7 +419,7 @@ export function LocationDropdown({ locationId, setLocationId, isLocked, isInvali
                   Are you sure? This is going to be deleted for all quotas.
                 </Text>
               )}
-              <HStack py={1} gap={2}>
+              <HStack py={1} gap="30px">
                 <Button
                   size="xs"
                   variant="ghost"
