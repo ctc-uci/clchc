@@ -62,9 +62,14 @@ export function LocationDropdown({ locations = [], locationId, setLocationId, is
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === "Enter" && filteredLocations.length > 0) {
-      e.preventDefault();
-      handleSelect(filteredLocations[0].id);
+    if (e.key === "Enter") {
+      const immediateFilteredLocations = locations.filter((l) =>
+        l.tagValue.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      if (immediateFilteredLocations.length > 0) {
+        e.preventDefault();
+        handleSelect(immediateFilteredLocations[0].id);
+      }
     }
   };
 
@@ -140,6 +145,7 @@ export function LocationDropdown({ locations = [], locationId, setLocationId, is
               value={isOpen ? searchQuery : (selectedLocation?.tagValue ?? "")}
               onChange={handleInputChange}
               onFocus={() => { setSearchQuery(""); setDebouncedSearch(""); onOpen(); }}
+              onClick={() => { if (!isOpen) { setSearchQuery(""); setDebouncedSearch(""); onOpen(); } }}
               onKeyDown={handleKeyDown}
               placeholder="Select location"
               autoComplete="off"

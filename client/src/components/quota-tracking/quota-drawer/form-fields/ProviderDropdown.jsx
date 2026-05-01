@@ -57,9 +57,14 @@ export function ProviderDropdown({ providers = [], providerId, setProviderId, is
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === "Enter" && filteredProviders.length > 0) {
-      e.preventDefault();
-      handleSelect(filteredProviders[0].id);
+    if (e.key === "Enter") {
+      const immediateFilteredProviders = providers.filter((p) =>
+        p.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      if (immediateFilteredProviders.length > 0) {
+        e.preventDefault();
+        handleSelect(immediateFilteredProviders[0].id);
+      }
     }
   };
 
@@ -102,6 +107,7 @@ export function ProviderDropdown({ providers = [], providerId, setProviderId, is
               value={isOpen ? searchQuery : (selectedProvider?.name ?? "")}
               onChange={handleInputChange}
               onFocus={() => { setSearchQuery(""); setDebouncedSearch(""); onOpen(); }}
+              onClick={() => { if (!isOpen) { setSearchQuery(""); setDebouncedSearch(""); onOpen(); } }}
               onKeyDown={handleKeyDown}
               placeholder="Select provider"
               autoComplete="off"
