@@ -20,12 +20,12 @@ import {
   Icon,
   IconButton,
   Input,
-  Radio,
   Skeleton,
   Stack,
   Text,
   useToast,
   VStack,
+  Checkbox
 } from "@chakra-ui/react";
 
 import {
@@ -713,7 +713,7 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
                           gap="6px"
                           cursor="pointer"
                         >
-                          <Radio
+                          <Checkbox
                             isChecked={!isRequired}
                             onChange={() => setIsRequired(!isRequired)}
                             border="2px solid #718096"
