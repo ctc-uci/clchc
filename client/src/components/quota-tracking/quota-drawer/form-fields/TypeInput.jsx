@@ -32,7 +32,7 @@ export const TypeInput = ({ type, setType, isLocked, isInvalid }) => {
             bg="gray.50"
             color="gray.500"
           >
-            {type}
+            {TYPE_OPTIONS.find((o) => o.value === type)?.label ?? type}
           </Box>
           <LockRightElement />
         </InputGroup>
