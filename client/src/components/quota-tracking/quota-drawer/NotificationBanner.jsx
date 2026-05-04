@@ -5,13 +5,18 @@ import { AlertCircle } from "lucide-react";
 import { actionMessage } from "./tools/constants";
 
 export const NotificationBanner = ({ action }) => {
+
+  const colors = action === "delete"
+  ? { bg: "#FFD2D2", primary: "#CE0000" }
+  : { bg: "#D2E8FF", primary: "#0050CE" };
+
   return (
     <Box
-      bg="#FFD2D2"
+      bg={colors.bg}
       borderRadius="8px"
       p={4}
       border="2px solid"
-      borderColor="#CE0000"
+      borderColor={colors.primary}
     >
       <Stack
         direction="row"
@@ -20,11 +25,11 @@ export const NotificationBanner = ({ action }) => {
       >
         <AlertCircle
           size={24}
-          color="#CE0000"
+          color={colors.primary}
         />
         <Text
           fontWeight="semibold"
-          color="#CE0000"
+          color={colors.primary}
           display="flex"
           alignItems="center"
           lineHeight="1"
@@ -35,7 +40,7 @@ export const NotificationBanner = ({ action }) => {
 
       <Text
         fontSize="sm"
-        color="#CE0000"
+        color={colors.primary}
       >
         {actionMessage[action ? action : "create"]}
       </Text>
