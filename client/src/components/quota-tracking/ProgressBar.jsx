@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from "react";
 
 import { Button, Flex, Icon, Progress, Text, useToast } from "@chakra-ui/react";
+import ToastAlert from "@/components/common/ToastAlert";
 
 import { useDebounce } from "@/hooks/useDebounce";
 import { useUpdateQuota } from "@/contexts/hooks/data-fetching/useQuotas";
@@ -41,13 +42,13 @@ export default function ProgressBar({ quota }) {
     const baseline = confirmedRef.current ?? quotaRef.current?.progress ?? 0;
     setCurrentProgress(baseline);
     toast({
-      title: "Update failed",
-      description:
-        "Your changes couldn't be saved. Progress has been restored.",
-      status: "error",
+      position: "top-right",
       duration: 4000,
       isClosable: true,
-      position: "bottom-right",
+      containerStyle: { width: "401px", maxWidth: "401px", height: "66px", maxHeight: "66px" },
+      render: ({ onClose }) => (
+        <ToastAlert status="error" borderColor="#90080F" title="Update Failed" description="Your changes couldn't be saved. Progress has been restored." onClose={onClose} />
+      ),
     });
   };
 

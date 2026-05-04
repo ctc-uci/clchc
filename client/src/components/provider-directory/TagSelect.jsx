@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import ToastAlert from "@/components/common/ToastAlert";
 
 import { AddIcon } from "@chakra-ui/icons";
 import {
@@ -126,12 +127,13 @@ const TagSelect = ({
 
       // feedback for successfully (or not) creating tags
       toast({
-        title: "Success",
-        description: "New tag created!",
-        status: "success",
-        position: "bottom-right",
+        position: "top-right",
         duration: 5000,
         isClosable: true,
+        containerStyle: { width: "401px", maxWidth: "401px", height: "66px", maxHeight: "66px" },
+        render: ({ onClose }) => (
+          <ToastAlert status="success" borderColor="#0C824D" title="Tag Created" description="New tag created!" onClose={onClose} />
+        ),
       });
     } catch (err) {
       console.error("Failed to create tag", err);
@@ -142,12 +144,13 @@ const TagSelect = ({
       setNewTagValue(trimmedTag);
 
       toast({
-        title: "Error",
-        description: errorToString(err),
-        status: "error",
-        position: "bottom-right",
+        position: "top-right",
         duration: 5000,
         isClosable: true,
+        containerStyle: { width: "401px", maxWidth: "401px", height: "66px", maxHeight: "66px" },
+        render: ({ onClose }) => (
+          <ToastAlert status="error" borderColor="#90080F" title="Error" description={errorToString(err)} onClose={onClose} />
+        ),
       });
     } finally {
       setCreating(false);
@@ -195,24 +198,26 @@ const TagSelect = ({
 
         if (typeof refetchTags === "function") await refetchTags();
         toast({
-          title: "Success",
-          description: "Tag successfully deleted!",
-          status: "success",
-          position: "bottom-right",
+          position: "top-right",
           duration: 5000,
           isClosable: true,
+          containerStyle: { width: "401px", maxWidth: "401px", height: "66px", maxHeight: "66px" },
+          render: ({ onClose }) => (
+            <ToastAlert status="success" borderColor="#0C824D" title="Tag Deleted" description="Tag successfully deleted!" onClose={onClose} />
+          ),
         });
       } catch (err) {
         console.error("Failed to delete tag", err);
         queryClient.setQueryData(["tags"], prevTags);
         onTagsChange(prevSelectedIds);
         toast({
-          title: "Error",
-          description: errorToString(err),
-          status: "error",
-          position: "bottom-right",
+          position: "top-right",
           duration: 5000,
           isClosable: true,
+          containerStyle: { width: "401px", maxWidth: "401px", height: "66px", maxHeight: "66px" },
+          render: ({ onClose }) => (
+            <ToastAlert status="error" borderColor="#90080F" title="Error" description={errorToString(err)} onClose={onClose} />
+          ),
         });
       } finally {
         setDeletingMap((m) => {

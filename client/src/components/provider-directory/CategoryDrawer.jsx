@@ -422,9 +422,15 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
 
       newCategories.forEach((cat) => {
         toast({
-          position: "bottom-right",
+          position: "top-right",
           duration: 5000,
           isClosable: true,
+          containerStyle: {
+            width: "401px",
+            maxWidth: "401px",
+            height: "66px",
+            maxHeight: "66px",
+          },
           render: ({ onClose }) => (
             <Alert
               status="success"
@@ -436,11 +442,11 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
               <AlertIcon />
               <Box>
                 <AlertTitle fontSize="14px" fontWeight="700">Category Created</AlertTitle>
-                <AlertDescription fontSize="13px" >
+                <AlertDescription fontSize="12px" >
                   You have created the new category &ldquo;{cat.name}&rdquo;.
                 </AlertDescription>
               </Box>
-              <CloseButton position="absolute" right={2} top={2} size="sm" onClick={onClose} />
+              <CloseButton position="absolute" right={2} top="50%" transform="translateY(-50%)" boxSize="18px" onClick={onClose} />
             </Alert>
           ),
         });
@@ -448,9 +454,15 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
 
       deletedNames.forEach((name) => {
         toast({
-          position: "bottom-right",
+          position: "top-right",
           duration: 5000,
           isClosable: true,
+          containerStyle: {
+            width: "401px",
+            maxWidth: "401px",
+            height: "66px",
+            maxHeight: "66px",
+          },
           render: ({ onClose }) => (
             <Alert
               status="error"
@@ -462,11 +474,11 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
               <AlertIcon />
               <Box gap = {0}>
                 <AlertTitle fontSize="14px" fontWeight="700">Category Deletion</AlertTitle>
-                <AlertDescription fontSize="13px">
+                <AlertDescription fontSize="12px">
                   You have deleted the category &ldquo;{name}&rdquo;.
                 </AlertDescription>
               </Box>
-              <CloseButton position="absolute" right={2} top={2} size="sm" onClick={onClose} />
+              <CloseButton position="absolute" right={2} top="50%" transform="translateY(-50%)" boxSize="18px" onClick={onClose} />
             </Alert>
           ),
         });
@@ -482,7 +494,7 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
       }
     } catch (err) {
       const errorMessage =
-        err?.response?.data || err.message || "Failed to save changes";
+        err?.response?.data?.error || err?.response?.data?.message || err.message || "Failed to save changes";
       console.error(
         "Failed to save changes",
         err?.response?.status,

@@ -21,6 +21,7 @@ import { MdDeleteOutline } from "react-icons/md";
 
 import { useDeleteLocation } from "@/contexts/hooks/data-fetching/useLocations";
 import { useDebounce } from "@/hooks/useDebounce";
+import ToastAlert from "@/components/common/ToastAlert";
 import { LockRightElement } from "../tools/shared";
 
 export function LocationDropdown({ locations = [], locationId, setLocationId, isLocked, isInvalid }) {
@@ -92,12 +93,13 @@ export function LocationDropdown({ locations = [], locationId, setLocationId, is
           }),
         onError: () => {
           toast({
-            title: "Error",
-            description: "Failed to delete location",
-            status: "error",
-            position: "bottom-right",
+            position: "top-right",
             duration: 5000,
             isClosable: true,
+            containerStyle: { width: "401px", maxWidth: "401px", height: "66px", maxHeight: "66px" },
+            render: ({ onClose }) => (
+              <ToastAlert status="error" borderColor="#90080F" title="Error" description="Failed to delete location." onClose={onClose} />
+            ),
           });
         },
       }

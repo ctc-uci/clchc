@@ -11,8 +11,10 @@ import {
   Stack,
   Text,
   useDisclosure,
+  useToast,
   Skeleton
 } from "@chakra-ui/react";
+import ToastAlert from "@/components/common/ToastAlert";
 
 import {
   useCreateQuota,
@@ -87,7 +89,8 @@ export default function QuotaDrawer({
   const [errors, setErrors] = useState({});
 
   const { mutate: createLog } = useCreateLog();
-  
+  const toast = useToast();
+
   const apptCalcFactor = userInfo?.dbUser?.apptCalcFactor ?? null;
 
   const currentDrawerTitle = !quotaID
@@ -235,10 +238,28 @@ export default function QuotaDrawer({
       //create
       if (!quotaID) {
         await createQuota(formData);
+        toast({
+          position: "top-right",
+          duration: 5000,
+          isClosable: true,
+          containerStyle: { width: "401px", maxWidth: "401px", height: "66px", maxHeight: "66px" },
+          render: ({ onClose }) => (
+            <ToastAlert status="success" borderColor="#0C824D" title="Quota Created" description="A new quota has been added." onClose={onClose} />
+          ),
+        });
       }
       //delete
       else if (effectiveAction === "delete") {
         await deleteQuota({ id: quotaID });
+        toast({
+          position: "top-right",
+          duration: 5000,
+          isClosable: true,
+          containerStyle: { width: "401px", maxWidth: "401px", height: "66px", maxHeight: "66px" },
+          render: ({ onClose }) => (
+            <ToastAlert status="error" borderColor="#90080F" title="Quota Deleted" description="The quota has been deleted." onClose={onClose} />
+          ),
+        });
         handleClose();
       }
       //update
