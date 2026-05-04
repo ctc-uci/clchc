@@ -10,7 +10,6 @@ export const CustomCard = ({ title, body, footer, footerUnderline, footerColor, 
       borderColor="gray.200"
       borderRadius="lg"
       boxShadow="sm"
-      _hover={{ boxShadow: "md" }}
       transition="box-shadow 0.2s ease"
     >
       <CardHeader pb="9px">
