@@ -60,7 +60,7 @@ export default function UserEditModal({ isOpen, onClose, userId, onUpdated }) {
     if (user) setSelectedRole(user.role ?? "viewer");
   }, [user]);
 
-  if (!user) return null;
+  if (!user) return null;3
 
   const currentFirebaseUid = user.firebaseUid;
   const username = user.firstName + " " + user.lastName;
@@ -77,6 +77,8 @@ export default function UserEditModal({ isOpen, onClose, userId, onUpdated }) {
       return;
     }
 
+    
+
     try {
       await updateUser({
         uid: currentFirebaseUid,
@@ -89,7 +91,7 @@ export default function UserEditModal({ isOpen, onClose, userId, onUpdated }) {
     } catch (err) {
       console.error("Approval failed: ", err);
     }
-  };
+  };asdf
 
   const onDelete = async () => {
     if (!currentFirebaseUid) {
