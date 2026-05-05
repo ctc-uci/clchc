@@ -1,8 +1,8 @@
 export const MAX_INPUT_NUMBER = 99;
 
 export const TYPE_OPTIONS = [
-  { value: "inperson", label: "In-person" },
-  { value: "telehealth", label: "Tele-health" },
+  { value: "inperson", label: "In Person" },
+  { value: "telehealth", label: "Telehealth" },
 ];
 
 export const inputStyles = {
