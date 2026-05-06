@@ -62,7 +62,7 @@ export const VersionLogPage = () => {
   };
 
   return (
-    <Box p={6}>
+    <Box px={6} pb={6}>
       <Flex align="center" justify="space-between" mb={6} h="45px">
         <PageHeader
           title="Audit Log"

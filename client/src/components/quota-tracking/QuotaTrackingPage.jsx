@@ -145,7 +145,7 @@ export const QuotaTracking = () => {
   };
 
   return (
-    <Box p={6}>
+    <Box px={6} pb={6}>
       <Flex align="center" justify="space-between" mb={6}>
         <PageHeader
           title="Quota Tracking"
