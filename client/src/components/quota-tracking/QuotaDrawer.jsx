@@ -381,7 +381,7 @@ export default function QuotaDrawer({
           </Stack>
         </DrawerBody>
         ) : (
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", flex: 1, overflow: "hidden" }}>
             <DrawerBody
               padding="30px 24px 30px 24px"
               >

@@ -10,7 +10,6 @@ import {
   HStack,
   Icon,
   Input,
-  InputGroup,
   Menu,
   MenuButton,
   MenuItem,
@@ -27,8 +26,6 @@ import {
 } from "@/contexts/hooks/data-fetching/useLocations";
 import { ChevronDown } from "lucide-react";
 import { MdDeleteOutline } from "react-icons/md";
-
-import { LockRightElement } from "../tools/shared";
 
 export function LocationDropdown({ locations = [], locationId, setLocationId, isLocked, isInvalid }) {
   const createLocation = useCreateLocation();
@@ -59,6 +56,7 @@ export function LocationDropdown({ locations = [], locationId, setLocationId, is
   );
 
   const handleMenuOpen = () => {
+    if (isLocked) return;
     setMenuOpen((prev) => {
       if (prev && isDifferent) return prev;
       if (!prev) {
@@ -163,7 +161,6 @@ export function LocationDropdown({ locations = [], locationId, setLocationId, is
     <FormControl
       isRequired
       w="50%"
-      isDisabled={isLocked}
       isInvalid={isInvalid}
     >
       <FormLabel
@@ -172,25 +169,6 @@ export function LocationDropdown({ locations = [], locationId, setLocationId, is
       >
         Location
       </FormLabel>
-      {isLocked ? (
-        <InputGroup>
-          <Box
-            w="100%"
-            border="1px"
-            borderColor="gray.300"
-            borderRadius="6px"
-            px={3}
-            py={2}
-            fontSize="14px"
-            pr="2.25rem"
-            bg="gray.50"
-            color="gray.500"
-          >
-            {selectedLocation?.tagValue ?? ""}
-          </Box>
-          <LockRightElement />
-        </InputGroup>
-      ) : (
         <Menu
           isOpen={menuOpen}
           onClose={() => {
@@ -222,7 +200,7 @@ export function LocationDropdown({ locations = [], locationId, setLocationId, is
               w="100%"
             >
               <Text>{selectedLocation?.tagValue ?? "Select location"}</Text>
-              <ChevronDown size={20} />
+              {!isLocked && <ChevronDown size={20} />}
             </HStack>
           </MenuButton>
 
@@ -341,17 +319,17 @@ export function LocationDropdown({ locations = [], locationId, setLocationId, is
                 ) : (
                   <MenuItem
                     onClick={() => {
-                      if (isLocked || isDeletingLocations) return;
+                      if (isDeletingLocations) return;
                       setIsAddingLocation(true);
                     }}
-                    isDisabled={isLocked || isDeletingLocations}
+                    isDisabled={isDeletingLocations}
                     bg="white"
                     p="10px 14px 10px 32px"
                     fontSize="12px"
                     fontWeight="400"
                     borderRadius="4px"
                     my="6px"
-                    opacity={isLocked || isDeletingLocations ? 0.4 : 1}
+                    opacity={isDeletingLocations ? 0.4 : 1}
                   >
                     <HStack
                       justifyContent="space-between"
@@ -429,7 +407,6 @@ export function LocationDropdown({ locations = [], locationId, setLocationId, is
             </HStack>
           </MenuList>
         </Menu>
-      )}
 
       <FormErrorMessage>Required</FormErrorMessage>
     </FormControl>

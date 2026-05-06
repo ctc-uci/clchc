@@ -26,6 +26,7 @@ export default function CustomSelect({
   value,
   setValue,
   isSearchable = false,
+  isReadOnly = false,
   placeholder = "Select option",
   styleProps = {},
 }) {
@@ -68,8 +69,8 @@ export default function CustomSelect({
           <Input
             value={isOpen ? searchQuery : (selectedLabel ?? "")}
             onChange={(e) => { setSearchQuery(e.target.value); debouncedSetSearch(e.target.value); }}
-            onFocus={() => { setSearchQuery(""); onOpen(); }}
-            onClick={() => { if (!isOpen) { setSearchQuery(""); onOpen(); } }}
+            onFocus={() => { if (isReadOnly) return; setSearchQuery(""); onOpen(); }}
+            onClick={() => { if (isReadOnly || isOpen) return; setSearchQuery(""); onOpen(); }}
             placeholder={placeholder}
             autoComplete="off"
             cursor={isOpen ? "text" : "pointer"}
@@ -85,12 +86,14 @@ export default function CustomSelect({
             pr="2.5rem"
             {...styleProps}
           />
-          <InputRightElement
-            pointerEvents="none"
-            color="gray.500"
-          >
-            <ChevronDown size={20} />
-          </InputRightElement>
+          {!isReadOnly && (
+            <InputRightElement
+              pointerEvents="none"
+              color="gray.500"
+            >
+              <ChevronDown size={20} />
+            </InputRightElement>
+          )}
         </InputGroup>
 
         {isOpen && (
@@ -167,12 +170,13 @@ export default function CustomSelect({
   }
 
   return (
+    <Box pointerEvents={isReadOnly ? "none" : undefined}>
     <Menu matchWidth>
       <MenuButton
         as={Button}
         variant="outline"
         w="100%"
-        rightIcon={<ChevronDown size={20} />}
+        rightIcon={isReadOnly ? undefined : <ChevronDown size={20} />}
         justifyContent="flex-start"
         textAlign="left"
         color={selectedLabel ? "var(--gray-700, #2D3748)" : "gray.400"}
@@ -233,5 +237,6 @@ export default function CustomSelect({
         </Box>
       </MenuList>
     </Menu>
+    </Box>
   );
 }
