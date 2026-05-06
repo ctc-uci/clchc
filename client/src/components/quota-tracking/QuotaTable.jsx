@@ -18,6 +18,7 @@ import {
 import { MdSentimentDissatisfied } from "react-icons/md";
 
 import TextPopup from "@/components/common/TextPopup";
+import { TYPE_OPTIONS } from "@/components/quota-tracking/quota-drawer/tools/constants";
 import ProgressBar from "@/components/quota-tracking/ProgressBar";
 import QuotaDrawer from "@/components/quota-tracking/QuotaDrawer";
 
@@ -234,7 +235,7 @@ const QuotaTable = ({ rows, loading, onRowsUpdate, role }) => {
                     textColor="white"
                     borderRadius="6px"
                   >
-                    <Text textTransform="capitalize">{row.appointmentType}</Text>
+                    {TYPE_OPTIONS.find((o) => o.value === row.appointmentType)?.label ?? row.appointmentType}
                   </Badge>
                 </Td>
 

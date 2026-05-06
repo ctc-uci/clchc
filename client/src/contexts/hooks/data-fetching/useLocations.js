@@ -40,7 +40,7 @@ export const useDeleteLocation = () => {
   const { locations } = useApi()
 
   return useMutation({
-    mutationFn: ({ id, data }) => {
+    mutationFn: ({ id }) => {
       return locations.delete(id)
     },
     onSuccess: () => {

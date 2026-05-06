@@ -85,7 +85,7 @@ export default function StepFinalize({ onClose, onSelect, onFinalize }) {
         justifyContent="flex-end"
         gap="10px"
         mt="auto"
-        pt="28px"
+        pt="180px"
         mb="-7px"
       >
         <Button
