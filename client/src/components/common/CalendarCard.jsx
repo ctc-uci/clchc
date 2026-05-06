@@ -16,7 +16,7 @@ import {
 
 const DAYS_OF_WEEK = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
-const CalendarCard = ({ value, onChange, fullWidth = false }) => {
+const CalendarCard = ({ value, onChange, fullWidth = false, isReadOnly = false }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [viewMonth, setViewMonth] = useState(() => {
     const d = value ? new Date(value + "T00:00:00") : new Date();
@@ -29,6 +29,7 @@ const CalendarCard = ({ value, onChange, fullWidth = false }) => {
   }, [value]);
 
   const handleOpen = () => {
+    if (isReadOnly) return;
     const d = value ? new Date(value + "T00:00:00") : new Date();
     setViewMonth(new Date(d.getFullYear(), d.getMonth(), 1));
     setIsOpen(true);
@@ -78,7 +79,7 @@ const CalendarCard = ({ value, onChange, fullWidth = false }) => {
       <PopoverTrigger>
         <Button
           variant="outline"
-          rightIcon={<ChevronDownIcon />}
+          rightIcon={isReadOnly ? undefined : <ChevronDownIcon />}
           onClick={handleOpen}
           h="45px"
           w={fullWidth ? "100%" : "110px"}
