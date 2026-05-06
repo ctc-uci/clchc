@@ -188,7 +188,7 @@ const ProviderFormFields = ({
         alignItems="end"
       >
         <Box w="100%">
-          <FormLabel {...fixedLabelProps}>Provider Name</FormLabel>
+          <FormLabel {...fixedLabelProps}>Provider Name <Text as="span" color="red.500">*</Text></FormLabel>
           <Flex gap={2}>
             <FormControl
               isRequired
