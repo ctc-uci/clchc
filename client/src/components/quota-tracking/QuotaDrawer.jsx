@@ -85,6 +85,7 @@ export default function QuotaDrawer({
   const [progress, setProgress] = useState(0);
   const [isLocked, setIsLocked] = useState(false);
   const [action, setAction] = useState("");
+  const [isLocationDifferent, setIsLocationDifferent] = useState(false);
   const [originalProgress, setOriginalProgress] = useState(0);
   const [errors, setErrors] = useState({});
 
@@ -158,6 +159,7 @@ export default function QuotaDrawer({
     };
 
     if (quotaID) {
+      if (!quotaData) return;
       fetchQuotaDetails();
     } else {
       setProviderId("");
@@ -298,6 +300,7 @@ export default function QuotaDrawer({
     setProgress(0);
     setIsLocked(false);
     setAction("");
+    setIsLocationDifferent(false);
     setErrors({});
     onClose();
   };
@@ -414,6 +417,7 @@ export default function QuotaDrawer({
                     setLocationId={setLocationId}
                     isLocked={isLocked}
                     isInvalid={!!errors.locationId}
+                    onDifferentChange={setIsLocationDifferent}
                   />
 
                   <TypeInput
@@ -448,6 +452,7 @@ export default function QuotaDrawer({
               quotaID={quotaID}
               handleSubmit={handleSubmit}
               handleClose={handleClose}
+              isLocationDifferent={isLocationDifferent}
             />
           </form>
         )}
