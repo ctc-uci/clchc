@@ -17,7 +17,6 @@ import {
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
-  Skeleton,
   Text,
   useToast,
 } from "@chakra-ui/react";
@@ -25,24 +24,15 @@ import {
 import {
   useCreateLocation,
   useDeleteLocation,
-  useLocations,
 } from "@/contexts/hooks/data-fetching/useLocations";
 import { ChevronDown } from "lucide-react";
 import { MdDeleteOutline } from "react-icons/md";
 
 import { LockRightElement } from "../tools/shared";
 
-export function LocationDropdown({
-  locationId,
-  setLocationId,
-  isLocked,
-  isInvalid,
-  onDifferentChange,
-}) {
-  const { data: { locations = [] } = {}, isLoading: loadingLocations } =
-    useLocations();
-  const { mutateAsync: createLocation } = useCreateLocation();
-  const { mutateAsync: deleteLocation } = useDeleteLocation();
+export function LocationDropdown({ locations = [], locationId, setLocationId, isLocked, isInvalid }) {
+  const createLocation = useCreateLocation();
+  const deleteLocation = useDeleteLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [newValue, setNewValue] = useState("");
   const [pendingDeleteIds, setPendingDeleteIds] = useState([]);
@@ -64,27 +54,6 @@ export function LocationDropdown({
     }
   }, [menuOpen]);
 
-  useEffect(() => {
-    if (typeof onDifferentChange === "function") {
-      onDifferentChange(isDifferent);
-    }
-  }, [isDifferent, onDifferentChange]);
-
-  if (loadingLocations) {
-    return (
-      <FormControl w="50%">
-        <Skeleton
-          height="16px"
-          mb={2}
-        />
-        <Skeleton
-          height="40px"
-          borderRadius="6px"
-        />
-      </FormControl>
-    );
-  }
-
   const selectedLocation = locations.find(
     (location) => String(location.id) === String(locationId)
   );
@@ -102,36 +71,17 @@ export function LocationDropdown({
     });
   };
 
-  const handleCreate = async () => {
+  const handleCreate = async (e) => {
+    e?.stopPropagation();
     const trimmed = newValue.trim();
     if (!trimmed) return;
 
-    const alreadyExists = locations.some(
-      (l) => l.tagValue.toLowerCase() === trimmed.toLowerCase()
-    );
-    if (alreadyExists) {
-      toast({
-        title: "Location already exists",
-        status: "warning",
-        position: "bottom-right",
-        duration: 3000,
-        isClosable: true,
-      });
-      return false;
-    }
-
     try {
-      const result = await createLocation({ tagValue: trimmed });
-      const newLoc = Array.isArray(result) ? result[0] : result;
-      if (newLoc?.id) {
-        if (!locationId) {
-          setLocationId(newLoc.id);
-        }
-        setNewValue("");
-        setIsAddingLocation(false);
-        return true;
-      }
-      return false;
+      const result = await createLocation.mutateAsync({ tagValue: trimmed });
+      const newLocation = Array.isArray(result) ? result[0] : result;
+      if (newLocation?.id) setLocationId(newLocation.id);
+      setNewValue("");
+      handleCancel();
     } catch (_err) {
       toast({
         title: "Error",
@@ -141,7 +91,6 @@ export function LocationDropdown({
         duration: 5000,
         isClosable: true,
       });
-      return false;
     }
   };
 
@@ -152,7 +101,6 @@ export function LocationDropdown({
       setIsDeleteConfirmArmed(false);
       return;
     }
-    e.stopPropagation();
     setPendingDeleteIds((prev) => [...prev, location.id]);
     setIsDeleteConfirmArmed(false);
     setIsAddingLocation(false);
@@ -164,7 +112,6 @@ export function LocationDropdown({
       setIsDeleteConfirmArmed(true);
       return;
     }
-
     handleConfirm();
   };
 
@@ -187,7 +134,7 @@ export function LocationDropdown({
   const handleConfirm = async () => {
     try {
       for (const id of pendingDeleteIds) {
-        await deleteLocation({ id });
+        await deleteLocation.mutateAsync({ id });
       }
 
       if (
@@ -211,9 +158,6 @@ export function LocationDropdown({
       });
     }
   };
-
-  const menuMaxHeight =
-    pendingDeleteIds.length > 0 && isDeleteConfirmArmed ? "300px" : "240px";
 
   return (
     <FormControl
@@ -258,39 +202,36 @@ export function LocationDropdown({
           matchWidth
         >
           <MenuButton
+            as={Box}
             onClick={handleMenuOpen}
-            as={Button}
-            variant="outline"
             w="100%"
-            justifyContent="flex-start"
-            textAlign="left"
-            rightIcon={<ChevronDown size={20} />}
-            color={"var(--gray-700, #2D3748)"}
-            fontFamily={"Inter"}
-            fontSize={"14px"}
-            fontWeight={"400"}
-            lineHeight={"20px"}
-            fontStyle={"normal"}
-            borderRadius={"4px"}
-            border={
-              isInvalid
-                ? "1px solid #FC8181"
-                : "1px solid var(--gray-200, #E2E8F0)"
-            }
-            background={"var(--white, #FFF)"}
+            border={isInvalid ? "1px solid #FC8181" : "1px solid var(--gray-200, #E2E8F0)"}
+            borderRadius="4px"
+            bg="white"
+            px={3}
+            py={2}
+            fontSize="14px"
+            color={selectedLocation ? "var(--gray-700, #2D3748)" : "gray.400"}
+            cursor="pointer"
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
           >
-            {selectedLocation?.tagValue
-              ? selectedLocation.tagValue.length > 16
-                ? selectedLocation.tagValue.slice(0, 16) + "..."
-                : selectedLocation.tagValue
-              : "Select"}
+            <HStack
+              justifyContent="space-between"
+              w="100%"
+            >
+              <Text>{selectedLocation?.tagValue ?? "Select location"}</Text>
+              <ChevronDown size={20} />
+            </HStack>
           </MenuButton>
+
           <MenuList
-            maxHeight={menuMaxHeight}
-            overflow="hidden"
+            p={2}
             minW="0"
-            px="10px"
-            py="2px"
+            w="100%"
+            boxShadow="md"
+            borderRadius="6px"
           >
             <Box
               maxH="180px"
@@ -307,7 +248,6 @@ export function LocationDropdown({
                 value={locationId === "" ? "" : String(locationId)}
                 onChange={(value) => setLocationId(Number(value))}
               >
-                {/* Existing locations, minus staged deletes */}
                 {locations.map((location) => (
                   <MenuItemOption
                     key={location.id}
@@ -378,22 +318,21 @@ export function LocationDropdown({
                         if (e.key === "Enter") {
                           e.preventDefault();
                           e.stopPropagation();
-                          void handleCreate();
+                          void handleCreate(e);
                         }
                       }}
-                      variant="outline"
-                      fontFamily={"Inter"}
-                      fontStyle={"normal"}
-                      lineHeight={"20px"}
+                      fontFamily="Inter"
+                      fontStyle="normal"
+                      lineHeight="20px"
                       fontSize="12px"
                       fontWeight="400"
                       color="black"
-                      border={"1px solid var(--gray-200, #E2E8F0)"}
+                      border="1px solid var(--gray-200, #E2E8F0)"
                       borderRadius="4px"
                       w="100%"
                       h="30px"
-                      padding={"10px"}
-                      margin={"0"}
+                      padding="10px"
+                      margin="0"
                       _placeholder={{ color: "#A0AEC0" }}
                       isDisabled={isDeletingLocations}
                       autoFocus
