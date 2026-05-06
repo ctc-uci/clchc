@@ -1,14 +1,15 @@
+import { useState } from "react";
+
 import { Box, Popover, PopoverArrow, PopoverBody, PopoverContent, PopoverTrigger, Portal, Text } from "@chakra-ui/react";
 
-
-
-
-
 const TextPopup = ({ text = "" }) => {
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
     <Popover
-      trigger="click"
+      isOpen={isOpen}
+      onClose={() => setIsOpen(false)}
+      closeOnBlur={false}
     >
       <PopoverTrigger>
         <Box
@@ -16,6 +17,7 @@ const TextPopup = ({ text = "" }) => {
           cursor="pointer"
           onClick={(e) => {
             e.stopPropagation();
+            setIsOpen((prev) => !prev);
           }}
         >
           <Text
