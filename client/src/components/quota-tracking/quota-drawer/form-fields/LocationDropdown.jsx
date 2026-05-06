@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-import { AddIcon, CheckIcon } from "@chakra-ui/icons";
+import { AddIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
@@ -11,15 +11,12 @@ import {
   Icon,
   Input,
   InputGroup,
-  InputRightElement,
-  Spinner,
   Menu,
   MenuButton,
   MenuItem,
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
-  Skeleton,
   Text,
   useToast,
 } from "@chakra-ui/react";
@@ -27,26 +24,20 @@ import {
 import {
   useCreateLocation,
   useDeleteLocation,
-  useLocations,
 } from "@/contexts/hooks/data-fetching/useLocations";
 import { ChevronDown } from "lucide-react";
 import { MdDeleteOutline } from "react-icons/md";
 
-import {
-  useCreateLocation,
-  useDeleteLocation,
-} from "@/contexts/hooks/data-fetching/useLocations";
-import { useDebounce } from "@/hooks/useDebounce";
 import { LockRightElement } from "../tools/shared";
 
 export function LocationDropdown({ locations = [], locationId, setLocationId, isLocked, isInvalid }) {
   const createLocation = useCreateLocation();
   const deleteLocation = useDeleteLocation();
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [menuOpen, setMenuOpen] = useState(false);
   const [newValue, setNewValue] = useState("");
-  const [deletingMap, setDeletingMap] = useState({});
-  const [searchQuery, setSearchQuery] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [pendingDeleteIds, setPendingDeleteIds] = useState([]);
+  const [isDeleteConfirmArmed, setIsDeleteConfirmArmed] = useState(false);
+  const [isAddingLocation, setIsAddingLocation] = useState(false);
   const toast = useToast();
   const selectedItemRef = useRef(null);
 
@@ -62,27 +53,6 @@ export function LocationDropdown({ locations = [], locationId, setLocationId, is
       }, 0);
     }
   }, [menuOpen]);
-
-  useEffect(() => {
-    if (typeof onDifferentChange === "function") {
-      onDifferentChange(isDifferent);
-    }
-  }, [isDifferent, onDifferentChange]);
-
-  if (loadingLocations) {
-    return (
-      <FormControl w="50%">
-        <Skeleton
-          height="16px"
-          mb={2}
-        />
-        <Skeleton
-          height="40px"
-          borderRadius="6px"
-        />
-      </FormControl>
-    );
-  }
 
   const selectedLocation = locations.find(
     (location) => String(location.id) === String(locationId)
@@ -101,12 +71,8 @@ export function LocationDropdown({ locations = [], locationId, setLocationId, is
     });
   };
 
-  const handleCreate = async () => {
-    const trimmed = newValue.trim();
-    if (!trimmed) return;
-
   const handleCreate = async (e) => {
-    e.stopPropagation();
+    e?.stopPropagation();
     const trimmed = newValue.trim();
     if (!trimmed) return;
 
@@ -115,7 +81,7 @@ export function LocationDropdown({ locations = [], locationId, setLocationId, is
       const newLocation = Array.isArray(result) ? result[0] : result;
       if (newLocation?.id) setLocationId(newLocation.id);
       setNewValue("");
-      handleClose();
+      handleCancel();
     } catch (_err) {
       toast({
         title: "Error",
@@ -135,7 +101,6 @@ export function LocationDropdown({ locations = [], locationId, setLocationId, is
       setIsDeleteConfirmArmed(false);
       return;
     }
-    e.stopPropagation();
     setPendingDeleteIds((prev) => [...prev, location.id]);
     setIsDeleteConfirmArmed(false);
     setIsAddingLocation(false);
@@ -147,7 +112,6 @@ export function LocationDropdown({ locations = [], locationId, setLocationId, is
       setIsDeleteConfirmArmed(true);
       return;
     }
-
     handleConfirm();
   };
 
@@ -170,7 +134,7 @@ export function LocationDropdown({ locations = [], locationId, setLocationId, is
   const handleConfirm = async () => {
     try {
       for (const id of pendingDeleteIds) {
-        await deleteLocation({ id });
+        await deleteLocation.mutateAsync({ id });
       }
 
       if (
@@ -194,9 +158,6 @@ export function LocationDropdown({ locations = [], locationId, setLocationId, is
       });
     }
   };
-
-  const menuMaxHeight =
-    pendingDeleteIds.length > 0 && isDeleteConfirmArmed ? "300px" : "240px";
 
   return (
     <FormControl
@@ -240,30 +201,38 @@ export function LocationDropdown({ locations = [], locationId, setLocationId, is
           closeOnSelect={false}
           matchWidth
         >
-          <InputGroup>
-            <Input
-              value={isOpen ? searchQuery : (selectedLocation?.tagValue ?? "")}
-              onChange={handleInputChange}
-              onFocus={() => { setSearchQuery(""); setDebouncedSearch(""); onOpen(); }}
-              placeholder="Select location"
-              cursor={isOpen ? "text" : "pointer"}
-              readOnly={!isOpen}
-              fontFamily="Inter"
-              fontSize="14px"
-              fontWeight="400"
-              color={selectedLocation || isOpen ? "var(--gray-700, #2D3748)" : "gray.400"}
-              borderRadius="4px"
-              border={isInvalid ? "1px solid #FC8181" : "1px solid var(--gray-200, #E2E8F0)"}
-              background="var(--white, #FFF)"
-              _focus={{ boxShadow: "none", borderColor: "inherit" }}
-              pr="2.5rem"
-            />
-            <InputRightElement pointerEvents="none" color="gray.500">
+          <MenuButton
+            as={Box}
+            onClick={handleMenuOpen}
+            w="100%"
+            border={isInvalid ? "1px solid #FC8181" : "1px solid var(--gray-200, #E2E8F0)"}
+            borderRadius="4px"
+            bg="white"
+            px={3}
+            py={2}
+            fontSize="14px"
+            color={selectedLocation ? "var(--gray-700, #2D3748)" : "gray.400"}
+            cursor="pointer"
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <HStack
+              justifyContent="space-between"
+              w="100%"
+            >
+              <Text>{selectedLocation?.tagValue ?? "Select location"}</Text>
               <ChevronDown size={20} />
-            </InputRightElement>
-          </InputGroup>
+            </HStack>
+          </MenuButton>
 
-          {isOpen && (
+          <MenuList
+            p={2}
+            minW="0"
+            w="100%"
+            boxShadow="md"
+            borderRadius="6px"
+          >
             <Box
               maxH="180px"
               overflowY="auto"
@@ -279,7 +248,6 @@ export function LocationDropdown({ locations = [], locationId, setLocationId, is
                 value={locationId === "" ? "" : String(locationId)}
                 onChange={(value) => setLocationId(Number(value))}
               >
-                {/* Existing locations, minus staged deletes */}
                 {locations.map((location) => (
                   <MenuItemOption
                     key={location.id}
@@ -350,22 +318,21 @@ export function LocationDropdown({ locations = [], locationId, setLocationId, is
                         if (e.key === "Enter") {
                           e.preventDefault();
                           e.stopPropagation();
-                          void handleCreate();
+                          void handleCreate(e);
                         }
                       }}
-                      variant="outline"
-                      fontFamily={"Inter"}
-                      fontStyle={"normal"}
-                      lineHeight={"20px"}
+                      fontFamily="Inter"
+                      fontStyle="normal"
+                      lineHeight="20px"
                       fontSize="12px"
                       fontWeight="400"
                       color="black"
-                      border={"1px solid var(--gray-200, #E2E8F0)"}
+                      border="1px solid var(--gray-200, #E2E8F0)"
                       borderRadius="4px"
                       w="100%"
                       h="30px"
-                      padding={"10px"}
-                      margin={"0"}
+                      padding="10px"
+                      margin="0"
                       _placeholder={{ color: "#A0AEC0" }}
                       isDisabled={isDeletingLocations}
                       autoFocus
@@ -396,43 +363,7 @@ export function LocationDropdown({ locations = [], locationId, setLocationId, is
                     </HStack>
                   </MenuItem>
                 )}
-              </Box>
-              <HStack
-                px={3}
-                py={2}
-                gap={2}
-                borderTop="1px solid"
-                borderColor="gray.100"
-              >
-                <Input
-                  placeholder="Enter location"
-                  value={newValue}
-                  onChange={(e) => setNewValue(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleCreate(e); } }}
-                  onMouseDown={(e) => e.stopPropagation()}
-                  fontFamily="Inter"
-                  fontStyle="normal"
-                  lineHeight="20px"
-                  fontSize="12px"
-                  fontWeight="400"
-                  color="black"
-                  border="1px solid var(--gray-200, #E2E8F0)"
-                  borderRadius="4px"
-                  h="30px"
-                  padding="10px"
-                  _placeholder={{ color: "#A0AEC0" }}
-                />
-                <Button
-                  size="xs"
-                  onClick={handleCreate}
-                  isDisabled={createLocation.isPending}
-                  variant="ghost"
-                  _hover={{ bg: "none" }}
-                  _active={{ bg: "none" }}
-                >
-                  {createLocation.isPending ? <Spinner size="xs" /> : <AddIcon />}
-                </Button>
-              </HStack>
+              </MenuOptionGroup>
             </Box>
 
             <HStack
