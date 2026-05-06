@@ -488,7 +488,7 @@ const ProviderDrawer = ({
 
     try {
       if (activeMode === "create") {
-        await createProvider(buildPayload(formValuesAfterTagDeletes));
+        await createProvider(buildPayload());
         toast({
           position: "top-right",
           duration: 5000,
