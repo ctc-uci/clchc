@@ -98,7 +98,7 @@ export const ProviderDirectoryPage = () => {
   };
 
   return (
-    <Box p={6}>
+    <Box px={6} pb={6}>
       <Flex flexDirection="column" mb={5} gap={6}>
         {/* TOP ROW: PageHeader + Manage Button (Manage only for ccm/master) */}
         <Flex justify="space-between" align="center">

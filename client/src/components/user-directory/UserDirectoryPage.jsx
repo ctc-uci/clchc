@@ -80,7 +80,7 @@ export const UserDirectory = () => {
   }, [users, searchQuery, selectedRole]);
 
   return (
-    <Box p={6}>
+    <Box px={6} pb={6}>
       <Flex
         align="center"
         justify="space-between"
