@@ -159,6 +159,7 @@ export default function QuotaDrawer({
     };
 
     if (quotaID) {
+      if (!quotaData) return;
       fetchQuotaDetails();
     } else {
       setProviderId("");

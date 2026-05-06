@@ -1,6 +1,6 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-import { CheckIcon } from "@chakra-ui/icons";
+import { AddIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
@@ -8,6 +8,7 @@ import {
   FormErrorMessage,
   FormLabel,
   HStack,
+  Icon,
   Input,
   InputGroup,
   Menu,
@@ -18,41 +19,42 @@ import {
   MenuOptionGroup,
   Skeleton,
   Text,
-  Icon,
-  InputRightElement,
-  Text,
-  useDisclosure,
-  useOutsideClick,
   useToast,
 } from "@chakra-ui/react";
+
+import {
+  useCreateLocation,
+  useDeleteLocation,
+  useLocations,
+} from "@/contexts/hooks/data-fetching/useLocations";
 import { ChevronDown } from "lucide-react";
 import { MdDeleteOutline } from "react-icons/md";
 
-import {
-  useLocations,
-  useCreateLocation,
-  useDeleteLocation,
-} from "@/contexts/hooks/data-fetching/useLocations";
-
-import { useDebounce } from "@/hooks/useDebounce";
-import ToastAlert from "@/components/common/ToastAlert";
 import { LockRightElement } from "../tools/shared";
 
-export function LocationDropdown({ locationId, setLocationId, isLocked, isInvalid, onDifferentChange }) {
+export function LocationDropdown({
+  locationId,
+  setLocationId,
+  isLocked,
+  isInvalid,
+  onDifferentChange,
+}) {
   const { data: { locations = [] } = {}, isLoading: loadingLocations } =
     useLocations();
-  const { mutateAsync: createLocation} = useCreateLocation();
-  const { mutateAsync: deleteLocation} = useDeleteLocation();
+  const { mutateAsync: createLocation } = useCreateLocation();
+  const { mutateAsync: deleteLocation } = useDeleteLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [newValue, setNewValue] = useState("");
   const [pendingDeleteIds, setPendingDeleteIds] = useState([]);
   const [isDeleteConfirmArmed, setIsDeleteConfirmArmed] = useState(false);
   const [isAddingLocation, setIsAddingLocation] = useState(false);
   const toast = useToast();
-  const containerRef = useRef(null);
+  const selectedItemRef = useRef(null);
 
   const isDeletingLocations = pendingDeleteIds.length > 0;
-  const isDifferent = pendingDeleteIds.length > 0 || (isAddingLocation && newValue.trim().length > 0);
+  const isDifferent =
+    pendingDeleteIds.length > 0 ||
+    (isAddingLocation && newValue.trim().length > 0);
 
   useEffect(() => {
     if (menuOpen) {
@@ -247,7 +249,9 @@ export function LocationDropdown({ locationId, setLocationId, isLocked, isInvali
       ) : (
         <Menu
           isOpen={menuOpen}
-          onClose={() => { if (!isDifferent) setMenuOpen(false); }}
+          onClose={() => {
+            if (!isDifferent) setMenuOpen(false);
+          }}
           closeOnBlur={!isDifferent}
           closeOnEsc={!isDifferent}
           closeOnSelect={false}
@@ -268,7 +272,11 @@ export function LocationDropdown({ locationId, setLocationId, isLocked, isInvali
             lineHeight={"20px"}
             fontStyle={"normal"}
             borderRadius={"4px"}
-            border={isInvalid ? "1px solid #FC8181" : "1px solid var(--gray-200, #E2E8F0)"}
+            border={
+              isInvalid
+                ? "1px solid #FC8181"
+                : "1px solid var(--gray-200, #E2E8F0)"
+            }
             background={"var(--white, #FFF)"}
           >
             {selectedLocation?.tagValue
@@ -288,24 +296,32 @@ export function LocationDropdown({ locationId, setLocationId, isLocked, isInvali
               maxH="180px"
               overflowY="auto"
               sx={{
-                '&::-webkit-scrollbar': { display: 'none' },
-                scrollbarWidth: 'none',
-                msOverflowStyle: 'none',
+                "&::-webkit-scrollbar": { display: "none" },
+                scrollbarWidth: "none",
+                msOverflowStyle: "none",
               }}
             >
-            <MenuOptionGroup
-              title=""
-              type="radio"
-              value={locationId === "" ? "" : String(locationId)}
-              onChange={(value) => setLocationId(Number(value))}
-            >
-              {/* Existing locations, minus staged deletes */}
-              {locations.map((location) => (
+              <MenuOptionGroup
+                title=""
+                type="radio"
+                value={locationId === "" ? "" : String(locationId)}
+                onChange={(value) => setLocationId(Number(value))}
+              >
+                {/* Existing locations, minus staged deletes */}
+                {locations.map((location) => (
                   <MenuItemOption
                     key={location.id}
                     value={String(location.id)}
-                    ref={String(location.id) === String(locationId) ? selectedItemRef : null}
-                    bg={pendingDeleteIds.includes(location.id) ? "#FFD2D2" : "white"}
+                    ref={
+                      String(location.id) === String(locationId)
+                        ? selectedItemRef
+                        : null
+                    }
+                    bg={
+                      pendingDeleteIds.includes(location.id)
+                        ? "#FFD2D2"
+                        : "white"
+                    }
                     px="10px"
                     py="4px"
                     fontSize="12px"
@@ -339,73 +355,76 @@ export function LocationDropdown({ locationId, setLocationId, isLocked, isInvali
                         _hover={{ bg: "transparent" }}
                         _active={{ bg: "transparent" }}
                       >
-                        <Icon as={MdDeleteOutline} boxSize="20px" />
+                        <Icon
+                          as={MdDeleteOutline}
+                          boxSize="20px"
+                        />
                       </Button>
                     </HStack>
                   </MenuItemOption>
                 ))}
 
-              {isAddingLocation ? (
-                <HStack
-                  px={3}
-                  py={2}
-                  gap={0}
-                >
-                  <Input
-                    placeholder="Enter location"
-                    value={newValue}
-                    onChange={(e) => setNewValue(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        void handleCreate();
-                      }
+                {isAddingLocation ? (
+                  <HStack
+                    px={3}
+                    py={2}
+                    gap={0}
+                  >
+                    <Input
+                      placeholder="Enter location"
+                      value={newValue}
+                      onChange={(e) => setNewValue(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          void handleCreate();
+                        }
+                      }}
+                      variant="outline"
+                      fontFamily={"Inter"}
+                      fontStyle={"normal"}
+                      lineHeight={"20px"}
+                      fontSize="12px"
+                      fontWeight="400"
+                      color="black"
+                      border={"1px solid var(--gray-200, #E2E8F0)"}
+                      borderRadius="4px"
+                      w="100%"
+                      h="30px"
+                      padding={"10px"}
+                      margin={"0"}
+                      _placeholder={{ color: "#A0AEC0" }}
+                      isDisabled={isDeletingLocations}
+                      autoFocus
+                    />
+                  </HStack>
+                ) : (
+                  <MenuItem
+                    onClick={() => {
+                      if (isLocked || isDeletingLocations) return;
+                      setIsAddingLocation(true);
                     }}
-                    variant="outline"
-                    fontFamily={"Inter"}
-                    fontStyle={"normal"}
-                    lineHeight={"20px"}
+                    isDisabled={isLocked || isDeletingLocations}
+                    bg="white"
+                    p="10px 14px 10px 32px"
                     fontSize="12px"
                     fontWeight="400"
-                    color="black"
-                    border={"1px solid var(--gray-200, #E2E8F0)"}
                     borderRadius="4px"
-                    w="100%"
-                    h="30px"
-                    padding={"10px"}
-                    margin={"0"}
-                    _placeholder={{ color: "#A0AEC0" }}
-                    isDisabled={isDeletingLocations}
-                    autoFocus
-                  />
-                </HStack>
-              ) : (
-                <MenuItem
-                  onClick={() => {
-                    if (isLocked || isDeletingLocations) return;
-                    setIsAddingLocation(true);
-                  }}
-                  isDisabled={isLocked || isDeletingLocations}
-                  bg="white"
-                  p="10px 14px 10px 32px"
-                  fontSize="12px"
-                  fontWeight="400"
-                  borderRadius="4px"
-                  my="6px"
-                  opacity={isLocked || isDeletingLocations ? 0.4 : 1}
-                >
-                  <HStack
-                    justifyContent="space-between"
-                    w="100%"
-                    spacing={2}
+                    my="6px"
+                    opacity={isLocked || isDeletingLocations ? 0.4 : 1}
                   >
-                    <Text>Add Location</Text>
-                    <AddIcon />
-                  </HStack>
-                </MenuItem>
-              )}
-            </MenuOptionGroup>
+                    <HStack
+                      justifyContent="space-between"
+                      w="100%"
+                      spacing={2}
+                    >
+                      <Text>Add Location</Text>
+                      <AddIcon />
+                    </HStack>
+                  </MenuItem>
+                )}
+              </MenuOptionGroup>
             </Box>
 
             <HStack
@@ -425,7 +444,10 @@ export function LocationDropdown({ locationId, setLocationId, isLocked, isInvali
                   Are you sure? This is going to be deleted for all quotas.
                 </Text>
               )}
-              <HStack py={1} gap="30px">
+              <HStack
+                py={1}
+                gap="30px"
+              >
                 <Button
                   width="55px"
                   height="24px"
@@ -445,7 +467,11 @@ export function LocationDropdown({ locationId, setLocationId, isLocked, isInvali
                   height="24px"
                   fontSize="12px"
                   fontWeight="600"
-                  onClick={pendingDeleteIds.length > 0 ? handleDeleteAction : handleSave}
+                  onClick={
+                    pendingDeleteIds.length > 0
+                      ? handleDeleteAction
+                      : handleSave
+                  }
                   isDisabled={!isDifferent}
                   opacity={isDifferent ? 1 : 0.4}
                   bg={pendingDeleteIds.length > 0 ? "#63171B" : "#3182CE"}
@@ -467,7 +493,6 @@ export function LocationDropdown({ locationId, setLocationId, isLocked, isInvali
       )}
 
       <FormErrorMessage>Required</FormErrorMessage>
-
     </FormControl>
   );
 }
