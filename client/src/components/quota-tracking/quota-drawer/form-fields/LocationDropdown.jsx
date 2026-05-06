@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
-import { AddIcon } from "@chakra-ui/icons";
+import { CheckIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
@@ -19,9 +19,14 @@ import {
   Skeleton,
   Text,
   Icon,
+  InputRightElement,
+  Text,
+  useDisclosure,
+  useOutsideClick,
   useToast,
 } from "@chakra-ui/react";
 import { ChevronDown } from "lucide-react";
+import { MdDeleteOutline } from "react-icons/md";
 
 import {
   useLocations,
@@ -29,8 +34,9 @@ import {
   useDeleteLocation,
 } from "@/contexts/hooks/data-fetching/useLocations";
 
+import { useDebounce } from "@/hooks/useDebounce";
+import ToastAlert from "@/components/common/ToastAlert";
 import { LockRightElement } from "../tools/shared";
-import { MdDeleteOutline } from "react-icons/md";
 
 export function LocationDropdown({ locationId, setLocationId, isLocked, isInvalid, onDifferentChange }) {
   const { data: { locations = [] } = {}, isLoading: loadingLocations } =
@@ -43,7 +49,7 @@ export function LocationDropdown({ locationId, setLocationId, isLocked, isInvali
   const [isDeleteConfirmArmed, setIsDeleteConfirmArmed] = useState(false);
   const [isAddingLocation, setIsAddingLocation] = useState(false);
   const toast = useToast();
-  const selectedItemRef = useRef(null);
+  const containerRef = useRef(null);
 
   const isDeletingLocations = pendingDeleteIds.length > 0;
   const isDifferent = pendingDeleteIds.length > 0 || (isAddingLocation && newValue.trim().length > 0);

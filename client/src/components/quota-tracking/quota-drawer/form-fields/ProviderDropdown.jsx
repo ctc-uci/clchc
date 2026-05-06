@@ -7,17 +7,33 @@ import {
 } from "@chakra-ui/react";
 
 import CustomSelect from "@/components/common/CustomSelect";
-
 import { LockRightElement } from "../tools/shared";
 
 export function ProviderDropdown({ providers = [], providerId, setProviderId, isLocked, isInvalid }) {
-  const options = providers.map((p) => ({
-    value: String(p.id),
-    label: p.name,
-  }));
   const selectedProvider = providers.find(
     (provider) => String(provider.id) === String(providerId)
   );
+
+  const options = providers.map((p) => ({ value: String(p.id), label: p.name }));
+
+  const fixedInputProps = {
+    bg: isLocked ? "gray.50" : "white",
+    color: "gray.700",
+    display: "flex",
+    w: "100%",
+    padding: "5px 8px",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: "10px",
+    borderRadius: "2px",
+    border: isInvalid ? "1px solid #FC8181" : "1px solid var(--gray-200, #E2E8F0)",
+    background: isLocked ? "var(--gray-50, #F7FAFC)" : "var(--white, #FFF)",
+    fontFamily: "Lato",
+    fontStyle: "normal",
+    fontSize: "14px",
+    fontWeight: "400",
+    lineHeight: "normal",
+  };
 
   return (
     <FormControl
@@ -34,15 +50,8 @@ export function ProviderDropdown({ providers = [], providerId, setProviderId, is
       {isLocked ? (
         <InputGroup>
           <Box
-            w="100%"
-            border="1px"
-            borderColor="gray.300"
-            borderRadius="6px"
-            px={3}
-            py={2}
+            {...fixedInputProps}
             pr="2.25rem"
-            bg="gray.50"
-            color="gray.500"
           >
             {selectedProvider?.name ?? ""}
           </Box>
@@ -51,9 +60,11 @@ export function ProviderDropdown({ providers = [], providerId, setProviderId, is
       ) : (
         <CustomSelect
           options={options}
-          value={providerId === "" ? "" : String(providerId)}
-          setValue={(val) => setProviderId(Number(val))}
-          styleProps={isInvalid ? { border: "1px solid #FC8181" } : {}}
+          value={String(providerId ?? "")}
+          setValue={setProviderId}
+          isSearchable
+          placeholder="Select provider"
+          styleProps={fixedInputProps}
         />
       )}
       <FormErrorMessage>Required</FormErrorMessage>

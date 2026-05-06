@@ -125,7 +125,7 @@ export default function TransferMasterRoleModal({ isOpen, onClose }) {
       <ModalContent
         padding="0.75em"
         minW="700px"
-        h="565px"
+        minH="565px"
         borderRadius="22px"
       >
         <TransferModalHeader step={step} />

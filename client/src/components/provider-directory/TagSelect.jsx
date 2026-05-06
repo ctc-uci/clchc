@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import ToastAlert from "@/components/common/ToastAlert";
 
 import { AddIcon } from "@chakra-ui/icons";
 import {
@@ -83,9 +84,13 @@ const TagSelect = ({
       toast({
         title: "Tag already exists",
         status: "warning",
-        position: "bottom-right",
-        duration: 3000,
+        position: "top-right",
+        duration: 5000,
         isClosable: true,
+        containerStyle: { width: "401px", maxWidth: "401px", height: "66px", maxHeight: "66px" },
+        render: ({ onClose }) => (
+          <ToastAlert status="success" borderColor="#0C824D" title="Tag Created" description="New tag created!" onClose={onClose} />
+        ),
       });
       return false;
     }
@@ -120,12 +125,13 @@ const TagSelect = ({
       handleCreateTag().catch((err) => {
         console.error("Failed to create tag", err);
         toast({
-          title: "Error",
-          description: errorToString(err),
-          status: "error",
-          position: "bottom-right",
+          position: "top-right",
           duration: 5000,
           isClosable: true,
+          containerStyle: { width: "401px", maxWidth: "401px", height: "66px", maxHeight: "66px" },
+          render: ({ onClose }) => (
+            <ToastAlert status="error" borderColor="#90080F" title="Error" description={errorToString(err)} onClose={onClose} />
+          ),
         });
       });
       return;

@@ -24,6 +24,8 @@ import {
   useToast,
 } from "@chakra-ui/react";
 
+import { useApi } from "@/api.js";
+import ToastAlert from "@/components/common/ToastAlert";
 import TagSelect from "@/components/provider-directory/TagSelect";
 import {
   useCreateProvider,
@@ -486,7 +488,16 @@ const ProviderDrawer = ({
 
     try {
       if (activeMode === "create") {
-        await createProvider(buildPayload());
+        await createProvider(buildPayload(formValuesAfterTagDeletes));
+        toast({
+          position: "top-right",
+          duration: 5000,
+          isClosable: true,
+          containerStyle: { width: "401px", maxWidth: "401px", height: "66px", maxHeight: "66px" },
+          render: ({ onClose }) => (
+            <ToastAlert status="success" borderColor="#0C824D" title="Provider Created" description="A new provider has been added to the directory." onClose={onClose} />
+          ),
+        });
       } else if (activeMode === "edit") {
         await updateProvider({
           id: provider.id,
@@ -495,13 +506,13 @@ const ProviderDrawer = ({
       } else if (activeMode === "delete") {
         await deleteProvider(provider.id);
         toast({
-          title: "Provider Deletion",
-          description: "You have deleted a provider from the directory.",
-          status: "error", // This is a successful delete, but the toast should be red according to Hi-Fi.
-          position: "bottom-right",
-          variant: "top-accent",
+          position: "top-right",
           duration: 5000,
           isClosable: true,
+          containerStyle: { width: "401px", maxWidth: "401px", height: "66px", maxHeight: "66px" },
+          render: ({ onClose }) => (
+            <ToastAlert status="error" borderColor="#90080F" title="Provider Deletion" description="You have deleted a provider from the directory." onClose={onClose} />
+          ),
         });
       }
 
@@ -510,12 +521,13 @@ const ProviderDrawer = ({
     } catch (err) {
       console.error(`Failed to ${activeMode} provider`, err);
       toast({
-        title: "Error",
-        description: errorToString(err),
-        status: "error",
-        position: "bottom-right",
+        position: "top-right",
         duration: 5000,
         isClosable: true,
+        containerStyle: { width: "401px", maxWidth: "401px", height: "66px", maxHeight: "66px" },
+        render: ({ onClose }) => (
+          <ToastAlert status="error" borderColor="#90080F" title="Error" description={errorToString(err)} onClose={onClose} />
+        ),
       });
     }
   };
