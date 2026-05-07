@@ -1,0 +1,19 @@
+server/nixpacks.toml
+  s_ddcb95b5a1d3ea::t_875f50ee2a088b 3,5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.1",
+  "base_commit_sha": "1f63f1a5f2207da1498506abf2f71b6f9da5edff",
+  "prompts": {},
+  "sessions": {
+    "s_ddcb95b5a1d3ea": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "21a8600f-3216-40ae-8112-099bed7aafbd",
+        "model": "claude-4.6-sonnet-medium-thinking"
+      },
+      "human_author": "Brendan Lieu <brendanlieu05@gmail.com>"
+    }
+  }
+}
