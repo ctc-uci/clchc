@@ -1,4 +1,6 @@
 # Pin to a nixpkgs commit that provides Node 22.13+ (required by eslint-visitor-keys@5)
 # Default Nixpacks "22" image uses Node 22.11.0 which fails engine check.
+# nodejs_24 does not exist in this nixpkgs snapshot, so we explicitly use nodejs_22.
 [phases.setup]
+nixPkgs = ["nodejs_22", "yarn-1_x"]
 nixpkgsArchive = "51ad838b03a05b1de6f9f2a0fffecee64a9788ee"
