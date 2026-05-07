@@ -91,7 +91,7 @@ export default function UserEditModal({ isOpen, onClose, userId, onUpdated }) {
     } catch (err) {
       console.error("Approval failed: ", err);
     }
-  };asdf
+  };
 
   const onDelete = async () => {
     if (!currentFirebaseUid) {
