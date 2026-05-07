@@ -19,21 +19,27 @@ import { MdSentimentDissatisfied } from "react-icons/md";
 const SkeletonRows = () => {
   return (
     <>
-      {Array.from({ length: 5 }, (_, i) => (
+      {Array.from({ length: 15 }, (_, i) => (
         <Tr
           key={i}
           borderBottom="1px solid"
           borderColor="gray.200"
         >
-          {Array.from({ length: 4 }, (_, j) => (
-            <Td
-              key={j}
-              borderRight="1px solid"
-              borderColor="gray.200"
-            >
-              <Skeleton height="40px" />
-            </Td>
-          ))}
+          <Td {...tdProps}>
+            <Skeleton height="20px" width={`${50 + (i * 13) % 35}%`} />
+          </Td>
+          <Td {...tdProps}>
+            <Box display="flex" gap="4px" alignItems="center">
+              <Skeleton height="20px" width="46px" />
+              <Skeleton height="20px" width="24px" />
+            </Box>
+          </Td>
+          <Td {...tdProps}>
+            <Skeleton height="20px" width="148px" />
+          </Td>
+          <Td {...tdProps} borderRight="none">
+            <Skeleton height="20px" width={`${40 + (i * 17) % 40}%`} />
+          </Td>
         </Tr>
       ))}
     </>
@@ -81,6 +87,7 @@ const VersionLogTable = ({ loading, logs }) => {
         borderColor="gray.200"
         borderRadius="lg"
         overflowY="auto"
+        minH="calc(100vh - 280px)"
       >
         <Table
           sx={{

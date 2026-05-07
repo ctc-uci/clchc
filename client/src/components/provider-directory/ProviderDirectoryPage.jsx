@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -29,6 +29,18 @@ export const ProviderDirectoryPage = () => {
   const [drawerMode, setDrawerMode] = useState("create");
   const [selectedProvider, setSelectedProvider] = useState(null);
   const [manageOpen, setManageOpen] = useState(false);
+  const manageRef = useRef(null);
+
+  useEffect(() => {
+    if (!manageOpen) return;
+    const handleClickOutside = (e) => {
+      if (manageRef.current && !manageRef.current.contains(e.target)) {
+        setManageOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [manageOpen]);
 
   const debouncedProviderQuery = useDebounce(
     (value) => setProviderQuery(value),
@@ -86,7 +98,7 @@ export const ProviderDirectoryPage = () => {
   };
 
   return (
-    <Box p={6}>
+    <Box px={6} pb={6}>
       <Flex flexDirection="column" mb={5} gap={6}>
         {/* TOP ROW: PageHeader + Manage Button (Manage only for ccm/master) */}
         <Flex justify="space-between" align="center">
@@ -96,7 +108,7 @@ export const ProviderDirectoryPage = () => {
             isLoading={roleLoading}
           />
           {(role === "ccm" || role === "master") && (
-            <Box position="relative">
+            <Box position="relative" ref={manageRef}>
               <Button
                 bg="#113D64"
                 color="white"

@@ -30,9 +30,8 @@ import QuotaTable from "./QuotaTable";
 const SkeletonCard = () => {
   return (
     <Card
-      height="12rem"
-      width="14rem"
-      flexShrink={1}
+      height="172.826px"
+      flex={1}
       borderWidth="1px"
       borderColor="gray.200"
       borderRadius="lg"
@@ -40,24 +39,13 @@ const SkeletonCard = () => {
       _hover={{ boxShadow: "md" }}
       transition="box-shadow 0.2s ease"
     >
-      <CardHeader pb={1}>
-        <Box
-          fontSize="sm"
-          color="gray.500"
-          fontWeight="medium"
-        >
-          <Skeleton height="10px" />
-        </Box>
+      <CardHeader pb="9px">
+        <Skeleton height="16px" width="60%" />
       </CardHeader>
 
-      <CardBody py={2}>
-        <Box
-          fontSize="3xl"
-          fontWeight="semibold"
-          color="gray.900"
-        >
-          <Skeleton height="20px" />
-        </Box>
+      <CardBody py={0}>
+        <Skeleton height="36px" width="50%" mb={2} />
+        <Skeleton height="14px" width="40%" />
       </CardBody>
     </Card>
   );
@@ -103,6 +91,7 @@ export const QuotaTracking = () => {
         totalProgress: 0,
         totalQuota: 0,
         rate: 0,
+        differentLocations: 0,
         activeProviders: 0,
         needsAttention: 0,
       };
@@ -156,7 +145,7 @@ export const QuotaTracking = () => {
   };
 
   return (
-    <Box p={6}>
+    <Box px={6} pb={6}>
       <Flex align="center" justify="space-between" mb={6}>
         <PageHeader
           title="Quota Tracking"

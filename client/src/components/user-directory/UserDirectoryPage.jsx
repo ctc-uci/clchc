@@ -8,11 +8,9 @@ import {
   Input,
   InputGroup,
   InputLeftElement,
-  Skeleton,
 } from "@chakra-ui/react";
 
 import { PageHeader } from "@/components/common/PageHeader";
-import { Navbar } from "@/components/layout/Navbar";
 import {
   useDeleteUser,
   useUsers,
@@ -54,6 +52,8 @@ export const UserDirectory = () => {
     refetch,
   } = useUsers({ user: searchQuery, status: "approved" });
 
+  const { data: pendingUsers = [] } = useUsers({ status: "pending" });
+
   const { mutate: deleteUser } = useDeleteUser();
 
   const handleDelete = (userId) => {
@@ -80,8 +80,13 @@ export const UserDirectory = () => {
   }, [users, searchQuery, selectedRole]);
 
   return (
-    <Box p={6}>
-      <Flex align="center" justify="space-between" mb={6} h="45px">
+    <Box px={6} pb={6}>
+      <Flex
+        align="center"
+        justify="space-between"
+        mb={6}
+        h="45px"
+      >
         <PageHeader
           title="User Directory"
           role={role}
@@ -104,21 +109,23 @@ export const UserDirectory = () => {
       </Flex>
       <Box mb={4}>
         <UserPendingStatusList />
-        <Flex
-          justify="flex-end"
-          mt={2}
-        >
-          <Box
-            as="button"
-            fontSize="14px"
-            fontStyle="italic"
-            color="gray.500"
-            _hover={{ color: "gray.700" }}
-            onClick={() => navigate("/pending-requests")}
+        {pendingUsers.length >= 2 && (
+          <Flex
+            justify="flex-end"
+            mt={2}
           >
-          View All
-          </Box>
-        </Flex>
+            <Box
+              as="button"
+              fontSize="14px"
+              fontStyle="italic"
+              color="gray.500"
+              _hover={{ color: "gray.700" }}
+              onClick={() => navigate("/pending-requests")}
+            >
+              View All
+            </Box>
+          </Flex>
+        )}
       </Box>
       <Flex
         gap={4}
@@ -126,7 +133,7 @@ export const UserDirectory = () => {
         pb={6}
       >
         <InputGroup flex={1}>
-          <InputLeftElement 
+          <InputLeftElement
             display="flex"
             alignItems="center"
             h="100%"

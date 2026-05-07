@@ -11,7 +11,10 @@ import {
   Stack,
   Text,
   useDisclosure,
+  useToast,
+  Skeleton
 } from "@chakra-ui/react";
+import ToastAlert from "@/components/common/ToastAlert";
 
 import {
   useCreateQuota,
@@ -19,6 +22,8 @@ import {
   useQuotaById,
   useUpdateQuota,
 } from "@/contexts/hooks/data-fetching/useQuotas";
+import { useProvidersSummary } from "@/contexts/hooks/data-fetching/useProviders";
+import { useLocations } from "@/contexts/hooks/data-fetching/useLocations";
 import { useCreateLog } from "@/contexts/hooks/data-fetching/useVersionLogs";
 import { useAuthContext } from "@/contexts/hooks/useAuthContext";
 import { useUserContext } from "@/contexts/hooks/useUserContext";
@@ -33,7 +38,6 @@ import { TypeInput } from "./quota-drawer/form-fields/TypeInput";
 import { NotificationBanner } from "./quota-drawer/NotificationBanner";
 import { QuotaDrawerFooter } from "./quota-drawer/QuotaDrawerFooter";
 import { drawerTitle } from "./quota-drawer/tools/constants";
-import { SkeletonBody } from "./quota-drawer/tools/shared";
 import {
   formatDateForInput,
   formatTimeForInput,
@@ -54,10 +58,14 @@ export default function QuotaDrawer({
   const btnRef = React.useRef();
   const userInfo = useUserContext();
   const [quota, setQuota] = useState(0);
-  const { data: quotaData, isLoading } = useQuotaById(
+  const { data: quotaData, isLoading: isQuotaByIdLoading } = useQuotaById(
     quotaID,
     isOpen && !!quotaID
   );
+  const { data: providers, isLoading: isProvidersLoading } = useProvidersSummary()
+  const { data: locationsData, isLoading: isLocationsLoading } = useLocations()
+  const locations = locationsData?.locations || [];
+  const isDrawerLoading = (quotaID ? isQuotaByIdLoading : false) || isProvidersLoading || isLocationsLoading;
   const { mutate: createQuota } = useCreateQuota();
   const { mutate: updateQuota } = useUpdateQuota();
   const {
@@ -77,11 +85,13 @@ export default function QuotaDrawer({
   const [progress, setProgress] = useState(0);
   const [isLocked, setIsLocked] = useState(false);
   const [action, setAction] = useState("");
+  const [isLocationDifferent, setIsLocationDifferent] = useState(false);
   const [originalProgress, setOriginalProgress] = useState(0);
   const [errors, setErrors] = useState({});
 
   const { mutate: createLog } = useCreateLog();
-  
+  const toast = useToast();
+
   const apptCalcFactor = userInfo?.dbUser?.apptCalcFactor ?? null;
 
   const currentDrawerTitle = !quotaID
@@ -149,6 +159,7 @@ export default function QuotaDrawer({
     };
 
     if (quotaID) {
+      if (!quotaData) return;
       fetchQuotaDetails();
     } else {
       setProviderId("");
@@ -229,10 +240,28 @@ export default function QuotaDrawer({
       //create
       if (!quotaID) {
         await createQuota(formData);
+        toast({
+          position: "top-right",
+          duration: 5000,
+          isClosable: true,
+          containerStyle: { width: "401px", maxWidth: "401px", height: "66px", maxHeight: "66px" },
+          render: ({ onClose }) => (
+            <ToastAlert status="success" borderColor="#0C824D" title="Quota Created" description="A new quota has been added." onClose={onClose} />
+          ),
+        });
       }
       //delete
       else if (effectiveAction === "delete") {
         await deleteQuota({ id: quotaID });
+        toast({
+          position: "top-right",
+          duration: 5000,
+          isClosable: true,
+          containerStyle: { width: "401px", maxWidth: "401px", height: "66px", maxHeight: "66px" },
+          render: ({ onClose }) => (
+            <ToastAlert status="error" borderColor="#90080F" title="Quota Deleted" description="The quota has been deleted." onClose={onClose} />
+          ),
+        });
         handleClose();
       }
       //update
@@ -271,6 +300,7 @@ export default function QuotaDrawer({
     setProgress(0);
     setIsLocked(false);
     setAction("");
+    setIsLocationDifferent(false);
     setErrors({});
     onClose();
   };
@@ -304,16 +334,61 @@ export default function QuotaDrawer({
           </Text>
         </DrawerHeader>
 
-        {isLoading ? (
-          <SkeletonBody />
+        {isDrawerLoading ? (
+          <DrawerBody padding="30px 24px 30px 24px">
+          <Stack gap={4}>
+
+            <Stack gap={2}>
+              <Skeleton height="14px" width="70px" />
+              <Skeleton height="40px" borderRadius="6px" />
+            </Stack>
+
+            <Flex justify="space-between" gap={4}>
+              <Stack flex={1} gap={2}>
+                <Skeleton height="14px" width="40px" />
+                <Skeleton height="40px" borderRadius="6px" />
+              </Stack>
+              <Stack flex={1} gap={2}>
+                <Skeleton height="14px" width="55px" />
+                <Flex gap={2}>
+                  <Skeleton height="40px" borderRadius="6px" flex={1} />
+                  <Skeleton height="40px" borderRadius="6px" flex={1} />
+                </Flex>
+              </Stack>
+            </Flex>
+
+            <Flex justify="space-between" gap={4}>
+              <Stack flex={1} gap={2}>
+                <Skeleton height="14px" width="65px" />
+                <Skeleton height="40px" borderRadius="6px" />
+              </Stack>
+              <Stack flex={1} gap={2}>
+                <Skeleton height="14px" width="40px" />
+                <Skeleton height="40px" borderRadius="6px" />
+              </Stack>
+            </Flex>
+
+            <Stack gap={2}>
+              <Skeleton height="14px" width="85px" />
+              <Skeleton height="80px" borderRadius="6px" />
+            </Stack>
+
+            <Stack gap={2}>
+              <Skeleton height="14px" width="120px" />
+              <Skeleton height="120px" borderRadius="6px" />
+            </Stack>
+
+          </Stack>
+        </DrawerBody>
         ) : (
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", flex: 1, overflow: "hidden" }}>
             <DrawerBody
               padding="30px 24px 30px 24px"
               >
               <Stack gap={4}>
                 {isLocked && <NotificationBanner action={action} />}
                 <ProviderDropdown
+                  providers={providers}
                   providerId={providerId}
                   setProviderId={setProviderId}
                   isLocked={isLocked}
@@ -337,10 +412,12 @@ export default function QuotaDrawer({
                 </Flex>
                 <Flex justify="space-between">
                   <LocationDropdown
+                    locations={locations}
                     locationId={locationId}
                     setLocationId={setLocationId}
                     isLocked={isLocked}
                     isInvalid={!!errors.locationId}
+                    onDifferentChange={setIsLocationDifferent}
                   />
 
                   <TypeInput
@@ -375,6 +452,7 @@ export default function QuotaDrawer({
               quotaID={quotaID}
               handleSubmit={handleSubmit}
               handleClose={handleClose}
+              isLocationDifferent={isLocationDifferent}
             />
           </form>
         )}

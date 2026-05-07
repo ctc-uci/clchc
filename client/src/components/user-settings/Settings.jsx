@@ -1,4 +1,5 @@
 import { Avatar, Box, Grid, GridItem, Text, useDisclosure } from "@chakra-ui/react";
+import { useState } from "react";
 
 import { useAuthContext } from "@/contexts/hooks/useAuthContext";
 import { useUserContext } from "@/contexts/hooks/useUserContext";
@@ -17,6 +18,7 @@ export function Settings() {
   const userData = useUserContext();
   const dbUser = userData?.dbUser;
   const { currentUser } = useAuthContext();
+  const [activeEditingKey, setActiveEditingKey] = useState(null);
 
   return (
     <Box
@@ -98,7 +100,10 @@ export function Settings() {
           borderColor="gray.200"
           marginBottom="30px"
         >
-          <PersonalInfo />
+          <PersonalInfo
+            activeEditingKey={activeEditingKey}
+            setActiveEditingKey={setActiveEditingKey}
+          />
         </GridItem>
 
         {dbUser?.role === "master" || dbUser?.role === "ccm" ? (
@@ -129,7 +134,10 @@ export function Settings() {
               ml="45px"
               borderColor="gray.200"
             >
-              <QuotaCalcFactor />
+              <QuotaCalcFactor
+                activeEditingKey={activeEditingKey}
+                setActiveEditingKey={setActiveEditingKey}
+              />
             </GridItem>
           </>
         ) : (

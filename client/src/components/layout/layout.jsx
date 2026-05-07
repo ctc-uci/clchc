@@ -12,7 +12,9 @@ const Layout = () => {
             <Box
                 display="inline-flex"
                 width="100%"
-                padding="9px 40px"
+                px="40px"
+                pt="9px"
+                pb="0"
                 alignItems="center"
                 justifyContent="space-between"
             >

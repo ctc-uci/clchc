@@ -8,6 +8,7 @@ export const QuotaDrawerFooter = ({
   quotaID,
   handleSubmit,
   handleClose,
+  isLocationDifferent,
 }) => {
   return (
     <DrawerFooter
@@ -60,6 +61,7 @@ export const QuotaDrawerFooter = ({
               fontWeight="600"
               lineHeight="28px"
               padding="10px"
+              isDisabled={isLocationDifferent}
             >
               {action === "delete" ? "Delete" : "Confirm"}
             </Button>
@@ -87,6 +89,7 @@ export const QuotaDrawerFooter = ({
               fontWeight="600"
               lineHeight="28px"
               padding="10px"
+              isDisabled={isLocationDifferent}
             >
               {!quotaID ? "Cancel" : "Delete Quota"}
             </Button>
@@ -106,6 +109,7 @@ export const QuotaDrawerFooter = ({
               fontWeight="600"
               lineHeight="28px"
               padding="10px"
+              isDisabled={isLocationDifferent}
             >
               {!quotaID ? "Create" : "Save Changes"}
             </Button>

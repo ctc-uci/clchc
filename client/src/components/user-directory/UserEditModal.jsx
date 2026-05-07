@@ -60,7 +60,7 @@ export default function UserEditModal({ isOpen, onClose, userId, onUpdated }) {
     if (user) setSelectedRole(user.role ?? "viewer");
   }, [user]);
 
-  if (!user) return null;
+  if (!user) return null;3
 
   const currentFirebaseUid = user.firebaseUid;
   const username = user.firstName + " " + user.lastName;
@@ -76,6 +76,8 @@ export default function UserEditModal({ isOpen, onClose, userId, onUpdated }) {
       console.error("Approval failed: missing firebaseUid");
       return;
     }
+
+    
 
     try {
       await updateUser({

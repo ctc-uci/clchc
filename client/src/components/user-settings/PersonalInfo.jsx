@@ -30,7 +30,7 @@ const ROLE_LABELS = {
   master: "Master",
 };
 
-export default function PersonalInfo() {
+export default function PersonalInfo({activeEditingKey, setActiveEditingKey}) {
   const userData = useUserContext();
   const { currentUser } = useAuthContext();
   const { mutateAsync: update } = useUpdateUser();
@@ -51,6 +51,7 @@ export default function PersonalInfo() {
     email: false,
     role: false,
   });
+  const [editingKey, setEditingKey] = useState("");
 
   useEffect(() => {
     if (dbUser) {
@@ -65,8 +66,9 @@ export default function PersonalInfo() {
 
   if (!dbUser) return null;
 
-  const updateUserProp = (key, value) =>
+  const updateUserProp = (key, value) => {
     setUserInfo((prev) => ({ ...prev, [key]: value }));
+  }
 
   const handleSave = async () => {
     if (!dbUser?.id) return false;
@@ -82,6 +84,7 @@ export default function PersonalInfo() {
       });
       await refetch();
       setEditing((prev) => ({ ...prev, [pendingKey]: false }));
+      setActiveEditingKey(null)
       return true;
     } catch (_error) {
       return false;
@@ -91,9 +94,20 @@ export default function PersonalInfo() {
   const toggleEdit = (key) => {
     if (editing[key]) {
       setPendingKey(key);
-      onOpen();
+      setEditingKey("");
+      if (userInfo[key] !== dbUser[key]) {
+        onOpen();
+      } else {
+        setEditing((prev) => ({ ...prev, [key]: false }));
+        setActiveEditingKey(null);
+      }
     } else {
+      // Prevents editing if another field is being edited
+      if (activeEditingKey && activeEditingKey !== key) return;
+
       setEditing((prev) => ({ ...prev, [key]: true }));
+      setEditingKey(key);
+      setActiveEditingKey(key);
     }
   };
 
@@ -203,6 +217,7 @@ export default function PersonalInfo() {
                     aria-label={isEditMode ? `Save ${label}` : `Edit ${label}`}
                     onClick={() => toggleEdit(key)}
                     flexShrink={0}
+                    disabled={activeEditingKey && activeEditingKey !== key}
                   />
                 )}
               </Flex>
