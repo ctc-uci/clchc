@@ -24,7 +24,7 @@ import {
 import { useTags, useCreateTag, useDeleteTag } from "@/contexts/hooks/data-fetching/useTags";
 import { errorToString } from "@/utils/utils";
 import { ChevronDown } from "lucide-react";
-import { MdDeleteOutline } from "react-icons/md";
+import { MdDelete } from "react-icons/md";
 
 const TagSelect = ({
   categoryId,
@@ -342,7 +342,7 @@ const TagSelect = ({
                           handleDeleteTag(tag)(e);
                         }}
                       >
-                        <Icon as={MdDeleteOutline} boxSize="20px" />
+                        <Icon as={MdDelete} boxSize="20px" />
                       </Button>
                     )}
                   </HStack>
