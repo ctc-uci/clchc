@@ -33,6 +33,7 @@ const TagSelect = ({
   onTagsChange,
   readOnly,
   onDifferentChange,
+  isInvalid,
 }) => {
   const { data: tagsData } = useTags();
   const { mutateAsync: createTag } = useCreateTag();
@@ -266,7 +267,7 @@ const TagSelect = ({
           lineHeight={"20px"}
           fontStyle={"normal"}
           borderRadius={"4px"}
-          border={"1px solid var(--gray-200, #E2E8F0)"}
+          border={isInvalid ? "1px solid #FC8181" : "1px solid var(--gray-200, #E2E8F0)"}
           background={"var(--white, #FFF)"}
         >
           Select

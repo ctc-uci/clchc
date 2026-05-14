@@ -158,14 +158,15 @@ const ProviderFormFields = ({
     justifyContent: "center",
     alignItems: "center",
     gap: "10px",
-    borderRadius: "2px",
-    border: "1px solid var(--gray-200, #E2E8F0)",
+    borderRadius: "4px",
+    borderWidth: "1px",
+    borderColor: "gray.200",
     background: readOnly ? "var(--gray-50, #F7FAFC)" : "var(--white, #FFF)",
-    fontFamily: "Lato",
     fontStyle: "normal",
     fontSize: "14px",
     fontWeight: "400",
     lineHeight: "normal",
+    _invalid: { borderColor: "red.300" },
   };
 
   const fixedLabelProps = {
@@ -303,22 +304,17 @@ const ProviderFormFields = ({
                     isReadOnly={readOnly}
                     bg={readOnly ? "gray.50" : "white"}
                     color="gray.700"
-                    display={"flex"}
-                    // minW={"100px"}
-                    w={"100%"}
-                    // minH={"30x"}
-                    padding={"5px 10px"}
-                    justifyContent={"center"}
-                    alignItems={"center"}
-                    gap={"10px"}
-                    borderRadius={"2px"}
-                    border={"1px solid var(--gray-200, #E2E8F0)"}
-                    background={"var(--white, #FFF);"}
-                    fontFamily={"Lato"}
-                    fontStyle={"normal"}
-                    fontSize={"14px"}
-                    fontWeight={"400"}
-                    lineHeight={"normal"}
+                    w="100%"
+                    padding="5px 10px"
+                    borderRadius="4px"
+                    borderWidth="1px"
+                    borderColor="gray.200"
+                    background="var(--white, #FFF)"
+                    fontStyle="normal"
+                    fontSize="14px"
+                    fontWeight="400"
+                    lineHeight="normal"
+                    _invalid={{ borderColor: "red.300" }}
                   />
                 )}
 
@@ -333,6 +329,7 @@ const ProviderFormFields = ({
                     }}
                     readOnly={readOnly}
                     onDifferentChange={onDifferentChange}
+                    isInvalid={!!errors[cat.id]}
                   />
                 )}
 
@@ -358,16 +355,16 @@ const ProviderFormFields = ({
           onChange={(e) => onChange("notes", e.target.value)}
           isReadOnly={readOnly}
           bg={readOnly ? "gray.50" : "white"}
-          fontFamily="Lato"
           fontSize="14px"
           fontWeight="400"
           color="gray.700"
-          borderRadius="6px"
-          border="1px solid var(--gray-200, #E2E8F0)"
+          borderRadius="4px"
+          borderWidth="1px"
+          borderColor="gray.200"
           background="var(--white, #FFF)"
           resize="vertical"
           rows={4}
-          h={"80px"}
+          h="80px"
         />
       </FormControl>
     </Flex>
@@ -537,6 +534,7 @@ const ProviderDrawer = ({
     setIsTagDifferent(false);
     setActiveMode(mode);
     setFormValues({});
+    setErrors({});
     onClose();
   };
 

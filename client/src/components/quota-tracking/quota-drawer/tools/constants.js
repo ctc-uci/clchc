@@ -7,16 +7,17 @@ export const TYPE_OPTIONS = [
 
 export const inputStyles = {
   bg: "white",
-  borderColor: "gray.300",
-  borderRadius: "6px",
+  borderColor: "gray.200",
+  borderRadius: "4px",
   _placeholder: { color: "gray.400" },
   _disabled: { bg: "gray.50", color: "gray.500", opacity: 1 },
+  _invalid: { borderColor: "red.300" },
 };
 
 export const selectStyles = {
   bg: "white",
-  borderColor: "gray.300",
-  borderRadius: "6px",
+  borderColor: "gray.200",
+  borderRadius: "4px",
   _placeholder: { color: "gray.400" },
   _disabled: { bg: "gray.50", color: "gray.500", opacity: 1 },
 };

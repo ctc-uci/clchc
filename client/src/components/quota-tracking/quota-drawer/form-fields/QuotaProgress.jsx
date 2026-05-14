@@ -17,6 +17,7 @@ export function QuotaProgress({
   progress,
   setProgress,
   isLocked,
+  isInvalid,
 }) {
   const safeQuota = Number(quota) || 0;
   const safeProgress = Number(progress) || 0;
@@ -47,8 +48,8 @@ export function QuotaProgress({
       <>
         <Progress
           value={percent}
-          height="10px"
-          borderRadius="999px"
+          height="16px"
+          borderRadius="4px"
           bg="gray.200"
           my={2}
           colorScheme="green"
@@ -78,7 +79,7 @@ export function QuotaProgress({
           >
             <Box
               position="relative"
-              w="109px"
+              w="110px"
             >
               <NumberInput
                 value={progress}
@@ -86,11 +87,10 @@ export function QuotaProgress({
                 max={MAX_INPUT_NUMBER}
                 variant="unstyled"
                 onChange={numberInputHandlerFactory(setProgress)}
-                border="1px"
-                borderColor="gray.300"
-                borderRadius="6px"
+                border={isInvalid ? "1px solid #FC8181" : "1.5px solid var(--gray-200, #E2E8F0)"}
+                borderRadius="9px"
                 size="lg"
-                w="109px"
+                w="110px"
               >
                 <NumberInputField
                   textAlign="center"
@@ -99,8 +99,8 @@ export function QuotaProgress({
                   color="black"
                   placeholder=" "
                   bg="white"
-                  borderRadius="6px"
-                  h="72px"
+                  borderRadius="9px"
+                  h="70px"
                 />
               </NumberInput>
             </Box>
@@ -119,7 +119,7 @@ export function QuotaProgress({
 
             <Box
               position="relative"
-              w="109px"
+              w="110px"
             >
               <NumberInput
                 value={quota}
@@ -128,10 +128,9 @@ export function QuotaProgress({
                 max={MAX_INPUT_NUMBER}
                 variant="unstyled"
                 onChange={numberInputHandlerFactory(setQuota)}
-                border="1px"
-                borderColor="gray.300"
-                borderRadius="6px"
-                w="109px"
+                border={isInvalid ? "1px solid #FC8181" : "1.5px solid var(--gray-200, #E2E8F0)"}
+                borderRadius="9px"
+                w="110px"
               >
                 <NumberInputField
                   textAlign="center"
@@ -139,8 +138,8 @@ export function QuotaProgress({
                   p={0}
                   color="black"
                   bg="white"
-                  borderRadius="6px"
-                  h="72px"
+                  borderRadius="9px"
+                  h="70px"
                 />
               </NumberInput>
             </Box>
