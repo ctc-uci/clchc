@@ -328,7 +328,7 @@ export default function ProviderTable({
         </Td>
         {dynamicCells}
         <Td {...fixedTdProps}>
-          {provider.notes && provider.notes.length > 100 ? (
+          {provider.notes && provider.notes.length > 50 ? (
             <TextPopup
               text={provider.notes}
               truncateAt={100}

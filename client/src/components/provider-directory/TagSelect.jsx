@@ -24,7 +24,7 @@ import {
 import { useTags, useCreateTag, useDeleteTag } from "@/contexts/hooks/data-fetching/useTags";
 import { errorToString } from "@/utils/utils";
 import { ChevronDown } from "lucide-react";
-import { MdDeleteOutline } from "react-icons/md";
+import { MdDelete } from "react-icons/md";
 
 const TagSelect = ({
   categoryId,
@@ -33,6 +33,7 @@ const TagSelect = ({
   onTagsChange,
   readOnly,
   onDifferentChange,
+  isInvalid,
 }) => {
   const { data: tagsData } = useTags();
   const { mutateAsync: createTag } = useCreateTag();
@@ -82,14 +83,12 @@ const TagSelect = ({
     );
     if (alreadyExists) {
       toast({
-        title: "Tag already exists",
-        status: "warning",
         position: "top-right",
         duration: 5000,
         isClosable: true,
         containerStyle: { width: "401px", maxWidth: "401px", height: "66px", maxHeight: "66px" },
         render: ({ onClose }) => (
-          <ToastAlert status="success" borderColor="#0C824D" title="Tag Created" description="New tag created!" onClose={onClose} />
+          <ToastAlert status="warning" borderColor="#DD6B20" title="Tag Already Exists" description={`"${trimmedTag}" already exists.`} onClose={onClose} />
         ),
       });
       return false;
@@ -102,6 +101,15 @@ const TagSelect = ({
     onTagsChange([...new Set([...selectedIds, newTag.id])]);
     setNewTagValue("");
     setIsAddingTag(false);
+    toast({
+      position: "top-right",
+      duration: 5000,
+      isClosable: true,
+      containerStyle: { width: "401px", maxWidth: "401px", height: "66px", maxHeight: "66px" },
+      render: ({ onClose }) => (
+        <ToastAlert status="success" borderColor="#0C824D" title="Tag Created" description={`"${trimmedTag}" has been added.`} onClose={onClose} />
+      ),
+    });
     return true;
   };
 
@@ -157,17 +165,28 @@ const TagSelect = ({
         ...selectedIds.filter((id) => !pendingDeleteIds.includes(id)),
       ];
       onTagsChange([...new Set(finalIds)]);
+      const deletedCount = pendingDeleteIds.length;
       setPendingDeleteIds([]);
       setMenuOpen(false);
+      toast({
+        position: "top-right",
+        duration: 5000,
+        isClosable: true,
+        containerStyle: { width: "401px", maxWidth: "401px", height: "66px", maxHeight: "66px" },
+        render: ({ onClose }) => (
+          <ToastAlert status="error" borderColor="#90080F" title="Tag Deleted" description={`${deletedCount} tag${deletedCount > 1 ? "s have" : " has"} been deleted.`} onClose={onClose} />
+        ),
+      });
     } catch (err) {
       console.error("Failed to save tag changes", err);
       toast({
-        title: "Error",
-        description: errorToString(err),
-        status: "error",
-        position: "bottom-right",
+        position: "top-right",
         duration: 5000,
         isClosable: true,
+        containerStyle: { width: "401px", maxWidth: "401px", height: "66px", maxHeight: "66px" },
+        render: ({ onClose }) => (
+          <ToastAlert status="error" borderColor="#90080F" title="Error" description={errorToString(err)} onClose={onClose} />
+        ),
       });
     }
   };
@@ -248,7 +267,7 @@ const TagSelect = ({
           lineHeight={"20px"}
           fontStyle={"normal"}
           borderRadius={"4px"}
-          border={"1px solid var(--gray-200, #E2E8F0)"}
+          border={isInvalid ? "1px solid #FC8181" : "1px solid var(--gray-200, #E2E8F0)"}
           background={"var(--white, #FFF)"}
         >
           Select
@@ -324,7 +343,7 @@ const TagSelect = ({
                           handleDeleteTag(tag)(e);
                         }}
                       >
-                        <Icon as={MdDeleteOutline} boxSize="20px" />
+                        <Icon as={MdDelete} boxSize="20px" />
                       </Button>
                     )}
                   </HStack>

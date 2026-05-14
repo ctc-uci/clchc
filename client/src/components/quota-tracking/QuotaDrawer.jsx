@@ -196,6 +196,7 @@ export default function QuotaDrawer({
     if (!endTime) newErrors.endTime = true;
     if (!locationId) newErrors.locationId = true;
     if (!type) newErrors.type = true;
+    if (!quota) newErrors.quota = true;
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -440,6 +441,7 @@ export default function QuotaDrawer({
                   progress={progress}
                   setProgress={setProgress}
                   isLocked={isLocked}
+                  isInvalid={!!errors.quota}
                 />
               </Stack>
             </DrawerBody>

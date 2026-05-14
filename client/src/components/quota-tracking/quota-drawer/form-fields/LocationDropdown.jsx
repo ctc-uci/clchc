@@ -25,7 +25,7 @@ import {
   useDeleteLocation,
 } from "@/contexts/hooks/data-fetching/useLocations";
 import { ChevronDown } from "lucide-react";
-import { MdDeleteOutline } from "react-icons/md";
+import { MdDelete } from "react-icons/md";
 
 export function LocationDropdown({ locations = [], locationId, setLocationId, isLocked, isInvalid }) {
   const createLocation = useCreateLocation();
@@ -274,7 +274,7 @@ export function LocationDropdown({ locations = [], locationId, setLocationId, is
                         _active={{ bg: "transparent" }}
                       >
                         <Icon
-                          as={MdDeleteOutline}
+                          as={MdDelete}
                           boxSize="20px"
                         />
                       </Button>

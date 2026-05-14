@@ -93,6 +93,7 @@ function SortableCategory({ category, onDelete, isPendingDelete, isPendingCreate
       mb={3}
       height="48px"
       borderRadius="6px"
+      border={isPendingDelete ? "1px solid #CE0000" : isPendingCreate ? "1px solid #0052CE" : "1px solid #E2E8F0"}
     >
       <Flex
         align="center"
@@ -113,7 +114,6 @@ function SortableCategory({ category, onDelete, isPendingDelete, isPendingCreate
       </Flex>
       <Flex
         borderRadius="0 6px 6px 0"
-        border={isPendingDelete ? "1px solid #CE0000" : isPendingCreate ? "1px solid #0052CE" : "1px solid #E2E8F0"}
         width="100%"
         height="100%"
         align="center"
@@ -625,7 +625,7 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
                 )}
 
                 <Box
-                  border="1px solid #E2E8F0"
+                  // border="1px solid #E2E8F0"
                   p="12px"
                   mt={6}
                 >
@@ -665,7 +665,7 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
                       onClick={() => setShowForm(!showForm)}
                       width="100%"
                       bg="#EDF2F7"
-                      borderRadius="10px"
+                      borderRadius="6px"
                       fontWeight="400"
                       fontStyle="normal"
                       fontSize="16px"
@@ -678,9 +678,10 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
 
                   {showForm && pendingDeleteIds.length === 0 && createPhase !== "confirming" && deletePhase !== "confirming" && (
                     <Stack
-                      gap={4}
+                      gap="20px"
                       mt={4}
-                      p={4}
+                      px="20px"
+                      py="25px"
                       borderWidth={1}
                       borderRadius="10px"
                       ref={formStackRef}
@@ -695,7 +696,7 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
                             bg="white"
                             type="text"
                             placeholder="Category Name"
-                            borderRadius="2px"
+                            borderRadius="4px"
                             value={name}
                             onChange={(e) => {
                               setName(e.target.value);
@@ -728,7 +729,20 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
                           <Checkbox
                             isChecked={!isRequired}
                             onChange={() => setIsRequired(!isRequired)}
-                            border="2px solid #718096"
+                            sx={{
+                              "& .chakra-checkbox__control": {
+                                borderRadius: "50%",
+                                border: "2px solid #718096",
+                              },
+                              "& .chakra-checkbox__control[data-checked]": {
+                                bg: "#3182CE",
+                                border: "2px solid #3182CE",
+                                boxShadow: "inset 0 0 0 3px white",
+                              },
+                              "& .chakra-checkbox__control svg": {
+                                display: "none",
+                              },
+                            }}
                           />
                           Optional?
                         </Flex>
@@ -848,7 +862,7 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
                           height="40px"
                           fontSize="16px"
                           fontWeight="400"
-                          borderRadius="10px"
+                          borderRadius="6px"
                           leftIcon={<Icon as={HiMinusSm} boxSize="24px" />}
                         >
                           Discard
@@ -861,7 +875,7 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
                           height="40px"
                           fontSize="16px"
                           fontWeight="400"
-                          borderRadius="10px"
+                          borderRadius="6px"
                         >
                           + Create
                         </Button>
