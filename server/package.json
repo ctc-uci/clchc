@@ -4,12 +4,15 @@
   "private": true,
   "type": "module",
   "main": "index.js",
-  "repository": "git@github.com:ctc-uci/npo-template-merged.git",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/ctc-uci/npo-template-merged.git"
+  },
   "author": "CTC <ctc@uci.edu>",
   "license": "MIT",
   "scripts": {
     "start": "tsx watch --clear-screen=false src/server.ts",
-    "test": "vitest --run",
+    "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint",
     "format": "npx prettier --write ."
@@ -27,6 +30,7 @@
     "firebase-admin": "^12.4.0",
     "mongoose": "^8.2.0",
     "mysql": "^2.18.1",
+    "node-cron": "^4.2.1",
     "node-schedule": "^2.1.1",
     "nodemailer": "^8.0.0",
     "nodemon": "^2.0.14",
@@ -54,6 +58,12 @@
     "typescript": "5.5.3",
     "typescript-eslint": "^8.1.0",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "1"
-  }
+    "vitest": "^4.1.4"
+  },
+  "description": "",
+  "keywords": [],
+  "bugs": {
+    "url": "https://github.com/ctc-uci/npo-template-merged/issues"
+  },
+  "homepage": "https://github.com/ctc-uci/npo-template-merged#readme"
 }

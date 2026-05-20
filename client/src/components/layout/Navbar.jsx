@@ -6,7 +6,10 @@ import { NavLink, useLocation } from "react-router-dom";
 
 const useIsActive = (pathname) => {
   const location = useLocation();
-  return location.pathname === pathname || location.pathname.startsWith(`${pathname}/`);
+  return (
+    location.pathname === pathname ||
+    location.pathname.startsWith(`${pathname}/`)
+  );
 };
 
 export const Navbar = () => {

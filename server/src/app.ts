@@ -12,11 +12,8 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
-import schedule from "node-schedule"; // TODO: Keep only if scheduling cronjobs
 
 dotenv.config();
-
-schedule.scheduleJob("0 0 0 0 0", () => console.info("Hello Cron Job!")); // TODO: delete sample cronjob
 
 const CLIENT_HOSTNAME =
   process.env.NODE_ENV === "development"
@@ -45,6 +42,7 @@ app.use("/quota", quotaRouter);
 app.use("/directoryCategories", directoryCategoriesRouter);
 app.use("/location", locationRouter);
 app.use("/providers", providersRouter);
+
 
 // Listening is moved to server.ts to enable importing app in tests
 export default app;
