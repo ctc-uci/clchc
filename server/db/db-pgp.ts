@@ -1,6 +1,8 @@
 // TODO: keep file only if using postgresql
-
+import dotenv from "dotenv";
 import pgPromise from "pg-promise";
+
+dotenv.config();
 
 const host =
   process.env.NODE_ENV !== "production"
