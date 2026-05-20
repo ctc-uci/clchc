@@ -6,7 +6,10 @@ import { NavLink, useLocation } from "react-router-dom";
 
 const useIsActive = (pathname) => {
   const location = useLocation();
-  return location.pathname === pathname || location.pathname.startsWith(`${pathname}/`);
+  return (
+    location.pathname === pathname ||
+    location.pathname.startsWith(`${pathname}/`)
+  );
 };
 
 export const Navbar = () => {
@@ -62,15 +65,6 @@ export const Navbar = () => {
         {...getLinkProps(isProviderActive)}
       >
         Provider Directory
-      </Link>
-
-
-      <Link
-        as={NavLink}
-        to="/version-log"
-        {...getLinkProps(isVersionActive)}
-      >
-        Audit Log
       </Link>
 
       {role === "master" || role === "ccm" ? (
