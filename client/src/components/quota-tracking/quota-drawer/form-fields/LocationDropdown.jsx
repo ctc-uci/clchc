@@ -24,6 +24,7 @@ import {
   useCreateLocation,
   useDeleteLocation,
 } from "@/contexts/hooks/data-fetching/useLocations";
+import ToastAlert from "@/components/common/ToastAlert";
 import { ChevronDown } from "lucide-react";
 import { MdDelete } from "react-icons/md";
 
@@ -74,6 +75,22 @@ export function LocationDropdown({ locations = [], locationId, setLocationId, is
     const trimmed = newValue.trim();
     if (!trimmed) return;
 
+    const alreadyExists = locations.some(
+      (l) => l.tagValue.toLowerCase() === trimmed.toLowerCase()
+    );
+    if (alreadyExists) {
+      toast({
+        position: "top-right",
+        duration: 5000,
+        isClosable: true,
+        containerStyle: { width: "401px", maxWidth: "401px", height: "66px", maxHeight: "66px" },
+        render: ({ onClose }) => (
+          <ToastAlert status="warning" borderColor="#DD6B20" title="Location Already Exists" description={`"${trimmed}" already exists.`} onClose={onClose} />
+        ),
+      });
+      return;
+    }
+
     try {
       const result = await createLocation.mutateAsync({ tagValue: trimmed });
       const newLocation = Array.isArray(result) ? result[0] : result;
@@ -82,12 +99,13 @@ export function LocationDropdown({ locations = [], locationId, setLocationId, is
       handleCancel();
     } catch (_err) {
       toast({
-        title: "Error",
-        description: "Failed to create location",
-        status: "error",
-        position: "bottom-right",
+        position: "top-right",
         duration: 5000,
         isClosable: true,
+        containerStyle: { width: "401px", maxWidth: "401px", height: "66px", maxHeight: "66px" },
+        render: ({ onClose }) => (
+          <ToastAlert status="error" borderColor="#90080F" title="Error" description="Failed to create location" onClose={onClose} />
+        ),
       });
     }
   };

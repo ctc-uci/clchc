@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import ToastAlert from "@/components/common/ToastAlert";
 import { CloseIcon } from "@chakra-ui/icons";
 import {
   Alert,
@@ -343,6 +344,27 @@ const CategoryDrawer = ({ isOpen, onClose, onSaved }) => {
   const handleAddCategory = () => {
     if (!name.trim()) {
       setNameError(true);
+      return;
+    }
+
+    const trimmed = name.trim();
+    const allNames = [
+      ...categories.map((c) => c.name),
+      ...LOCKED_COLUMNS.map((c) => c.name),
+    ];
+    const alreadyExists = allNames.some(
+      (n) => n.toLowerCase() === trimmed.toLowerCase()
+    );
+    if (alreadyExists) {
+      toast({
+        position: "top-right",
+        duration: 5000,
+        isClosable: true,
+        containerStyle: { width: "401px", maxWidth: "401px", height: "66px", maxHeight: "66px" },
+        render: ({ onClose }) => (
+          <ToastAlert status="warning" borderColor="#DD6B20" title="Category Already Exists" description={`"${trimmed}" already exists.`} onClose={onClose} />
+        ),
+      });
       return;
     }
 
