@@ -115,6 +115,13 @@ export default function UserTable({
     onOpen();
   };
 
+  const canEdit = (targetUser) => {
+    if (targetUser.id === dbUser?.id) return false;
+    if (dbUser?.role === "master") return targetUser.role !== "master";
+    if (dbUser?.role === "ccm") return targetUser.role === "viewer" || targetUser.role === "ccs";
+    return false;
+  };
+
   const roleColors = {
     master: { bg: "#573D59", color: "white" },
     ccm: { bg: "#07B8AC", color: "white" },
@@ -193,7 +200,7 @@ export default function UserTable({
                   </Td>
                   <Td {...tdProps} borderRight="none">
                     <Stack direction="row">
-                      {user.role !== "master" && user.id !== dbUser?.id && (
+                      {canEdit(user) && (
                         <IconButton
                           aria-label="Edit"
                           variant="ghost"
