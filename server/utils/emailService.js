@@ -33,15 +33,24 @@ export async function notifyCcmNewUserRequest(name, email) {
       </div>
     `;
 
-    // Query for CCM's email address
-    const rows = await db.query(`SELECT email FROM users WHERE role = 'ccm'`);
-    // Validate email
-    if (!rows || !rows.length) throw new Error("Cannot find ccm.");
-    const ccmEmail = rows[0].email;
+    const masterRows = await db.query(`SELECT email FROM users WHERE role = 'master'`);
+    const ccmRows = await db.query(`SELECT email FROM users WHERE role = 'ccm'`);
+
+    if ((!masterRows || !masterRows.length) && (!ccmRows || !ccmRows.length)) {
+      throw new Error("Cannot find any master or ccm users.");
+    }
+
+    if (masterRows.length > 1) {
+      throw new Error(`Expected at most one master user, found ${masterRows.length}.`);
+    }
+
+    const masterEmails = masterRows.map((r) => r.email).join(", ");
+    const ccmEmails = ccmRows.map((r) => r.email).join(", ");
 
     await transporter.sendMail({
       from: `"Admin" <${process.env.EMAIL_USER}>`,
-      to: ccmEmail,
+      to: masterEmails || undefined,
+      cc: ccmEmails || undefined,
       subject: "New User Request",
       text: `New user request from ${sanitizedName} (${sanitizedEmail})`,
       html: emailMessage,
